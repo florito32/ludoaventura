@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '1.3';
+  var VERSION = '1.4';
 
   var HISTORY = [
+    { v: '1.4', date: '2026-10-27', changes: [
+      'Accessibilité : contrastes des couleurs renforcés, focus clavier visible, lien « Aller au contenu ».',
+      'Référencement : adresse canonique, aperçus de partage, plan du site.'
+    ] },
     { v: '1.3', date: '2026-10-27', changes: [
       'Nouvelle page d\u2019accueil Ludoaventura qui présente les aventures.',
       'Le monde des éléphants devient la première aventure (adresse : /elephants/).'
@@ -55,9 +59,9 @@
       var btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'version-badge';
-      btn.textContent = 'v' + VERSION;
+      // Texte visible « v1.x » + précision réservée aux lecteurs d'écran.
+      btn.innerHTML = 'v' + VERSION + '<span class="visually-hidden"> — historique des versions</span>';
       btn.setAttribute('aria-haspopup', 'dialog');
-      btn.setAttribute('aria-label', 'Version ' + VERSION + ' : voir l’historique des changements');
       btn.addEventListener('click', function () { dialog.showModal(); });
       slot.appendChild(btn);
     });

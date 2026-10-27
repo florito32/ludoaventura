@@ -1,7 +1,7 @@
 // Service worker Ludoaventura.
 // Stratégie « réseau d'abord » : en ligne, on sert toujours la dernière version publiée
 // (mise à jour automatique, sans bouton) ; hors ligne, on sert la copie en cache.
-const CACHE = 'ludoaventura-v1.3';
+const CACHE = 'ludoaventura-v1.4';
 const PRECACHE = ['./', 'index.html', 'css/site.css', 'elephants/', 'js/version.js', 'js/pwa.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon.svg'];
 
 self.addEventListener('install', (event) => {

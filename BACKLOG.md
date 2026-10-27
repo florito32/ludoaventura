@@ -10,7 +10,7 @@ Statuts : à faire / en cours / fait à valider / terminé / question en attente
 | 4 | Mettre en ligne sur GitHub Pages | terminé (déjà actif depuis `main` : https://florito32.github.io/ludoaventura/) | test en ligne automatique après chaque déploiement (workflow « Test en ligne ») |
 | 5 | Rendre le site installable (PWA) avec mise à jour automatique | fait à valider (v1.2, PR #5 : manifeste, icônes, service worker réseau d'abord, hors ligne) | ✅ 24/24 en local + CI + test en ligne |
 | 6 | Tests Playwright (parcours, mobile / tablette / ordinateur) + GitHub Actions sur chaque PR | terminé (PR #3) | ✅ 12/12 en local (téléphone, téléphone carré, tablette, ordinateur) |
-| 7 | Vérifier SEO et accessibilité de la page actuelle | à faire | |
+| 7 | Vérifier SEO et accessibilité de la page actuelle | fait à valider (v1.4 : accent assombri #9a4e1a pour contraste ≥ 4,5:1 WCAG AA, focus visible, lien d'évitement, canonical, Open Graph, robots.txt, sitemap.xml) | ✅ 65/65 en local, audit axe-core WCAG 2.1 A/AA clair + sombre |
 | 8 | Sourcer les chiffres et affirmations de la page « éléphants » | à faire | |
 | 9 | Clarifier l'objectif du site : le dépôt s'appelle « ludoaventura » mais la page parle d'éléphants | terminé : Ludoaventura = collection d'aventures, les éléphants sont la 1re | — |
 | 10 | Rétablir l'accès GitHub en écriture | terminé (app Claude installée, push + PR + fusion OK) | — |
@@ -20,5 +20,5 @@ Statuts : à faire / en cours / fait à valider / terminé / question en attente
 | 14 | Mettre à jour CLAUDE.md sur GitHub | fait à valider | — |
 | 15 | Supprimer les branches fusionnées `claude/setup-instructions` et `claude/claude-md-autonomie` | question en attente : suppression refusée par le proxy des sessions cloud (API et git push) — à supprimer à la main sur GitHub | |
 | 16 | « Go » : reprendre tout le backlog en autonomie | en cours | |
-| 17 | Structurer le site : accueil Ludoaventura + page éléphants comme 1re aventure | fait à valider (v1.3) — hypothèses à valider : adresse `/elephants/`, carte « Prochaine aventure » sur l'accueil, CSS commun `css/site.css` | ✅ 36/36 en local |
+| 17 | Structurer le site : accueil Ludoaventura + page éléphants comme 1re aventure | fait à valider (v1.3, PR #6) — hypothèses à valider : adresse `/elephants/`, carte « Prochaine aventure » sur l'accueil, CSS commun `css/site.css` | ✅ 36/36 en local + CI |
 | 18 | Accélérer la CI (image officielle Playwright au lieu de l'installation de Chromium) | fait à valider | ✅ |
