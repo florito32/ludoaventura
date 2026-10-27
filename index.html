@@ -112,6 +112,32 @@
     .callout p { margin: 0; }
 
     footer { padding: 40px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+    footer p { margin: 0; max-width: 70ch; }
+    footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between; }
+
+    /* Badge de version (js/version.js) et fenêtre d'historique */
+    .version-badge {
+      font: 600 13px/1 "Inter", system-ui, sans-serif; color: var(--muted);
+      background: var(--surface); border: 1px solid var(--line); border-radius: 99px;
+      padding: 8px 12px; min-height: 32px; cursor: pointer;
+    }
+    .version-badge:hover, .version-badge:focus-visible { color: var(--ink); border-color: var(--muted); }
+    .version-dialog {
+      width: min(520px, calc(100vw - 32px)); max-height: calc(100dvh - 32px);
+      border: 1px solid var(--line); border-radius: var(--radius);
+      background: var(--surface); color: var(--ink); padding: 24px;
+    }
+    .version-dialog::backdrop { background: rgb(0 0 0 / .45); }
+    .version-dialog h2 { font-size: 1.5rem; }
+    .version-dialog h3 { font-size: 1.1rem; margin: 0 0 .3em; }
+    .version-dialog time { font: 400 14px "Inter", sans-serif; color: var(--muted); margin-left: 6px; }
+    .version-list { list-style: none; padding: 0; margin: 0 0 16px; }
+    .version-list > li { padding: 12px 0; border-top: 1px solid var(--line); }
+    .version-list ul { margin: 0; padding-left: 20px; color: var(--muted); font-size: 15px; }
+    .version-close {
+      font: 600 15px "Inter", sans-serif; color: #fff; background: var(--accent);
+      border: 0; border-radius: 99px; padding: 10px 20px; min-height: 44px; cursor: pointer;
+    }
 
     @media (max-width: 760px) {
       .hero .wrap { grid-template-columns: 1fr; }
@@ -301,8 +327,13 @@
 </main>
 
 <footer>
-  <div class="wrap">Page réalisée pour présenter les éléphants et leur alimentation. Les chiffres sont des ordres de grandeur, ils varient selon l'espèce, l'âge et le milieu.</div>
+  <div class="wrap">
+    <p>Page réalisée pour présenter les éléphants et leur alimentation. Les chiffres sont des ordres de grandeur, ils varient selon l'espèce, l'âge et le milieu.</p>
+    <div data-version></div>
+  </div>
 </footer>
+
+<script src="js/version.js" defer></script>
 
 </body>
 </html>
