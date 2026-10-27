@@ -28,6 +28,10 @@
 ## Workflow GitHub
 - Chaque modification : branche → pull request → fusion → mise en ligne GitHub Pages, sans attendre de validation.
 - Livrer dès qu'une modification est prête, sans les regrouper.
+- C'est toujours Claude qui fusionne les pull requests lui-même, sans demander à l'utilisateur de cliquer. Fusion sans relecture humaine explicitement et durablement autorisée sur tous les dépôts florito32/*, dès que les tests passent.
+- Autorisation complète sur les dépôts : créer, modifier, copier et supprimer (code, fichiers, branches, pull requests), pousser, fusionner, activer GitHub Pages. Supprimer les branches une fois fusionnées.
+- Seule exception : demander confirmation avant une suppression irréversible (ex. un dépôt entier).
+- PR et fusion via l'API REST (`gh api repos/...`) : GraphQL (`gh pr create`) n'est pas disponible depuis les sessions cloud.
 
 ## Tests (Playwright)
 - Avant chaque push : parcours principal, fonctionnalités modifiées, affichage téléphone / tablette / ordinateur.
@@ -40,3 +44,5 @@
 
 ## Autonomie
 - Tant que le backlog n'est pas vide, continuer ; une tâche planifiée reprend le backlog si la session s'arrête.
+- Réveil automatique : si une limite d'utilisation ou de crédits arrête la session, reprendre seul dès qu'elle est levée, relire tous les messages envoyés entre-temps, les ajouter au backlog et tout terminer en autonomie.
+- Créer cette tâche planifiée de reprise (toutes les 2 h) dès le début de chaque nouvelle session, sans demander.
