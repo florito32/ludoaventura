@@ -1,0 +1,154 @@
+/* Styles communs à toutes les pages Ludoaventura. */
+:root {
+  --bg: #f6f1e7;
+  --surface: #fffaf0;
+  --ink: #2b2620;
+  --muted: #6b6155;
+  --accent: #b5652b;
+  --accent-soft: #f0dcc6;
+  --green: #4f6b3a;
+  --green-soft: #dfe7d2;
+  --line: #e3d8c6;
+  --radius: 18px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1a17;
+    --surface: #26231f;
+    --ink: #efe8dc;
+    --muted: #b3a896;
+    --accent: #e09257;
+    --accent-soft: #3d2c1e;
+    --green: #a8c48d;
+    --green-soft: #2a3324;
+    --line: #3a352e;
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 17px/1.65 "Inter", system-ui, sans-serif;
+}
+h1, h2, h3 { font-family: "Fraunces", Georgia, serif; line-height: 1.15; margin: 0 0 .5em; }
+a { color: var(--accent); }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+
+nav {
+  position: sticky; top: 0; z-index: 10;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+nav .wrap { display: flex; gap: 20px; align-items: center; height: 56px; overflow-x: auto; }
+nav strong { font-family: "Fraunces", serif; white-space: nowrap; }
+nav a.brand { font-family: "Fraunces", serif; font-weight: 600; color: var(--accent); }
+nav a.brand::after { content: " ›"; color: var(--muted); }
+nav a { color: var(--muted); text-decoration: none; font-size: 15px; white-space: nowrap; }
+nav a:hover { color: var(--ink); }
+
+header.hero { padding: 72px 0 56px; }
+.hero .wrap { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: center; }
+.eyebrow { color: var(--accent); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; font-size: 13px; }
+.hero h1 { font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 800; }
+.hero p { font-size: 1.15rem; color: var(--muted); max-width: 52ch; }
+.hero svg { width: 100%; height: auto; }
+
+section { padding: 56px 0; border-top: 1px solid var(--line); }
+section h2 { font-size: clamp(1.8rem, 4vw, 2.5rem); }
+.lead { color: var(--muted); max-width: 65ch; margin-bottom: 32px; }
+
+.grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+.card h3 { font-size: 1.3rem; }
+.card p { margin: 0; color: var(--muted); }
+.tag {
+  display: inline-block; font-size: 13px; font-weight: 600;
+  padding: 3px 10px; border-radius: 99px; margin-bottom: 12px;
+  background: var(--accent-soft); color: var(--accent);
+}
+.tag.green { background: var(--green-soft); color: var(--green); }
+.status { font-size: 14px; margin-top: 12px !important; }
+
+.stats { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-top: 8px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+.stat b { display: block; font-family: "Fraunces", serif; font-size: 2rem; color: var(--accent); }
+.stat span { color: var(--muted); font-size: 15px; }
+
+.food-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.food-list li { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 20px; }
+.food-list .emoji { font-size: 1.8rem; display: block; margin-bottom: 6px; }
+.food-list strong { display: block; margin-bottom: 4px; }
+.food-list p { margin: 0; color: var(--muted); font-size: 15px; }
+
+.day { position: relative; margin: 24px 0 0; padding-left: 28px; border-left: 3px solid var(--accent-soft); }
+.day div { margin-bottom: 20px; position: relative; }
+.day div::before {
+  content: ""; position: absolute; left: -36px; top: 7px;
+  width: 13px; height: 13px; border-radius: 50%; background: var(--accent);
+}
+.day b { color: var(--accent); }
+
+.callout {
+  background: var(--green-soft); color: var(--ink);
+  border-radius: var(--radius); padding: 24px 28px; margin-top: 32px;
+}
+.callout h3 { color: var(--green); font-size: 1.25rem; }
+.callout p { margin: 0; }
+
+footer { padding: 40px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+footer p { margin: 0; max-width: 70ch; }
+footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between; }
+
+/* Badge de version (js/version.js) et fenêtre d'historique */
+.version-badge {
+  font: 600 13px/1 "Inter", system-ui, sans-serif; color: var(--muted);
+  background: var(--surface); border: 1px solid var(--line); border-radius: 99px;
+  padding: 8px 12px; min-height: 32px; cursor: pointer;
+}
+.version-badge:hover, .version-badge:focus-visible { color: var(--ink); border-color: var(--muted); }
+.version-dialog {
+  width: min(520px, calc(100vw - 32px)); max-height: calc(100dvh - 32px);
+  border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--surface); color: var(--ink); padding: 24px;
+}
+.version-dialog::backdrop { background: rgb(0 0 0 / .45); }
+.version-dialog h2 { font-size: 1.5rem; }
+.version-dialog h3 { font-size: 1.1rem; margin: 0 0 .3em; }
+.version-dialog time { font: 400 14px "Inter", sans-serif; color: var(--muted); margin-left: 6px; }
+.version-list { list-style: none; padding: 0; margin: 0 0 16px; }
+.version-list > li { padding: 12px 0; border-top: 1px solid var(--line); }
+.version-list ul { margin: 0; padding-left: 20px; color: var(--muted); font-size: 15px; }
+.version-close {
+  font: 600 15px "Inter", sans-serif; color: #fff; background: var(--accent);
+  border: 0; border-radius: 99px; padding: 10px 20px; min-height: 44px; cursor: pointer;
+}
+
+@media (max-width: 760px) {
+  .hero .wrap { grid-template-columns: 1fr; }
+  header.hero { padding: 40px 0 32px; }
+  .hero svg { max-width: 320px; margin: 0 auto; }
+}
+
+/* Accueil Ludoaventura : liste des aventures */
+.adventures { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.adventure {
+  display: flex; flex-direction: column; gap: 8px; text-decoration: none; color: inherit;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 24px; transition: border-color .15s, transform .15s;
+}
+a.adventure:hover, a.adventure:focus-visible { border-color: var(--accent); transform: translateY(-2px); }
+.adventure .emoji { font-size: 2.6rem; line-height: 1; }
+.adventure .tag { align-self: flex-start; margin: 4px 0 0; }
+.adventure h3 { font-size: 1.4rem; margin: 4px 0 0; }
+.adventure p { margin: 0; color: var(--muted); }
+.adventure .cta { margin-top: auto; padding-top: 8px; font-weight: 600; color: var(--accent); }
+.adventure.soon { border-style: dashed; background: transparent; }
+.adventure.soon .cta { color: var(--muted); }

@@ -2,18 +2,18 @@
 // Les tests marqués @smoke sont aussi rejoués sur la page en ligne.
 const { test, expect } = require('@playwright/test');
 
-test.describe('Page éléphants', () => {
+test.describe('Aventure éléphants', () => {
   test('se charge sans erreur JavaScript @smoke', async ({ page }) => {
     const errors = [];
     page.on('pageerror', (e) => errors.push(e.message));
-    await page.goto('./');
+    await page.goto('elephants/');
     await expect(page).toHaveTitle(/éléphants/i);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     expect(errors).toEqual([]);
   });
 
   test('chaque lien du menu mène à sa section', async ({ page }) => {
-    await page.goto('./');
+    await page.goto('elephants/');
     const links = page.locator('nav a[href^="#"]');
     const count = await links.count();
     expect(count).toBeGreaterThan(0);
@@ -21,6 +21,30 @@ test.describe('Page éléphants', () => {
       const id = (await links.nth(i).getAttribute('href')).slice(1);
       await expect(page.locator(`#${id}`)).toHaveCount(1);
     }
+  });
+
+  test('pas de défilement horizontal @smoke', async ({ page }) => {
+    await page.goto('elephants/');
+    const overflow = await page.evaluate(
+      () => document.documentElement.scrollWidth - document.documentElement.clientWidth
+    );
+    expect(overflow).toBeLessThanOrEqual(0);
+  });
+});
+
+test.describe('Accueil Ludoaventura', () => {
+  test('présente les aventures et mène aux éléphants @smoke', async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    await page.goto('./');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Ludoaventura');
+    await page.getByRole('link', { name: /Le monde des éléphants/ }).click();
+    await expect(page).toHaveURL(/\/elephants\/$/);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(/éléphants/i);
+    // Retour à l'accueil depuis l'aventure
+    await page.getByRole('link', { name: 'Ludoaventura' }).click();
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Ludoaventura');
+    expect(errors).toEqual([]);
   });
 
   test('pas de défilement horizontal @smoke', async ({ page }) => {

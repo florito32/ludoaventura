@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '1.2';
+  var VERSION = '1.3';
 
   var HISTORY = [
+    { v: '1.3', date: '2026-10-27', changes: [
+      'Nouvelle page d\u2019accueil Ludoaventura qui présente les aventures.',
+      'Le monde des éléphants devient la première aventure (adresse : /elephants/).'
+    ] },
     { v: '1.2', date: '2026-10-27', changes: [
       'Site installable comme une application sur iPhone et Android (PWA).',
       'Mise à jour automatique au lancement et consultation possible hors ligne.'

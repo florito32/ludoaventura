@@ -26,3 +26,9 @@ test('service worker actif et page disponible hors ligne', async ({ page, contex
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await context.setOffline(false);
 });
+
+test('le service worker s\'enregistre aussi depuis une aventure', async ({ page }) => {
+  await page.goto('elephants/');
+  const scope = await page.evaluate(() => navigator.serviceWorker.ready.then((r) => r.scope));
+  expect(new URL(scope).pathname).toBe(new URL('./', page.url()).pathname.replace(/elephants\/$/, ''));
+});
