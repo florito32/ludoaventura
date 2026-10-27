@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '1.1';
+  var VERSION = '1.2';
 
   var HISTORY = [
+    { v: '1.2', date: '2026-10-27', changes: [
+      'Site installable comme une application sur iPhone et Android (PWA).',
+      'Mise à jour automatique au lancement et consultation possible hors ligne.'
+    ] },
     { v: '1.1', date: '2026-10-27', changes: [
       'Affichage du numéro de version ; un clic ouvre cet historique.',
       'Tests automatiques sur téléphone, tablette et ordinateur à chaque modification.'

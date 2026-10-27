@@ -1,4 +1,5 @@
 # Tests Playwright à chaque pull request et à chaque push sur main.
+# Image officielle Playwright : navigateurs déjà installés (CI plus rapide).
 name: Tests
 on:
   pull_request:
@@ -7,10 +8,9 @@ on:
 jobs:
   playwright:
     runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v1.63.0-noble
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 22, cache: npm }
       - run: npm ci
-      - run: npx playwright install --with-deps chromium
       - run: npm test
+        env: { HOME: /root }
