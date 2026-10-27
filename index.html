@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Le monde des éléphants</title>
+  <meta name="description" content="Présentation des éléphants : espèces, mode de vie et alimentation.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f6f1e7;
+      --surface: #fffaf0;
+      --ink: #2b2620;
+      --muted: #6b6155;
+      --accent: #b5652b;
+      --accent-soft: #f0dcc6;
+      --green: #4f6b3a;
+      --green-soft: #dfe7d2;
+      --line: #e3d8c6;
+      --radius: 18px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1c1a17;
+        --surface: #26231f;
+        --ink: #efe8dc;
+        --muted: #b3a896;
+        --accent: #e09257;
+        --accent-soft: #3d2c1e;
+        --green: #a8c48d;
+        --green-soft: #2a3324;
+        --line: #3a352e;
+      }
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 17px/1.65 "Inter", system-ui, sans-serif;
+    }
+    h1, h2, h3 { font-family: "Fraunces", Georgia, serif; line-height: 1.15; margin: 0 0 .5em; }
+    a { color: var(--accent); }
+    .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+
+    nav {
+      position: sticky; top: 0; z-index: 10;
+      background: color-mix(in srgb, var(--bg) 88%, transparent);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--line);
+    }
+    nav .wrap { display: flex; gap: 20px; align-items: center; height: 56px; overflow-x: auto; }
+    nav strong { font-family: "Fraunces", serif; white-space: nowrap; }
+    nav a { color: var(--muted); text-decoration: none; font-size: 15px; white-space: nowrap; }
+    nav a:hover { color: var(--ink); }
+
+    header.hero { padding: 72px 0 56px; }
+    .hero .wrap { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: center; }
+    .eyebrow { color: var(--accent); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; font-size: 13px; }
+    .hero h1 { font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 800; }
+    .hero p { font-size: 1.15rem; color: var(--muted); max-width: 52ch; }
+    .hero svg { width: 100%; height: auto; }
+
+    section { padding: 56px 0; border-top: 1px solid var(--line); }
+    section h2 { font-size: clamp(1.8rem, 4vw, 2.5rem); }
+    .lead { color: var(--muted); max-width: 65ch; margin-bottom: 32px; }
+
+    .grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .card h3 { font-size: 1.3rem; }
+    .card p { margin: 0; color: var(--muted); }
+    .tag {
+      display: inline-block; font-size: 13px; font-weight: 600;
+      padding: 3px 10px; border-radius: 99px; margin-bottom: 12px;
+      background: var(--accent-soft); color: var(--accent);
+    }
+    .tag.green { background: var(--green-soft); color: var(--green); }
+    .status { font-size: 14px; margin-top: 12px !important; }
+
+    .stats { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-top: 8px; }
+    .stat { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+    .stat b { display: block; font-family: "Fraunces", serif; font-size: 2rem; color: var(--accent); }
+    .stat span { color: var(--muted); font-size: 15px; }
+
+    .food-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .food-list li { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 20px; }
+    .food-list .emoji { font-size: 1.8rem; display: block; margin-bottom: 6px; }
+    .food-list strong { display: block; margin-bottom: 4px; }
+    .food-list p { margin: 0; color: var(--muted); font-size: 15px; }
+
+    .day { position: relative; margin: 24px 0 0; padding-left: 28px; border-left: 3px solid var(--accent-soft); }
+    .day div { margin-bottom: 20px; position: relative; }
+    .day div::before {
+      content: ""; position: absolute; left: -36px; top: 7px;
+      width: 13px; height: 13px; border-radius: 50%; background: var(--accent);
+    }
+    .day b { color: var(--accent); }
+
+    .callout {
+      background: var(--green-soft); color: var(--ink);
+      border-radius: var(--radius); padding: 24px 28px; margin-top: 32px;
+    }
+    .callout h3 { color: var(--green); font-size: 1.25rem; }
+    .callout p { margin: 0; }
+
+    footer { padding: 40px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+
+    @media (max-width: 760px) {
+      .hero .wrap { grid-template-columns: 1fr; }
+      header.hero { padding: 40px 0 32px; }
+      .hero svg { max-width: 320px; margin: 0 auto; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <strong>🐘 Éléphants</strong>
+    <a href="#presentation">Présentation</a>
+    <a href="#especes">Espèces</a>
+    <a href="#alimentation">Alimentation</a>
+    <a href="#journee">Une journée</a>
+    <a href="#protection">Protection</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">Les géants de la savane et de la forêt</div>
+      <h1>Le monde des éléphants</h1>
+      <p>Plus grands animaux terrestres de la planète, les éléphants sont intelligents, sociables et passent la majeure partie de leur journée… à manger. Découvrez qui ils sont et ce qu'ils mettent dans leur assiette.</p>
+    </div>
+    <svg viewBox="0 0 400 300" role="img" aria-label="Illustration d'un éléphant">
+      <ellipse cx="200" cy="278" rx="150" ry="12" fill="currentColor" opacity=".08"/>
+      <g fill="#8f8a84">
+        <ellipse cx="215" cy="160" rx="120" ry="80"/>
+        <rect x="120" y="190" width="34" height="85" rx="14"/>
+        <rect x="170" y="200" width="34" height="75" rx="14"/>
+        <rect x="245" y="200" width="34" height="75" rx="14"/>
+        <rect x="290" y="190" width="34" height="85" rx="14"/>
+        <circle cx="110" cy="125" r="58"/>
+        <path d="M70 140 C50 190, 55 240, 80 262 C88 268, 98 262, 94 254 C76 230, 76 195, 95 160 Z"/>
+        <path d="M333 150 C350 160, 352 185, 345 200" stroke="#8f8a84" stroke-width="7" fill="none" stroke-linecap="round"/>
+      </g>
+      <path d="M135 80 C185 70, 205 120, 190 165 C180 190, 140 195, 128 170 Z" fill="#a39e98"/>
+      <circle cx="98" cy="115" r="6" fill="#2b2620"/>
+      <path d="M78 160 C70 175, 60 180, 48 178" stroke="#f3ecdf" stroke-width="9" fill="none" stroke-linecap="round"/>
+      <g fill="#4f6b3a">
+        <path d="M30 278 C34 250, 40 240, 46 236 C44 252, 42 266, 40 278 Z"/>
+        <path d="M360 278 C356 255, 364 240, 372 232 C370 250, 368 266, 368 278 Z"/>
+      </g>
+    </svg>
+  </div>
+</header>
+
+<main>
+  <section id="presentation">
+    <div class="wrap">
+      <h2>Présentation</h2>
+      <p class="lead">Les éléphants appartiennent à la famille des <em>Elephantidae</em>. Ils vivent en Afrique et en Asie, dans des milieux variés : savanes, forêts tropicales, marais et même zones semi-désertiques.</p>
+      <div class="stats">
+        <div class="stat"><b>jusqu'à 6 t</b><span>pour un grand mâle d'Afrique</span></div>
+        <div class="stat"><b>≈ 4 m</b><span>de hauteur au garrot pour les plus grands</span></div>
+        <div class="stat"><b>60–70 ans</b><span>d'espérance de vie à l'état sauvage</span></div>
+        <div class="stat"><b>22 mois</b><span>de gestation, la plus longue des mammifères</span></div>
+      </div>
+      <div class="grid" style="margin-top:28px">
+        <div class="card">
+          <span class="tag">La trompe</span>
+          <h3>Un outil à tout faire</h3>
+          <p>Fusion du nez et de la lèvre supérieure, la trompe compte des dizaines de milliers de muscles. Elle sert à respirer, sentir, boire, saisir la nourriture, caresser et communiquer.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Les défenses</span>
+          <h3>Des incisives géantes</h3>
+          <p>Les défenses sont des dents qui poussent toute la vie. Elles servent à creuser pour trouver de l'eau, arracher l'écorce, déplacer des obstacles et se défendre.</p>
+        </div>
+        <div class="card">
+          <span class="tag">La famille</span>
+          <h3>Une société matriarcale</h3>
+          <p>Les troupeaux sont menés par la femelle la plus âgée, la matriarche, qui mémorise les points d'eau et les chemins. Les jeunes mâles quittent le groupe vers 12–15 ans.</p>
+        </div>
+        <div class="card">
+          <span class="tag">L'intelligence</span>
+          <h3>Mémoire et émotions</h3>
+          <p>Les éléphants se reconnaissent dans un miroir, communiquent par infrasons sur plusieurs kilomètres et manifestent un comportement particulier face à leurs morts.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="especes">
+    <div class="wrap">
+      <h2>Les trois espèces</h2>
+      <p class="lead">On distingue aujourd'hui trois espèces d'éléphants, faciles à reconnaître à la forme de leurs oreilles et de leur dos.</p>
+      <div class="grid">
+        <div class="card">
+          <span class="tag">Afrique</span>
+          <h3>Éléphant de savane</h3>
+          <p><em>Loxodonta africana</em>. Le plus grand. Grandes oreilles en forme de carte de l'Afrique, défenses chez les mâles et les femelles.</p>
+          <p class="status">Statut UICN : en danger</p>
+        </div>
+        <div class="card">
+          <span class="tag">Afrique</span>
+          <h3>Éléphant de forêt</h3>
+          <p><em>Loxodonta cyclotis</em>. Plus petit, oreilles arrondies, défenses droites orientées vers le bas pour circuler dans la végétation dense.</p>
+          <p class="status">Statut UICN : en danger critique</p>
+        </div>
+        <div class="card">
+          <span class="tag green">Asie</span>
+          <h3>Éléphant d'Asie</h3>
+          <p><em>Elephas maximus</em>. Oreilles plus petites, dos bombé, deux bosses sur le front. Seuls certains mâles portent des défenses.</p>
+          <p class="status">Statut UICN : en danger</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="alimentation">
+    <div class="wrap">
+      <h2>L'alimentation des éléphants</h2>
+      <p class="lead">Les éléphants sont <strong>strictement herbivores</strong>. Leur système digestif est peu efficace : ils n'assimilent qu'environ 40 % de ce qu'ils mangent. Pour compenser, ils mangent énormément et presque sans arrêt.</p>
+
+      <div class="stats">
+        <div class="stat"><b>100–300 kg</b><span>de végétaux par jour</span></div>
+        <div class="stat"><b>16–18 h</b><span>passées à se nourrir chaque jour</span></div>
+        <div class="stat"><b>70–200 L</b><span>d'eau bus quotidiennement</span></div>
+        <div class="stat"><b>≈ 100 kg</b><span>d'excréments produits par jour</span></div>
+      </div>
+
+      <h3 style="margin-top:40px">Au menu</h3>
+      <ul class="food-list">
+        <li><span class="emoji">🌾</span><strong>Herbes et graminées</strong><p>La base du régime, surtout à la saison des pluies quand l'herbe est abondante.</p></li>
+        <li><span class="emoji">🌿</span><strong>Feuilles et branches</strong><p>Arrachées aux arbres et arbustes grâce à la trompe, surtout en saison sèche.</p></li>
+        <li><span class="emoji">🪵</span><strong>Écorce</strong><p>Décollée avec les défenses, riche en fibres et en calcium.</p></li>
+        <li><span class="emoji">🥭</span><strong>Fruits</strong><p>Mangues, figues, marula… Les éléphants de forêt en mangent beaucoup.</p></li>
+        <li><span class="emoji">🥕</span><strong>Racines et tubercules</strong><p>Déterrés avec les pieds et les défenses quand la végétation se fait rare.</p></li>
+        <li><span class="emoji">🪨</span><strong>Minéraux et sel</strong><p>Ils lèchent ou creusent des sols salins pour compléter leurs apports en sodium.</p></li>
+      </ul>
+
+      <div class="grid" style="margin-top:32px">
+        <div class="card">
+          <span class="tag">Comment ils mangent</span>
+          <h3>La trompe et les molaires</h3>
+          <p>La trompe saisit et porte la nourriture à la bouche. Quatre énormes molaires broient les végétaux ; elles sont remplacées six fois au cours de la vie. Quand la dernière est usée, l'éléphant âgé ne peut plus bien se nourrir.</p>
+        </div>
+        <div class="card">
+          <span class="tag green">Selon les saisons</span>
+          <h3>Un régime qui s'adapte</h3>
+          <p>À la saison des pluies, l'herbe fraîche domine. À la saison sèche, les éléphants se tournent vers les feuilles, l'écorce et les racines, et parcourent de longues distances pour trouver de l'eau.</p>
+        </div>
+        <div class="card">
+          <span class="tag">Afrique vs Asie</span>
+          <h3>Des préférences différentes</h3>
+          <p>L'éléphant de savane broute beaucoup d'herbe, l'éléphant de forêt mange davantage de fruits, et l'éléphant d'Asie alterne entre herbes, bambous et feuillages.</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <h3>🌱 Des jardiniers de la nature</h3>
+        <p>En mangeant des fruits, les éléphants dispersent les graines sur des kilomètres dans leurs excréments, qui servent aussi d'engrais. Certains arbres dépendent presque entièrement d'eux pour se reproduire. En abattant des arbres, ils ouvrent aussi des clairières utiles à d'autres animaux.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="journee">
+    <div class="wrap">
+      <h2>Une journée dans la vie d'un éléphant</h2>
+      <p class="lead">Manger occupe l'essentiel du temps. Voici à quoi ressemble une journée typique dans la savane.</p>
+      <div class="day">
+        <div><b>À l'aube</b> — Le troupeau se remet en marche et commence à brouter l'herbe encore humide de rosée.</div>
+        <div><b>En matinée</b> — Arrachage de branches et de feuilles ; les jeunes apprennent en imitant les adultes.</div>
+        <div><b>Midi</b> — Pause à l'ombre ou au point d'eau : on boit, on se baigne et on se couvre de boue pour se protéger du soleil.</div>
+        <div><b>L'après-midi</b> — Reprise de l'alimentation en se déplaçant lentement, parfois sur plus de 10 km.</div>
+        <div><b>La nuit</b> — Les éléphants continuent souvent à manger. Ils ne dorment que 2 à 4 heures, parfois debout.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="protection">
+    <div class="wrap">
+      <h2>Pourquoi les protéger ?</h2>
+      <p class="lead">Le braconnage pour l'ivoire, la perte d'habitat et les conflits avec les agriculteurs menacent les trois espèces. Protéger les éléphants, c'est aussi protéger les forêts et savanes qu'ils façonnent.</p>
+      <div class="grid">
+        <div class="card"><h3>Ne pas acheter d'ivoire</h3><p>Le commerce de l'ivoire alimente le braconnage.</p></div>
+        <div class="card"><h3>Soutenir les réserves</h3><p>Les parcs et corridors écologiques permettent aux troupeaux de se déplacer et de se nourrir.</p></div>
+        <div class="card"><h3>Coexister</h3><p>Des solutions comme les clôtures à ruches éloignent les éléphants des cultures sans les blesser.</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">Page réalisée pour présenter les éléphants et leur alimentation. Les chiffres sont des ordres de grandeur, ils varient selon l'espèce, l'âge et le milieu.</div>
+</footer>
+
+</body>
+</html>
