@@ -1,0 +1,16 @@
+# Tests Playwright à chaque pull request et à chaque push sur main.
+name: Tests
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  playwright:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm test
