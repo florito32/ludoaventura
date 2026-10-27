@@ -55,3 +55,16 @@ test.describe('Accueil Ludoaventura', () => {
     expect(overflow).toBeLessThanOrEqual(0);
   });
 });
+
+test.describe('Sources de la page éléphants', () => {
+  test('chaque renvoi [n] pointe vers une source existante avec un lien externe', async ({ page }) => {
+    await page.goto('elephants/');
+    const refs = page.locator('a.ref');
+    expect(await refs.count()).toBeGreaterThan(10);
+    for (const href of await refs.evaluateAll((els) => els.map((e) => e.getAttribute('href')))) {
+      const target = page.locator(href);
+      await expect(target).toHaveCount(1);
+      expect(await target.locator('a[href^="https://"]').count()).toBeGreaterThan(0);
+    }
+  });
+});

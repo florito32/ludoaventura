@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '1.4';
+  var VERSION = '1.5';
 
   var HISTORY = [
+    { v: '1.5', date: '2026-10-27', changes: [
+      'Éléphants : chaque chiffre renvoie à sa source, nouvelle section « Sources ».',
+      'Chiffres corrigés d\u2019après les sources (nourriture ≈ 150 kg/jour, eau 100–200 L, sommeil ≈ 2 h, trompe ≈ 90 000 faisceaux musculaires…).'
+    ] },
     { v: '1.4', date: '2026-10-27', changes: [
       'Accessibilité : contrastes des couleurs renforcés, focus clavier visible, lien « Aller au contenu ».',
       'Référencement : adresse canonique, aperçus de partage, plan du site.'
