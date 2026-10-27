@@ -4,9 +4,12 @@
 (function () {
   'use strict';
   if (!('serviceWorker' in navigator)) return;
+  // sw.js est à la racine du site, à côté du dossier js/ : on le localise depuis ce script
+  // pour que l'enregistrement fonctionne depuis n'importe quelle page (accueil, aventures).
+  var swUrl = new URL('../sw.js', document.currentScript.src).href;
 
   window.addEventListener('load', function () {
-    navigator.serviceWorker.register('sw.js').then(function (reg) {
+    navigator.serviceWorker.register(swUrl).then(function (reg) {
       reg.update().catch(function () {
         var events = ['click', 'touchstart', 'scroll', 'keydown'];
         function retry() {
