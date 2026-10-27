@@ -6,9 +6,9 @@ Statuts : à faire / en cours / fait à valider / terminé / question en attente
 |---|-------------|--------|-------|
 | 1 | Accéder au dépôt GitHub et lire CLAUDE.md / BACKLOG.md | terminé (les fichiers n'existaient pas) | — |
 | 2 | Appliquer les instructions de travail : créer CLAUDE.md et BACKLOG.md | terminé (PR #1 fusionnée) | — |
-| 3 | Afficher le numéro de version sur la page + historique au clic | fait à valider (v1.1, pied de page) | ✅ 16/16 en local + CI |
+| 3 | Afficher le numéro de version sur la page + historique au clic | fait à valider (v1.1, pied de page, PR #4) | ✅ 16/16 en local + CI + test en ligne |
 | 4 | Mettre en ligne sur GitHub Pages | terminé (déjà actif depuis `main` : https://florito32.github.io/ludoaventura/) | test en ligne automatique après chaque déploiement (workflow « Test en ligne ») |
-| 5 | Rendre le site installable (PWA) avec mise à jour automatique | à faire | |
+| 5 | Rendre le site installable (PWA) avec mise à jour automatique | fait à valider (v1.2 : manifeste, icônes, service worker réseau d'abord, hors ligne) | ✅ 24/24 en local (dont test hors ligne) |
 | 6 | Tests Playwright (parcours, mobile / tablette / ordinateur) + GitHub Actions sur chaque PR | terminé (PR #3) | ✅ 12/12 en local (téléphone, téléphone carré, tablette, ordinateur) |
 | 7 | Vérifier SEO et accessibilité de la page actuelle | à faire | |
 | 8 | Sourcer les chiffres et affirmations de la page « éléphants » | à faire | |
@@ -21,3 +21,4 @@ Statuts : à faire / en cours / fait à valider / terminé / question en attente
 | 15 | Supprimer les branches fusionnées `claude/setup-instructions` et `claude/claude-md-autonomie` | question en attente : suppression refusée par le proxy des sessions cloud (API et git push) — à supprimer à la main sur GitHub | |
 | 16 | « Go » : reprendre tout le backlog en autonomie | en cours | |
 | 17 | Structurer le site : accueil Ludoaventura + page éléphants comme 1re aventure | à faire | |
+| 18 | Accélérer la CI (image officielle Playwright au lieu de l'installation de Chromium) | fait à valider | ✅ |
