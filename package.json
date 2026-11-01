@@ -1,0 +1,14 @@
+{
+  "name": "ludoaventura",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Ludoaventura — jeu éducatif d’aventure (site statique GitHub Pages).",
+  "scripts": {
+    "test": "playwright test",
+    "test:live": "BASE_URL=https://florito32.github.io/ludoaventura/ playwright test --grep @smoke"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "1.63.0"
+  }
+}

@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ludoaventura — l'île aux calculs, jeu éducatif d'aventure</title>
+  <meta name="description" content="Ludoaventura : jeu éducatif gratuit pour tous les âges. Explore l'île, résous des calculs à chaque étape et trouve le trésor. Quatre niveaux, de 5 ans aux adultes.">
+  <link rel="canonical" href="https://florito32.github.io/ludoaventura/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Ludoaventura — l'île aux calculs">
+  <meta property="og:description" content="Explore l'île, résous des calculs et trouve le trésor. Pour tous les âges.">
+  <meta property="og:url" content="https://florito32.github.io/ludoaventura/">
+  <meta property="og:image" content="https://florito32.github.io/ludoaventura/icons/icon-512.png">
+  <meta property="og:locale" content="fr_FR">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#0f5c63">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-title" content="Ludoaventura">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="stylesheet" href="css/site.css">
+</head>
+<body>
+<a class="skip" href="#contenu">Aller au contenu</a>
+
+<header class="entete">
+  <p class="logo"><span aria-hidden="true">🧭</span> Ludoaventura</p>
+  <p class="etoiles" id="total-etoiles" hidden><span aria-hidden="true">⭐</span> <span id="total-etoiles-n">0</span><span class="visually-hidden"> étoiles</span></p>
+</header>
+
+<main id="contenu" tabindex="-1">
+
+  <!-- ÉCRAN 1 : accueil et choix du niveau -->
+  <section class="ecran" id="ecran-accueil" aria-labelledby="titre-accueil">
+    <h1 id="titre-accueil">L'île aux calculs</h1>
+    <p class="intro">Un trésor est caché au sommet du volcan. Traverse les cinq lieux de l'île en résolvant des calculs pour l'atteindre&nbsp;!</p>
+
+    <form id="form-niveau">
+      <fieldset class="niveaux">
+        <legend>Choisis ton niveau</legend>
+        <!-- Cartes de niveau générées par js/jeu.js depuis Questions.NIVEAUX -->
+      </fieldset>
+      <div class="actions">
+        <button type="submit" class="btn btn-principal" id="btn-partir">Partir à l'aventure</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ÉCRAN 2 : carte de l'île -->
+  <section class="ecran" id="ecran-carte" aria-labelledby="titre-carte" hidden>
+    <h2 id="titre-carte">Carte de l'île</h2>
+    <p class="sous-titre" id="carte-aide">Touche le lieu qui brille pour relever son défi.</p>
+    <div class="carte">
+      <svg class="carte-fond" viewBox="0 0 400 300" aria-hidden="true" focusable="false" preserveAspectRatio="none">
+        <rect width="400" height="300" class="mer"/>
+        <path class="ile" d="M40 210 C20 150 60 70 140 55 C210 40 260 20 330 60 C385 95 390 175 350 225 C310 275 200 285 130 270 C80 260 52 240 40 210 Z"/>
+        <path class="chemin" d="M60 186 Q100 235 148 240 Q210 245 260 216 Q250 160 160 132 Q240 90 312 90"/>
+      </svg>
+      <ol class="lieux" id="lieux"><!-- boutons de lieux générés par js/jeu.js --></ol>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn btn-secondaire" id="btn-changer-niveau">Changer de niveau</button>
+    </div>
+  </section>
+
+  <!-- ÉCRAN 3 : défi d'un lieu -->
+  <section class="ecran" id="ecran-defi" aria-labelledby="titre-defi" hidden>
+    <p class="lieu-icone" id="defi-icone" aria-hidden="true"></p>
+    <h2 id="titre-defi"></h2>
+    <p class="histoire" id="defi-histoire"></p>
+    <div class="progression" aria-hidden="true"><span id="defi-barre"></span></div>
+    <p class="compteur" id="defi-compteur"></p>
+    <p class="question" id="defi-question" aria-live="polite"></p>
+    <div class="choix" id="defi-choix" role="group" aria-labelledby="defi-question"></div>
+    <p class="retour" id="defi-retour" role="status" aria-live="polite"></p>
+    <div class="actions">
+      <button type="button" class="btn btn-principal" id="btn-suivant" hidden>Question suivante</button>
+      <button type="button" class="btn btn-lien" id="btn-quitter-defi">Retour à la carte</button>
+    </div>
+  </section>
+
+  <!-- ÉCRAN 4 : bilan d'un lieu -->
+  <section class="ecran" id="ecran-bilan" aria-labelledby="titre-bilan" hidden>
+    <p class="lieu-icone" id="bilan-icone" aria-hidden="true"></p>
+    <h2 id="titre-bilan"></h2>
+    <p class="bilan-etoiles" id="bilan-etoiles"></p>
+    <p id="bilan-texte"></p>
+    <div class="actions">
+      <button type="button" class="btn btn-principal" id="btn-bilan-carte">Retour à la carte</button>
+      <button type="button" class="btn btn-secondaire" id="btn-bilan-rejouer">Rejouer ce lieu</button>
+    </div>
+  </section>
+
+  <!-- ÉCRAN 5 : trésor trouvé -->
+  <section class="ecran" id="ecran-tresor" aria-labelledby="titre-tresor" hidden>
+    <p class="lieu-icone tresor" aria-hidden="true">💎</p>
+    <h2 id="titre-tresor">Trésor trouvé&nbsp;!</h2>
+    <p id="tresor-texte"></p>
+    <div class="actions">
+      <button type="button" class="btn btn-principal" id="btn-tresor-rejouer">Changer de niveau</button>
+      <button type="button" class="btn btn-secondaire" id="btn-tresor-carte">Revoir la carte</button>
+    </div>
+  </section>
+</main>
+
+<footer class="pied">
+  <p>Ludoaventura · jeu éducatif gratuit <span data-version></span></p>
+</footer>
+
+<script src="js/questions.js"></script>
+<script src="js/jeu.js"></script>
+<script src="js/version.js"></script>
+<script src="js/pwa.js"></script>
+</body>
+</html>

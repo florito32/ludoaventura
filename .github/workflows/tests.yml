@@ -1,0 +1,16 @@
+# Tests Playwright à chaque pull request et à chaque push sur main.
+# Image officielle Playwright : navigateurs déjà installés (CI plus rapide).
+name: Tests
+on:
+  pull_request:
+  push:
+    branches: [main]
+jobs:
+  playwright:
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v1.63.0-noble
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm test
+        env: { HOME: /root }
