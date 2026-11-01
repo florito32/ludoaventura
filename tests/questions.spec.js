@@ -4,7 +4,7 @@ const Q = require('../js/questions.js');
 const { resoudre } = require('./aide');
 
 test.describe('générateur de questions', () => {
-  test.skip(({}, info) => info.project.name !== 'ordinateur', 'test de logique : un seul format suffit');
+  test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
 
   for (const niveau of Object.keys(Q.NIVEAUX)) {
     test(`niveau ${niveau} : 5 lieux, réponses justes et choix valides`, () => {
