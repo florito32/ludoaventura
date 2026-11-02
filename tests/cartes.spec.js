@@ -164,3 +164,21 @@ test('le bouton « Mêmes réglages » n\'apparaît pas pour un seul joueur', as
   await preparer(page, 1);
   await expect(page.getByRole('button', { name: 'Mêmes réglages pour tous les joueurs' })).toBeHidden();
 });
+
+test('« Voir le mot » montre le mot seul (aide), « Voir la réponse » montre aussi la solution', async ({ page }) => {
+  await preparer(page, 1);
+  await page.getByRole('checkbox', { name: 'Lettres', exact: true }).uncheck();
+  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await expect(page.locator('#carte-mot')).toHaveClass(/cache/);
+  await page.getByRole('button', { name: 'Voir le mot' }).click();
+  await expect(page.locator('#carte-mot')).not.toHaveClass(/cache/);
+  await expect(page.locator('#carte-reponse')).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Cacher le mot' })).toBeVisible();
+  await page.getByRole('button', { name: 'Voir la réponse' }).click();
+  await expect(page.locator('#carte-reponse')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Voir le mot' })).toBeVisible();
+  await page.getByRole('button', { name: 'Cacher la réponse' }).click();
+  await expect(page.locator('#carte-mot')).toHaveClass(/cache/);
+  await expect(page.locator('#carte-reponse')).toBeHidden();
+});

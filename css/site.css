@@ -425,8 +425,9 @@ main:focus { outline: none; }
 .carte-mot.lettre { font-size: 4rem; }
 .carte-reponse { margin: 0 0 8px !important; text-align: center; font-weight: 700; color: #1f5a2f; }
 .carte-mot .muette { color: var(--rouge-texte); text-decoration: underline wavy; text-underline-offset: 4px; }
+.carte-boutons { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
 .btn-voir {
-  display: block; margin: 0 auto; font: inherit; font-weight: 700; cursor: pointer; min-height: 40px; padding: 4px 14px;
+  display: block; margin: 0; font: inherit; font-weight: 700; cursor: pointer; min-height: 40px; padding: 4px 14px;
   background: #fff; color: var(--encre); border: 2px solid var(--encre); border-radius: 99px;
 }
 .tour-consigne { margin: 10px 0 0; font-weight: 600; min-height: 1.4em; }
