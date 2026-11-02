@@ -1,4 +1,4 @@
-// Accessibilité : audit axe-core (WCAG 2.1 A et AA) sur chaque écran, thèmes clair et sombre.
+// Accessibilité : audit axe-core (WCAG 2.1 A et AA) sur l'accueil et le plateau.
 const { test, expect } = require('@playwright/test');
 const AxeBuilder = require('@axe-core/playwright').default;
 
@@ -7,19 +7,14 @@ async function audit(page) {
   return r.violations.map((v) => `${v.id} (${v.nodes.length}) : ${v.nodes.slice(0, 3).map((n) => n.target.join(' ')).join(' | ')}`);
 }
 
-for (const scheme of ['light', 'dark']) {
-  test(`aucune violation WCAG A/AA (${scheme}) : accueil, carte, défi`, async ({ page }) => {
-    await page.emulateMedia({ colorScheme: scheme, reducedMotion: 'reduce' });
-    await page.goto('./');
-    expect(await audit(page)).toEqual([]);
-    await page.getByRole('button', { name: 'Partir à l\'aventure' }).click();
-    await expect(page.getByRole('heading', { name: 'Carte de l\'île' })).toBeVisible();
-    expect(await audit(page)).toEqual([]);
-    await page.locator('#lieux button').first().click();
-    await page.locator('#defi-choix button').first().click();
-    expect(await audit(page)).toEqual([]);
-  });
-}
+test('aucune violation WCAG A/AA : accueil et plateau', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('./');
+  expect(await audit(page)).toEqual([]);
+  await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
+  await expect(page.getByRole('heading', { name: 'Le plateau' })).toBeVisible();
+  expect(await audit(page)).toEqual([]);
+});
 
 test('le lien « Aller au contenu » est le premier arrêt clavier', async ({ page }) => {
   test.skip(test.info().project.name !== 'ordinateur', 'navigation clavier testée sur ordinateur');

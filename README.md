@@ -1,10 +1,11 @@
 # Ludoaventura
 
-Jeu éducatif d'aventure, pour tous les âges : traverse l'île en résolvant des calculs pour trouver le trésor.
+**Aventura** : jeu éducatif d'aventure, en version numérique. Les joueurs avancent ensemble du DÉPART jusqu'au volcan et cumulent assez de points pour finir l'aventure.
 
 **Jouer :** https://florito32.github.io/ludoaventura/
 
-- 4 niveaux : Moussaillon (dès 5 ans), Matelot (dès 7 ans), Navigateur (dès 9 ans), Capitaine (ados et adultes)
+- Version actuelle : visuel (accueil et plateau illustrés), sans questions pour l'instant
+- Illustrations : celles du jeu de société Aventura (`img/`)
 - Installable comme une application (iPhone, Android), jouable hors ligne
 - HTML, CSS et JavaScript sans dépendance ; tests Playwright (`npm test`)
 

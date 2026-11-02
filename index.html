@@ -3,113 +3,116 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Ludoaventura — l'île aux calculs, jeu éducatif d'aventure</title>
-  <meta name="description" content="Ludoaventura : jeu éducatif gratuit pour tous les âges. Explore l'île, résous des calculs à chaque étape et trouve le trésor. Quatre niveaux, de 5 ans aux adultes.">
+  <title>Aventura — Ludoaventura, jeu éducatif d'aventure</title>
+  <meta name="description" content="Aventura : jeu éducatif d'aventure en équipe. Avancez sur le plateau du départ jusqu'au volcan et cumulez assez de points pour finir l'aventure.">
   <link rel="canonical" href="https://florito32.github.io/ludoaventura/">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Ludoaventura — l'île aux calculs">
-  <meta property="og:description" content="Explore l'île, résous des calculs et trouve le trésor. Pour tous les âges.">
+  <meta property="og:title" content="Aventura — jeu éducatif d'aventure">
+  <meta property="og:description" content="Avancez sur le plateau du départ jusqu'au volcan et cumulez assez de points en équipe pour finir l'aventure.">
   <meta property="og:url" content="https://florito32.github.io/ludoaventura/">
   <meta property="og:image" content="https://florito32.github.io/ludoaventura/icons/icon-512.png">
   <meta property="og:locale" content="fr_FR">
   <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#0f5c63">
-  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#3f7a46">
+  <link rel="icon" href="icons/favicon.png" type="image/png">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-  <meta name="apple-mobile-web-app-title" content="Ludoaventura">
+  <meta name="apple-mobile-web-app-title" content="Aventura">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
+  <!-- Les illustrations de l'accueil sont chargées en priorité. -->
+  <link rel="preload" as="image" href="img/fond.webp" type="image/webp">
+  <link rel="preload" as="image" href="img/arche.webp" type="image/webp">
   <link rel="stylesheet" href="css/site.css">
 </head>
 <body>
 <a class="skip" href="#contenu">Aller au contenu</a>
 
-<header class="entete">
-  <p class="logo"><span aria-hidden="true">🧭</span> Ludoaventura</p>
-  <p class="etoiles" id="total-etoiles" hidden><span aria-hidden="true">⭐</span> <span id="total-etoiles-n">0</span><span class="visually-hidden"> étoiles</span></p>
-</header>
-
 <main id="contenu" tabindex="-1">
 
-  <!-- ÉCRAN 1 : accueil et choix du niveau -->
-  <section class="ecran" id="ecran-accueil" aria-labelledby="titre-accueil">
-    <h1 id="titre-accueil">L'île aux calculs</h1>
-    <p class="intro">Un trésor est caché au sommet du volcan. Traverse les cinq lieux de l'île en résolvant des calculs pour l'atteindre&nbsp;!</p>
-
-    <form id="form-niveau">
-      <fieldset class="niveaux">
-        <legend>Choisis ton niveau</legend>
-        <!-- Cartes de niveau générées par js/jeu.js depuis Questions.NIVEAUX -->
-      </fieldset>
-      <div class="actions">
-        <button type="submit" class="btn btn-principal" id="btn-partir">Partir à l'aventure</button>
+  <!-- ÉCRAN 1 : accueil, composé comme la boîte du jeu (décor, arche, aventurier, herbes) -->
+  <section class="ecran accueil" id="ecran-accueil" aria-labelledby="titre-accueil">
+    <h1 id="titre-accueil" class="visually-hidden">Aventura</h1>
+    <div class="scene">
+      <img class="calque arche" src="img/arche.webp" alt="Arche de pierre sculptée portant le mot « Aventura »" width="1368" height="879">
+      <img class="calque perso" src="img/perso.webp" alt="" width="495" height="1065">
+      <img class="calque herbe" src="img/herbe.webp" alt="" width="531" height="779">
+      <div class="accueil-actions">
+        <p class="accroche">Un jeu éducatif d'aventure, à jouer en équipe</p>
+        <button type="button" class="btn btn-principal" id="btn-commencer">Commencer l'aventure</button>
       </div>
-    </form>
-  </section>
-
-  <!-- ÉCRAN 2 : carte de l'île -->
-  <section class="ecran" id="ecran-carte" aria-labelledby="titre-carte" hidden>
-    <h2 id="titre-carte">Carte de l'île</h2>
-    <p class="sous-titre" id="carte-aide">Touche le lieu qui brille pour relever son défi.</p>
-    <div class="carte">
-      <svg class="carte-fond" viewBox="0 0 400 300" aria-hidden="true" focusable="false" preserveAspectRatio="none">
-        <rect width="400" height="300" class="mer"/>
-        <path class="ile" d="M40 210 C20 150 60 70 140 55 C210 40 260 20 330 60 C385 95 390 175 350 225 C310 275 200 285 130 270 C80 260 52 240 40 210 Z"/>
-        <path class="chemin" d="M60 186 Q100 235 148 240 Q210 245 260 216 Q250 160 160 132 Q240 90 312 90"/>
-      </svg>
-      <ol class="lieux" id="lieux"><!-- boutons de lieux générés par js/jeu.js --></ol>
-    </div>
-    <div class="actions">
-      <button type="button" class="btn btn-secondaire" id="btn-changer-niveau">Changer de niveau</button>
     </div>
   </section>
 
-  <!-- ÉCRAN 3 : défi d'un lieu -->
-  <section class="ecran" id="ecran-defi" aria-labelledby="titre-defi" hidden>
-    <p class="lieu-icone" id="defi-icone" aria-hidden="true"></p>
-    <h2 id="titre-defi"></h2>
-    <p class="histoire" id="defi-histoire"></p>
-    <div class="progression" aria-hidden="true"><span id="defi-barre"></span></div>
-    <p class="compteur" id="defi-compteur"></p>
-    <p class="question" id="defi-question" aria-live="polite"></p>
-    <div class="choix" id="defi-choix" role="group" aria-labelledby="defi-question"></div>
-    <p class="retour" id="defi-retour" role="status" aria-live="polite"></p>
-    <div class="actions">
-      <button type="button" class="btn btn-principal" id="btn-suivant" hidden>Question suivante</button>
-      <button type="button" class="btn btn-lien" id="btn-quitter-defi">Retour à la carte</button>
-    </div>
-  </section>
+  <!-- ÉCRAN 2 : le plateau de jeu -->
+  <section class="ecran plateau-ecran" id="ecran-plateau" aria-labelledby="titre-plateau" hidden>
+    <header class="barre">
+      <button type="button" class="btn-retour" id="btn-accueil"><span aria-hidden="true">←</span> Accueil</button>
+      <h2 id="titre-plateau">Le plateau</h2>
+      <span class="barre-vide" aria-hidden="true"></span>
+    </header>
 
-  <!-- ÉCRAN 4 : bilan d'un lieu -->
-  <section class="ecran" id="ecran-bilan" aria-labelledby="titre-bilan" hidden>
-    <p class="lieu-icone" id="bilan-icone" aria-hidden="true"></p>
-    <h2 id="titre-bilan"></h2>
-    <p class="bilan-etoiles" id="bilan-etoiles"></p>
-    <p id="bilan-texte"></p>
-    <div class="actions">
-      <button type="button" class="btn btn-principal" id="btn-bilan-carte">Retour à la carte</button>
-      <button type="button" class="btn btn-secondaire" id="btn-bilan-rejouer">Rejouer ce lieu</button>
-    </div>
-  </section>
+    <div class="table">
+      <!-- Plateau illustré + pions posés sur les cases (positions en % de l'image, voir js/plateau.js) -->
+      <figure class="plateau" id="plateau">
+        <img id="plateau-img" src="img/plateau-jour.webp" width="1600" height="1071"
+             alt="Plateau d'Aventura : un chemin part de la flèche DÉPART, passe par une croix dans la prairie, le pont sur le lac, le marais et les collines, et finit au volcan, case ARRIVÉE. Au centre, un parchemin MISSION.">
+        <ol class="cases" id="cases" aria-label="Cases du parcours"></ol>
+        <div class="pions" id="pions" aria-hidden="true"></div>
+      </figure>
 
-  <!-- ÉCRAN 5 : trésor trouvé -->
-  <section class="ecran" id="ecran-tresor" aria-labelledby="titre-tresor" hidden>
-    <p class="lieu-icone tresor" aria-hidden="true">💎</p>
-    <h2 id="titre-tresor">Trésor trouvé&nbsp;!</h2>
-    <p id="tresor-texte"></p>
-    <div class="actions">
-      <button type="button" class="btn btn-principal" id="btn-tresor-rejouer">Changer de niveau</button>
-      <button type="button" class="btn btn-secondaire" id="btn-tresor-carte">Revoir la carte</button>
+      <aside class="panneau" aria-label="Table de jeu">
+        <div class="bloc points">
+          <h3>Points de l'équipe</h3>
+          <p class="points-valeur"><span id="points">0</span></p>
+          <p class="points-objectif">Objectif : indiqué par la carte AVENTURE</p>
+        </div>
+
+        <div class="bloc">
+          <h3>Joueurs</h3>
+          <ul class="joueurs" id="joueurs"></ul>
+        </div>
+
+        <div class="bloc">
+          <h3>Les dés</h3>
+          <div class="des">
+            <figure class="de-fig">
+              <span class="de" aria-hidden="true"><i></i><i></i><i></i></span>
+              <figcaption>Dé <strong>FAIBLE</strong></figcaption>
+            </figure>
+            <figure class="de-fig">
+              <span class="de de-fort" aria-hidden="true"><i></i><i></i><i></i></span>
+              <figcaption>Dé <strong>FORT</strong></figcaption>
+            </figure>
+          </div>
+        </div>
+
+        <div class="bloc">
+          <h3>Les cartes</h3>
+          <ul class="cartes">
+            <li class="pile pile-aventure"><span class="carte" aria-hidden="true"></span>AVENTURE</li>
+            <li class="pile pile-rouge"><span class="carte" aria-hidden="true"></span>JEU rouge</li>
+            <li class="pile pile-jaune"><span class="carte" aria-hidden="true"></span>JEU jaune</li>
+            <li class="pile pile-bleue"><span class="carte" aria-hidden="true"></span>JEU bleu</li>
+          </ul>
+        </div>
+
+        <div class="bloc">
+          <h3 id="ambiance-titre">Ambiance</h3>
+          <div class="ambiance" role="group" aria-labelledby="ambiance-titre">
+            <button type="button" class="ambiance-btn" data-ambiance="jour" aria-pressed="true">Jour</button>
+            <button type="button" class="ambiance-btn" data-ambiance="soir" aria-pressed="false">Soir</button>
+          </div>
+        </div>
+      </aside>
     </div>
   </section>
 </main>
 
 <footer class="pied">
-  <p>Ludoaventura · jeu éducatif gratuit <span data-version></span></p>
+  <p>Ludoaventura · Aventura <span data-version></span></p>
 </footer>
 
-<script src="js/questions.js"></script>
-<script src="js/jeu.js"></script>
+<script src="js/plateau.js"></script>
 <script src="js/version.js"></script>
 <script src="js/pwa.js"></script>
 </body>
