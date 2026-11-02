@@ -71,7 +71,7 @@
       b.dataset.id = a.id;
       b.innerHTML = '<img src="' + a.image + '" alt="" width="200" height="220">' +
         '<span class="aventurier-nom">' + a.nom + '</span><span class="aventurier-titre">' + a.titre + '</span>' +
-        '<span class="aventurier-pris" aria-hidden="true"></span>';
+        '<span class="aventurier-pris" aria-hidden="true"></span><span class="visually-hidden aventurier-proprio"></span>';
       b.addEventListener('click', function () {
         partie.choix[partie.actif] = a.id;
         if (partie.actif < partie.nbJoueurs - 1) partie.actif++;
@@ -105,7 +105,8 @@
       b.setAttribute('aria-pressed', String(proprio === partie.actif));
       b.disabled = proprio >= 0 && proprio !== partie.actif;
       b.querySelector('.aventurier-pris').textContent = proprio >= 0 ? 'J' + (proprio + 1) : '';
-      b.setAttribute('aria-label', a.nom + ', ' + a.titre + (proprio >= 0 ? ' — choisi par Joueur ' + (proprio + 1) : ''));
+      // Nom accessible = texte visible + précision pour les lecteurs d'écran (WCAG 2.5.3).
+      b.querySelector('.aventurier-proprio').textContent = proprio >= 0 ? ' — choisi par Joueur ' + (proprio + 1) : '';
     });
   }
 
