@@ -47,7 +47,8 @@ test.describe('règles du déroulement', () => {
 test('un tour complet : piocher, répondre, lancer, message écrit puis joueur suivant automatiquement', async ({ page }) => {
   await lancerPartie(page, { joueurs: 2 });
   await expect(page.locator('#tour-nom')).toHaveText('Léa');
-  await expect(page.locator('#tour-manche')).toContainText('Croix 1 sur 5');
+  // Le tour de jeu n'écrit plus « Croix 1 sur 5 — la prairie » (demande du 02/11/2026).
+  await expect(page.locator('#tour')).not.toContainText(/Croix \d sur \d/);
   await page.getByRole('button', { name: 'Piocher une carte' }).click();
   await expect(page.locator('#carte-titre')).toContainText('Carte n° 1 de Léa');
   await page.getByRole('button', { name: 'Bonne réponse' }).click();

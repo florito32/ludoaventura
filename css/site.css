@@ -402,7 +402,6 @@ main:focus { outline: none; }
 
 /* ---------- Tour de jeu ---------- */
 .tour { border-left: 10px solid var(--c, var(--encre)); }
-.tour-manche { margin: 0 0 8px; font-weight: 800; color: var(--rouge-texte); }
 .tour-joueur { display: flex; align-items: center; gap: 10px; }
 .tour-joueur img { width: 56px; height: 62px; border-radius: 10px; border: 3px solid var(--c); background: #fff; }
 .tour-joueur p { margin: 0; font-size: 1.1rem; }

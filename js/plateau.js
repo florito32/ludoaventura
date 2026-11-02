@@ -379,7 +379,6 @@
   function rendre(options) {
     var r = partie.regles;
     var j = partie.joueurs[r.joueur];
-    var c = CASES[r.manche];
 
     if (!(options && options.sansDeplacement)) placerPions();
     $('points').textContent = r.points;
@@ -388,7 +387,6 @@
     $('jauge').classList.toggle('atteint', r.points >= r.objectif);
     majConstruction(r.points);
 
-    $('tour-manche').textContent = (c.arrivee ? 'ARRIVÉE' : 'Croix ' + r.manche) + ' sur ' + R.NB_CROIX + ' — ' + c.nom.replace(/^.*— /, '');
     $('tour-portrait').src = j.aventurier.image;
     $('tour-portrait').className = 'joueur-' + j.couleur;
     $('tour-nom').textContent = j.nom;
