@@ -112,24 +112,88 @@ function portrait(p) {
 `;
 }
 
+// ---------- Personnage debout qui marche (pion du plateau) ----------
+// Planche de 3 images côte à côte (viewBox 0 0 300 160, 100 × 160 chacune) :
+// 0 = au repos, 1 = jambe gauche levée, 2 = jambe droite levée.
+// Le plateau affiche l'image 0, puis alterne 1 et 2 pendant la marche (css/site.css → .pion.marche).
+// La tête reprend celle du portrait (même dessin), réduite ; le corps est dessiné ici.
+const B = trait(3);
+const TETE = 'translate(10 -8) scale(.4)'; // menton du portrait (y 148) → y 51 dans l'image
+
+// Bras : trait épais à la couleur du haut, cerné d'encre, main ronde. h = [x, y] de la main.
+const bras = (epaule, main, haut, peau) => `
+    <path d="M${epaule[0]} ${epaule[1]} L${main[0]} ${main[1]}" stroke="${ENCRE}" stroke-width="13" stroke-linecap="round"/>
+    <path d="M${epaule[0]} ${epaule[1]} L${main[0]} ${main[1]}" stroke="${haut}" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="${main[0]}" cy="${main[1] + 3}" r="5" fill="${peau}" ${B}/>`;
+
+// Jambe : du bassin (x, 100) jusqu'au pied ; levee = genou plié (jambe plus courte, pied relevé).
+const jambe = (x, bas, levee, sens) => {
+  const pied = levee ? 134 : 142;
+  return `
+    <path d="M${x - 6} 98 H${x + 6} L${x + 6 + (levee ? sens * 2 : 0)} ${pied} H${x - 6 + (levee ? sens * 2 : 0)} Z" fill="${bas}" ${B}/>
+    <ellipse cx="${x + (levee ? sens * 2 : 0) + sens * 2}" cy="${pied + 4}" rx="9" ry="5" fill="#4a2e1a" ${B}/>`;
+};
+
+function silhouette(p, image) {
+  const bas = p.bas || '#5a4a3a';
+  const peau = p.peau;
+  const acc = p.acc || [];
+  // Bras qui se balancent à l'opposé des jambes.
+  const mainG = image === 1 ? [26, 86] : image === 2 ? [30, 98] : [27, 94];
+  const mainD = image === 2 ? [74, 86] : image === 1 ? [70, 98] : [73, 94];
+  const tete = [cheveuxArriere[p.arriere || 'aucun'](p.cheveux)];
+  const devant = [
+    visage(peau, p.joues || '#e86a5a'),
+    acc.includes('barbe') ? accessoires.barbe(p.cheveux) : '',
+    cheveuxDessus[p.dessus || 'aucun'](p.cheveux),
+    chapeaux[p.chapeau || 'aucun'](p.chapeauCouleur, p.chapeauDetail),
+    acc.filter((a) => ['lunettes', 'boucles'].includes(a)).map((a) => accessoires[a](p.accCouleur)).join('')
+  ];
+  const torse = `
+    <path d="M30 66 Q50 56 70 66 L67 104 H33 Z" fill="${p.haut}" ${B}/>
+    <path d="M44 61 L50 70 L56 61" fill="none" stroke="${p.col || '#fff'}" stroke-width="4"/>`;
+  const surTorse = [];
+  if (acc.includes('bretelles')) surTorse.push(`<path d="M38 64 L40 102 M62 64 L60 102" stroke="#8a4a1c" stroke-width="4" fill="none"/>`);
+  if (acc.includes('foulard')) surTorse.push(`<path d="M41 60 Q50 68 59 60 L60 65 Q50 74 40 65 Z" fill="${p.accCouleur}" ${B}/><path d="M54 66 l4 12 l5 -3 Z" fill="${p.accCouleur}" ${B}/>`);
+  if (acc.includes('boussole')) surTorse.push(`<path d="M42 62 L50 80 L58 62" fill="none" stroke="#8a4a1c" stroke-width="2"/><circle cx="50" cy="84" r="6" fill="#ffd23f" ${B}/><path d="M50 80 l2 4 l-2 4 l-2 -4 Z" fill="#e3262a"/>`);
+  if (acc.includes('appareil')) surTorse.push(`<path d="M36 64 L52 82 M64 64 L62 80" stroke="${ENCRE}" stroke-width="2" fill="none"/><rect x="46" y="78" width="20" height="13" rx="3" fill="#3b3b3b" ${B}/><circle cx="56" cy="84.5" r="4" fill="#9fd6df" stroke="${ENCRE}" stroke-width="2"/>`);
+  const ceinture = `<path d="M33 98 H67 V104 H33 Z" fill="${bas}" ${B}/>`;
+  return `<g transform="translate(${image * 100} 0)">
+    <g transform="${TETE}">${tete.join('')}</g>
+    ${jambe(43, bas, image === 1, -1)}${jambe(57, bas, image === 2, 1)}
+    ${torse}${ceinture}${surTorse.join('')}
+    ${bras([33, 70], mainG, p.haut, peau)}${bras([67, 70], mainD, p.haut, peau)}
+    <g transform="${TETE}">${devant.join('')}</g>
+  </g>`;
+}
+
+function debout(p) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 160" width="300" height="160" role="img" aria-label="${p.nom}">
+  <!-- ${p.nom} debout (3 images : repos, pas gauche, pas droit), généré par outils/aventuriers.js -->
+  ${[0, 1, 2].map((i) => silhouette(p, i)).join('\n  ')}
+</svg>
+`;
+}
+
 // ---------- Les 10 aventuriers ----------
 const AVENTURIERS = require('../js/aventuriers.js').LISTE;
 const DESSINS = {
-  lea: { fond: '#8fc8ea', peau: '#f2c9a0', cheveux: '#7a4b22', arriere: 'long', dessus: 'court', chapeau: 'brousse', chapeauCouleur: '#c9a46a', chapeauDetail: '#e3262a', haut: '#1f7a72', acc: ['bretelles'] },
-  tom: { fond: '#b4ca58', peau: '#e8b48a', cheveux: '#e2b34a', dessus: 'meche', chapeau: 'casque', chapeauCouleur: '#ff7a1a', haut: '#2e55c9' },
-  nour: { fond: '#ffd166', peau: '#c68a5e', cheveux: '#2a1d17', arriere: 'long', chapeau: 'bandana', chapeauCouleur: '#e3262a', haut: '#1c3473', acc: ['boussole'] },
-  malo: { fond: '#f7b267', peau: '#f6d2b0', cheveux: '#c4572a', dessus: 'court', chapeau: 'casquette', chapeauCouleur: '#ffe600', haut: '#2f9e5b', acc: ['lunettes'] },
-  ines: { fond: '#9fd6df', peau: '#8d5a3b', cheveux: '#1f1410', arriere: 'tresses', dessus: 'court', chapeau: 'feuilles', chapeauCouleur: '#4caf50', haut: '#f08a24' },
-  jo: { fond: '#c9e4a6', peau: '#f0c09a', cheveux: '#f2f2ee', chapeau: 'peche', chapeauCouleur: '#7d8a3a', haut: '#c0392b', acc: ['barbe', 'lunettes'] },
-  kenji: { fond: '#f6e7a6', peau: '#f1cf9f', cheveux: '#1f1410', dessus: 'meche', chapeau: 'bandeau', chapeauCouleur: '#2e55c9', haut: '#8a5a2b', acc: ['foulard'], accCouleur: '#ffd23f' },
-  zoe: { fond: '#c7b3ec', peau: '#d9a27a', cheveux: '#5a3520', arriere: 'boucles', dessus: 'boucles', haut: '#ffd23f', acc: ['appareil'] },
-  sam: { fond: '#ffb38a', peau: '#a8704a', cheveux: '#3b2a1e', dessus: 'court', chapeau: 'plume', chapeauCouleur: '#8a5a2b', chapeauDetail: '#e3262a', haut: '#a3a05a', acc: ['bretelles'] },
-  awa: { fond: '#8fd0b0', peau: '#6e4128', cheveux: '#1f1410', chapeau: 'turban', chapeauCouleur: '#ffb000', chapeauDetail: '#e3262a', haut: '#6b3fa0', acc: ['boucles'] }
+  lea: { bas: '#c9a46a', fond: '#8fc8ea', peau: '#f2c9a0', cheveux: '#7a4b22', arriere: 'long', dessus: 'court', chapeau: 'brousse', chapeauCouleur: '#c9a46a', chapeauDetail: '#e3262a', haut: '#1f7a72', acc: ['bretelles'] },
+  tom: { bas: '#5a4a3a', fond: '#b4ca58', peau: '#e8b48a', cheveux: '#e2b34a', dessus: 'meche', chapeau: 'casque', chapeauCouleur: '#ff7a1a', haut: '#2e55c9' },
+  nour: { bas: '#c9a46a', fond: '#ffd166', peau: '#c68a5e', cheveux: '#2a1d17', arriere: 'long', chapeau: 'bandana', chapeauCouleur: '#e3262a', haut: '#1c3473', acc: ['boussole'] },
+  malo: { bas: '#1c3473', fond: '#f7b267', peau: '#f6d2b0', cheveux: '#c4572a', dessus: 'court', chapeau: 'casquette', chapeauCouleur: '#ffe600', haut: '#2f9e5b', acc: ['lunettes'] },
+  ines: { bas: '#5b3a1e', fond: '#9fd6df', peau: '#8d5a3b', cheveux: '#1f1410', arriere: 'tresses', dessus: 'court', chapeau: 'feuilles', chapeauCouleur: '#4caf50', haut: '#f08a24' },
+  jo: { bas: '#3a5a7a', fond: '#c9e4a6', peau: '#f0c09a', cheveux: '#f2f2ee', chapeau: 'peche', chapeauCouleur: '#7d8a3a', haut: '#c0392b', acc: ['barbe', 'lunettes'] },
+  kenji: { bas: '#2a2a2a', fond: '#f6e7a6', peau: '#f1cf9f', cheveux: '#1f1410', dessus: 'meche', chapeau: 'bandeau', chapeauCouleur: '#2e55c9', haut: '#8a5a2b', acc: ['foulard'], accCouleur: '#ffd23f' },
+  zoe: { bas: '#2e55c9', fond: '#c7b3ec', peau: '#d9a27a', cheveux: '#5a3520', arriere: 'boucles', dessus: 'boucles', haut: '#ffd23f', acc: ['appareil'] },
+  sam: { bas: '#6b4a2a', fond: '#ffb38a', peau: '#a8704a', cheveux: '#3b2a1e', dessus: 'court', chapeau: 'plume', chapeauCouleur: '#8a5a2b', chapeauDetail: '#e3262a', haut: '#a3a05a', acc: ['bretelles'] },
+  awa: { bas: '#e3a23a', fond: '#8fd0b0', peau: '#6e4128', cheveux: '#1f1410', chapeau: 'turban', chapeauCouleur: '#ffb000', chapeauDetail: '#e3262a', haut: '#6b3fa0', acc: ['boucles'] }
 };
 
 const dossier = path.join(__dirname, '..', 'img', 'aventuriers');
 fs.mkdirSync(dossier, { recursive: true });
 for (const a of AVENTURIERS) {
   fs.writeFileSync(path.join(dossier, a.id + '.svg'), portrait({ nom: a.nom, ...DESSINS[a.id] }));
-  console.log('img/aventuriers/' + a.id + '.svg');
+  fs.writeFileSync(path.join(dossier, a.id + '-debout.svg'), debout({ nom: a.nom, ...DESSINS[a.id] }));
+  console.log('img/aventuriers/' + a.id + '.svg + ' + a.id + '-debout.svg');
 }

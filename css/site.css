@@ -260,27 +260,40 @@ main:focus { outline: none; }
 .cases { list-style: none; margin: 0; padding: 0; }
 .case { position: absolute; width: 1px; height: 1px; }
 .pions { position: absolute; inset: 0; pointer-events: none; }
-/* Pion : galet plat cerné de noir, comme ceux du nid illustré au centre du plateau. */
+/* Pion : l'aventurier debout, les pieds sur la croix, sur un socle ovale à la couleur du joueur.
+   L'image (img/aventuriers/<id>-debout.svg) est une planche de 3 dessins : repos, pas gauche, pas droit.
+   --image est posée par js/plateau.js. */
 .pion {
-  position: absolute; width: clamp(22px, 4.4%, 52px); aspect-ratio: 1; border-radius: 50%;
-  transform: translate(-50%, -50%);
-  border: 3px solid var(--c, #1d1510);
-  /* Portrait de l'aventurier dans le pion (visage centré), bordure à la couleur du joueur. */
-  background-size: 165%; background-position: 50% 38%; background-repeat: no-repeat;
-  box-shadow: 0 0 0 2px #1d1510, 0 3px 3px rgb(0 0 0 / .35);
+  position: absolute; width: clamp(26px, 5%, 60px); aspect-ratio: 100 / 160;
+  transform: translate(-50%, -90%);
   animation: poser .5s ease-out backwards;
   /* Le déplacement d'une case à l'autre suit la route (js/plateau.js → marcher), sans transition CSS. */
 }
-.pion-actif { z-index: 2; box-shadow: 0 0 0 2px #1d1510, 0 0 0 6px #fff, 0 4px 6px rgb(0 0 0 / .4); }
+/* Socle : galet plat cerné de noir, comme ceux du nid illustré au centre du plateau. */
+.pion::before {
+  content: ""; position: absolute; left: 8%; right: 8%; bottom: 0; height: 15%;
+  border-radius: 50%; background: var(--c, #1d1510); border: 2px solid #1d1510;
+  box-shadow: 0 2px 2px rgb(0 0 0 / .35);
+}
+.pion::after {
+  content: ""; position: absolute; inset: 0 0 5% 0;
+  background: var(--image) 0 0 / 300% 100% no-repeat;
+  filter: drop-shadow(0 1px 0 rgb(255 255 255 / .6));
+}
+/* Pendant la marche : les deux pas alternent. */
+.pion.marche::after { animation: pas .36s steps(1) infinite; }
+@keyframes pas { 0% { background-position: 50% 0; } 50% { background-position: 100% 0; } }
+.pion-actif { z-index: 2; }
+.pion-actif::before { box-shadow: 0 0 0 3px #fff, 0 0 0 5px #1d1510, 0 3px 4px rgb(0 0 0 / .4); }
 .pion:nth-child(2) { animation-delay: .08s; }
 .pion:nth-child(3) { animation-delay: .16s; }
 .pion:nth-child(4) { animation-delay: .24s; }
-@keyframes poser { from { transform: translate(-50%, -140%); opacity: 0; } }
-@media (prefers-reduced-motion: reduce) { .pion { animation: none; } }
-.pion-rouge { background-color: var(--rouge); --c: var(--rouge); }
-.pion-jaune { background-color: var(--jaune); --c: #f2c400; }
-.pion-bleu { background-color: #2e55c9; --c: #2e55c9; }
-.pion-vert { background-color: var(--vert-pion); --c: var(--vert-pion); }
+@keyframes poser { from { transform: translate(-50%, -170%); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .pion, .pion.marche::after { animation: none; } }
+.pion-rouge { --c: var(--rouge); }
+.pion-jaune { --c: #f2c400; }
+.pion-bleu { --c: #2e55c9; }
+.pion-vert { --c: var(--vert-pion); }
 
 /* Points de l'équipe en haut à gauche du plateau (tailles en cqw = % de la largeur du plateau).
    Encadré horizontal : la construction à gauche, les points à droite, pour rester peu haut
@@ -372,9 +385,9 @@ main:focus { outline: none; }
   100% { opacity: 0; transform: translate(var(--dx), calc(var(--dy) + 40px)) rotate(540deg); }
 }
 .pion.saute { animation: saute .7s ease-out; }
-@keyframes saute { 30% { transform: translate(-50%, -110%); } 55% { transform: translate(-50%, -50%); } 70% { transform: translate(-50%, -75%); } }
+@keyframes saute { 30% { transform: translate(-50%, -140%); } 55% { transform: translate(-50%, -90%); } 70% { transform: translate(-50%, -112%); } }
 .pion.secoue { animation: secoue .6s ease-in-out; }
-@keyframes secoue { 20%, 60% { transform: translate(-62%, -50%); } 40%, 80% { transform: translate(-38%, -50%); } }
+@keyframes secoue { 20%, 60% { transform: translate(-62%, -90%); } 40%, 80% { transform: translate(-38%, -90%); } }
 @media (prefers-reduced-motion: reduce) {
   .pion.saute, .pion.secoue, .reaction i { animation: none; }
   .reaction i { display: none; }

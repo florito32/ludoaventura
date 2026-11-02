@@ -386,7 +386,9 @@
       var p = document.createElement('span');
       var c = CASES[depart ? 0 : partie.regles.positions[k]];
       p.className = 'pion pion-' + j.couleur;
-      p.style.backgroundImage = 'url("' + j.aventurier.image + '")';
+      // Personnage debout (planche de 3 dessins). Adresse complète : une url() relative dans une variable CSS
+      // serait lue depuis le dossier css/ de la feuille de style.
+      p.style.setProperty('--image', 'url("' + new URL(j.aventurier.debout, document.baseURI).href + '")');
       p.style.left = (c.x + DECALAGES[k][0]) + '%';
       p.style.top = (c.y + DECALAGES[k][1] * RAPPORT) + '%';
       p.dataset.case = depart ? '0' : String(partie.regles.positions[k]);

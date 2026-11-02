@@ -50,8 +50,8 @@ test('sur le plateau : nom de l\'aventurier qui joue et portrait sur chaque pion
   await cocherTout(page, 2);
   await page.getByRole('button', { name: 'Lancer la partie' }).click();
   await expect(page.locator('#tour-nom')).toHaveText('Inès');
-  await expect(page.locator('.pion').nth(0)).toHaveAttribute('style', /aventuriers\/ines\.svg/);
-  await expect(page.locator('.pion').nth(1)).toHaveAttribute('style', /aventuriers\/jo\.svg/);
+  await expect(page.locator('.pion').nth(0)).toHaveAttribute('style', /aventuriers\/ines-debout\.svg/);
+  await expect(page.locator('.pion').nth(1)).toHaveAttribute('style', /aventuriers\/jo-debout\.svg/);
 });
 
 test('passer de 4 à 2 joueurs garde les choix des 2 premiers', async ({ page }) => {

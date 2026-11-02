@@ -81,3 +81,36 @@ test('au tour suivant, le personnage suit la route du pont jusqu\'au marais', as
   });
   expect(ok).toBe(true);
 });
+
+test('le pion est l\'aventurier debout (plus haut que large), pieds sur la croix, et ses pas alternent en marchant', async ({ page }) => {
+  await lancerPartie(page, { joueurs: 1 });
+  const pion = page.locator('.pion').first();
+  await expect(pion).toHaveClass(/marche/);
+  // Pendant la marche : le dessin affiché alterne pas gauche / pas droit (planche de 3 dessins).
+  const pendant = await page.evaluate(() => {
+    const p = document.querySelector('.pion');
+    const a = p.getAnimations({ subtree: true }).find((x) => x.animationName === 'pas');
+    if (!a) return null;
+    a.pause();
+    const vus = [];
+    for (const t of [0, 200]) { a.currentTime = t; vus.push(getComputedStyle(p, '::after').backgroundPositionX); }
+    a.play();
+    return { vus, image: getComputedStyle(p, '::after').backgroundImage };
+  });
+  expect(pendant).not.toBeNull();
+  expect(pendant.vus).toEqual(['50%', '100%']);
+  expect(pendant.image).toMatch(/lea-debout\.svg/);
+  expect(pendant.image).not.toMatch(/\/css\//); // adresse lue depuis la page, pas depuis css/
+  // Le dessin est bien chargé (même adresse que celle affichée).
+  const url = pendant.image.match(/url\("?(.*?)"?\)/)[1];
+  expect((await page.request.get(url)).ok()).toBe(true);
+  await expect(pion).not.toHaveClass(/marche/);
+  // Au repos : dessin 0, personnage plus haut que large, pieds (bas du pion) près de la croix.
+  expect(await pion.evaluate((p) => getComputedStyle(p, '::after').backgroundPositionX)).toMatch(/^0(%|px)?$/);
+  const b = await pion.boundingBox();
+  expect(b.height).toBeGreaterThan(b.width * 1.4);
+  const croix = await page.locator('#cases li').nth(1).boundingBox();
+  const plateau = await page.locator('#plateau').boundingBox();
+  // DECALAGES[0] = 2,6 % : le pion est un peu décalé de la croix, ses pieds restent tout près.
+  expect(Math.abs(b.y + b.height * 0.9 - croix.y)).toBeLessThan(plateau.width * 0.05);
+});

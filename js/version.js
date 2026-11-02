@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '4.1';
+  var VERSION = '4.2';
 
   var HISTORY = [
+    { v: '4.2', date: '2026-11-02', changes: [
+      'Sur le plateau, chaque aventurier est maintenant dessiné en entier, debout sur un socle à la couleur du joueur (et non plus un visage dans un rond). Il marche d\u2019une croix à l\u2019autre : ses jambes et ses bras bougent à chaque pas.'
+    ] },
     { v: '4.1', date: '2026-11-02', changes: [
       'Les personnages suivent la route pour aller d\u2019une croix à l\u2019autre (et non plus en ligne droite) : chemin pavé, pont, sentier du marais, descente vers le volcan. Chaque déplacement dure 1,5 seconde.'
     ] },

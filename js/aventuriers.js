@@ -1,5 +1,5 @@
 // Les 10 aventuriers qu'on peut choisir en début de partie (personnages originaux).
-// Portraits : img/aventuriers/<id>.svg, générés par outils/aventuriers.js.
+// Portraits : img/aventuriers/<id>.svg, personnages debout : <id>-debout.svg (outils/aventuriers.js).
 // Module sans interface : utilisable dans la page (window.Aventuriers) et dans les tests Node.
 (function (racine) {
   'use strict';
@@ -16,7 +16,8 @@
     { id: 'sam', nom: 'Sam', titre: 'le pisteur' },
     { id: 'awa', nom: 'Awa', titre: 'la cheffe d’expédition' }
   ];
-  LISTE.forEach(function (a) { a.image = 'img/aventuriers/' + a.id + '.svg'; });
+  // image = portrait (choix de l'aventurier) ; debout = personnage en pied qui marche sur le plateau.
+  LISTE.forEach(function (a) { a.image = 'img/aventuriers/' + a.id + '.svg'; a.debout = 'img/aventuriers/' + a.id + '-debout.svg'; });
 
   function trouver(id) {
     for (var i = 0; i < LISTE.length; i++) if (LISTE[i].id === id) return LISTE[i];
