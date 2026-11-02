@@ -45,7 +45,7 @@ h2, h3 { font-family: "Rockwell", "Roboto Slab", "Georgia", serif; line-height: 
 .skip:focus { top: 12px; }
 main { flex: 1; display: flex; flex-direction: column; }
 main:focus { outline: none; }
-.ecran[hidden] { display: none !important; }
+[hidden] { display: none !important; }
 
 /* ---------- Boutons ---------- */
 .btn {
@@ -193,6 +193,36 @@ main:focus { outline: none; }
 }
 .joueur-jaune .aventurier-pris:not(:empty) { color: var(--encre); text-shadow: none; }
 
+/* Réglages des cartes du joueur actif : packs (plusieurs) et niveau (un seul). */
+.onglet-joueur small { font-size: .72rem; color: var(--encre-douce); }
+.reglages-joueur {
+  margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: #fff;
+  border: 3px solid var(--parchemin-bord); border-left: 8px solid var(--c);
+}
+.reglages-joueur h3 { font-size: 1.05rem; margin-bottom: 8px; }
+.reglage { margin-bottom: 10px; }
+.reglage-titre { margin: 0 0 6px; font-weight: 700; }
+.reglage-titre span { font-weight: 400; color: var(--encre-douce); font-size: .85rem; }
+.packs { display: flex; flex-wrap: wrap; gap: 8px; }
+.pack, .niveau-carte { position: relative; }
+.pack input, .niveau-carte input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.pack span {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 6px 14px; cursor: pointer;
+  border: 2px solid var(--parchemin-bord); border-radius: 99px; background: var(--parchemin); font-weight: 600;
+}
+.pack span::before { content: ""; width: 16px; height: 16px; border: 2px solid var(--encre); border-radius: 4px; background: #fff; }
+.pack input:checked + span { background: var(--encre); color: #fff; border-color: var(--encre); }
+.pack input:checked + span::before { content: "✓"; display: grid; place-items: center; font-size: .75rem; color: var(--encre); }
+.niveaux-cartes { display: flex; gap: 8px; }
+.niveau-carte span {
+  display: grid; place-items: center; width: 52px; height: 44px; cursor: pointer; font-weight: 800; font-size: 1.15rem;
+  border: 2px solid var(--parchemin-bord); border-radius: 10px; background: var(--parchemin);
+}
+.niveau-carte input:checked + span { background: var(--encre); color: #fff; border-color: var(--encre); }
+.pack input:focus-visible + span, .niveau-carte input:focus-visible + span { outline: 3px solid var(--rouge); outline-offset: 3px; }
+.reglage-alerte { margin: 0 0 8px; color: var(--rouge-texte); font-weight: 700; min-height: 0; }
+.reglage-alerte:empty { display: none; }
+
 /* ---------- Plateau ---------- */
 .plateau-ecran { width: 100%; max-width: 1280px; margin: 0 auto; padding: 8px 12px 16px; }
 .barre { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; margin-bottom: 10px; color: #fff; }
@@ -261,8 +291,25 @@ main:focus { outline: none; }
   background: #fff; box-shadow: inset 0 0 0 5px var(--c);
 }
 .carte-piochee p { margin: 0; }
-.carte-titre { font-weight: 800; margin-bottom: 4px !important; }
-.carte-texte { font-size: .9rem; }
+.carte-entete { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.carte-titre { font-weight: 800; }
+.carte-titre small { display: block; font-weight: 600; font-size: .78rem; color: var(--encre-douce); }
+.btn-ecouter {
+  flex: none; font: inherit; font-weight: 700; cursor: pointer; min-height: 44px; padding: 6px 12px;
+  background: var(--encre); color: #fff; border: 2px solid var(--encre); border-radius: 99px;
+}
+.btn-ecouter:disabled { opacity: .5; cursor: not-allowed; }
+.carte-consigne { margin-top: 8px !important; font-weight: 600; }
+.carte-mot {
+  margin: 6px 0 !important; text-align: center; font: 800 clamp(1.5rem, 6vw, 2.1rem)/1.2 "Rockwell", "Roboto Slab", Georgia, serif;
+  letter-spacing: .04em; overflow-wrap: anywhere;
+}
+.carte-mot.cache { letter-spacing: .15em; color: var(--encre-douce); }
+.carte-mot.lettre { font-size: 4rem; }
+.btn-voir {
+  display: block; margin: 0 auto; font: inherit; font-weight: 700; cursor: pointer; min-height: 40px; padding: 4px 14px;
+  background: #fff; color: var(--encre); border: 2px solid var(--encre); border-radius: 99px;
+}
 .tour-consigne { margin: 10px 0 0; font-weight: 600; min-height: 1.4em; }
 .tour-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
 .tour-actions .btn { flex: 1 1 auto; min-height: 48px; padding: 10px 14px; font-size: 1rem; }

@@ -1,0 +1,41 @@
+// Lecture à voix haute des cartes (synthèse vocale du navigateur, Web Speech API).
+// Voix française choisie si l'appareil en propose une ; sinon la langue fr-FR est demandée.
+(function (racine) {
+  'use strict';
+
+  var synthese = racine.speechSynthesis;
+
+  function disponible() {
+    return !!(synthese && racine.SpeechSynthesisUtterance);
+  }
+
+  function voixFrancaise() {
+    var voix = synthese.getVoices ? synthese.getVoices() : [];
+    for (var i = 0; i < voix.length; i++) if (/^fr[-_]FR/i.test(voix[i].lang)) return voix[i];
+    for (var k = 0; k < voix.length; k++) if (/^fr/i.test(voix[k].lang)) return voix[k];
+    return null;
+  }
+
+  // Lit le texte (arrête une lecture déjà en cours).
+  function lire(texte) {
+    if (!disponible()) return false;
+    synthese.cancel();
+    var u = new racine.SpeechSynthesisUtterance(texte);
+    u.lang = 'fr-FR';
+    u.rate = 0.85; // un peu plus lent : dictée pour enfants
+    var v = voixFrancaise();
+    if (v) u.voice = v;
+    synthese.speak(u);
+    return true;
+  }
+
+  // Texte à prononcer pour une carte : la consigne, puis le mot en minuscules
+  // (en majuscules, certaines voix l'épellent comme un sigle). Les lettres ne sont pas dites.
+  function texteCarte(carte) {
+    if (carte.lettre) return 'Quelle est cette lettre ?';
+    var mot = carte.mot.replace(/(\.\.\.|…)/g, ' ').replace(/\s+/g, ' ').trim().toLocaleLowerCase('fr-FR');
+    return 'Épelle le mot : ' + mot + '.';
+  }
+
+  racine.Voix = { disponible: disponible, lire: lire, texteCarte: texteCarte };
+})(this);

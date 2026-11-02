@@ -4,9 +4,15 @@
 (function () {
   'use strict';
 
-  var VERSION = '2.5';
+  var VERSION = '2.6';
 
   var HISTORY = [
+    { v: '2.6', date: '2026-11-02', changes: [
+      'Les cartes JEU arrivent : 300 cartes en 5 packs (Mots simples, Mots compliqués, Temps, Numérique, Lettres), 3 niveaux chacun.',
+      'À la préparation, chaque joueur choisit les packs où il pioche et son niveau.',
+      'Dictée : le mot reste caché, « Voir le mot » permet de vérifier. Pour les lettres : « Quelle est cette lettre ? ».',
+      'Bouton « Écouter » : une voix lit la carte à haute voix.'
+    ] },
     { v: '2.5', date: '2026-11-02', changes: [
       'Toutes les aventures ont maintenant une illustration dessinée, dans le style du plateau (comme Préhistoire) à la place des photos.'
     ] },

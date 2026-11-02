@@ -5,7 +5,7 @@ const P = require('../js/aventuriers.js');
 async function preparation(page, joueurs) {
   await page.goto('./');
   await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
-  await page.getByRole('radio', { name: String(joueurs), exact: true }).check();
+  await page.getByRole('radio', { name: new RegExp('^' + joueurs + ' joueurs?$') }).check();
 }
 
 test('10 aventuriers différents, chacun avec un nom et un portrait', async ({ page }) => {
@@ -20,13 +20,15 @@ test('10 aventuriers différents, chacun avec un nom et un portrait', async ({ p
   }
 });
 
-test('un onglet par joueur ; toucher un portrait le donne au joueur actif puis passe au suivant', async ({ page }) => {
+test('un onglet par joueur ; toucher un portrait le donne au joueur actif, « Joueur suivant » passe au suivant', async ({ page }) => {
   await preparation(page, 3);
   const onglets = page.locator('.onglet-joueur');
   await expect(onglets).toHaveCount(3);
   await expect(onglets.nth(0)).toHaveAttribute('aria-pressed', 'true');
   await page.getByRole('button', { name: /^Zoé/ }).click();
   await expect(onglets.nth(0)).toContainText('Zoé');
+  await expect(onglets.nth(0)).toHaveAttribute('aria-pressed', 'true'); // reste sur le joueur pour choisir ses cartes
+  await page.getByRole('button', { name: 'Joueur suivant →' }).click();
   await expect(onglets.nth(1)).toHaveAttribute('aria-pressed', 'true');
   // Un aventurier pris par un autre joueur n'est plus disponible.
   await expect(page.getByRole('button', { name: /^Zoé/ })).toBeDisabled();
@@ -42,6 +44,7 @@ test('un onglet par joueur ; toucher un portrait le donne au joueur actif puis p
 test('sur le plateau : nom et portrait de chaque aventurier, dans la liste et sur les pions @smoke', async ({ page }) => {
   await preparation(page, 2);
   await page.getByRole('button', { name: /^Inès/ }).click();
+  await page.getByRole('button', { name: 'Joueur suivant →' }).click();
   await page.getByRole('button', { name: /^Papi Jo/ }).click();
   await page.getByRole('button', { name: 'Lancer la partie' }).click();
   await expect(page.locator('#joueurs li').nth(0)).toContainText('Inès');
@@ -56,7 +59,7 @@ test('passer de 4 à 2 joueurs garde les choix des 2 premiers', async ({ page })
   await expect(page.locator('.onglet-joueur')).toHaveCount(4);
   await page.locator('.onglet-joueur').nth(3).click();
   await expect(page.locator('.onglet-joueur').nth(3)).toHaveAttribute('aria-pressed', 'true');
-  await page.getByRole('radio', { name: '2', exact: true }).check();
+  await page.getByRole('radio', { name: '2 joueurs' }).check();
   await expect(page.locator('.onglet-joueur')).toHaveCount(2);
   await expect(page.locator('.onglet-joueur').nth(1)).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('.onglet-joueur').nth(0)).toContainText('Léa');
