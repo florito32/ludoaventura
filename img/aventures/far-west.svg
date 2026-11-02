@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" width="640" height="400">
+  <!-- Aventure « far-west » : illustration originale (générée par outils/aventures.js). -->
+  <defs><linearGradient id="c" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4fa3e0"/><stop offset="1" stop-color="#cde9f7"/></linearGradient></defs>
+    <rect width="640" height="400" fill="url(#c)"/>
+    <circle cx="100" cy="80" r="38" fill="#ffd23f" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M300 280 V170 H360 V150 H420 V170 H470 V280 Z" fill="#c4572a" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M60 280 V200 H180 V280 Z" fill="#b14a22" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M500 280 V210 H520 V180 H560 V210 H600 V280 Z" fill="#b14a22" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M300 200 H470 M60 225 H180" stroke="#1d1510" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" opacity=".5"/>
+    <path d="M0 270 C200 260 440 260 640 270 V400 H0 Z" fill="#e0894a" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    <g fill="#2f8a4e" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+      <rect x="200" y="210" width="34" height="140" rx="17"/>
+      <path d="M200 280 H170 C158 280 154 270 154 260 V230 C154 218 172 218 172 230 V262 H200 Z"/>
+      <path d="M234 260 H262 V220 C262 208 280 208 280 220 V258 C280 272 270 276 262 276 H234 Z"/>
+    </g>
+    <path d="M200 350 H234" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M420 350 c20 -16 40 -16 60 0 M80 370 c16 -10 32 -10 48 0" fill="none" stroke="#b5651d" stroke-width="5" stroke-linecap="round"/>
+</svg>

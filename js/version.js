@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '2.4';
+  var VERSION = '2.5';
 
   var HISTORY = [
+    { v: '2.5', date: '2026-11-02', changes: [
+      'Toutes les aventures ont maintenant une illustration dessinée, dans le style du plateau (comme Préhistoire) à la place des photos.'
+    ] },
     { v: '2.4', date: '2026-11-02', changes: [
       'On joue ! Chacun son tour, le joueur avance sur la croix et pioche une carte dans son propre tas.',
       'Le maître du jeu indique si la réponse est bonne : bonne réponse = dé FORT, mauvaise réponse = aide des autres puis dé FAIBLE.',
