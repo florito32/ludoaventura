@@ -47,5 +47,5 @@ Statuts : à faire / en cours / fait à valider / terminé / question en attente
 | 41 | La partie ne redémarre depuis l'accueil que si la page est fermée : changer de page, rafraîchir ou mise en veille → la partie continue | à faire | — |
 | 42 | Les personnages suivent la route d'une croix à l'autre (pas en ligne droite) | à faire | — |
 | 43 | Personnages debout sur le plateau (pas un visage dans un cercle), qui marchent d'une croix à l'autre ; déplacement de 1,5 s | à faire | — |
-| 44 | Préparation : packs et types de questions décochés au départ, c'est au joueur de les cocher | à faire | — |
-| 45 | Tour de jeu : ne plus afficher « Croix 1 sur 5 — la prairie » | fait à valider (v3.8) | ✅ local + CI |
+| 44 | Préparation : packs et types de questions décochés au départ, c'est au joueur de les cocher | fait à valider (v3.9) — hypothèses : au lancement, si un joueur n'a coché aucun pack (ou aucune question, sauf s'il ne pioche que des Lettres), ses réglages s'affichent avec un message ; le niveau reste coché sur 1 par défaut | ✅ local + CI |
+| 45 | Tour de jeu : ne plus afficher « Croix 1 sur 5 — la prairie » | fait à valider (v3.8, PR #24) | ✅ local + CI |

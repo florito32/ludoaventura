@@ -1,6 +1,7 @@
 // Aventuriers : 10 portraits, chaque joueur choisit le sien en début de partie.
 const { test, expect } = require('@playwright/test');
 const P = require('../js/aventuriers.js');
+const { cocherTout } = require('./aide');
 
 async function preparation(page, joueurs) {
   await page.goto('./');
@@ -46,6 +47,7 @@ test('sur le plateau : nom de l\'aventurier qui joue et portrait sur chaque pion
   await page.getByRole('button', { name: /^Inès/ }).click();
   await page.getByRole('button', { name: 'Joueur suivant →' }).click();
   await page.getByRole('button', { name: /^Papi Jo/ }).click();
+  await cocherTout(page, 2);
   await page.getByRole('button', { name: 'Lancer la partie' }).click();
   await expect(page.locator('#tour-nom')).toHaveText('Inès');
   await expect(page.locator('.pion').nth(0)).toHaveAttribute('style', /aventuriers\/ines\.svg/);

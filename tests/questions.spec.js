@@ -2,7 +2,7 @@
 const { test, expect } = require('@playwright/test');
 const Q = require('../js/questions.js');
 const C = require('../js/cartes.js');
-const { rapide } = require('./aide');
+const { rapide, cocherTout } = require('./aide');
 
 const rep = (id, mot) => Q.trouver(id).reponse(mot, C.INFOS[mot]);
 const possible = (id, mot) => Q.possibles(mot, C.INFOS[mot], [id]).length === 1;
@@ -52,6 +52,7 @@ async function preparer(page) {
   await page.goto('./');
   await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
   await page.getByRole('radio', { name: '1 joueur' }).check();
+  await cocherTout(page, 1);
 }
 
 test('le joueur choisit ses questions ; « Lettres muettes » seule → la réponse surligne les lettres muettes @smoke', async ({ page }) => {
@@ -61,9 +62,6 @@ test('le joueur choisit ses questions ; « Lettres muettes » seule → la répo
     await page.getByRole('checkbox', { name: t, exact: true }).uncheck();
   }
   await expect(page.locator('.onglet-joueur').nth(0)).toContainText('1 question');
-  // Au moins un type doit rester coché.
-  await page.getByRole('checkbox', { name: 'Lettres muettes', exact: true }).click();
-  await expect(page.getByRole('checkbox', { name: 'Lettres muettes', exact: true })).toBeChecked();
   await page.getByRole('checkbox', { name: 'Lettres', exact: true }).uncheck(); // pas de lettres seules
   await page.getByRole('button', { name: 'Lancer la partie' }).click();
   for (let t = 0; t < 3; t++) {

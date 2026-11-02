@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '3.8';
+  var VERSION = '3.9';
 
   var HISTORY = [
+    { v: '3.9', date: '2026-11-02', changes: [
+      'Préparation : les packs et les questions sont décochés au départ, chaque joueur coche les siens. Si un joueur n\u2019a rien coché, « Lancer la partie » affiche ses réglages avec un message.'
+    ] },
     { v: '3.8', date: '2026-11-02', changes: [
       'Tour de jeu : la mention « Croix 1 sur 5 — la prairie » n\u2019est plus affichée.'
     ] },

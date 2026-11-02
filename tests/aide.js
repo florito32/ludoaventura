@@ -2,8 +2,18 @@
 // Va de l'accueil au plateau : nombre de joueurs et aventure au choix.
 // Les tests raccourcissent la pause entre deux joueurs (2,2 s en vrai) et repoussent le lancer
 // automatique du dé (1,6 s en vrai) pour pouvoir cliquer « Lancer le dé » sans course.
-async function rapide(page, { autoDe = 600000 } = {}) {
-  await page.addInitScript((a) => { window.AVENTURA_PAUSE = 80; window.AVENTURA_DUREE_DE = 0; window.AVENTURA_AUTO_DE = a; }, autoDe);
+async function rapide(page, { autoDe = 600000, pause = 80 } = {}) {
+  await page.addInitScript(([a, p]) => { window.AVENTURA_PAUSE = p; window.AVENTURA_DUREE_DE = 0; window.AVENTURA_AUTO_DE = a; }, [autoDe, pause]);
+  page.__rapide = true;
+}
+
+// Packs et questions sont décochés au départ (v3.9) : coche tout pour chaque joueur, puis revient au joueur 1.
+async function cocherTout(page, joueurs) {
+  for (let k = 0; k < joueurs; k++) {
+    await page.locator('.onglet-joueur').nth(k).click();
+    for (const c of await page.locator('#packs input, #types-questions input').all()) await c.check();
+  }
+  await page.locator('.onglet-joueur').nth(0).click();
 }
 
 async function lancerPartie(page, { joueurs = 2, aventure = 'Viking' } = {}) {
@@ -12,6 +22,7 @@ async function lancerPartie(page, { joueurs = 2, aventure = 'Viking' } = {}) {
   await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
   await page.getByRole('radio', { name: new RegExp('^' + joueurs + ' joueurs?$') }).check();
   await page.getByRole('radio', { name: new RegExp('^' + aventure) }).check();
+  await cocherTout(page, joueurs);
   await page.getByRole('button', { name: 'Lancer la partie' }).click();
   await page.getByRole('heading', { name: 'Le plateau' }).waitFor();
 }
@@ -21,4 +32,4 @@ async function attendreJoueur(page, nom) {
   await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
 }
 
-module.exports = { lancerPartie, rapide, attendreJoueur };
+module.exports = { lancerPartie, rapide, attendreJoueur, cocherTout };

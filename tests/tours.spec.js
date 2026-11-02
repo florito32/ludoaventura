@@ -45,6 +45,7 @@ test.describe('règles du déroulement', () => {
 });
 
 test('un tour complet : piocher, répondre, lancer, message écrit puis joueur suivant automatiquement', async ({ page }) => {
+  await rapide(page, { pause: 1500 }); // le message « Léa gagne… » reste affiché assez longtemps pour être lu par le test
   await lancerPartie(page, { joueurs: 2 });
   await expect(page.locator('#tour-nom')).toHaveText('Léa');
   // Le tour de jeu n'écrit plus « Croix 1 sur 5 — la prairie » (demande du 02/11/2026).
