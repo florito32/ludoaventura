@@ -516,9 +516,12 @@
     var actions = $('tour-actions');
     actions.innerHTML = '';
     var consigne = $('tour-consigne');
+    // Texte lu par les lecteurs d'écran seulement (invisible à l'écran).
+    function annoncer(t) { consigne.innerHTML = '<span class="visually-hidden">' + t + '</span>'; }
     if (r.etape === 'piocher') {
       $('carte-piochee').hidden = true;
-      consigne.textContent = j.nom + ' avance sur la croix et pioche une carte dans son tas.';
+      // Pas de commentaire visible (v4.3) : seulement pour les lecteurs d'écran.
+      annoncer(j.nom + ' pioche une carte dans son tas.');
       bouton('Piocher une carte', 'btn-principal', function () {
         partie.carte = piocherCarte(j);
         R.piocher(r);
@@ -530,11 +533,8 @@
       bouton('Bonne réponse', 'btn-bonne', function () { R.repondre(r, true); reagir(true); rendre(); lancerApresReaction(); });
       bouton('Mauvaise réponse', 'btn-mauvaise', function () { R.repondre(r, false); reagir(false); rendre(); lancerApresReaction(); });
     } else if (r.etape === 'lancer') {
-      consigne.textContent = r.de === 'fort'
-        ? 'Bravo ! ' + j.nom + ' lance le dé FORT.'
-        : 'Les autres joueurs et le maître du jeu aident à trouver la bonne réponse, puis ' + j.nom + ' lance le dé FAIBLE.';
-      consigne.textContent += ' Le dé se lance tout seul dans un instant.';
-      bouton('Lancer le dé ' + r.de.toUpperCase(), 'btn-principal', function () { lancerDe(r.de); });
+      // Après « Bonne / Mauvaise réponse » : ni commentaire ni bouton (v4.3), le dé se lance tout seul.
+      annoncer(j.nom + ' lance le dé ' + r.de.toUpperCase() + '.');
     } else if (r.etape === 'suivant' || r.etape === 'fin') {
       // Points ajoutés : on l'écrit, puis on passe tout seul au joueur suivant (ou au résultat).
       var gain = j.nom + ' gagne ' + points(r.dernierLancer) + ' !';
@@ -595,7 +595,7 @@
   }
 
   // Une fois l'animation de réponse terminée, le bon dé (FORT ou FAIBLE) se lance tout seul.
-  // Le bouton « Lancer le dé » reste là pour lancer plus tôt. Les tests règlent ce délai avec window.AVENTURA_AUTO_DE.
+  // Il n'y a plus de bouton (v4.3). Les tests règlent ce délai avec window.AVENTURA_AUTO_DE.
   var DELAI_AUTO_DE = typeof window.AVENTURA_AUTO_DE === 'number' ? window.AVENTURA_AUTO_DE : DUREE_REACTION;
   var minuteurDe = null;
   function lancerApresReaction() {
@@ -725,7 +725,7 @@
   function lancerDe(type) {
     var r = partie.regles;
     if (r.etape !== 'lancer' || r.de !== type || partie.roule) return;
-    clearTimeout(minuteurDe); minuteurDe = null; // lancé à la main avant le lancer automatique
+    clearTimeout(minuteurDe); minuteurDe = null; // lancé (par les tests) avant le lancer automatique
     partie.roule = true;
     $('tour-actions').innerHTML = '';
     var v = window.Des.lancer(type);
@@ -898,5 +898,7 @@
   // Préchargement discret du plateau pendant que l'accueil est affiché.
   window.addEventListener('load', function () { new Image().src = 'img/plateau-jour.webp'; });
 
-  window.Aventura = { cases: CASES, route: ROUTE, trajet: trajet, decalages: DECALAGES, partie: partie, cartesDuJoueur: cartesDuJoueur, majConstruction: majConstruction };
+  window.Aventura = { cases: CASES, route: ROUTE, trajet: trajet, decalages: DECALAGES, partie: partie, cartesDuJoueur: cartesDuJoueur, majConstruction: majConstruction,
+    // Tests : lancer le dé sans attendre le lancer automatique (il n'y a plus de bouton depuis v4.3).
+    lancerDe: function () { lancerDe(partie.regles.de); } };
 })();

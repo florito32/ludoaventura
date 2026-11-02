@@ -1,7 +1,7 @@
 // Dés : faces conformes aux règles, lancer à l'écran.
 const { test, expect } = require('@playwright/test');
 const Des = require('../js/des.js');
-const { lancerPartie, rapide } = require('./aide');
+const { lancerPartie, rapide, lancerLeDe } = require('./aide');
 
 test.describe('règles des dés', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
@@ -30,7 +30,7 @@ test('bonne réponse → dé FORT (4 à 6 points), mauvaise → dé FAIBLE (1 à
   for (const [reponse, min, max] of [['Bonne réponse', 4, 6], ['Mauvaise réponse', 1, 3]]) {
     await page.getByRole('button', { name: 'Piocher une carte' }).click();
     await page.getByRole('button', { name: reponse }).click();
-    await page.getByRole('button', { name: /^Lancer le dé/ }).click();
+    await lancerLeDe(page);
     await expect(page.locator('#tour-consigne')).toContainText('gagne');
     const pts = Number(await page.locator('#points').textContent());
     expect(pts - total).toBeGreaterThanOrEqual(min);
@@ -46,7 +46,7 @@ test('le dé roule sur le plateau puis montre, face visible, les points gagnés'
   await lancerPartie(page);
   await page.getByRole('button', { name: 'Piocher une carte' }).click();
   await page.getByRole('button', { name: 'Bonne réponse' }).click();
-  await page.getByRole('button', { name: 'Lancer le dé FORT' }).click();
+  await lancerLeDe(page);
   const zone = page.locator('#de-plateau');
   await expect(zone).toBeVisible();
   // Pendant que le dé roule, les points ne sont pas encore comptés.

@@ -1,7 +1,7 @@
 // Tours de jeu : pioche dans son tas, bonne / mauvaise réponse, dé, points cumulés, fin de partie.
 const { test, expect } = require('@playwright/test');
 const R = require('../js/regles.js');
-const { lancerPartie, attendreJoueur, rapide } = require('./aide');
+const { lancerPartie, attendreJoueur, rapide, lancerLeDe } = require('./aide');
 
 test.describe('règles du déroulement', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
@@ -53,7 +53,7 @@ test('un tour complet : piocher, répondre, lancer, message écrit puis joueur s
   await page.getByRole('button', { name: 'Piocher une carte' }).click();
   await expect(page.locator('#carte-titre')).toContainText('Carte n° 1 de Léa');
   await page.getByRole('button', { name: 'Bonne réponse' }).click();
-  await page.getByRole('button', { name: 'Lancer le dé FORT' }).click();
+  await lancerLeDe(page);
   const pts = Number(await page.locator('#points').textContent());
   expect(pts).toBeGreaterThanOrEqual(4);
   expect(pts).toBeLessThanOrEqual(6);
@@ -67,7 +67,7 @@ async function jouerPartie(page, bonne) {
   for (let t = 0; t < 10; t++) {
     await page.getByRole('button', { name: 'Piocher une carte' }).click();
     await page.getByRole('button', { name: bonne ? 'Bonne réponse' : 'Mauvaise réponse' }).click();
-    await page.getByRole('button', { name: /^Lancer le dé/ }).click();
+    await lancerLeDe(page);
     if (t < 9) await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
   }
   // Après le dernier lancer, le résultat s'affiche tout seul.
@@ -110,7 +110,7 @@ test('animation de réponse : « Bravo ! » et confettis si bonne, « Oups ! » 
   await expect(reaction).toContainText('Bravo !');
   await expect(reaction.locator('i')).toHaveCount(18);
   await expect(page.locator('.pion').nth(0)).toHaveClass(/saute/);
-  await page.getByRole('button', { name: /^Lancer le dé/ }).click();
+  await lancerLeDe(page);
   await attendreJoueur(page, 'Tom');
   await page.getByRole('button', { name: 'Piocher une carte' }).click();
   await page.getByRole('button', { name: 'Mauvaise réponse' }).click();
@@ -127,8 +127,11 @@ test('après l\u2019animation de réponse, le bon dé se lance tout seul (FORT s
     const avant = Number(await page.locator('#points').textContent());
     await page.getByRole('button', { name: 'Piocher une carte' }).click();
     await page.getByRole('button', { name: reponse }).click();
-    await expect(page.locator('#tour-consigne')).toContainText('Le dé se lance tout seul');
-    // Aucun clic sur « Lancer le dé » : le dé roule seul, les points arrivent et le tour passe.
+    // v4.3 : ni commentaire visible ni bouton « Lancer le dé » dans le tour de jeu.
+    await expect(page.locator('#tour-actions')).toBeEmpty();
+    await expect(page.locator('#tour-consigne .visually-hidden')).toHaveCount(1);
+    await expect(page.locator('#tour-consigne')).not.toContainText('Bravo');
+    // Le dé roule seul, les points arrivent et le tour passe.
     await attendreJoueur(page, nom);
     const gain = Number(await page.locator('#points').textContent()) - avant;
     expect(gain).toBeGreaterThanOrEqual(min);
@@ -136,16 +139,26 @@ test('après l\u2019animation de réponse, le bon dé se lance tout seul (FORT s
   }
 });
 
-test('lancer le dé à la main avant le lancer automatique ne le lance pas deux fois', async ({ page }) => {
+test('lancer le dé avant le lancer automatique ne le lance pas deux fois', async ({ page }) => {
   await rapide(page, { autoDe: 400 });
   page.__rapide = true;
   await lancerPartie(page, { joueurs: 1 });
   await page.getByRole('button', { name: 'Piocher une carte' }).click();
   await page.getByRole('button', { name: 'Bonne réponse' }).click();
-  await page.getByRole('button', { name: 'Lancer le dé FORT' }).click();
+  await lancerLeDe(page);
   const pts = Number(await page.locator('#points').textContent());
   await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
   await page.waitForTimeout(800);
   await expect(page.locator('#points')).toHaveText(String(pts));
   await expect(page.getByRole('button', { name: 'Piocher une carte' })).toBeVisible();
+});
+
+test('v4.3 : pas de commentaire visible dans le tour de jeu au moment de piocher', async ({ page }) => {
+  await lancerPartie(page, { joueurs: 2 });
+  await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
+  // Seul un texte pour lecteurs d'écran (masqué à l'écran) reste dans la consigne.
+  const visibles = await page.locator('#tour-consigne').evaluate((el) =>
+    Array.from(el.childNodes).filter((n) => !(n.classList && n.classList.contains('visually-hidden')) && n.textContent.trim()).length);
+  expect(visibles).toBe(0);
+  await expect(page.locator('#tour-consigne')).not.toContainText('avance sur la croix');
 });

@@ -1,7 +1,7 @@
 // Cartes JEU : 5 packs × 3 niveaux depuis l'Excel, choix par joueur, dictée, lecture vocale.
 const { test, expect } = require('@playwright/test');
 const C = require('../js/cartes.js');
-const { rapide, cocherTout } = require('./aide');
+const { rapide, cocherTout, lancerLeDe } = require('./aide');
 
 // Remplace la synthèse vocale du navigateur par un enregistreur (les phrases « lues » sont gardées).
 async function voixEspion(page) {
@@ -126,7 +126,7 @@ test('la carte piochée vient des packs et du niveau du joueur ; mot caché puis
     expect(temps2).toContain(mot);
     await expect(page.locator('#carte-reponse')).toHaveText('Réponse : ' + [...mot].filter((c) => /\p{L}/u.test(c)).join(' - '));
     await page.getByRole('button', { name: 'Bonne réponse' }).click();
-    await page.getByRole('button', { name: /^Lancer le dé/ }).click();
+    await lancerLeDe(page);
     if (t < 4) await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
   }
 });
@@ -156,7 +156,7 @@ test('🔊 Écouter : la voix lit la consigne et le mot (en français), sans dir
 
   // Carte lettre : seule la question est lue.
   await page.getByRole('button', { name: 'Bonne réponse' }).click();
-  await page.getByRole('button', { name: /^Lancer le dé/ }).click();
+  await lancerLeDe(page);
   await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
   await page.getByRole('button', { name: 'Préparation' }).click();
   for (const nom of ['Lettres', 'Temps']) await page.getByRole('checkbox', { name: nom, exact: true }).click(); // Lettres d'abord : on ne peut pas décocher le dernier pack

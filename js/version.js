@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '4.2';
+  var VERSION = '4.3';
 
   var HISTORY = [
+    { v: '4.3', date: '2026-11-02', changes: [
+      'Tour de jeu : plus de commentaires après « Bonne réponse » / « Mauvaise réponse » ni au moment de piocher, et plus de bouton « Lancer le dé » : le dé se lance tout seul.'
+    ] },
     { v: '4.2', date: '2026-11-02', changes: [
       'Sur le plateau, les aventuriers sont debout (corps entier) sur un socle à la couleur du joueur, au lieu d\u2019un visage dans un rond.',
       'Ils marchent d\u2019une croix à l\u2019autre : jambes et bras qui se balancent, et ils se tournent dans le sens de la route.'

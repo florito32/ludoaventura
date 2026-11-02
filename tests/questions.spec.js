@@ -2,7 +2,7 @@
 const { test, expect } = require('@playwright/test');
 const Q = require('../js/questions.js');
 const C = require('../js/cartes.js');
-const { rapide, cocherTout } = require('./aide');
+const { rapide, cocherTout, lancerLeDe } = require('./aide');
 
 const rep = (id, mot) => Q.trouver(id).reponse(mot, C.INFOS[mot]);
 const possible = (id, mot) => Q.possibles(mot, C.INFOS[mot], [id]).length === 1;
@@ -73,7 +73,7 @@ test('le joueur choisit ses questions ; « Lettres muettes » seule → la répo
     await expect(page.locator('#carte-mot .muette')).toHaveText(muettes);
     await expect(page.locator('#carte-reponse')).toHaveText('Réponse : ' + muettes.join(', '));
     await page.getByRole('button', { name: 'Bonne réponse' }).click();
-    await page.getByRole('button', { name: /^Lancer le dé/ }).click();
+    await lancerLeDe(page);
     if (t < 2) await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
   }
 });
