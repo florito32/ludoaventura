@@ -1,49 +1,22 @@
-/* Ludoaventura — feuille de style unique.
-   Couleurs en variables (thème clair par défaut, thème sombre automatique).
-   Contrastes vérifiés par l'audit axe-core (WCAG 2.1 AA) des tests. */
+/* Aventura (Ludoaventura) — feuille de style unique.
+   Couleurs reprises des illustrations : vert prairie, parchemin, encre brune,
+   rouge / jaune / bleu des piles de cartes. Thème clair uniquement : les illustrations
+   sont conçues sur fond clair. */
 
 :root {
-  --bg: #f6efe1;          /* sable */
-  --surface: #fffaf0;
-  --ink: #1d2a2c;
-  --muted: #4b5a5c;
-  --line: #d9ccb0;
-  --primary: #0f5c63;     /* bleu lagon profond */
-  --on-primary: #ffffff;
-  --accent: #b4430b;      /* corail : lieu à explorer */
-  --ok: #1b6e36;
-  --ko: #a5221a;
-  --ok-bg: #dff3e4;
-  --ko-bg: #fbe3e1;
-  --star: #9a6700;
-  --mer: #9fd6df;
-  --ile: #ead59f;
-  --ile-bord: #c9ae6b;
-  --chemin: #8a5a2b;
+  --vert: #3f7a46;        /* vert du bas du plateau (texte blanc dessus : contraste ≥ 4,5:1) */
+  --vert-fonce: #2c5a33;
+  --parchemin: #f6eedb;
+  --parchemin-bord: #d8c7a0;
+  --encre: #3b2a1e;       /* brun foncé des contours et du mot MISSION */
+  --encre-douce: #5e4a3a;
+  --rouge: #e3262a;
+  --jaune: #ffe600;
+  --bleu: #1c3473;
+  --vert-pion: #2f9e5b;
+  --ciel: #8fc8ea;
   --radius: 14px;
   color-scheme: light;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0e1a1c;
-    --surface: #16272a;
-    --ink: #eef3f2;
-    --muted: #a9bab9;
-    --line: #2b4245;
-    --primary: #5cc8c4;
-    --on-primary: #08262a;
-    --accent: #ffa36b;
-    --ok: #7ad99a;
-    --ko: #ff9a8f;
-    --ok-bg: #16392240;
-    --ko-bg: #4a1a1640;
-    --star: #ffd166;
-    --mer: #12434d;
-    --ile: #5e5232;
-    --ile-bord: #8a7748;
-    --chemin: #e7c17d;
-    color-scheme: dark;
-  }
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -54,149 +27,194 @@ body {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  background: var(--bg);
-  color: var(--ink);
-  font: 400 1.0625rem/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);
+  background: var(--vert);
+  color: var(--encre);
+  font: 400 1rem/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
-h1, h2 { line-height: 1.2; margin: 0 0 .4em; }
-h1 { font-size: clamp(1.7rem, 6vw, 2.4rem); }
-h2 { font-size: clamp(1.4rem, 5vw, 1.9rem); }
-h1:focus, h2:focus { outline: none; }
-:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
-
+h2, h3 { font-family: "Rockwell", "Roboto Slab", "Georgia", serif; line-height: 1.15; margin: 0; }
+:focus-visible { outline: 3px solid var(--jaune); outline-offset: 3px; box-shadow: 0 0 0 6px var(--encre); }
 .visually-hidden {
   position: absolute !important; width: 1px; height: 1px; overflow: hidden;
   clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
 }
 .skip {
-  position: absolute; left: 12px; top: -60px; z-index: 10;
-  background: var(--primary); color: var(--on-primary);
-  padding: 10px 14px; border-radius: 8px; text-decoration: none; font-weight: 600;
+  position: absolute; left: 12px; top: -60px; z-index: 20;
+  background: var(--encre); color: #fff; padding: 10px 14px; border-radius: 8px; font-weight: 700; text-decoration: none;
 }
 .skip:focus { top: 12px; }
-
-/* ----- En-tête et pied ----- */
-.entete {
-  display: flex; align-items: center; justify-content: space-between;
-  max-width: 760px; width: 100%; margin: 0 auto; padding: 12px 16px;
-}
-.logo { margin: 0; font-weight: 800; font-size: 1.15rem; color: var(--primary); letter-spacing: .01em; }
-.etoiles { margin: 0; font-weight: 700; color: var(--star); }
-main { flex: 1; width: 100%; max-width: 760px; margin: 0 auto; padding: 0 16px 24px; }
+main { flex: 1; display: flex; flex-direction: column; }
 main:focus { outline: none; }
-.pied { text-align: center; color: var(--muted); font-size: .9rem; padding: 12px 16px 20px; }
-.pied p { margin: 0; display: flex; gap: 8px; justify-content: center; align-items: center; flex-wrap: wrap; }
+.ecran[hidden] { display: none !important; }
 
-.ecran { text-align: center; }
-.intro, .sous-titre, .histoire { color: var(--muted); max-width: 34em; margin: 0 auto 1.2em; }
-
-/* ----- Boutons (hiérarchie : principal > secondaire > lien) ----- */
-.actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 20px; }
+/* ---------- Boutons ---------- */
 .btn {
-  font: inherit; font-weight: 700; cursor: pointer;
-  min-height: 48px; padding: 10px 22px; border-radius: 999px; border: 2px solid transparent;
+  font: inherit; font-weight: 800; cursor: pointer; letter-spacing: .02em;
+  min-height: 52px; padding: 12px 26px; border-radius: 12px;
+  border: 3px solid var(--encre);
 }
-.btn-principal { background: var(--primary); color: var(--on-primary); }
-.btn-principal:hover { filter: brightness(1.1); }
-.btn-secondaire { background: transparent; color: var(--primary); border-color: var(--primary); }
-.btn-lien { background: none; color: var(--muted); text-decoration: underline; padding-inline: 10px; }
+.btn-principal {
+  background: var(--rouge); color: #fff; font-size: 1.1rem;
+  box-shadow: 0 4px 0 var(--encre);
+  text-shadow: 0 1px 0 rgb(0 0 0 / .35);
+}
+.btn-principal:hover { filter: brightness(1.06); }
+.btn-principal:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--encre); }
 
-/* ----- Choix du niveau ----- */
-.niveaux { border: 0; padding: 0; margin: 0; display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
-.niveaux legend { font-weight: 700; font-size: 1.15rem; margin: 0 auto 12px; padding: 0; }
-.niveau {
-  position: relative; display: flex; flex-direction: column; gap: 2px; cursor: pointer;
-  background: var(--surface); border: 2px solid var(--line); border-radius: var(--radius);
-  padding: 14px 12px; text-align: center;
+/* ---------- Accueil : composition façon boîte du jeu ---------- */
+.accueil {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  /* Décor peint : ciel, montagnes, prairie. Couleur de prairie en secours sous l'image. */
+  background: #b4ca58 url("../img/fond.webp") center 58% / cover no-repeat;
+  overflow: hidden;
 }
-.niveau input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
-.niveau:has(input:checked) { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary) inset; }
-.niveau:has(input:focus-visible) { outline: 3px solid var(--accent); outline-offset: 3px; }
-.niveau-nom { font-weight: 800; font-size: 1.1rem; color: var(--primary); }
-.niveau-age { font-weight: 600; }
-.niveau-resume { color: var(--muted); font-size: .92rem; }
+.scene {
+  position: relative;
+  width: min(100vw, calc(100dvh - 40px), 820px);
+  aspect-ratio: 1;
+}
+.calque { position: absolute; height: auto; pointer-events: none; user-select: none; }
+.arche { left: 15%; top: 14%; width: 72%; filter: drop-shadow(0 6px 8px rgb(0 0 0 / .18)); }
+.perso { left: 25%; top: 39%; width: 30%; }
+.herbe { left: -2%; bottom: 0; width: 24%; }
+.accueil-actions {
+  position: absolute; right: 4%; bottom: 7%; width: 44%;
+  display: flex; flex-direction: column; align-items: stretch; gap: 10px; text-align: center;
+}
+.accroche {
+  margin: 0; font-weight: 700; font-size: clamp(.8rem, 2.6vw, 1rem); color: var(--encre);
+  background: var(--parchemin); border: 2px solid var(--encre); border-radius: 10px; padding: 6px 10px;
+}
+.accueil-actions .btn { font-size: clamp(.95rem, 3vw, 1.2rem); padding-inline: 12px; }
 
-/* ----- Carte de l'île ----- */
-.carte { position: relative; width: 100%; max-width: 640px; margin: 0 auto; aspect-ratio: 4 / 3; }
-.carte-fond { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: var(--radius); }
-.mer { fill: var(--mer); }
-.ile { fill: var(--ile); stroke: var(--ile-bord); stroke-width: 3; }
-.chemin { fill: none; stroke: var(--chemin); stroke-width: 3; stroke-dasharray: 2 7; stroke-linecap: round; stroke-linejoin: round; }
-.lieux { list-style: none; margin: 0; padding: 0; }
-.lieux li { position: absolute; transform: translate(-50%, -50%); }
-.lieu {
-  display: flex; flex-direction: column; align-items: center; gap: 0;
-  background: none; border: 0; padding: 4px; cursor: pointer; font: inherit; color: var(--ink);
-  border-radius: 12px;
+/* Écrans en hauteur (téléphones, tablettes debout) : la scène occupe tout l'écran,
+   l'arche est agrandie et l'aventurier (coupé à la taille sur l'illustration) sort par le bas. */
+@media (max-aspect-ratio: 4/5) {
+  .accueil { display: flex; align-items: stretch; background-position: center bottom; }
+  .scene { flex: 1; width: 100%; aspect-ratio: auto; min-height: 420px; }
+  /* Le décor (carré) couvre l'écran par la hauteur : l'horizon reste à ~58 % de la hauteur,
+     on pose donc la base de l'arche juste sous l'horizon. */
+  .arche { left: 4%; width: 92%; top: auto; bottom: 39%; }
+  .perso { left: 2%; width: 56%; top: auto; bottom: -14%; }
+  .herbe { left: -6%; width: 34%; }
+  .accueil-actions { right: 4%; bottom: 5%; width: 54%; }
 }
-.lieu:disabled { cursor: not-allowed; }
-.lieu-pastille {
-  display: grid; place-items: center; width: clamp(40px, 11vw, 60px); aspect-ratio: 1;
-  font-size: clamp(1.25rem, 5.5vw, 1.9rem); border-radius: 50%;
-  background: var(--surface); border: 3px solid var(--primary); box-shadow: 0 2px 6px rgb(0 0 0 / .2);
-}
-.lieu:disabled .lieu-pastille { border-color: var(--line); filter: grayscale(1); opacity: .85; }
-.lieu-courant .lieu-pastille { border-color: var(--accent); animation: briller 1.4s ease-in-out infinite; }
-.lieu-nom {
-  font-size: clamp(.68rem, 2.6vw, .85rem); font-weight: 700; white-space: nowrap;
-  background: var(--surface); padding: 0 6px; border-radius: 6px; margin-top: 2px;
-}
-.lieu-etoiles { font-size: clamp(.65rem, 2.4vw, .8rem); color: var(--star); letter-spacing: 1px; line-height: 1; background: var(--surface); padding: 1px 4px; border-radius: 6px; }
-@keyframes briller {
-  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 60%, transparent); }
-  50% { box-shadow: 0 0 0 10px color-mix(in srgb, var(--accent) 0%, transparent); }
-}
-@media (prefers-reduced-motion: reduce) { .lieu-courant .lieu-pastille { animation: none; } }
 
-/* ----- Défi ----- */
-.lieu-icone { font-size: 3rem; margin: 0; line-height: 1.1; }
-.lieu-icone.tresor { font-size: 4.5rem; }
-.progression { height: 8px; background: var(--line); border-radius: 99px; max-width: 420px; margin: 0 auto 6px; overflow: hidden; }
-.progression span { display: block; height: 100%; width: 0; background: var(--primary); transition: width .3s; }
-.compteur { color: var(--muted); font-size: .95rem; margin: 0 0 8px; }
-.question { font-size: clamp(2rem, 9vw, 3.2rem); font-weight: 800; margin: 8px 0 16px; font-variant-numeric: tabular-nums; }
-.choix { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 420px; margin: 0 auto; }
-.choix-btn {
-  font: inherit; font-size: clamp(1.4rem, 6vw, 1.8rem); font-weight: 800; font-variant-numeric: tabular-nums;
-  min-height: 64px; border-radius: var(--radius); cursor: pointer;
-  background: var(--surface); color: var(--ink); border: 2px solid var(--line);
+/* ---------- Plateau ---------- */
+.plateau-ecran { width: 100%; max-width: 1280px; margin: 0 auto; padding: 8px 12px 16px; }
+.barre { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; margin-bottom: 10px; color: #fff; }
+.barre h2 { font-size: clamp(1.3rem, 4.5vw, 1.8rem); text-shadow: 0 2px 0 var(--vert-fonce); }
+.barre h2:focus { outline: none; }
+.btn-retour {
+  justify-self: start; font: inherit; font-weight: 700; color: #fff; cursor: pointer;
+  background: var(--vert-fonce); border: 2px solid #fff; border-radius: 99px; padding: 6px 14px; min-height: 44px;
 }
-.choix-btn:not(:disabled):hover { border-color: var(--primary); }
-.choix-btn:disabled { cursor: default; }
-.choix-btn.juste { background: var(--ok-bg); border-color: var(--ok); color: var(--ok); }
-.choix-btn.faux { background: var(--ko-bg); border-color: var(--ko); color: var(--ko); }
-.retour { min-height: 1.6em; font-weight: 700; margin: 14px 0 0; }
-.retour.ok { color: var(--ok); }
-.retour.ko { color: var(--ko); }
+.table { display: grid; gap: 14px; grid-template-columns: 1fr; align-items: start; }
+@media (min-width: 900px) {
+  .table { grid-template-columns: minmax(0, 1fr) 290px; }
+}
 
-/* ----- Bilan ----- */
-.bilan-etoiles { font-size: 2.6rem; color: var(--star); letter-spacing: 6px; margin: 0; }
+.plateau {
+  position: relative; margin: 0; border-radius: var(--radius); overflow: hidden;
+  border: 4px solid var(--parchemin); box-shadow: 0 6px 18px rgb(0 0 0 / .3);
+  background: var(--ciel);
+}
+.plateau img { display: block; width: 100%; height: auto; }
+.cases { list-style: none; margin: 0; padding: 0; }
+.case { position: absolute; width: 1px; height: 1px; }
+.pions { position: absolute; inset: 0; pointer-events: none; }
+/* Pion : galet plat cerné de noir, comme ceux du nid illustré au centre du plateau. */
+.pion {
+  position: absolute; width: clamp(16px, 3.6%, 44px); aspect-ratio: 1; border-radius: 50%;
+  transform: translate(-50%, -50%);
+  border: 2px solid #1d1510;
+  box-shadow: inset -3px -4px 0 rgb(0 0 0 / .22), inset 3px 3px 0 rgb(255 255 255 / .35), 0 3px 3px rgb(0 0 0 / .35);
+  animation: poser .5s ease-out backwards;
+}
+.pion:nth-child(2) { animation-delay: .08s; }
+.pion:nth-child(3) { animation-delay: .16s; }
+.pion:nth-child(4) { animation-delay: .24s; }
+@keyframes poser { from { transform: translate(-50%, -140%); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .pion { animation: none; } }
+.pion-rouge { background: var(--rouge); }
+.pion-jaune { background: var(--jaune); }
+.pion-bleu { background: #2e55c9; }
+.pion-vert { background: var(--vert-pion); }
 
-/* ----- Version + historique ----- */
+/* ---------- Panneau de la table de jeu ---------- */
+.panneau {
+  display: grid; gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+@media (min-width: 900px) { .panneau { grid-template-columns: 1fr; } }
+.bloc {
+  background: var(--parchemin); border: 3px solid var(--encre); border-radius: var(--radius);
+  padding: 12px 14px; box-shadow: 0 3px 0 rgb(0 0 0 / .25);
+}
+.bloc h3 { font-size: 1.05rem; margin-bottom: 8px; letter-spacing: .02em; }
+.points { text-align: center; }
+.points-valeur { margin: 0; font: 800 2.6rem/1 "Rockwell", "Roboto Slab", Georgia, serif; color: var(--rouge); text-shadow: 0 2px 0 var(--encre); }
+.points-objectif { margin: 6px 0 0; font-size: .85rem; color: var(--encre-douce); }
+
+.joueurs { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.joueurs li { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; font-weight: 600; }
+.joueur-couleur { font-weight: 400; color: var(--encre-douce); }
+.joueur-case { font-size: .78rem; font-weight: 700; color: var(--encre); background: #fff; border: 1px solid var(--parchemin-bord); border-radius: 99px; padding: 1px 8px; }
+.pion-mini { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #1d1510; box-shadow: inset -2px -3px 0 rgb(0 0 0 / .2); }
+
+/* Dés : faces blanches à points de couleur, comme le dé illustré sur la boîte. */
+.des { display: flex; gap: 18px; justify-content: center; }
+.de-fig { margin: 0; text-align: center; font-size: .9rem; }
+.de {
+  position: relative; display: block; width: 58px; height: 58px; margin: 0 auto 6px;
+  background: #fff; border: 3px solid var(--encre); border-radius: 12px;
+  box-shadow: inset -4px -5px 0 #d9d2c4, 0 3px 0 rgb(0 0 0 / .25);
+  transform: rotate(-6deg);
+}
+.de-fort { transform: rotate(7deg); background: #fff7d6; }
+.de i { position: absolute; width: 12px; height: 12px; border-radius: 50%; }
+.de i:nth-child(1) { left: 9px; top: 9px; background: var(--rouge); }
+.de i:nth-child(2) { left: 20px; top: 20px; background: var(--bleu); }
+.de i:nth-child(3) { left: 31px; top: 31px; background: #e0b800; }
+
+/* Piles de cartes : couleurs des emplacements du plateau. */
+.cartes { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.pile { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: .72rem; font-weight: 700; text-align: center; line-height: 1.15; }
+.carte {
+  position: relative; display: block; width: 100%; max-width: 54px; aspect-ratio: 5 / 7; border-radius: 6px;
+  border: 3px solid var(--parchemin); outline: 2px solid var(--encre);
+  box-shadow: 3px 3px 0 var(--parchemin), 3px 3px 0 2px var(--encre), 6px 6px 0 var(--parchemin), 6px 6px 0 2px var(--encre);
+  margin: 2px 8px 8px 0;
+}
+.pile-aventure .carte { background: repeating-linear-gradient(45deg, #c9a46a 0 6px, #b8904f 6px 12px); }
+.pile-rouge .carte { background: var(--rouge); }
+.pile-jaune .carte { background: var(--jaune); }
+.pile-bleue .carte { background: var(--bleu); }
+
+.ambiance { display: flex; gap: 8px; }
+.ambiance-btn {
+  flex: 1; font: inherit; font-weight: 700; cursor: pointer; min-height: 44px; border-radius: 10px;
+  background: #fff; color: var(--encre); border: 2px solid var(--encre);
+}
+.ambiance-btn[aria-pressed="true"] { background: var(--encre); color: #fff; }
+
+/* ---------- Pied de page + version ---------- */
+.pied { text-align: center; color: #fff; font-size: .9rem; padding: 10px 16px calc(14px + env(safe-area-inset-bottom)); background: var(--vert); }
+.pied p { margin: 0; display: flex; gap: 8px; justify-content: center; align-items: center; flex-wrap: wrap; }
 .version-badge {
-  font: inherit; font-size: .85rem; cursor: pointer; color: var(--muted);
-  background: none; border: 1px solid var(--line); border-radius: 99px; padding: 2px 10px; min-height: 28px;
+  font: inherit; font-size: .85rem; cursor: pointer; color: #fff;
+  background: none; border: 1px solid #fff; border-radius: 99px; padding: 2px 10px; min-height: 28px;
 }
-.version-badge:hover, .version-badge:focus-visible { color: var(--ink); border-color: var(--muted); }
 .version-dialog {
-  max-width: min(520px, calc(100vw - 32px)); max-height: 80vh; border: 0; border-radius: var(--radius);
-  padding: 20px 22px; background: var(--surface); color: var(--ink);
+  max-width: min(520px, calc(100vw - 32px)); max-height: 80vh; border: 3px solid var(--encre); border-radius: var(--radius);
+  padding: 20px 22px; background: var(--parchemin); color: var(--encre);
 }
 .version-dialog::backdrop { background: rgb(0 0 0 / .45); }
-.version-dialog h2 { font-size: 1.4rem; }
+.version-dialog h2 { font-size: 1.4rem; margin-bottom: .5em; }
 .version-dialog h3 { font-size: 1.05rem; margin: 0 0 .3em; }
-.version-dialog time { font-weight: 400; font-size: .85rem; color: var(--muted); margin-left: 6px; }
+.version-dialog time { font-family: system-ui, sans-serif; font-weight: 400; font-size: .85rem; color: var(--encre-douce); margin-left: 6px; }
 .version-list { list-style: none; padding: 0; margin: 0 0 16px; }
 .version-list > li { margin-bottom: 14px; }
 .version-list ul { margin: 0; padding-left: 20px; }
-.version-close { font: inherit; font-weight: 700; min-height: 44px; padding: 8px 20px; border-radius: 99px; border: 0; background: var(--primary); color: var(--on-primary); cursor: pointer; }
-
-/* Écrans très bas (téléphones carrés, paysage) : on resserre. */
-@media (max-height: 560px) {
-  .entete { padding-block: 6px; }
-  .lieu-icone { font-size: 2rem; }
-  .question { margin: 4px 0 10px; }
-  .choix-btn { min-height: 52px; }
-  .intro, .histoire { margin-bottom: .6em; }
-}
+.version-close { font: inherit; font-weight: 700; min-height: 44px; padding: 8px 20px; border-radius: 10px; border: 2px solid var(--encre); background: var(--encre); color: #fff; cursor: pointer; }

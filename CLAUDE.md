@@ -3,10 +3,10 @@
 À lire en premier à chaque session, avec `BACKLOG.md`.
 
 ## Le projet
-- Ludoaventura : jeu éducatif d'aventure, pour tous les âges (niveau choisi au départ).
+- Ludoaventura : version numérique du jeu de société éducatif **Aventura** (plateau, pions, dés FAIBLE / FORT, cartes AVENTURE et JEU). Matériel d'origine sur l'ordinateur de l'utilisateur : `C:\Users\fbore\Documents\Projets\09- Aventura\jeu numérique` (illustrations, plateau.pdf, Règles.docx).
 - Site en ligne : https://florito32.github.io/ludoaventura/
 - Dépôt distinct de `florito32/minijeux` (site de petits jeux, ancien nom « ludoaventura »).
-- Fichiers clés : `index.html` (écrans du jeu), `js/questions.js` (générateur de questions, sans interface), `js/jeu.js` (déroulement), `js/version.js` (version + historique), `sw.js` (hors ligne / mises à jour).
+- Fichiers clés : `index.html` (écrans : accueil, plateau), `js/plateau.js` (cases du parcours en % de l'image, pions), `img/` (illustrations détourées en WebP), `js/version.js` (version + historique), `sw.js` (hors ligne / mises à jour).
 - À chaque mise en ligne : incrémenter `VERSION` dans `js/version.js` **et** `CACHE` dans `sw.js`.
 
 ## Questions

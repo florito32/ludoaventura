@@ -23,7 +23,7 @@ test('service worker actif et page disponible hors ligne', async ({ page, contex
   await expect.poll(() => page.evaluate(() => !!navigator.serviceWorker.controller)).toBe(true);
   await context.setOffline(true);
   await page.reload();
-  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Commencer l\'aventure' })).toBeVisible();
   await context.setOffline(false);
 });
 

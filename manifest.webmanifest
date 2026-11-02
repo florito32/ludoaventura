@@ -1,16 +1,15 @@
 {
-  "name": "Ludoaventura — l'île aux calculs",
-  "short_name": "Ludoaventura",
-  "description": "Jeu éducatif d'aventure pour tous les âges : explore l'île et résous des calculs pour trouver le trésor.",
+  "name": "Aventura — Ludoaventura",
+  "short_name": "Aventura",
+  "description": "Jeu éducatif d'aventure en équipe : avancez du départ jusqu'au volcan et cumulez assez de points pour finir l'aventure.",
   "lang": "fr",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f6efe1",
-  "theme_color": "#0f5c63",
+  "background_color": "#3f7a46",
+  "theme_color": "#3f7a46",
   "icons": [
     { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" },
-    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml" }
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ]
 }

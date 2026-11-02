@@ -4,9 +4,16 @@
 (function () {
   'use strict';
 
-  var VERSION = '1.0';
+  var VERSION = '2.0';
 
   var HISTORY = [
+    { v: '2.0', date: '2026-11-02', changes: [
+      'Le jeu devient Aventura, avec les vraies illustrations du jeu de société.',
+      'Accueil composé comme la boîte : arche « Aventura », aventurier, décor et herbes.',
+      'Plateau illustré avec les 4 pions sur la case DÉPART, les points de l\u2019équipe, les dés FAIBLE et FORT et les piles de cartes.',
+      'Ambiance Jour ou Soir (les deux versions du plateau).',
+      'Pas encore de questions : visuel seulement. Le jeu de calcul de la v1.0 est retiré.'
+    ] },
     { v: '1.0', date: '2026-11-01', changes: [
       'Première version de Ludoaventura : l\u2019île aux calculs.',
       'Quatre niveaux : Moussaillon (dès 5 ans), Matelot (dès 7 ans), Navigateur (dès 9 ans), Capitaine (ados et adultes).',
