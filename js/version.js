@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '4.4';
+  var VERSION = '4.5';
 
   var HISTORY = [
+    { v: '4.5', date: '2026-11-02', changes: [
+      'Quand le dé est lancé, le personnage reste sur sa croix : il ne disparaît plus pour réapparaître.'
+    ] },
     { v: '4.4', date: '2026-11-02', changes: [
       'Dé : les coins épousent le bord arrondi (les faces de derrière ne dépassent plus aux coins).'
     ] },

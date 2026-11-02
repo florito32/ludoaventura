@@ -274,11 +274,15 @@ main:focus { outline: none; }
   background: var(--c); border: 2px solid var(--encre); box-shadow: 0 3px 4px rgb(0 0 0 / .35);
 }
 .pion-actif .socle { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--encre), 0 4px 6px rgb(0 0 0 / .4); }
-.figurine { position: absolute; inset: 0 0 4% 0; animation: poser .5s ease-out backwards; }
+/* Arrivée des personnages sur le plateau : seulement quand ils sont posés (classe « arrive », retirée ensuite).
+   Sinon, la fin de l'animation « Bravo ! » / « Oups ! » relançait cette arrivée au moment du dé :
+   le personnage disparaissait puis réapparaissait sur sa croix (corrigé en v4.5). */
+.figurine { position: absolute; inset: 0 0 4% 0; }
+.pion.arrive .figurine { animation: poser .5s ease-out backwards; }
 .figurine-svg { display: block; width: 100%; height: 100%; overflow: visible; }
-.pion:nth-child(2) .figurine { animation-delay: .08s; }
-.pion:nth-child(3) .figurine { animation-delay: .16s; }
-.pion:nth-child(4) .figurine { animation-delay: .24s; }
+.pion.arrive:nth-child(2) .figurine { animation-delay: .08s; }
+.pion.arrive:nth-child(3) .figurine { animation-delay: .16s; }
+.pion.arrive:nth-child(4) .figurine { animation-delay: .24s; }
 @keyframes poser { from { transform: translateY(-40%); opacity: 0; } }
 /* Le personnage regarde dans le sens de la marche (propriété « scale », indépendante des animations). */
 .pion.gauche .figurine-svg { scale: -1 1; }
@@ -289,7 +293,7 @@ main:focus { outline: none; }
 .pion.marche .figurine-svg { animation: hop .15s ease-in-out infinite alternate; }
 @keyframes pas { from { transform: rotate(-20deg); } to { transform: rotate(20deg); } }
 @keyframes hop { to { transform: translateY(-3%); } }
-@media (prefers-reduced-motion: reduce) { .figurine, .pion.marche .figurine-svg, .pion.marche .figurine-svg * { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .figurine, .pion.arrive .figurine, .pion.marche .figurine-svg, .pion.marche .figurine-svg * { animation: none; } }
 .pion-rouge { --c: var(--rouge); }
 .pion-jaune { --c: #f2c400; }
 .pion-bleu { --c: #2e55c9; }
