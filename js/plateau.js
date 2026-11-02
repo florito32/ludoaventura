@@ -507,15 +507,15 @@
       '<small>' + c.packNom + ' · niveau ' + c.niveau + (c.question ? ' · ' + c.question.nom : '') + '</small>';
     $('carte-consigne').textContent = c.lettre ? 'Quelle est cette lettre ?' : c.question.consigne;
     var mot = $('carte-mot');
-    var voir = $('btn-voir');
+    var boutons = $('carte-boutons');
     $('carte-reponse').hidden = true;
     if (c.lettre) {
       mot.textContent = c.mot;
       mot.className = 'carte-mot lettre';
-      voir.hidden = true;
+      boutons.hidden = true;
     } else {
       cacherMot();
-      voir.hidden = false;
+      boutons.hidden = false;
     }
   }
 
@@ -524,8 +524,27 @@
     mot.className = 'carte-mot cache';
     mot.innerHTML = '<span aria-hidden="true">' + partie.carte.mot.replace(/[^\s'’-]/g, '•') + '</span><span class="visually-hidden">Mot caché</span>';
     $('carte-reponse').hidden = true;
-    $('btn-voir').textContent = 'Voir la réponse';
-    $('btn-voir').setAttribute('aria-expanded', 'false');
+    partie.vue = 'cache';
+    majBoutonsCarte();
+  }
+
+  // Textes des deux boutons selon ce qui est affiché : rien, le mot seul (aide) ou la réponse.
+  function majBoutonsCarte() {
+    var mot = $('btn-voir-mot'), rep = $('btn-voir');
+    mot.textContent = partie.vue === 'mot' ? 'Cacher le mot' : 'Voir le mot';
+    mot.setAttribute('aria-expanded', String(partie.vue === 'mot'));
+    rep.textContent = partie.vue === 'reponse' ? 'Cacher la réponse' : 'Voir la réponse';
+    rep.setAttribute('aria-expanded', String(partie.vue === 'reponse'));
+  }
+
+  // Aide : le mot seul, sans la réponse.
+  function montrerMotSeul() {
+    var mot = $('carte-mot');
+    mot.className = 'carte-mot';
+    mot.textContent = partie.carte.mot;
+    $('carte-reponse').hidden = true;
+    partie.vue = 'mot';
+    majBoutonsCarte();
   }
 
   // Montre le mot (lettres muettes surlignées si c'est la question) et la réponse attendue.
@@ -541,16 +560,13 @@
     var rep = $('carte-reponse');
     rep.textContent = q.id === 'ecrire' ? 'Compare avec ce qui a été écrit.' : 'Réponse : ' + q.reponse(c.mot, info);
     rep.hidden = false;
+    partie.vue = 'reponse';
+    majBoutonsCarte();
   }
 
   function brancherCarte() {
-    $('btn-voir').addEventListener('click', function () {
-      if ($('carte-mot').classList.contains('cache')) {
-        montrerReponse();
-        this.textContent = 'Cacher la réponse';
-        this.setAttribute('aria-expanded', 'true');
-      } else cacherMot();
-    });
+    $('btn-voir-mot').addEventListener('click', function () { if (partie.vue === 'mot') cacherMot(); else montrerMotSeul(); });
+    $('btn-voir').addEventListener('click', function () { if (partie.vue === 'reponse') cacherMot(); else montrerReponse(); });
     var ecouter = $('btn-ecouter');
     if (!window.Voix.disponible()) {
       ecouter.disabled = true;

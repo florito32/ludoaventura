@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '3.4';
+  var VERSION = '3.5';
 
   var HISTORY = [
+    { v: '3.5', date: '2026-11-02', changes: [
+      'Sur la carte, nouveau bouton « Voir le mot » à côté de « Voir la réponse » : le mot seul, comme une aide avant la solution.'
+    ] },
     { v: '3.4', date: '2026-11-02', changes: [
       'Après l\u2019animation « Bravo ! » ou « Oups ! », le bon dé (FORT ou FAIBLE) se lance tout seul. Le bouton reste là pour le lancer plus tôt.'
     ] },
