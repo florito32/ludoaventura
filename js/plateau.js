@@ -17,14 +17,16 @@
   // Couleur de chaque joueur : son pion et son tas de cartes (1 à 4 joueurs, le 4e a des cartes vertes).
   var COULEURS = ['rouge', 'jaune', 'bleu', 'vert'];
   // Décalage des pions posés sur une même case (en % de la largeur du plateau).
-  var DECALAGES = [[-2.2, -2.2], [2.2, -2.2], [-2.2, 2.6], [2.2, 2.6]];
+  var DECALAGES = [[-2.6, -2.6], [2.6, -2.6], [-2.6, 2.6], [2.6, 2.6]];
   var RAPPORT = 1600 / 1071; // largeur / hauteur du plateau
 
   var $ = function (id) { return document.getElementById(id); };
   var A = window.Aventures;
+  var P = window.Aventuriers;
 
   // État de la partie (en mémoire : une nouvelle ouverture repart de zéro).
-  var partie = { nbJoueurs: 2, aventure: A.LISTE[0], points: 0, joueurs: [] };
+  // choix[i] = aventurier du joueur i (par défaut : les 4 premiers de la liste).
+  var partie = { nbJoueurs: 2, aventure: A.LISTE[0], points: 0, joueurs: [], choix: ['lea', 'tom', 'nour', 'malo'], actif: 0 };
 
   function afficher(id) {
     document.querySelectorAll('.ecran').forEach(function (s) { s.hidden = s.id !== id; });
@@ -52,8 +54,59 @@
         '<span class="aventure-diff diff-' + av.difficulte + '">' + DIFF[av.difficulte] + '</span>';
       box.appendChild(label);
     });
-    $('form-preparation').addEventListener('change', majDetail);
+    $('form-preparation').addEventListener('change', function () { majDetail(); majAventuriers(); });
     majDetail();
+  }
+
+  // ---------- Choix des aventuriers ----------
+  // Un onglet par joueur (le joueur qui choisit), puis une grille de 10 portraits.
+  // Toucher un portrait le donne au joueur actif, puis passe au joueur suivant.
+  // Un aventurier déjà pris par un autre joueur n'est pas disponible.
+  function construireAventuriers() {
+    var grille = $('grille-aventuriers');
+    P.LISTE.forEach(function (a) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'aventurier';
+      b.dataset.id = a.id;
+      b.innerHTML = '<img src="' + a.image + '" alt="" width="200" height="220">' +
+        '<span class="aventurier-nom">' + a.nom + '</span><span class="aventurier-titre">' + a.titre + '</span>' +
+        '<span class="aventurier-pris" aria-hidden="true"></span>';
+      b.addEventListener('click', function () {
+        partie.choix[partie.actif] = a.id;
+        if (partie.actif < partie.nbJoueurs - 1) partie.actif++;
+        majAventuriers();
+      });
+      grille.appendChild(b);
+    });
+    majAventuriers();
+  }
+
+  function majAventuriers() {
+    var nb = Number(document.querySelector('input[name="nb"]:checked').value);
+    if (partie.actif >= nb) partie.actif = nb - 1;
+    var onglets = $('choix-joueurs');
+    onglets.innerHTML = '';
+    for (var i = 0; i < nb; i++) {
+      var a = P.trouver(partie.choix[i]);
+      var o = document.createElement('button');
+      o.type = 'button';
+      o.className = 'onglet-joueur joueur-' + COULEURS[i];
+      o.setAttribute('aria-pressed', String(i === partie.actif));
+      o.innerHTML = '<img src="' + a.image + '" alt="" width="200" height="220"><span>Joueur ' + (i + 1) +
+        '<strong>' + a.nom + '</strong></span>';
+      o.addEventListener('click', (function (k) { return function () { partie.actif = k; majAventuriers(); }; })(i));
+      onglets.appendChild(o);
+    }
+    document.querySelectorAll('.aventurier').forEach(function (b) {
+      var proprio = partie.choix.slice(0, nb).indexOf(b.dataset.id);
+      var a = P.trouver(b.dataset.id);
+      b.className = 'aventurier' + (proprio >= 0 ? ' pris joueur-' + COULEURS[proprio] : '');
+      b.setAttribute('aria-pressed', String(proprio === partie.actif));
+      b.disabled = proprio >= 0 && proprio !== partie.actif;
+      b.querySelector('.aventurier-pris').textContent = proprio >= 0 ? 'J' + (proprio + 1) : '';
+      b.setAttribute('aria-label', a.nom + ', ' + a.titre + (proprio >= 0 ? ' — choisi par Joueur ' + (proprio + 1) : ''));
+    });
   }
 
   function lireChoix() {
@@ -95,7 +148,8 @@
     partie.points = 0;
     partie.joueurs = [];
     for (var i = 0; i < partie.nbJoueurs; i++) {
-      partie.joueurs.push({ nom: 'Joueur ' + (i + 1), couleur: COULEURS[i], kase: 0 });
+      var perso = P.trouver(partie.choix[i]);
+      partie.joueurs.push({ nom: perso.nom, aventurier: perso, couleur: COULEURS[i], kase: 0 });
     }
 
     // Rouleau : nom et image de l'aventure à la place de « MISSION ».
@@ -118,13 +172,14 @@
     partie.joueurs.forEach(function (j, i) {
       var p = document.createElement('span');
       p.className = 'pion pion-' + j.couleur;
+      p.style.backgroundImage = 'url("' + j.aventurier.image + '")';
       p.style.left = (CASES[0].x + DECALAGES[i][0]) + '%';
       p.style.top = (CASES[0].y + DECALAGES[i][1] * RAPPORT) + '%';
       p.dataset.case = '0';
       pions.appendChild(p);
 
       var li = document.createElement('li');
-      li.innerHTML = '<span class="pion-mini pion-' + j.couleur + '" aria-hidden="true"></span>' +
+      li.innerHTML = '<img class="portrait-mini joueur-' + j.couleur + '" src="' + j.aventurier.image + '" alt="" width="200" height="220">' +
         '<span>' + j.nom + ' <span class="joueur-couleur">(' + j.couleur + ')</span></span>' +
         '<span class="joueur-case">DÉPART</span>';
       liste.appendChild(li);
@@ -187,6 +242,7 @@
   $('form-preparation').addEventListener('submit', function (e) { e.preventDefault(); lancerPartie(); });
 
   construireAventures();
+  construireAventuriers();
   construireCases();
   brancherAmbiance();
   brancherDes();
