@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '2.9';
+  var VERSION = '3.0';
 
   var HISTORY = [
+    { v: '3.0', date: '2026-11-02', changes: [
+      'Bonne réponse : le pion saute, des confettis éclatent et « Bravo ! » s\u2019affiche.',
+      'Mauvaise réponse : le pion tremble et « Oups ! » s\u2019affiche.'
+    ] },
     { v: '2.9', date: '2026-11-02', changes: [
       'Quand on lance le dé, un vrai dé roule sur le plateau, rebondit et montre les points gagnés.'
     ] },

@@ -279,6 +279,7 @@
     $('carte-piochee').hidden = true;
     $('bandeau').hidden = true;
     $('de-plateau').hidden = true;
+    $('reaction').hidden = true;
     partie.roule = false;
     afficher('ecran-plateau');
     // …puis le premier joueur se déplace de DÉPART jusqu'à la première croix (animation de début de partie).
@@ -352,8 +353,8 @@
       });
     } else if (r.etape === 'repondre') {
       consigne.textContent = 'La réponse de ' + j.nom + ' est-elle bonne ?';
-      bouton('Bonne réponse', 'btn-bonne', function () { R.repondre(r, true); rendre(); });
-      bouton('Mauvaise réponse', 'btn-mauvaise', function () { R.repondre(r, false); rendre(); });
+      bouton('Bonne réponse', 'btn-bonne', function () { R.repondre(r, true); reagir(true); rendre(); });
+      bouton('Mauvaise réponse', 'btn-mauvaise', function () { R.repondre(r, false); reagir(false); rendre(); });
     } else if (r.etape === 'lancer') {
       consigne.textContent = r.de === 'fort'
         ? 'Bravo ! ' + j.nom + ' lance le dé FORT.'
@@ -372,6 +373,32 @@
       consigne.textContent = gain + ' ' + suite;
       bandeau(gain + ' ' + suite);
     }
+  }
+
+  // Petite animation après la réponse : le pion saute et des confettis éclatent (bonne réponse),
+  // ou le pion tremble avec un « Oups ! » (mauvaise réponse).
+  var COULEURS_CONFETTIS = ['#e3262a', '#ffe600', '#2e55c9', '#2f9e5b', '#ff8a1f', '#fff'];
+  function reagir(bonne) {
+    var r = partie.regles;
+    var pion = document.querySelectorAll('.pion')[r.joueur];
+    var zone = $('reaction');
+    zone.hidden = false;
+    zone.className = 'reaction ' + (bonne ? 'bonne' : 'mauvaise');
+    zone.style.left = pion.style.left;
+    zone.style.top = pion.style.top;
+    var html = '<span class="reaction-texte">' + (bonne ? 'Bravo !' : 'Oups !') + '</span>';
+    if (bonne) {
+      for (var i = 0; i < 18; i++) {
+        var a = (i / 18) * 2 * Math.PI, d = 40 + Math.random() * 40;
+        html += '<i style="--dx:' + Math.round(Math.cos(a) * d) + 'px;--dy:' + Math.round(Math.sin(a) * d - 20) + 'px;background:' +
+          COULEURS_CONFETTIS[i % COULEURS_CONFETTIS.length] + ';animation-delay:' + Math.round(Math.random() * 120) + 'ms"></i>';
+      }
+    }
+    zone.innerHTML = html;
+    pion.classList.remove('saute', 'secoue');
+    void pion.offsetWidth;
+    pion.classList.add(bonne ? 'saute' : 'secoue');
+    plusTard(function () { zone.hidden = true; pion.classList.remove('saute', 'secoue'); }, 1600);
   }
 
   // Après le lancer : pause de lecture, puis joueur suivant (ou résultat de la partie).

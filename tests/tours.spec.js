@@ -98,3 +98,21 @@ test('partie entière perdue : toutes les réponses mauvaises → aventure manqu
   await page.getByRole('button', { name: 'Nouvelle partie' }).click();
   await expect(page.getByRole('heading', { name: 'Préparer la partie' })).toBeVisible();
 });
+
+test('animation de réponse : « Bravo ! » et confettis si bonne, « Oups ! » si mauvaise', async ({ page }) => {
+  await lancerPartie(page, { joueurs: 2 });
+  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await page.getByRole('button', { name: 'Bonne réponse' }).click();
+  const reaction = page.locator('#reaction');
+  await expect(reaction).toHaveClass(/bonne/);
+  await expect(reaction).toContainText('Bravo !');
+  await expect(reaction.locator('i')).toHaveCount(18);
+  await expect(page.locator('.pion').nth(0)).toHaveClass(/saute/);
+  await page.getByRole('button', { name: /^Lancer le dé/ }).click();
+  await attendreJoueur(page, 'Tom');
+  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await page.getByRole('button', { name: 'Mauvaise réponse' }).click();
+  await expect(reaction).toHaveClass(/mauvaise/);
+  await expect(reaction).toContainText('Oups !');
+  await expect(page.locator('.pion').nth(1)).toHaveClass(/secoue/);
+});
