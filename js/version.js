@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '4.3';
+  var VERSION = '4.4';
 
   var HISTORY = [
+    { v: '4.4', date: '2026-11-02', changes: [
+      'Dé : les coins épousent le bord arrondi (les faces de derrière ne dépassent plus aux coins).'
+    ] },
     { v: '4.3', date: '2026-11-02', changes: [
       'Tour de jeu : plus de commentaires après « Bonne réponse » / « Mauvaise réponse » ni au moment de piocher, et plus de bouton « Lancer le dé » : le dé se lance tout seul.'
     ] },

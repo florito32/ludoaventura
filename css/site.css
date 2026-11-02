@@ -335,6 +335,9 @@ main:focus { outline: none; }
   position: absolute; inset: 0; display: grid; grid-template: repeat(3, 1fr) / repeat(3, 1fr); padding: 14%; gap: 2%;
   background: #fffdf6; border: 3px solid var(--encre); border-radius: 18%;
   box-shadow: inset -5px -6px 0 rgb(0 0 0 / .12);
+  /* Les faces tournées vers l'arrière sont masquées : leurs coins carrés ne dépassent plus
+     des coins arrondis de la face visible (v4.4). */
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
 }
 .de3d-fort .face { background: #fff3c4; }
 .de3d .face i { width: 70%; aspect-ratio: 1; border-radius: 50%; place-self: center; background: var(--encre); }
