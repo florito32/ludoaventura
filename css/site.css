@@ -212,7 +212,7 @@ main:focus { outline: none; }
 }
 .pack span::before { content: ""; width: 16px; height: 16px; border: 2px solid var(--encre); border-radius: 4px; background: #fff; }
 .pack input:checked + span { background: var(--encre); color: #fff; border-color: var(--encre); }
-.pack input:checked + span::before { content: "✓"; display: grid; place-items: center; font-size: .75rem; color: var(--encre); }
+.pack input:checked + span::before { content: "✓"; content: "✓" / ""; display: grid; place-items: center; font-size: .75rem; color: var(--encre); }
 .niveaux-cartes { display: flex; gap: 8px; }
 .niveau-carte span {
   display: grid; place-items: center; width: 52px; height: 44px; cursor: pointer; font-weight: 800; font-size: 1.15rem;
@@ -420,6 +420,8 @@ main:focus { outline: none; }
 }
 .carte-mot.cache { letter-spacing: .15em; color: var(--encre-douce); }
 .carte-mot.lettre { font-size: 4rem; }
+.carte-reponse { margin: 0 0 8px !important; text-align: center; font-weight: 700; color: #1f5a2f; }
+.carte-mot .muette { color: var(--rouge-texte); text-decoration: underline wavy; text-underline-offset: 4px; }
 .btn-voir {
   display: block; margin: 0 auto; font: inherit; font-weight: 700; cursor: pointer; min-height: 40px; padding: 4px 14px;
   background: #fff; color: var(--encre); border: 2px solid var(--encre); border-radius: 99px;

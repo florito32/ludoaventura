@@ -25,13 +25,16 @@
   var P = window.Aventuriers;
   var C = window.Cartes;
   var TOUS_PACKS = C.PACKS.map(function (p) { return p.id; });
+  var Q = window.Questions;
+  var TOUS_TYPES = Q.TYPES.map(function (t) { return t.id; });
 
   // État de la partie (en mémoire : une nouvelle ouverture repart de zéro).
   // choix[i] = aventurier du joueur i (par défaut : les 4 premiers de la liste) ;
   // packs[i] / niveaux[i] = packs où le joueur i pioche et son niveau (tous les packs, niveau 1 par défaut).
   var partie = {
     nbJoueurs: 2, aventure: A.LISTE[0], joueurs: [], choix: ['lea', 'tom', 'nour', 'malo'], actif: 0, regles: null,
-    packs: [0, 1, 2, 3].map(function () { return TOUS_PACKS.slice(); }), niveaux: [1, 1, 1, 1], carte: null
+    packs: [0, 1, 2, 3].map(function () { return TOUS_PACKS.slice(); }), niveaux: [1, 1, 1, 1], carte: null,
+    types: [0, 1, 2, 3].map(function () { return TOUS_TYPES.slice(); }) // types de questions cochés par chaque joueur
   };
 
   function afficher(id) {
@@ -121,6 +124,26 @@
       partie.niveaux[partie.actif] = Number(e.target.value);
       majAventuriers();
     });
+    // Types de questions (cases à cocher, au moins un).
+    var types = $('types-questions');
+    Q.TYPES.forEach(function (t) {
+      var l = document.createElement('label');
+      l.className = 'pack';
+      l.innerHTML = '<input type="checkbox" name="type" value="' + t.id + '"><span>' + t.nom + '</span>';
+      types.appendChild(l);
+    });
+    types.addEventListener('change', function (e) {
+      var coches = Array.prototype.filter.call(types.querySelectorAll('input'), function (i) { return i.checked; })
+        .map(function (i) { return i.value; });
+      if (!coches.length) {
+        e.target.checked = true;
+        $('packs-alerte').textContent = 'Il faut garder au moins un type de question.';
+        return;
+      }
+      $('packs-alerte').textContent = '';
+      partie.types[partie.actif] = coches;
+      majAventuriers();
+    });
     $('btn-joueur-suivant').addEventListener('click', function () {
       partie.actif++;
       majAventuriers();
@@ -130,7 +153,9 @@
 
   function resumeCartes(i) {
     var n = partie.packs[i].length;
-    return 'Niveau ' + partie.niveaux[i] + ' · ' + (n === TOUS_PACKS.length ? 'tous les packs' : n + ' pack' + (n > 1 ? 's' : ''));
+    var t = partie.types[i].length;
+    return 'Niveau ' + partie.niveaux[i] + ' · ' + (n === TOUS_PACKS.length ? 'tous les packs' : n + ' pack' + (n > 1 ? 's' : '')) +
+      ' · ' + (t === TOUS_TYPES.length ? 'toutes les questions' : t + ' question' + (t > 1 ? 's' : ''));
   }
 
   function majAventuriers() {
@@ -165,6 +190,7 @@
     $('reglages-titre').textContent = 'Cartes de ' + actif.nom + ' (Joueur ' + (partie.actif + 1) + ')';
     $('packs').querySelectorAll('input').forEach(function (i) { i.checked = partie.packs[partie.actif].indexOf(i.value) >= 0; });
     $('niveaux-cartes').querySelectorAll('input').forEach(function (i) { i.checked = Number(i.value) === partie.niveaux[partie.actif]; });
+    $('types-questions').querySelectorAll('input').forEach(function (i) { i.checked = partie.types[partie.actif].indexOf(i.value) >= 0; });
     var suivant = $('btn-joueur-suivant');
     suivant.hidden = partie.actif >= nb - 1;
     suivant.textContent = 'Joueur suivant →';
@@ -192,10 +218,21 @@
     return liste;
   }
 
-  // Pioche dans le tas du joueur ; tas vide → on remélange toutes ses cartes.
+  // Pioche dans le tas du joueur (tas vide → on remélange toutes ses cartes) et tire au hasard
+  // une question parmi les types cochés par le joueur qui ont du sens pour ce mot.
+  // Si aucun type coché ne convient à la carte, elle repart sous le tas et on en prend une autre.
   function piocherCarte(j) {
-    if (!j.tas.length) j.tas = melanger(cartesDuJoueur(j.index));
-    return j.tas.pop();
+    var choisis = partie.types[j.index];
+    for (var essai = 0; essai < 400; essai++) {
+      if (!j.tas.length) j.tas = melanger(cartesDuJoueur(j.index));
+      var c = j.tas.pop();
+      if (c.lettre) { c.question = null; return c; }
+      var poss = Q.possibles(c.mot, C.INFOS[c.mot], choisis);
+      if (poss.length) { c.question = poss[Math.floor(Math.random() * poss.length)]; return c; }
+      j.tas.unshift(c);
+    }
+    c.question = Q.trouver('epeler'); // filet de sécurité (ne devrait pas servir)
+    return c;
   }
 
   function lireChoix() {
@@ -430,17 +467,18 @@
     }, PAUSE);
   }
 
-  // Affiche la carte piochée : dictée (mot caché) ou lettre (affichée), avec la lecture vocale.
+  // Affiche la carte piochée : la question tirée et le mot caché (ou la lettre affichée), avec la lecture vocale.
   function montrerCarte(j) {
     var c = partie.carte;
     var box = $('carte-piochee');
     box.hidden = false;
     box.className = 'carte-piochee joueur-' + j.couleur;
     $('carte-titre').innerHTML = 'Carte n° ' + partie.regles.pioches[j.index] + ' de ' + j.nom +
-      '<small>' + c.packNom + ' · niveau ' + c.niveau + '</small>';
-    $('carte-consigne').textContent = c.lettre ? 'Quelle est cette lettre ?' : 'Épelle le mot :';
+      '<small>' + c.packNom + ' · niveau ' + c.niveau + (c.question ? ' · ' + c.question.nom : '') + '</small>';
+    $('carte-consigne').textContent = c.lettre ? 'Quelle est cette lettre ?' : c.question.consigne;
     var mot = $('carte-mot');
     var voir = $('btn-voir');
+    $('carte-reponse').hidden = true;
     if (c.lettre) {
       mot.textContent = c.mot;
       mot.className = 'carte-mot lettre';
@@ -455,17 +493,31 @@
     var mot = $('carte-mot');
     mot.className = 'carte-mot cache';
     mot.innerHTML = '<span aria-hidden="true">' + partie.carte.mot.replace(/[^\s'’-]/g, '•') + '</span><span class="visually-hidden">Mot caché</span>';
-    $('btn-voir').textContent = 'Voir le mot';
+    $('carte-reponse').hidden = true;
+    $('btn-voir').textContent = 'Voir la réponse';
     $('btn-voir').setAttribute('aria-expanded', 'false');
+  }
+
+  // Montre le mot (lettres muettes surlignées si c'est la question) et la réponse attendue.
+  function montrerReponse() {
+    var c = partie.carte, info = C.INFOS[c.mot], q = c.question;
+    var mot = $('carte-mot');
+    mot.className = 'carte-mot';
+    if (q.id === 'muettes') {
+      mot.innerHTML = c.mot.split('').map(function (ch, i) {
+        return info.muettes.indexOf(i) >= 0 ? '<span class="muette">' + ch + '</span>' : ch;
+      }).join('');
+    } else mot.textContent = c.mot;
+    var rep = $('carte-reponse');
+    rep.textContent = q.id === 'ecrire' ? 'Compare avec ce qui a été écrit.' : 'Réponse : ' + q.reponse(c.mot, info);
+    rep.hidden = false;
   }
 
   function brancherCarte() {
     $('btn-voir').addEventListener('click', function () {
-      var mot = $('carte-mot');
-      if (mot.classList.contains('cache')) {
-        mot.className = 'carte-mot';
-        mot.textContent = partie.carte.mot;
-        this.textContent = 'Cacher le mot';
+      if ($('carte-mot').classList.contains('cache')) {
+        montrerReponse();
+        this.textContent = 'Cacher la réponse';
         this.setAttribute('aria-expanded', 'true');
       } else cacherMot();
     });

@@ -79,6 +79,10 @@
             <p class="reglage-titre" id="niveau-titre">Niveau</p>
             <div class="niveaux-cartes" id="niveaux-cartes" role="radiogroup" aria-labelledby="niveau-titre"></div>
           </div>
+          <div class="reglage">
+            <p class="reglage-titre" id="types-titre">Questions posées <span>(une au hasard à chaque carte)</span></p>
+            <div class="packs" id="types-questions" role="group" aria-labelledby="types-titre"></div>
+          </div>
           <p class="reglage-alerte" id="packs-alerte" role="status" aria-live="polite"></p>
           <button type="button" class="btn btn-secondaire" id="btn-joueur-suivant"></button>
         </div>
@@ -154,7 +158,8 @@
             </div>
             <p class="carte-consigne" id="carte-consigne"></p>
             <p class="carte-mot" id="carte-mot"></p>
-            <button type="button" class="btn-voir" id="btn-voir" aria-controls="carte-mot" aria-expanded="false">Voir le mot</button>
+            <p class="carte-reponse" id="carte-reponse" hidden></p>
+            <button type="button" class="btn-voir" id="btn-voir" aria-controls="carte-mot carte-reponse" aria-expanded="false">Voir la réponse</button>
           </div>
           <p class="tour-consigne" id="tour-consigne" role="status" aria-live="polite"></p>
           <div class="tour-actions" id="tour-actions"></div>
@@ -184,6 +189,7 @@
 <script src="js/aventures.js"></script>
 <script src="js/aventuriers.js"></script>
 <script src="js/cartes.js"></script>
+<script src="js/questions.js"></script>
 <script src="js/voix.js"></script>
 <script src="js/constructions.js"></script>
 <script src="js/regles.js"></script>
