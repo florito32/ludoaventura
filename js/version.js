@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '2.6';
+  var VERSION = '2.7';
 
   var HISTORY = [
+    { v: '2.7', date: '2026-11-02', changes: [
+      'Illustrations des aventures plus élaborées, dans l\u2019esprit du dessin de l\u2019aventurier : trait d\u2019encre irrégulier, hachures dans les ombres, couleurs peintes et grain de papier, plus de détails.'
+    ] },
     { v: '2.6', date: '2026-11-02', changes: [
       'Les cartes JEU arrivent : 300 cartes en 5 packs (Mots simples, Mots compliqués, Temps, Numérique, Lettres), 3 niveaux chacun.',
       'À la préparation, chaque joueur choisit les packs où il pioche et son niveau.',

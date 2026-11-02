@@ -1,44 +1,44 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" width="640" height="400">
-  <!-- Aventure « Préhistoire » : feu de camp au fond d'une caverne, deux silex au premier plan.
-       Illustration originale (la photo des anciens livrets n'est pas libre de droits). -->
+  <!-- Aventure « prehistoire » : illustration originale (générée par outils/aventures.js). -->
   <defs>
-    <radialGradient id="lueur" cx="50%" cy="72%" r="60%">
-      <stop offset="0" stop-color="#ffb347"/>
-      <stop offset=".35" stop-color="#a4572a"/>
-      <stop offset="1" stop-color="#2a1a14"/>
-    </radialGradient>
-    <linearGradient id="flamme" x1="0" y1="1" x2="0" y2="0">
-      <stop offset="0" stop-color="#e3262a"/>
-      <stop offset=".55" stop-color="#ff8a1f"/>
-      <stop offset="1" stop-color="#ffe600"/>
-    </linearGradient>
+    <linearGradient id="ciel-p" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2a1a12"/><stop offset="1" stop-color="#5a3420"/></linearGradient>
+    <filter id="encre" x="-2%" y="-2%" width="104%" height="104%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="4" result="b"/>
+      <feDisplacementMap in="SourceGraphic" in2="b" scale="2.4" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+    <filter id="doux" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="3"/></filter>
+    <filter id="flou" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="9"/></filter>
+    <filter id="papier" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" seed="9"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 .55  0 0 0 0 .5  0 0 0 0 .45  0 0 0 -1.1 .9"/>
+    </filter>
+    <filter id="taches" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="3" seed="2"/>
+      <feColorMatrix type="matrix" values="0 0 0 0 .2  0 0 0 0 .15  0 0 0 0 .1  0 0 0 -1.6 .9"/>
+    </filter>
   </defs>
+  <defs><radialGradient id="lueur" cx="50%" cy="68%" r="62%"><stop offset="0" stop-color="#f6b25a"/><stop offset=".4" stop-color="#a45a2a"/><stop offset="1" stop-color="#2a1a12"/></radialGradient></defs>
   <rect width="640" height="400" fill="url(#lueur)"/>
-  <!-- Voûte de la caverne -->
-  <path d="M0 0 H640 V150 C590 90 520 60 440 70 C380 30 260 30 200 70 C120 60 50 100 0 160 Z" fill="#1d120d"/>
-  <path d="M0 400 V300 C80 280 160 300 220 320 H420 C480 300 560 280 640 300 V400 Z" fill="#3a2418"/>
-  <!-- Peintures rupestres -->
-  <g fill="none" stroke="#e8a35c" stroke-width="5" stroke-linecap="round" opacity=".85">
-    <path d="M90 170 c20 -18 50 -18 70 0 M100 170 v22 M150 170 v22 M160 165 l12 -10 M85 168 l-8 -8"/>
-    <path d="M500 150 c18 -14 44 -14 60 0 M508 150 v20 M552 150 v20 M565 146 l10 -12"/>
-    <path d="M470 205 l-30 30 M462 213 l-14 -4"/>
+  <g filter="url(#encre)">
+    <path d="M0 0 H640 V170 C600 110 540 70 450 80 C390 40 260 36 200 76 C120 66 50 110 0 176 Z" fill="#3a2418" stroke="#2a1c14" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M80.9 120.2l-3.6 9.9M76.7 118.1l-3.9 10.6M74.1 118.1l-4.1 11.2M70.3 117.2l-3.8 10.6M67.4 115.3l-5.5 15.2M63.3 114.7l-6.2 17.0M60.8 112.5l-3.8 10.5M57.1 112.5l-5.1 13.9" fill="none" stroke="#2a1c14" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" opacity="0.7"/><path d="M159.5 80.7l-3.7 10.2M156.9 79.8l-4.0 11.1M154.4 78.3l-5.0 13.8M150.8 77.0l-6.0 16.5M148.0 74.6l-3.8 10.4M143.1 74.4l-4.0 10.9M140.5 73.6l-4.2 11.6M137.8 71.4l-4.6 12.7" fill="none" stroke="#2a1c14" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" opacity="0.7"/><path d="M299.9 49.4l-5.2 14.2M296.3 48.4l-4.2 11.5M292.7 48.4l-4.9 13.5M290.0 46.0l-4.2 11.6M287.3 44.9l-4.5 12.3M283.8 44.3l-4.1 11.4M281.4 42.9l-3.7 10.1M276.9 42.7l-4.4 12.0" fill="none" stroke="#2a1c14" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" opacity="0.7"/><path d="M430.0 59.1l-6.2 16.9M427.2 59.7l-4.0 10.9M423.4 56.7l-3.9 10.8M421.1 56.0l-3.8 10.3M417.5 55.5l-3.6 9.8M414.1 54.1l-4.2 11.7M411.1 53.2l-5.1 13.9M408.0 52.3l-5.2 14.2" fill="none" stroke="#2a1c14" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" opacity="0.7"/><path d="M540.3 89.5l-4.9 13.6M536.7 89.7l-5.6 15.5M534.0 87.3l-4.5 12.5M529.9 86.9l-5.8 16.0M526.8 86.0l-4.0 10.9M523.6 84.9l-5.0 13.6M520.5 83.5l-5.0 13.8M516.8 81.1l-3.9 10.7" fill="none" stroke="#2a1c14" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" opacity="0.7"/><path d="M600.7 130.5l-4.5 12.4M597.4 129.6l-4.2 11.4M593.2 127.9l-5.8 15.9M591.1 126.4l-3.8 10.4M587.7 125.9l-5.9 16.2M584.6 123.5l-4.6 12.5M580.7 124.0l-4.4 12.0M577.5 122.1l-4.4 12.0" fill="none" stroke="#2a1c14" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" opacity="0.7"/>
+    <g fill="#d9824a" stroke="#d9824a" opacity=".9">
+      <path d="M110 190 c10 -22 54 -24 70 -6 c8 -4 16 0 16 8 c-6 4 -10 4 -14 2 c-4 10 -14 14 -26 14 l-2 16 h-6 l0 -14 c-12 0 -22 -2 -28 -6 l-4 18 h-6 l2 -22 c-6 -2 -6 -6 -2 -10 z" stroke-width="1"/>
+      <path d="M500 170 c4 -10 10 -10 12 0 l2 -12 c0 -6 6 -6 6 0 l0 12 l4 -14 c2 -6 8 -4 6 2 l-4 14 l8 -8 c4 -4 8 0 4 4 l-14 18 c-6 8 -22 8 -26 -4 z" stroke-width="1"/>
+      <path d="M420 210 l0 -20 l6 0 l0 20 m-12 -14 l18 0 m-12 14 l-6 14 m12 -14 l6 14 M450 214 l40 -24" fill="none" stroke-width="4" stroke-linecap="round"/>
+    </g>
+    <path d="M0 400 V300 C80 280 160 296 220 316 H420 C480 296 560 280 640 300 V400 Z" fill="#4a2e1e" stroke="#2a1c14" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M40.1 320.9l2.8 7.8M36.2 321.5l4.4 12.1M33.0 321.4l3.6 10.0M30.2 324.1l3.6 9.9M27.1 323.9l4.5 12.3M23.8 326.3l2.9 8.0M20.2 326.8l3.2 8.9" fill="none" stroke="#2a1c14" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" opacity="0.6"/><path d="M121.0 329.9l3.8 10.6M116.8 331.6l3.1 8.5M113.0 332.0l2.8 7.8M109.5 333.6l3.6 9.8M107.0 334.7l3.2 8.7M104.2 335.0l2.9 8.0M100.0 337.0l3.6 9.9" fill="none" stroke="#2a1c14" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" opacity="0.6"/><path d="M519.1 320.7l3.1 8.6M516.4 321.2l3.3 9.1M513.8 321.3l4.5 12.3M510.0 323.3l3.0 8.2M506.9 325.4l3.1 8.6M503.8 324.8l4.4 12.0M501.4 326.6l3.2 8.8" fill="none" stroke="#2a1c14" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" opacity="0.6"/><path d="M589.2 329.2l4.6 12.7M585.8 330.9l3.4 9.3M583.6 333.0l4.0 10.9M580.7 333.3l3.8 10.6M576.5 335.6l3.9 10.8M574.9 335.1l4.0 10.9M570.4 337.9l2.8 7.6" fill="none" stroke="#2a1c14" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" opacity="0.6"/>
+    <path d="M246 304 L392 284 L398 300 L252 320 Z" fill="#7a4b22" stroke="#2a1c14" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/><path d="M248 284 L394 304 L388 320 L242 300 Z" fill="#8a5a2b" stroke="#2a1c14" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+    <ellipse cx="236" cy="326" rx="26" ry="14.3" fill="#8b8b83" stroke="#2a1c14" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/><path d="M232.4 317.1l1.9 5.1M228.1 318.7l2.6 7.3M225.3 319.6l2.8 7.8M223.3 320.6l3.1 8.5" fill="none" stroke="#2a1c14" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" opacity="0.8"/><ellipse cx="404" cy="326" rx="26" ry="14.3" fill="#8b8b83" stroke="#2a1c14" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/><path d="M399.9 317.7l3.0 8.2M396.1 318.4l2.1 5.6M393.1 320.9l2.0 5.5M390.6 321.1l2.1 5.9" fill="none" stroke="#2a1c14" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" opacity="0.8"/><ellipse cx="320" cy="338" rx="30" ry="16.5" fill="#8b8b83" stroke="#2a1c14" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/><path d="M316.7 329.8l2.4 6.5M313.3 332.0l2.3 6.3M309.5 331.4l2.8 7.7M305.9 333.9l2.5 7.0" fill="none" stroke="#2a1c14" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" opacity="0.8"/>
+    <path d="M320 120 C352 170 384 194 374 250 C366 292 274 292 266 252 C258 212 298 200 294 168 C312 190 318 206 316 226 C330 198 332 164 320 120 Z" fill="#e8562a" stroke="#2a1c14" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M322 190 C344 222 354 242 346 266 C338 288 302 288 296 266 C292 246 310 232 322 190 Z" fill="#f6c44a" stroke="#2a1c14" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M322 240 C332 254 334 266 330 276 C324 286 312 284 310 274 C308 262 316 256 322 240 Z" fill="#fff2b0" stroke="#2a1c14" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M80 364 l28 -38 l36 8 l12 32 l-32 18 Z" fill="#b7b9b2" stroke="#2a1c14" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/><path d="M99.7 346.8l3.7 6.4M97.1 348.5l5.6 9.8M94.0 349.4l3.9 6.8M90.9 351.7l4.2 7.3" fill="none" stroke="#2a1c14" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" opacity="0.8"/>
+    <path d="M520 370 l20 -42 l38 0 l10 34 l-38 22 Z" fill="#a8aaa2" stroke="#2a1c14" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/><path d="M546.5 340.2l5.0 8.7M543.4 342.1l5.6 9.7M540.3 343.8l4.8 8.2M537.7 346.0l3.9 6.8" fill="none" stroke="#2a1c14" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round" opacity="0.8"/>
+    <path d="M440 400 L600 230 L606 236 L448 400 Z" fill="#7a4b22" stroke="#2a1c14" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><path d="M600 230 L610 206 L618 228 L606 240 Z" fill="#9aa0a0" stroke="#2a1c14" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>
+    <g fill="#ffe27a"><circle cx="190" cy="300" r="3"/><circle cx="210" cy="270" r="2.4"/><circle cx="452" cy="290" r="3"/><circle cx="430" cy="262" r="2"/></g>
   </g>
-  <!-- Bûches et pierres du foyer -->
-  <g stroke="#1d120d" stroke-width="5" stroke-linejoin="round">
-    <rect x="250" y="300" width="140" height="22" rx="10" fill="#7a4b22" transform="rotate(-12 320 311)"/>
-    <rect x="250" y="300" width="140" height="22" rx="10" fill="#8a5a2b" transform="rotate(12 320 311)"/>
-    <ellipse cx="240" cy="330" rx="26" ry="16" fill="#8b8b83"/>
-    <ellipse cx="400" cy="330" rx="26" ry="16" fill="#9a9a90"/>
-    <ellipse cx="320" cy="340" rx="28" ry="14" fill="#7d7d76"/>
-  </g>
-  <!-- Flammes -->
-  <path d="M320 140 C350 190 380 210 372 262 C366 300 274 300 268 262 C262 222 300 210 296 180 C312 200 318 214 316 232 C328 206 330 176 320 140 Z"
-        fill="url(#flamme)" stroke="#1d120d" stroke-width="5" stroke-linejoin="round"/>
-  <path d="M322 210 C338 236 346 252 340 270 C334 288 304 288 300 270 C296 252 312 242 322 210 Z" fill="#ffe600"/>
-  <!-- Silex -->
-  <g stroke="#1d120d" stroke-width="5" stroke-linejoin="round">
-    <path d="M90 360 l30 -40 l38 8 l12 34 l-34 18 Z" fill="#b6b9b4"/>
-    <path d="M520 365 l20 -44 l40 0 l10 36 l-40 22 Z" fill="#a7aaa4"/>
-  </g>
-  <g fill="#ffe600"><circle cx="186" cy="320" r="4"/><circle cx="200" cy="300" r="3"/><circle cx="470" cy="318" r="4"/></g>
+  <rect width="640" height="400" filter="url(#taches)" opacity=".18" style="mix-blend-mode:multiply"/>
+  <rect width="640" height="400" filter="url(#papier)" opacity=".2" style="mix-blend-mode:multiply"/>
 </svg>
