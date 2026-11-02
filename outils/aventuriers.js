@@ -1,6 +1,7 @@
 // Génère les 10 portraits d'aventuriers (img/aventuriers/*.svg).
 // Personnages originaux dessinés en vectoriel : contour brun épais et couleurs vives,
 // pour rester proches du style des illustrations du plateau.
+// Génère aussi les personnages en pied du plateau (js/figurines.js).
 // Lancer : node outils/aventuriers.js
 'use strict';
 const fs = require('fs');
@@ -127,9 +128,80 @@ const DESSINS = {
   awa: { fond: '#8fd0b0', peau: '#6e4128', cheveux: '#1f1410', chapeau: 'turban', chapeauCouleur: '#ffb000', chapeauDetail: '#e3262a', haut: '#6b3fa0', acc: ['boucles'] }
 };
 
+// ---------- Personnages en pied, pour le plateau (js/figurines.js) ----------
+// Même tête que le portrait, posée sur un corps avec bras et jambes séparés :
+// le plateau les fait bouger pour la marche (classes .jambe-g/.jambe-d/.bras-g/.bras-d, css/site.css).
+// viewBox 0 0 200 400 : les pieds touchent le bas (y ≈ 392), là où le pion est posé sur la case.
+const PANTALONS = { lea: '#6b4a2b', tom: '#3b3b46', nour: '#c9a46a', malo: '#3c5a8a', ines: '#4a5a2a', jo: '#3c5a8a', kenji: '#4a3a2a', zoe: '#2e3f6e', sam: '#5a4a32', awa: '#3a2a4a' };
+
+function teteSeule(p) {
+  // Visage sans le cou (le cou est dessiné avec le corps).
+  const v = visage(p.peau, p.joues || '#e86a5a').replace(/<rect x="88" y="136"[^>]*\/>/, '');
+  const accTete = (p.acc || []).filter((a) => ['lunettes', 'boucles'].includes(a)).map((a) => accessoires[a](p.accCouleur)).join('');
+  return `${v}
+    ${(p.acc || []).includes('barbe') ? accessoires.barbe(p.cheveux) : ''}
+    ${cheveuxDessus[p.dessus || 'aucun'](p.cheveux)}
+    ${chapeaux[p.chapeau || 'aucun'](p.chapeauCouleur, p.chapeauDetail)}
+    ${accTete}`;
+}
+
+function corpsEnPied(id, p) {
+  const pant = PANTALONS[id] || '#5b4636';
+  const acc = p.acc || [];
+  const bras = (cote) => {
+    const x = cote === 'g' ? 62 : 138, sens = cote === 'g' ? -1 : 1;
+    return `<g class="bras-${cote}">
+      <path d="M${x} 196 C${x + sens * 14} 222 ${x + sens * 14} 248 ${x + sens * 8} 270" fill="none" stroke="${ENCRE}" stroke-width="26" stroke-linecap="round"/>
+      <path d="M${x} 196 C${x + sens * 14} 222 ${x + sens * 14} 248 ${x + sens * 8} 270" fill="none" stroke="${p.haut}" stroke-width="18" stroke-linecap="round"/>
+      <circle cx="${x + sens * 8}" cy="276" r="11" fill="${p.peau}" ${T}/>
+    </g>`;
+  };
+  const jambe = (cote) => {
+    const x = cote === 'g' ? 84 : 116;
+    return `<g class="jambe-${cote}">
+      <rect x="${x - 14}" y="282" width="28" height="84" rx="10" fill="${pant}" ${T}/>
+      <path d="M${x - 16} 362 h30 c10 0 18 8 18 18 v6 h-50 Z" fill="#3b2a1e" ${T}/>
+    </g>`;
+  };
+  return `${bras('g')}${jambe('g')}${jambe('d')}
+    <rect x="88" y="150" width="24" height="40" rx="8" fill="${p.peau}" ${T}/>
+    <path d="M62 196 C62 176 78 170 100 170 C122 170 138 176 138 196 L136 292 L64 292 Z" fill="${p.haut}" ${T}/>
+    <path d="M84 172 L100 194 L116 172" fill="none" stroke="${p.col || '#fff'}" stroke-width="7"/>
+    <path d="M84 172 L100 194 L116 172" fill="none" stroke="${ENCRE}" stroke-width="3"/>
+    <path d="M64 268 H136" stroke="#3b2a1e" stroke-width="10"/>
+    ${acc.includes('bretelles') ? `<path d="M76 176 L80 266 M124 176 L120 266" stroke="#8a4a1c" stroke-width="9" fill="none"/>` : ''}
+    ${acc.includes('foulard') ? `<path d="M80 170 C90 182 110 182 120 170 L124 178 C112 192 88 192 76 178 Z" fill="${p.accCouleur}" ${T}/>` : ''}
+    ${acc.includes('boussole') ? `<path d="M80 176 L100 212 L120 176" fill="none" stroke="#8a4a1c" stroke-width="3"/><circle cx="100" cy="220" r="11" fill="#ffd23f" ${T}/>` : ''}
+    ${acc.includes('appareil') ? `<path d="M78 176 L112 222" stroke="${ENCRE}" stroke-width="3"/><rect x="100" y="214" width="34" height="22" rx="5" fill="#3b3b3b" ${T}/><circle cx="117" cy="225" r="7" fill="#9fd6df" ${T}/>` : ''}
+    ${bras('d')}`;
+}
+
+function figurine(id, p) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 400" class="figurine-svg" aria-hidden="true" focusable="false">`
+    // Cheveux longs derrière le corps (sinon ils couvriraient le buste).
+    + `<g class="cheveux" transform="translate(100 18) scale(.92) translate(-100 0)">${cheveuxArriere[p.arriere || 'aucun'](p.cheveux)}</g>`
+    + `<g class="corps">${corpsEnPied(id, p)}</g>`
+    + `<g class="tete" transform="translate(100 18) scale(.92) translate(-100 0)">${teteSeule(p)}</g>`
+    + `</svg>`;
+}
+
 const dossier = path.join(__dirname, '..', 'img', 'aventuriers');
 fs.mkdirSync(dossier, { recursive: true });
 for (const a of AVENTURIERS) {
   fs.writeFileSync(path.join(dossier, a.id + '.svg'), portrait({ nom: a.nom, ...DESSINS[a.id] }));
   console.log('img/aventuriers/' + a.id + '.svg');
 }
+
+// Personnages en pied : un module JavaScript (SVG en ligne, pour pouvoir animer bras et jambes).
+const figurines = {};
+for (const a of AVENTURIERS) figurines[a.id] = figurine(a.id, { nom: a.nom, ...DESSINS[a.id] }).replace(/\s*\n\s*/g, ' ');
+fs.writeFileSync(path.join(__dirname, '..', 'js', 'figurines.js'),
+  `// Personnages en pied posés sur le plateau (SVG en ligne). Fichier généré par outils/aventuriers.js : ne pas modifier à la main.
+(function (racine) {
+  'use strict';
+  var FIGURINES = ${JSON.stringify(figurines, null, 2)};
+  if (typeof module !== 'undefined' && module.exports) module.exports = FIGURINES;
+  else racine.Figurines = FIGURINES;
+})(this);
+`);
+console.log('js/figurines.js');

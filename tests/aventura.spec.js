@@ -48,7 +48,8 @@ test('plateau : illustration, 6 cases ; le 1er pion part de DÉPART et va sur la
   const pions = page.locator('.pion');
   await expect(pions).toHaveCount(4);
   const plateau = await page.locator('#plateau').boundingBox();
-  const centre = async (loc) => { const b = await loc.boundingBox(); return [b.x + b.width / 2, b.y + b.height / 2]; };
+  // Point où le personnage pose les pieds (bas du pion, js/plateau.js + css .pion).
+  const centre = async (loc) => { const b = await loc.boundingBox(); return [b.x + b.width / 2, b.y + b.height * 0.94]; };
   const proche = async (pion, kase) => {
     const [cx, cy] = await centre(pion);
     const c = await page.locator('#cases li').nth(kase).boundingBox();
