@@ -259,28 +259,41 @@ main:focus { outline: none; }
 .rouleau p { margin: 0; font: 800 2.1cqw/1 "Rockwell", "Roboto Slab", Georgia, serif; color: var(--encre); letter-spacing: .03em; text-transform: uppercase; white-space: nowrap; }
 .cases { list-style: none; margin: 0; padding: 0; }
 .case { position: absolute; width: 1px; height: 1px; }
-.pions { position: absolute; inset: 0; pointer-events: none; }
-/* Pion : galet plat cerné de noir, comme ceux du nid illustré au centre du plateau. */
+.pions { position: absolute; inset: 0; pointer-events: none; z-index: 4; } /* personnages devant l'encadré des points */
+/* Pion : le personnage debout sur la case. Le point (left/top) est sous ses pieds ;
+   un socle ovale à la couleur du joueur l'identifie. Dessins : js/figurines.js. */
 .pion {
-  position: absolute; width: clamp(22px, 4.4%, 52px); aspect-ratio: 1; border-radius: 50%;
-  transform: translate(-50%, -50%);
-  border: 3px solid var(--c, #1d1510);
-  /* Portrait de l'aventurier dans le pion (visage centré), bordure à la couleur du joueur. */
-  background-size: 165%; background-position: 50% 38%; background-repeat: no-repeat;
-  box-shadow: 0 0 0 2px #1d1510, 0 3px 3px rgb(0 0 0 / .35);
-  animation: poser .5s ease-out backwards;
+  position: absolute; width: clamp(24px, 4.6%, 58px); aspect-ratio: 1 / 2;
+  transform: translate(-50%, -94%);
   /* Le déplacement d'une case à l'autre suit la route (js/plateau.js → marcher), sans transition CSS. */
 }
-.pion-actif { z-index: 2; box-shadow: 0 0 0 2px #1d1510, 0 0 0 6px #fff, 0 4px 6px rgb(0 0 0 / .4); }
-.pion:nth-child(2) { animation-delay: .08s; }
-.pion:nth-child(3) { animation-delay: .16s; }
-.pion:nth-child(4) { animation-delay: .24s; }
-@keyframes poser { from { transform: translate(-50%, -140%); opacity: 0; } }
-@media (prefers-reduced-motion: reduce) { .pion { animation: none; } }
-.pion-rouge { background-color: var(--rouge); --c: var(--rouge); }
-.pion-jaune { background-color: var(--jaune); --c: #f2c400; }
-.pion-bleu { background-color: #2e55c9; --c: #2e55c9; }
-.pion-vert { background-color: var(--vert-pion); --c: var(--vert-pion); }
+.pion.devant { z-index: 1; } /* les deux personnages du premier rang passent devant ceux du fond */
+.pion-actif { z-index: 3; }
+.socle {
+  position: absolute; left: -6%; right: -6%; bottom: -4%; height: 15%; border-radius: 50%;
+  background: var(--c); border: 2px solid var(--encre); box-shadow: 0 3px 4px rgb(0 0 0 / .35);
+}
+.pion-actif .socle { box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--encre), 0 4px 6px rgb(0 0 0 / .4); }
+.figurine { position: absolute; inset: 0 0 4% 0; animation: poser .5s ease-out backwards; }
+.figurine-svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.pion:nth-child(2) .figurine { animation-delay: .08s; }
+.pion:nth-child(3) .figurine { animation-delay: .16s; }
+.pion:nth-child(4) .figurine { animation-delay: .24s; }
+@keyframes poser { from { transform: translateY(-40%); opacity: 0; } }
+/* Le personnage regarde dans le sens de la marche (propriété « scale », indépendante des animations). */
+.pion.gauche .figurine-svg { scale: -1 1; }
+/* Marche : jambes et bras se balancent en alternance, le corps monte et descend à chaque pas. */
+.figurine-svg .jambe-g, .figurine-svg .jambe-d, .figurine-svg .bras-g, .figurine-svg .bras-d { transform-box: fill-box; transform-origin: 50% 4%; }
+.pion.marche .jambe-g, .pion.marche .bras-d { animation: pas .3s ease-in-out infinite alternate; }
+.pion.marche .jambe-d, .pion.marche .bras-g { animation: pas .3s ease-in-out infinite alternate-reverse; }
+.pion.marche .figurine-svg { animation: hop .15s ease-in-out infinite alternate; }
+@keyframes pas { from { transform: rotate(-20deg); } to { transform: rotate(20deg); } }
+@keyframes hop { to { transform: translateY(-3%); } }
+@media (prefers-reduced-motion: reduce) { .figurine, .pion.marche .figurine-svg, .pion.marche .figurine-svg * { animation: none; } }
+.pion-rouge { --c: var(--rouge); }
+.pion-jaune { --c: #f2c400; }
+.pion-bleu { --c: #2e55c9; }
+.pion-vert { --c: var(--vert-pion); }
 
 /* Points de l'équipe en haut à gauche du plateau (tailles en cqw = % de la largeur du plateau).
    Encadré horizontal : la construction à gauche, les points à droite, pour rester peu haut
@@ -371,12 +384,12 @@ main:focus { outline: none; }
   0% { opacity: 1; transform: translate(0, 0) rotate(0); }
   100% { opacity: 0; transform: translate(var(--dx), calc(var(--dy) + 40px)) rotate(540deg); }
 }
-.pion.saute { animation: saute .7s ease-out; }
-@keyframes saute { 30% { transform: translate(-50%, -110%); } 55% { transform: translate(-50%, -50%); } 70% { transform: translate(-50%, -75%); } }
-.pion.secoue { animation: secoue .6s ease-in-out; }
-@keyframes secoue { 20%, 60% { transform: translate(-62%, -50%); } 40%, 80% { transform: translate(-38%, -50%); } }
+.pion.saute .figurine { animation: saute .7s ease-out; }
+@keyframes saute { 30% { transform: translateY(-30%); } 55% { transform: none; } 70% { transform: translateY(-12%); } }
+.pion.secoue .figurine { animation: secoue .6s ease-in-out; }
+@keyframes secoue { 20%, 60% { transform: translateX(-12%) rotate(-6deg); } 40%, 80% { transform: translateX(12%) rotate(6deg); } }
 @media (prefers-reduced-motion: reduce) {
-  .pion.saute, .pion.secoue, .reaction i { animation: none; }
+  .pion.saute .figurine, .pion.secoue .figurine, .reaction i { animation: none; }
   .reaction i { display: none; }
   .reaction-texte { animation: none; }
 }

@@ -42,7 +42,7 @@ test('un onglet par joueur ; toucher un portrait le donne au joueur actif, « Jo
   await expect(page.getByRole('button', { name: /^Zoé/ })).toBeEnabled();
 });
 
-test('sur le plateau : nom de l\'aventurier qui joue et portrait sur chaque pion @smoke', async ({ page }) => {
+test('sur le plateau : nom de l\'aventurier qui joue et son personnage debout sur chaque case @smoke', async ({ page }) => {
   await preparation(page, 2);
   await page.getByRole('button', { name: /^Inès/ }).click();
   await page.getByRole('button', { name: 'Joueur suivant →' }).click();
@@ -50,8 +50,8 @@ test('sur le plateau : nom de l\'aventurier qui joue et portrait sur chaque pion
   await cocherTout(page, 2);
   await page.getByRole('button', { name: 'Lancer la partie' }).click();
   await expect(page.locator('#tour-nom')).toHaveText('Inès');
-  await expect(page.locator('.pion').nth(0)).toHaveAttribute('style', /aventuriers\/ines\.svg/);
-  await expect(page.locator('.pion').nth(1)).toHaveAttribute('style', /aventuriers\/jo\.svg/);
+  await expect(page.locator('.pion').nth(0)).toHaveAttribute('data-aventurier', 'ines');
+  await expect(page.locator('.pion').nth(1)).toHaveAttribute('data-aventurier', 'jo');
 });
 
 test('passer de 4 à 2 joueurs garde les choix des 2 premiers', async ({ page }) => {

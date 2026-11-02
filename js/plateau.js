@@ -34,8 +34,9 @@
 
   // Couleur de chaque joueur : son pion et son tas de cartes (1 à 4 joueurs, le 4e a des cartes vertes).
   var COULEURS = ['rouge', 'jaune', 'bleu', 'vert'];
-  // Décalage des pions posés sur une même case (en % de la largeur du plateau).
-  var DECALAGES = [[-2.6, -2.6], [2.6, -2.6], [-2.6, 2.6], [2.6, 2.6]];
+  // Décalage des personnages posés sur une même case (en % de la largeur du plateau) :
+  // deux devant, deux derrière, pour qu'ils restent tous visibles sans trop s'écarter de la croix.
+  var DECALAGES = [[-1.8, -1.2], [1.8, -1.2], [-1.8, 1], [1.8, 1]];
   var RAPPORT = 1600 / 1071; // largeur / hauteur du plateau
 
   var $ = function (id) { return document.getElementById(id); };
@@ -385,8 +386,10 @@
     partie.joueurs.forEach(function (j, k) {
       var p = document.createElement('span');
       var c = CASES[depart ? 0 : partie.regles.positions[k]];
-      p.className = 'pion pion-' + j.couleur;
-      p.style.backgroundImage = 'url("' + j.aventurier.image + '")';
+      p.className = 'pion pion-' + j.couleur + (k >= 2 ? ' devant' : '');
+      p.dataset.aventurier = j.aventurier.id;
+      // Personnage debout (js/figurines.js) sur un socle à la couleur du joueur.
+      p.innerHTML = '<span class="socle"></span><span class="figurine">' + window.Figurines[j.aventurier.id] + '</span>';
       p.style.left = (c.x + DECALAGES[k][0]) + '%';
       p.style.top = (c.y + DECALAGES[k][1] * RAPPORT) + '%';
       p.dataset.case = depart ? '0' : String(partie.regles.positions[k]);
@@ -430,10 +433,28 @@
     var images = pts.map(function (q, k) {
       return { left: (q[0] + dx) + '%', top: (q[1] + dy) + '%', offset: cumul[k] / total };
     });
-    if (p.marche) p.marche.cancel();
+    if (p.marche) p.marche.cancel(); // une marche encore en cours est remplacée par la nouvelle
+    (p.tournants || []).forEach(clearTimeout);
     p.classList.add('marche');
-    p.marche = p.animate(images, { duration: DUREE_MARCHE, easing: 'linear' });
-    p.marche.onfinish = p.marche.oncancel = function () { p.classList.remove('marche'); p.marche = null; };
+    var anim = p.animate(images, { duration: DUREE_MARCHE, easing: 'linear' });
+    p.marche = anim;
+    // Fin de CETTE marche seulement (l'annulation d'une marche remplacée arrive plus tard, sans effet ici).
+    anim.onfinish = anim.oncancel = function () {
+      if (p.marche !== anim) return;
+      p.classList.remove('marche'); p.marche = null;
+    };
+    // Le personnage regarde dans le sens de la marche : il se retourne quand la route repart vers la gauche.
+    p.tournants = [];
+    var sens = null;
+    for (var s = 1; s < pts.length; s++) {
+      var ex2 = pts[s][0] - pts[s - 1][0];
+      if (Math.abs(ex2) < 1) continue; // petit écart ou tronçon presque vertical : on garde le sens actuel
+      var gauche = ex2 < 0;
+      if (gauche === sens) continue;
+      if (sens === null) p.classList.toggle('gauche', gauche); // sens de départ : tout de suite
+      else p.tournants.push(setTimeout(p.classList.toggle.bind(p.classList, 'gauche', gauche), cumul[s - 1] / total * DUREE_MARCHE));
+      sens = gauche;
+    }
   }
 
   // Place les pions ; celui qui change de case y marche en suivant la route.
@@ -555,8 +576,9 @@
     var zone = $('reaction');
     zone.hidden = false;
     zone.className = 'reaction ' + (bonne ? 'bonne' : 'mauvaise');
+    // La bulle s'affiche au-dessus de la tête du personnage (le point du pion est à ses pieds).
     zone.style.left = pion.style.left;
-    zone.style.top = pion.style.top;
+    zone.style.top = 'calc(' + pion.style.top + ' - ' + Math.round(pion.offsetHeight * 0.85) + 'px)';
     var html = '<span class="reaction-texte">' + (bonne ? 'Bravo !' : 'Oups !') + '</span>';
     if (bonne) {
       for (var i = 0; i < 18; i++) {
@@ -876,5 +898,5 @@
   // Préchargement discret du plateau pendant que l'accueil est affiché.
   window.addEventListener('load', function () { new Image().src = 'img/plateau-jour.webp'; });
 
-  window.Aventura = { cases: CASES, route: ROUTE, trajet: trajet, partie: partie, cartesDuJoueur: cartesDuJoueur, majConstruction: majConstruction };
+  window.Aventura = { cases: CASES, route: ROUTE, trajet: trajet, decalages: DECALAGES, partie: partie, cartesDuJoueur: cartesDuJoueur, majConstruction: majConstruction };
 })();

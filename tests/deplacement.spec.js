@@ -50,12 +50,14 @@ test('le personnage marche sur la route de DÉPART à la prairie, en 1,5 s @smok
     }
     anim.finish();
     res.trajet = window.Aventura.trajet(0, 1);
+    res.decalage = window.Aventura.decalages[0];
     return res;
   });
   expect(mesures.duree).toBe(1500);
   // Décalage du pion du joueur 1 sur sa case (js/plateau.js → DECALAGES[0]).
   const rapport = 1600 / 1071;
-  const trajet = mesures.trajet.map(([x, y]) => [x - 2.6, y - 2.6 * rapport]);
+  const [ddx, ddy] = mesures.decalage;
+  const trajet = mesures.trajet.map(([x, y]) => [x + ddx, y + ddy * rapport]);
   for (const p of mesures.points) expect(distanceTrajet(p, trajet, rapport)).toBeLessThan(0.6);
   // Il n'est pas allé en ligne droite : à mi-chemin, il est loin de la droite DÉPART → prairie.
   const droite = [trajet[0], trajet[trajet.length - 1]];
@@ -80,4 +82,42 @@ test('au tour suivant, le personnage suit la route du pont jusqu\'au marais', as
     return !!anim && anim.effect.getKeyframes().length === window.Aventura.trajet(2, 3).length;
   });
   expect(ok).toBe(true);
+});
+
+test('les personnages sont debout sur le plateau (corps entier, pas un visage dans un cercle)', async ({ page }) => {
+  await lancerPartie(page, { joueurs: 4 });
+  for (let k = 0; k < 4; k++) {
+    const pion = page.locator('.pion').nth(k);
+    await expect(pion.locator('svg.figurine-svg')).toHaveCount(1);
+    for (const partie of ['.tete', '.corps', '.jambe-g', '.jambe-d', '.bras-g', '.bras-d']) await expect(pion.locator(partie)).toHaveCount(1);
+    await expect(pion.locator('.socle')).toHaveCount(1); // socle à la couleur du joueur
+    const b = await pion.boundingBox();
+    expect(b.height).toBeGreaterThan(b.width * 1.6); // silhouette debout, plus haute que large
+    expect(await pion.evaluate((e) => getComputedStyle(e).borderRadius)).toBe('0px');
+  }
+});
+
+test('pendant le déplacement, le personnage marche : jambes et bras bougent, puis s\'arrêtent', async ({ page }) => {
+  await lancerPartie(page, { joueurs: 1 });
+  const pion = page.locator('.pion').first();
+  await expect(pion).toHaveClass(/marche/);
+  const enMarche = await pion.evaluate((p) => ['.jambe-g', '.jambe-d', '.bras-g', '.bras-d'].map((s) => p.querySelector(s).getAnimations().length));
+  expect(enMarche).toEqual([1, 1, 1, 1]);
+  await expect(pion).not.toHaveClass(/marche/, { timeout: 4000 });
+  const arrete = await pion.evaluate((p) => p.querySelector('.jambe-g').getAnimations().length);
+  expect(arrete).toBe(0);
+});
+
+test('le personnage se tourne dans le sens de la marche (vers la gauche entre le marais et les collines)', async ({ page }) => {
+  await lancerPartie(page, { joueurs: 1 });
+  const pion = page.locator('.pion').first();
+  await expect(pion).not.toHaveClass(/gauche/); // DÉPART → prairie : il part vers la droite
+  for (let t = 0; t < 3; t++) {
+    await page.getByRole('button', { name: 'Piocher une carte' }).click();
+    await page.getByRole('button', { name: 'Bonne réponse' }).click();
+    await page.getByRole('button', { name: 'Lancer le dé FORT' }).click();
+    await attendreJoueur(page, 'Léa');
+  }
+  await expect(pion).toHaveAttribute('data-case', '4');
+  await expect(pion).toHaveClass(/gauche/, { timeout: 4000 }); // la route redescend vers la gauche
 });
