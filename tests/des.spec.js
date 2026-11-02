@@ -69,3 +69,16 @@ test('le dé roule sur le plateau puis montre, face visible, les points gagnés'
   const faces = await page.locator('#de3d .face').evaluateAll((f) => f.map((x) => Number(x.dataset.valeur)).sort());
   expect(faces).toEqual([4, 4, 5, 5, 6, 6]);
 });
+
+test('v4.4 : les coins du dé restent arrondis (les faces de derrière ne dépassent pas)', async ({ page }) => {
+  await lancerPartie(page);
+  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await page.getByRole('button', { name: 'Bonne réponse' }).click();
+  await lancerLeDe(page);
+  const faces = page.locator('#de3d .face');
+  await expect(faces).toHaveCount(6);
+  for (const f of await faces.all()) {
+    await expect.poll(() => f.evaluate((el) => getComputedStyle(el).backfaceVisibility)).toBe('hidden');
+    await expect.poll(() => f.evaluate((el) => parseFloat(getComputedStyle(el).borderTopLeftRadius))).toBeGreaterThan(0);
+  }
+});
