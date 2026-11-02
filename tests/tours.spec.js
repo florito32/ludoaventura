@@ -162,3 +162,26 @@ test('v4.3 : pas de commentaire visible dans le tour de jeu au moment de piocher
   expect(visibles).toBe(0);
   await expect(page.locator('#tour-consigne')).not.toContainText('avance sur la croix');
 });
+
+test('v4.5 : à la fin de « Bravo ! » / « Oups ! », le personnage reste sur sa croix (pas de disparition-réapparition)', async ({ page }) => {
+  await rapide(page, { autoDe: 300 });
+  page.__rapide = true;
+  await lancerPartie(page, { joueurs: 2 });
+  for (const reponse of ['Bonne réponse', 'Mauvaise réponse']) {
+    await page.getByRole('button', { name: 'Piocher une carte' }).click();
+    // L'arrivée normale des personnages en début de partie doit être finie avant de compter.
+    await page.waitForFunction(() => [...document.querySelectorAll('.pion .figurine')]
+      .every((f) => f.getAnimations().every((a) => a.animationName !== 'poser' || a.playState === 'finished')));
+    // On compte les animations « poser » (arrivée du personnage) qui démarrent à partir de maintenant.
+    await page.evaluate(() => {
+      window.__arrivees = 0;
+      document.querySelector('#pions').addEventListener('animationstart', (e) => { if (e.animationName === 'poser') window.__arrivees++; });
+    });
+    await page.getByRole('button', { name: reponse }).click();
+    await page.locator('#reaction:not([hidden])').waitFor({ state: 'attached' });
+    await page.locator('#reaction[hidden]').waitFor({ state: 'attached', timeout: 5000 }); // fin de l'animation de réponse
+    await expect(page.locator('#de-plateau')).toHaveClass(/pose/);
+    expect(await page.evaluate(() => window.__arrivees)).toBe(0);
+    await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
+  }
+});

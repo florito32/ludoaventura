@@ -386,7 +386,16 @@
     partie.joueurs.forEach(function (j, k) {
       var p = document.createElement('span');
       var c = CASES[depart ? 0 : partie.regles.positions[k]];
-      p.className = 'pion pion-' + j.couleur + (k >= 2 ? ' devant' : '');
+      p.className = 'pion arrive pion-' + j.couleur + (k >= 2 ? ' devant' : '');
+      // L'animation d'arrivée ne doit jouer qu'une fois (voir css : .pion.arrive).
+      function finArrivee(e) {
+        if (e.animationName !== 'poser') return;
+        p.classList.remove('arrive');
+        p.removeEventListener('animationend', finArrivee);
+        p.removeEventListener('animationcancel', finArrivee);
+      }
+      p.addEventListener('animationend', finArrivee);
+      p.addEventListener('animationcancel', finArrivee);
       p.dataset.aventurier = j.aventurier.id;
       // Personnage debout (js/figurines.js) sur un socle à la couleur du joueur.
       p.innerHTML = '<span class="socle"></span><span class="figurine">' + window.Figurines[j.aventurier.id] + '</span>';
@@ -588,7 +597,7 @@
       }
     }
     zone.innerHTML = html;
-    pion.classList.remove('saute', 'secoue');
+    pion.classList.remove('saute', 'secoue', 'arrive'); // l'arrivée ne doit pas rejouer après la réaction
     void pion.offsetWidth;
     pion.classList.add(bonne ? 'saute' : 'secoue');
     plusTard(function () { zone.hidden = true; pion.classList.remove('saute', 'secoue'); }, DUREE_REACTION);
