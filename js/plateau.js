@@ -262,6 +262,8 @@
     $('objectif').textContent = partie.objectif;
     $('objectif-texte').textContent = libelleObjectif(av, partie.nbJoueurs);
     $('jauge').setAttribute('aria-valuemax', partie.objectif);
+    $('construction').innerHTML = window.Constructions.svg(av.id);
+    partie.etapesVues = 0;
 
     // Pions : tous posés sur DÉPART…
     var pions = $('pions');
@@ -332,6 +334,7 @@
     $('jauge').setAttribute('aria-valuenow', r.points);
     $('jauge-barre').style.width = Math.min(100, r.points / r.objectif * 100) + '%';
     $('jauge').classList.toggle('atteint', r.points >= r.objectif);
+    majConstruction(r.points);
 
     $('tour-manche').textContent = (c.arrivee ? 'ARRIVÉE' : 'Croix ' + r.manche) + ' sur ' + R.NB_CROIX + ' — ' + c.nom.replace(/^.*— /, '');
     $('tour-portrait').src = j.aventurier.image;
@@ -373,6 +376,21 @@
       consigne.textContent = gain + ' ' + suite;
       bandeau(gain + ' ' + suite);
     }
+  }
+
+  // La construction de l'aventure avance avec les points (complète quand l'objectif est atteint).
+  function majConstruction(pts) {
+    var av = partie.aventure, cst = window.Constructions;
+    var n = cst.CONSTRUCTIONS[av.id].etapes.length;
+    var vues = cst.etapesVisibles(av.id, pts, partie.objectif);
+    $('construction').querySelectorAll('.etape').forEach(function (g, k) {
+      var visible = k < vues;
+      g.classList.toggle('vue', visible);
+      if (visible && k >= partie.etapesVues) g.classList.add('nouvelle');
+    });
+    partie.etapesVues = vues;
+    $('construction').classList.toggle('complete', vues === n);
+    $('construction').setAttribute('aria-label', 'Construction de ' + cst.CONSTRUCTIONS[av.id].nom + ' : ' + vues + ' étape' + (vues > 1 ? 's' : '') + ' sur ' + n);
   }
 
   // Petite animation après la réponse : le pion saute et des confettis éclatent (bonne réponse),
@@ -560,5 +578,5 @@
   // Préchargement discret du plateau pendant que l'accueil est affiché.
   window.addEventListener('load', function () { new Image().src = 'img/plateau-jour.webp'; });
 
-  window.Aventura = { cases: CASES, partie: partie, cartesDuJoueur: cartesDuJoueur };
+  window.Aventura = { cases: CASES, partie: partie, cartesDuJoueur: cartesDuJoueur, majConstruction: majConstruction };
 })();

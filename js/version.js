@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '3.0';
+  var VERSION = '3.1';
 
   var HISTORY = [
+    { v: '3.1', date: '2026-11-02', changes: [
+      'Sous les points, ce que l\u2019équipe construit (drakkar, épées, grand feu, pyramide…) se construit étape par étape au fil des points, et il est complet quand l\u2019objectif est atteint.'
+    ] },
     { v: '3.0', date: '2026-11-02', changes: [
       'Bonne réponse : le pion saute, des confettis éclatent et « Bravo ! » s\u2019affiche.',
       'Mauvaise réponse : le pion tremble et « Oups ! » s\u2019affiche.'

@@ -293,6 +293,17 @@ main:focus { outline: none; }
 .points-plateau .jauge { height: clamp(6px, 1cqw, 12px); margin-top: clamp(3px, .5cqw, 8px); }
 .points-plateau .points-objectif { margin: clamp(2px, .4cqw, 6px) 0 0; font-size: clamp(.56rem, 1.2cqw, .85rem); line-height: 1.2; font-weight: 600; }
 .points-valeur.gagne { animation: gonfle .6s ease-out; }
+/* Construction de l'aventure : les étapes apparaissent au fil des points. */
+.construction {
+  margin-top: clamp(3px, .6cqw, 8px); border-radius: 8px; overflow: hidden; background: #dcefd8; border: 2px solid var(--encre);
+}
+.construction svg { display: block; width: 100%; height: auto; }
+.construction .etape { opacity: .14; filter: grayscale(1); transition: opacity .4s, filter .4s; } /* en filigrane : ce qu'il reste à construire */
+.construction .etape.vue { opacity: 1; filter: none; }
+.construction .etape.nouvelle { animation: pose-etape .7s ease-out; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes pose-etape { from { transform: translateY(-18px) scale(.8); opacity: 0; } }
+.construction.complete { box-shadow: 0 0 0 3px #ffd23f; }
+@media (prefers-reduced-motion: reduce) { .construction .etape.nouvelle { animation: none; } }
 @keyframes gonfle { 40% { transform: scale(1.35); } }
 
 /* Dé en 3D qui roule sur le plateau (cube CSS de 6 faces). */
