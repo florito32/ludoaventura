@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '3.7';
+  var VERSION = '3.8';
 
   var HISTORY = [
+    { v: '3.8', date: '2026-11-02', changes: [
+      'Tour de jeu : la mention « Croix 1 sur 5 — la prairie » n\u2019est plus affichée.'
+    ] },
     { v: '3.7', date: '2026-11-02', changes: [
       'Points de l\u2019équipe : le chiffre n\u2019est plus écrit deux fois (ombre décalée retirée), il reste seulement en rouge.'
     ] },
