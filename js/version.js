@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '2.0';
+  var VERSION = '2.1';
 
   var HISTORY = [
+    { v: '2.1', date: '2026-11-02', changes: [
+      'Les dés se lancent en les touchant.',
+      'Dé FAIBLE : 2 faces à 1, 2 faces à 2, 2 faces à 3 points. Dé FORT : 2 faces à 4, 2 faces à 5, 2 faces à 6 points.'
+    ] },
     { v: '2.0', date: '2026-11-02', changes: [
       'Le jeu devient Aventura, avec les vraies illustrations du jeu de société.',
       'Accueil composé comme la boîte : arche « Aventura », aventurier, décor et herbes.',

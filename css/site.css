@@ -163,20 +163,37 @@ main:focus { outline: none; }
 .joueur-case { font-size: .78rem; font-weight: 700; color: var(--encre); background: #fff; border: 1px solid var(--parchemin-bord); border-radius: 99px; padding: 1px 8px; }
 .pion-mini { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #1d1510; box-shadow: inset -2px -3px 0 rgb(0 0 0 / .2); }
 
-/* Dés : faces blanches à points de couleur, comme le dé illustré sur la boîte. */
-.des { display: flex; gap: 18px; justify-content: center; }
-.de-fig { margin: 0; text-align: center; font-size: .9rem; }
+/* Dés : faces blanches à points de couleur (comme le dé illustré sur la boîte).
+   Les points sont placés sur une grille 3 × 3 (js/des.js → POINTS). */
+.des { display: flex; gap: 12px; justify-content: center; }
+.de-btn {
+  flex: 1; max-width: 130px; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  font: inherit; color: var(--encre); cursor: pointer; padding: 8px 4px 6px;
+  background: #fff; border: 2px solid var(--parchemin-bord); border-radius: 12px;
+}
+.de-btn:hover { border-color: var(--encre); }
 .de {
-  position: relative; display: block; width: 58px; height: 58px; margin: 0 auto 6px;
+  display: grid; grid-template: repeat(3, 1fr) / repeat(3, 1fr); padding: 7px; gap: 2px;
+  width: 58px; height: 58px; margin-bottom: 4px;
   background: #fff; border: 3px solid var(--encre); border-radius: 12px;
   box-shadow: inset -4px -5px 0 #d9d2c4, 0 3px 0 rgb(0 0 0 / .25);
   transform: rotate(-6deg);
 }
-.de-fort { transform: rotate(7deg); background: #fff7d6; }
-.de i { position: absolute; width: 12px; height: 12px; border-radius: 50%; }
-.de i:nth-child(1) { left: 9px; top: 9px; background: var(--rouge); }
-.de i:nth-child(2) { left: 20px; top: 20px; background: var(--bleu); }
-.de i:nth-child(3) { left: 31px; top: 31px; background: #e0b800; }
+.de-fort { transform: rotate(7deg); background: #fff3c4; box-shadow: inset -4px -5px 0 #e6d38f, 0 3px 0 rgb(0 0 0 / .25); }
+.de i { width: 10px; height: 10px; border-radius: 50%; place-self: center; background: var(--encre); }
+.de i:nth-of-type(3n+1) { background: var(--rouge); }
+.de i:nth-of-type(3n+2) { background: var(--bleu); }
+.de i:nth-of-type(3n) { background: #c99a00; }
+.de.roule { animation: rouler .6s ease-out; }
+@keyframes rouler {
+  0% { transform: rotate(0) scale(1); }
+  40% { transform: rotate(200deg) scale(1.15); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) { .de.roule { animation: none; } }
+.de-nom { font-size: .9rem; }
+.de-faces { font-size: .78rem; color: var(--encre-douce); }
+.de-resultat { margin: 10px 0 0; text-align: center; font-weight: 700; min-height: 1.4em; }
 
 /* Piles de cartes : couleurs des emplacements du plateau. */
 .cartes { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
