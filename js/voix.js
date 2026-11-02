@@ -29,12 +29,13 @@
     return true;
   }
 
-  // Texte à prononcer pour une carte : la consigne, puis le mot en minuscules
-  // (en majuscules, certaines voix l'épellent comme un sigle). Les lettres ne sont pas dites.
+  // Texte à prononcer pour une carte : la question tirée, puis le mot en minuscules
+  // (en majuscules, certaines voix l'épellent comme un sigle). Les lettres seules ne sont pas dites.
   function texteCarte(carte) {
     if (carte.lettre) return 'Quelle est cette lettre ?';
     var mot = carte.mot.replace(/(\.\.\.|…)/g, ' ').replace(/\s+/g, ' ').trim().toLocaleLowerCase('fr-FR');
-    return 'Épelle le mot : ' + mot + '.';
+    var consigne = carte.question ? carte.question.consigne : 'Épelle le mot :';
+    return consigne + ' ' + mot + '.';
   }
 
   racine.Voix = { disponible: disponible, lire: lire, texteCarte: texteCarte };

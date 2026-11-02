@@ -4,9 +4,14 @@
 (function () {
   'use strict';
 
-  var VERSION = '3.1';
+  var VERSION = '3.2';
 
   var HISTORY = [
+    { v: '3.2', date: '2026-11-02', changes: [
+      'Huit types de questions : épeler, nombre de lettres, syllabes, consonnes, voyelles, première lettre, lettres muettes, réécrire le mot.',
+      'À la préparation, chaque joueur coche les questions qu\u2019il veut ; chaque carte en tire une au hasard.',
+      '« Voir la réponse » montre le mot et la réponse attendue (lettres muettes surlignées). La voix lit la question tirée.'
+    ] },
     { v: '3.1', date: '2026-11-02', changes: [
       'Sous les points, ce que l\u2019équipe construit (drakkar, épées, grand feu, pyramide…) se construit étape par étape au fil des points, et il est complet quand l\u2019objectif est atteint.'
     ] },
