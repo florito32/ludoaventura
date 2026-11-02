@@ -4,9 +4,16 @@
 (function () {
   'use strict';
 
-  var VERSION = '2.3';
+  var VERSION = '2.4';
 
   var HISTORY = [
+    { v: '2.4', date: '2026-11-02', changes: [
+      'On joue ! Chacun son tour, le joueur avance sur la croix et pioche une carte dans son propre tas.',
+      'Le maître du jeu indique si la réponse est bonne : bonne réponse = dé FORT, mauvaise réponse = aide des autres puis dé FAIBLE.',
+      'Les points du dé s\u2019ajoutent aux points de l\u2019équipe ; tous les joueurs passent une croix avant d\u2019aller à la suivante.',
+      'À l\u2019ARRIVÉE : aventure réussie si l\u2019équipe atteint l\u2019objectif, avec « Rejouer » ou « Nouvelle partie ».',
+      'Les cartes n\u2019ont pas encore de questions : le maître du jeu pose les siennes.'
+    ] },
     { v: '2.3', date: '2026-11-02', changes: [
       'Chaque joueur choisit son aventurier parmi 10 personnages : Léa, Tom, Nour, Malo, Inès, Papi Jo, Kenji, Zoé, Sam et Awa.',
       'Le portrait de l\u2019aventurier apparaît sur son pion, dans la liste des joueurs et sur son tas de cartes.'

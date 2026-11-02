@@ -59,6 +59,11 @@ main:focus { outline: none; }
   text-shadow: 0 1px 0 rgb(0 0 0 / .35);
 }
 .btn-principal:hover { filter: brightness(1.06); }
+.btn-secondaire { background: #fff; color: var(--encre); box-shadow: 0 4px 0 var(--encre); }
+.btn-bonne { background: #1f7a3a; color: #fff; box-shadow: 0 4px 0 var(--encre); }
+.btn-mauvaise { background: #fff; color: var(--rouge-texte); box-shadow: 0 4px 0 var(--encre); }
+.btn-bonne::before { content: "✔ "; }
+.btn-mauvaise::before { content: "✘ "; }
 .btn-principal:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--encre); }
 
 /* ---------- Accueil : composition façon boîte du jeu ---------- */
@@ -231,7 +236,10 @@ main:focus { outline: none; }
   background-size: 165%; background-position: 50% 38%; background-repeat: no-repeat;
   box-shadow: 0 0 0 2px #1d1510, 0 3px 3px rgb(0 0 0 / .35);
   animation: poser .5s ease-out backwards;
+  transition: left .6s ease-in-out, top .6s ease-in-out;
 }
+.pion-actif { z-index: 2; box-shadow: 0 0 0 2px #1d1510, 0 0 0 6px #fff, 0 4px 6px rgb(0 0 0 / .4); }
+@media (prefers-reduced-motion: reduce) { .pion { transition: none; } }
 .pion:nth-child(2) { animation-delay: .08s; }
 .pion:nth-child(3) { animation-delay: .16s; }
 .pion:nth-child(4) { animation-delay: .24s; }
@@ -241,6 +249,23 @@ main:focus { outline: none; }
 .pion-jaune { background-color: var(--jaune); --c: #f2c400; }
 .pion-bleu { background-color: #2e55c9; --c: #2e55c9; }
 .pion-vert { background-color: var(--vert-pion); --c: var(--vert-pion); }
+
+/* ---------- Tour de jeu ---------- */
+.tour { border-left: 10px solid var(--c, var(--encre)); }
+.tour-manche { margin: 0 0 8px; font-weight: 800; color: var(--rouge-texte); }
+.tour-joueur { display: flex; align-items: center; gap: 10px; }
+.tour-joueur img { width: 56px; height: 62px; border-radius: 10px; border: 3px solid var(--c); background: #fff; }
+.tour-joueur p { margin: 0; font-size: 1.1rem; }
+.carte-piochee {
+  margin: 10px 0 0; padding: 10px 12px; border-radius: 10px; border: 3px solid var(--encre);
+  background: #fff; box-shadow: inset 0 0 0 5px var(--c);
+}
+.carte-piochee p { margin: 0; }
+.carte-titre { font-weight: 800; margin-bottom: 4px !important; }
+.carte-texte { font-size: .9rem; }
+.tour-consigne { margin: 10px 0 0; font-weight: 600; min-height: 1.4em; }
+.tour-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+.tour-actions .btn { flex: 1 1 auto; min-height: 48px; padding: 10px 14px; font-size: 1rem; }
 
 /* ---------- Panneau de la table de jeu ---------- */
 .panneau {
@@ -257,12 +282,15 @@ main:focus { outline: none; }
 .points-valeur { margin: 0; font: 800 2.6rem/1 "Rockwell", "Roboto Slab", Georgia, serif; color: var(--rouge); text-shadow: 0 2px 0 var(--encre); }
 .points-sur { font-size: 1.3rem; color: var(--encre); text-shadow: none; }
 .jauge { height: 12px; margin: 10px 0 0; background: #fff; border: 2px solid var(--encre); border-radius: 99px; overflow: hidden; }
+.jauge.atteint span { background: #1f7a3a; }
 .jauge span { display: block; height: 100%; width: 0; background: var(--rouge); transition: width .4s; }
 .points-objectif { margin: 8px 0 0; font-size: .95rem; font-weight: 600; color: var(--encre); }
 
 .joueurs { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
 .joueurs li { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; font-weight: 600; }
 .joueur-couleur { font-weight: 400; color: var(--encre-douce); }
+#joueurs li.actif { background: #fff; border-radius: 10px; box-shadow: 0 0 0 2px var(--encre); }
+#joueurs li { padding: 3px 6px; }
 .joueur-case { font-size: .78rem; font-weight: 700; color: var(--encre); background: #fff; border: 1px solid var(--parchemin-bord); border-radius: 99px; padding: 1px 8px; }
 .portrait-mini { width: 34px; height: 37px; border-radius: 8px; border: 3px solid var(--c); background: #fff; }
 .pion-mini { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #1d1510; box-shadow: inset -2px -3px 0 rgb(0 0 0 / .2); }
@@ -275,7 +303,9 @@ main:focus { outline: none; }
   font: inherit; color: var(--encre); cursor: pointer; padding: 8px 4px 6px;
   background: #fff; border: 2px solid var(--parchemin-bord); border-radius: 12px;
 }
-.de-btn:hover { border-color: var(--encre); }
+.de-btn:hover:not(:disabled) { border-color: var(--encre); }
+.de-btn:disabled { cursor: default; opacity: .55; }
+.de-btn.a-lancer { border-color: var(--encre); box-shadow: 0 0 0 4px var(--rouge); opacity: 1; }
 .de {
   display: grid; grid-template: repeat(3, 1fr) / repeat(3, 1fr); padding: 7px; gap: 2px;
   width: 58px; height: 58px; margin-bottom: 4px;
@@ -308,6 +338,9 @@ main:focus { outline: none; }
   box-shadow: 3px 3px 0 var(--parchemin), 3px 3px 0 2px var(--encre), 6px 6px 0 var(--parchemin), 6px 6px 0 2px var(--encre);
   margin: 2px 8px 8px 0;
 }
+.pile.a-piocher .carte { animation: piocher 1.2s ease-in-out infinite; }
+@keyframes piocher { 50% { transform: translateY(-6px); } }
+@media (prefers-reduced-motion: reduce) { .pile.a-piocher .carte { animation: none; outline-width: 4px; } }
 .pile-rouge .carte { background: var(--rouge); }
 .pile-jaune .carte { background: var(--jaune); }
 .pile-bleu .carte { background: var(--bleu); }
@@ -319,6 +352,18 @@ main:focus { outline: none; }
   background: #fff; color: var(--encre); border: 2px solid var(--encre);
 }
 .ambiance-btn[aria-pressed="true"] { background: var(--encre); color: #fff; }
+
+/* ---------- Fin de partie ---------- */
+.fin {
+  max-width: min(460px, calc(100vw - 32px)); border: 4px solid var(--encre); border-radius: var(--radius);
+  padding: 22px; text-align: center; background: var(--parchemin); color: var(--encre);
+}
+.fin::backdrop { background: rgb(0 0 0 / .5); }
+.fin-icone { font-size: 3.5rem; margin: 0; line-height: 1; }
+.fin h2 { font-size: 1.7rem; margin: 8px 0; }
+.fin.gagne h2 { color: #1f7a3a; }
+.fin.perdu h2 { color: var(--rouge-texte); }
+.fin-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 16px; }
 
 /* ---------- Pied de page + version ---------- */
 .pied { text-align: center; color: #fff; font-size: .9rem; padding: 10px 16px calc(14px + env(safe-area-inset-bottom)); background: var(--vert); }

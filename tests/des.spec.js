@@ -23,15 +23,18 @@ test.describe('règles des dés', () => {
   });
 });
 
-test('toucher un dé le lance et affiche le résultat', async ({ page }) => {
+test('pendant un tour, seul le dé demandé se lance et montre sa valeur', async ({ page }) => {
   await lancerPartie(page);
-  for (const [type, ok] of [['faible', /^Dé FAIBLE : [123] points?$/], ['fort', /^Dé FORT : [456] points$/]]) {
-    for (let i = 0; i < 5; i++) {
-      await page.locator(`.de-btn[data-de="${type}"]`).click();
-      await expect(page.locator('#de-resultat')).toHaveText(ok);
-      const v = Number((await page.locator('#de-resultat').textContent()).match(/: (\d)/)[1]);
-      // La face dessinée montre autant de points que la valeur annoncée.
-      await expect(page.locator(`.de-btn[data-de="${type}"] .de i`)).toHaveCount(v);
-    }
+  for (const [reponse, type, ok] of [['Bonne réponse', 'fort', /^Dé FORT : [456] points$/], ['Mauvaise réponse', 'faible', /^Dé FAIBLE : [123] points?$/]]) {
+    await page.getByRole('button', { name: 'Piocher une carte' }).click();
+    await page.getByRole('button', { name: reponse }).click();
+    const autre = type === 'fort' ? 'faible' : 'fort';
+    await expect(page.locator(`.de-btn[data-de="${autre}"]`)).toBeDisabled();
+    await page.locator(`.de-btn[data-de="${type}"]`).click();
+    await expect(page.locator('#de-resultat')).toHaveText(ok);
+    const v = Number((await page.locator('#de-resultat').textContent()).match(/: (\d)/)[1]);
+    // La face dessinée montre autant de points que la valeur annoncée.
+    await expect(page.locator(`.de-btn[data-de="${type}"] .de i`)).toHaveCount(v);
+    await page.getByRole('button', { name: /^Au tour de/ }).click();
   }
 });
