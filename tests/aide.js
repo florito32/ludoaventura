@@ -1,7 +1,7 @@
 // Outils partagés par les tests.
 // Va de l'accueil au plateau : nombre de joueurs et aventure au choix.
 // Les tests raccourcissent la pause entre deux joueurs (2,2 s en vrai) et repoussent le lancer
-// automatique du dé (1,6 s en vrai) pour pouvoir cliquer « Lancer le dé » sans course.
+// automatique du dé (1,6 s en vrai) pour pouvoir lancer le dé (lancerLeDe) sans course.
 async function rapide(page, { autoDe = 600000, pause = 80 } = {}) {
   await page.addInitScript(([a, p]) => { window.AVENTURA_PAUSE = p; window.AVENTURA_DUREE_DE = 0; window.AVENTURA_AUTO_DE = a; }, [autoDe, pause]);
   page.__rapide = true;
@@ -41,10 +41,16 @@ async function lancerPartie(page, { joueurs = 2, aventure = 'Viking' } = {}) {
   await page.getByRole('button', { name: 'Lancer la partie' }).click();
   await page.getByRole('heading', { name: 'Le plateau' }).waitFor();
 }
+// Lance le dé tout de suite (le bouton « Lancer le dé » n'existe plus depuis v4.3 : sans les tests, il se lance seul).
+async function lancerLeDe(page) {
+  await page.waitForFunction(() => window.Aventura && window.Aventura.partie.regles && window.Aventura.partie.regles.etape === 'lancer');
+  await page.evaluate(() => window.Aventura.lancerDe());
+}
+
 // Attend que le tour passe au joueur suivant (enchaînement automatique après le dé).
 async function attendreJoueur(page, nom) {
   await page.locator('#tour-nom').filter({ hasText: new RegExp('^' + nom + '$') }).waitFor();
   await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
 }
 
-module.exports = { lancerPartie, rapide, attendreJoueur, cocherTout, ouvrirNeuf };
+module.exports = { lancerLeDe, lancerPartie, rapide, attendreJoueur, cocherTout, ouvrirNeuf };
