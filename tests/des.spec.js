@@ -38,3 +38,33 @@ test('bonne réponse → dé FORT (4 à 6 points), mauvaise → dé FAIBLE (1 à
     await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
   }
 });
+
+test('le dé roule sur le plateau puis montre, face visible, les points gagnés', async ({ page }) => {
+  await page.addInitScript(() => { window.AVENTURA_PAUSE = 80; window.AVENTURA_DUREE_DE = 700; });
+  page.__rapide = true; // garder la durée réelle du roulé
+  await lancerPartie(page);
+  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await page.getByRole('button', { name: 'Bonne réponse' }).click();
+  await page.getByRole('button', { name: 'Lancer le dé FORT' }).click();
+  const zone = page.locator('#de-plateau');
+  await expect(zone).toBeVisible();
+  // Pendant que le dé roule, les points ne sont pas encore comptés.
+  await expect(page.locator('#points')).toHaveText('0');
+  await expect(zone).toHaveClass(/pose/);
+  const v = Number(await zone.getAttribute('data-valeur'));
+  expect([4, 5, 6]).toContain(v);
+  await expect(page.locator('#de-gain')).toHaveText('+' + v);
+  expect(Number(await page.locator('#points').textContent())).toBe(v);
+  // La face tournée vers le joueur porte bien cette valeur.
+  const faceVisible = await page.evaluate(() => {
+    const t = document.getElementById('de3d').style.transform;
+    const [x, y] = t.match(/-?\d+/g).map(Number).map((a) => ((a % 360) + 360) % 360);
+    const o = [[0, 0], [0, 270], [0, 180], [0, 90], [270, 0], [90, 0]];
+    const k = o.findIndex(([a, b]) => a === x && b === y);
+    return Number(document.querySelectorAll('#de3d .face')[k].dataset.valeur);
+  });
+  expect(faceVisible).toBe(v);
+  // Le dé FORT n'a que des faces 4, 5 et 6.
+  const faces = await page.locator('#de3d .face').evaluateAll((f) => f.map((x) => Number(x.dataset.valeur)).sort());
+  expect(faces).toEqual([4, 4, 5, 5, 6, 6]);
+});

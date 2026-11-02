@@ -124,6 +124,11 @@
           <div class="jauge" role="progressbar" aria-labelledby="titre-points" aria-valuemin="0" id="jauge"><span id="jauge-barre"></span></div>
           <p class="points-objectif" id="objectif-texte"></p>
         </div>
+        <!-- Dé en 3D qui roule sur le plateau au moment du lancer (js/plateau.js → lancerDe). -->
+        <div class="de-plateau" id="de-plateau" aria-hidden="true" hidden>
+          <div class="de3d" id="de3d"></div>
+          <p class="de-gain" id="de-gain"></p>
+        </div>
         <!-- Message écrit sur le plateau (points gagnés, joueur suivant). -->
         <p class="bandeau" id="bandeau" aria-hidden="true" hidden></p>
       </figure>

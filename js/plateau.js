@@ -278,6 +278,8 @@
 
     $('carte-piochee').hidden = true;
     $('bandeau').hidden = true;
+    $('de-plateau').hidden = true;
+    partie.roule = false;
     afficher('ecran-plateau');
     // …puis le premier joueur se déplace de DÉPART jusqu'à la première croix (animation de début de partie).
     rendre({ sansDeplacement: true });
@@ -377,6 +379,7 @@
     var r = partie.regles;
     plusTard(function () {
       $('bandeau').hidden = true;
+      $('de-plateau').hidden = true;
       if (r.etape === 'suivant') { R.suivant(r); rendre(); }
       else if (r.etape === 'fin') montrerFin();
     }, PAUSE);
@@ -430,14 +433,75 @@
   }
 
   // ---------- Dés ----------
-  // Lance le dé demandé par la règle et ajoute ses points à l'équipe.
+  // Durée du roulé du dé (ms). Les tests la raccourcissent avec window.AVENTURA_DUREE_DE.
+  var DUREE_DE = typeof window.AVENTURA_DUREE_DE === 'number' ? window.AVENTURA_DUREE_DE : 1400;
+  // Orientation du cube qui montre chaque face (face k = valeur FACES[type][k]).
+  var ORIENTATIONS = [[0, 0], [0, -90], [0, 180], [0, 90], [-90, 0], [90, 0]];
+  var CLASSES_FACES = ['avant', 'droite', 'arriere', 'gauche', 'haut', 'bas'];
+
+  // Points d'une face (grille 3 × 3, cases données par js/des.js).
+  function facePoints(valeur) {
+    var cases = window.Des.POINTS[valeur], html = '';
+    for (var k = 0; k < 9; k++) if (cases.indexOf(k) >= 0) html += '<i style="grid-area:' + (Math.floor(k / 3) + 1) + '/' + (k % 3 + 1) + '"></i>';
+    return html;
+  }
+
+  // Construit le cube du dé demandé (FAIBLE : 1-1-2-2-3-3, FORT : 4-4-5-5-6-6).
+  function construireCube(type) {
+    var cube = $('de3d');
+    cube.className = 'de3d de3d-' + type;
+    cube.innerHTML = window.Des.FACES[type].map(function (v, k) {
+      return '<span class="face face-' + CLASSES_FACES[k] + '" data-valeur="' + v + '">' + facePoints(v) + '</span>';
+    }).join('');
+    return cube;
+  }
+
+  // Lance le dé demandé par la règle : il roule sur le plateau, puis ses points s'ajoutent à l'équipe.
   function lancerDe(type) {
     var r = partie.regles;
-    if (r.etape !== 'lancer' || r.de !== type) return;
+    if (r.etape !== 'lancer' || r.de !== type || partie.roule) return;
+    partie.roule = true;
+    $('tour-actions').innerHTML = '';
     var v = window.Des.lancer(type);
-    R.lancer(r, v);
-    rendre();
-    enchainer();
+    var faces = window.Des.FACES[type];
+    // Une des faces qui portent cette valeur, au hasard.
+    var possibles = [];
+    faces.forEach(function (f, k) { if (f === v) possibles.push(k); });
+    var k = possibles[Math.floor(Math.random() * possibles.length)];
+
+    var zone = $('de-plateau'), cube = construireCube(type);
+    zone.hidden = false;
+    zone.dataset.valeur = v;
+    $('de-gain').textContent = '';
+    var fin = 'rotateX(' + (ORIENTATIONS[k][0] - 720) + 'deg) rotateY(' + (ORIENTATIONS[k][1] - 1080) + 'deg)';
+    var calme = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function poser() {
+      cube.style.transform = fin;
+      $('de-gain').textContent = '+' + v;
+      zone.classList.add('pose');
+      R.lancer(r, v);
+      partie.roule = false;
+      rendre();
+      var pv = document.querySelector('.points-plateau .points-valeur');
+      pv.classList.remove('gagne'); void pv.offsetWidth; pv.classList.add('gagne');
+      enchainer();
+    }
+
+    zone.classList.remove('pose');
+    if (calme || DUREE_DE < 100 || !cube.animate) { poser(); return; }
+    // Le dé arrive depuis le bord du plateau en roulant et en rebondissant, puis se pose.
+    zone.animate([
+      { transform: 'translate(-260%, -120%) scale(.7)' },
+      { transform: 'translate(-90%, 10%) scale(1)', offset: 0.45 },
+      { transform: 'translate(-30%, -25%) scale(1.05)', offset: 0.65 },
+      { transform: 'translate(0, 0) scale(1)' }
+    ], { duration: DUREE_DE, easing: 'cubic-bezier(.2,.7,.3,1)' });
+    var anim = cube.animate([
+      { transform: 'rotateX(0deg) rotateY(0deg)' },
+      { transform: fin }
+    ], { duration: DUREE_DE, easing: 'cubic-bezier(.15,.6,.25,1)' });
+    anim.onfinish = poser;
   }
 
   // ---------- Fin de partie ----------
