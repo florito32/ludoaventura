@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '3.9';
+  var VERSION = '4.0';
 
   var HISTORY = [
+    { v: '4.0', date: '2026-11-02', changes: [
+      'La partie en cours n\u2019est plus perdue : rafraîchir la page, aller sur une autre page ou mettre l\u2019écran en veille, on reprend au même endroit. Elle ne repart de l\u2019accueil que si la page est fermée.'
+    ] },
     { v: '3.9', date: '2026-11-02', changes: [
       'Préparation : les packs et les questions sont décochés au départ, chaque joueur coche les siens. Si un joueur n\u2019a rien coché, « Lancer la partie » affiche ses réglages avec un message.'
     ] },
