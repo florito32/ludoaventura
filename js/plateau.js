@@ -14,6 +14,24 @@
     { nom: 'ARRIVÉE — le volcan', x: 72.5, y: 93, arrivee: true }
   ];
 
+  // Tracé de la route entre deux cases (points intermédiaires, en % de l'image), relevé sur l'illustration :
+  // ROUTE[i] mène de CASES[i - 1] à CASES[i]. Les pions suivent ces points au lieu d'aller en ligne droite.
+  var ROUTE = [
+    null,
+    // DÉPART → croix 1 (la prairie) : le long de la terre, puis le chemin pavé qui serpente vers le haut.
+    [[23, 88.6], [27.5, 87.5], [30, 84.7], [30.9, 81], [30.6, 77.2], [29.1, 74.4], [26.3, 72.6], [23.1, 71.2], [20.3, 69.3], [18.4, 67]],
+    // Croix 1 → croix 2 (le pont) : le chemin pavé monte vers le lac.
+    [[19.4, 60], [21.9, 58.1], [24.7, 57.4], [27.5, 57.1], [30.6, 56.4], [33.75, 55.3], [36.6, 53.9], [39, 52.5], [40.6, 48.7], [41.9, 45.4], [43.4, 44]],
+    // Croix 2 → croix 3 (le marais) : on traverse le pont puis le sentier de sable vers la droite.
+    [[50.3, 41.2], [54, 40.5], [58, 40.5], [60.3, 41], [62.5, 39.8], [65, 38.2], [68.1, 37.2], [71.3, 36.5], [74.4, 35.8], [77.5, 35.4], [80.6, 34.9]],
+    // Croix 3 → croix 4 (les collines) : le sentier fait demi-tour et redescend entre les collines.
+    [[85.9, 36.5], [86.9, 38.9], [86.6, 41.2], [85.3, 44], [83.1, 46.8], [80.3, 49.2], [76.9, 51], [73.75, 52.4], [70.6, 53.8], [68.4, 55.5], [67.5, 57.6]],
+    // Croix 4 → ARRIVÉE (le volcan) : la descente jusqu'au pied du volcan.
+    [[70.3, 64.3], [71.9, 67.1], [73.4, 70], [75, 72.8], [75.6, 75.1], [74.7, 77.4], [73.4, 79.8], [72.8, 82.1], [73.1, 84.9], [73.1, 87.7], [73.1, 90.5]]
+  ];
+  // Durée d'un déplacement d'une case à la suivante (ms). Les tests la règlent avec window.AVENTURA_MARCHE.
+  var DUREE_MARCHE = typeof window.AVENTURA_MARCHE === 'number' ? window.AVENTURA_MARCHE : 1500;
+
   // Couleur de chaque joueur : son pion et son tas de cartes (1 à 4 joueurs, le 4e a des cartes vertes).
   var COULEURS = ['rouge', 'jaune', 'bleu', 'vert'];
   // Décalage des pions posés sur une même case (en % de la largeur du plateau).
@@ -382,14 +400,55 @@
     partie.roule = false;
   }
 
-  // Place un pion sur sa case ; les pions d'une même case sont décalés pour rester visibles.
+  // Points (en % du plateau) du trajet de la case « de » à la case « a » en suivant la route.
+  function trajet(de, a) {
+    var pts = [[CASES[de].x, CASES[de].y]];
+    for (var k = de + 1; k <= a; k++) {
+      (ROUTE[k] || []).forEach(function (q) { pts.push(q); });
+      pts.push([CASES[k].x, CASES[k].y]);
+    }
+    return pts;
+  }
+
+  // Fait marcher le pion i le long de la route, de la case « de » à la case « a », en DUREE_MARCHE ms.
+  // La vitesse est constante : chaque point du trajet est atteint à proportion de la distance parcourue.
+  function marcher(p, i, de, a) {
+    var dx = DECALAGES[i][0], dy = DECALAGES[i][1] * RAPPORT;
+    var pts = trajet(de, a);
+    var fin = pts[pts.length - 1];
+    p.style.left = (fin[0] + dx) + '%';
+    p.style.top = (fin[1] + dy) + '%';
+    var calme = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (calme || DUREE_MARCHE < 50 || !p.animate || pts.length < 2) return;
+    // Distances mesurées en proportions réelles (1 % de hauteur = 1 / RAPPORT % de largeur).
+    var cumul = [0];
+    for (var k = 1; k < pts.length; k++) {
+      var ex = pts[k][0] - pts[k - 1][0], ey = (pts[k][1] - pts[k - 1][1]) / RAPPORT;
+      cumul.push(cumul[k - 1] + Math.sqrt(ex * ex + ey * ey));
+    }
+    var total = cumul[cumul.length - 1] || 1;
+    var images = pts.map(function (q, k) {
+      return { left: (q[0] + dx) + '%', top: (q[1] + dy) + '%', offset: cumul[k] / total };
+    });
+    if (p.marche) p.marche.cancel();
+    p.classList.add('marche');
+    p.marche = p.animate(images, { duration: DUREE_MARCHE, easing: 'linear' });
+    p.marche.onfinish = p.marche.oncancel = function () { p.classList.remove('marche'); p.marche = null; };
+  }
+
+  // Place les pions ; celui qui change de case y marche en suivant la route.
+  // Les pions d'une même case sont décalés pour rester visibles.
   function placerPions() {
     var r = partie.regles;
     document.querySelectorAll('.pion').forEach(function (p, i) {
-      var c = CASES[r.positions[i]];
-      p.style.left = (c.x + DECALAGES[i][0]) + '%';
-      p.style.top = (c.y + DECALAGES[i][1] * RAPPORT) + '%';
-      p.dataset.case = r.positions[i];
+      var avant = Number(p.dataset.case), apres = r.positions[i];
+      if (apres > avant) marcher(p, i, avant, apres);
+      else {
+        var c = CASES[apres];
+        p.style.left = (c.x + DECALAGES[i][0]) + '%';
+        p.style.top = (c.y + DECALAGES[i][1] * RAPPORT) + '%';
+      }
+      p.dataset.case = apres;
       p.classList.toggle('pion-actif', i === r.joueur && r.etape !== 'fin');
     });
   }
@@ -817,5 +876,5 @@
   // Préchargement discret du plateau pendant que l'accueil est affiché.
   window.addEventListener('load', function () { new Image().src = 'img/plateau-jour.webp'; });
 
-  window.Aventura = { cases: CASES, partie: partie, cartesDuJoueur: cartesDuJoueur, majConstruction: majConstruction };
+  window.Aventura = { cases: CASES, route: ROUTE, trajet: trajet, partie: partie, cartesDuJoueur: cartesDuJoueur, majConstruction: majConstruction };
 })();
