@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '2.2';
+  var VERSION = '2.3';
 
   var HISTORY = [
+    { v: '2.3', date: '2026-11-02', changes: [
+      'Chaque joueur choisit son aventurier parmi 10 personnages : Léa, Tom, Nour, Malo, Inès, Papi Jo, Kenji, Zoé, Sam et Awa.',
+      'Le portrait de l\u2019aventurier apparaît sur son pion, dans la liste des joueurs et sur son tas de cartes.'
+    ] },
     { v: '2.2', date: '2026-11-02', changes: [
       'Nouvel écran « Préparer la partie » : nombre de joueurs (1 à 4) et choix de l\u2019aventure parmi 10.',
       'Le nom et l\u2019image de l\u2019aventure s\u2019affichent sur le rouleau du plateau, à la place de « MISSION ».',

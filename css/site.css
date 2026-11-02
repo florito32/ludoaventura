@@ -144,12 +144,49 @@ main:focus { outline: none; }
 .detail-objectif { font-size: 1.05rem; }
 .detail-objectif strong { color: var(--rouge-texte); }
 .actions-prepa {
-  position: sticky; bottom: 0; display: flex; justify-content: center; padding: 10px 0 calc(6px + env(safe-area-inset-bottom));
-  background: linear-gradient(transparent, var(--vert) 35%);
+  position: sticky; bottom: 0; z-index: 2; display: flex; justify-content: center;
+  margin: 0 -12px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+  background: var(--vert); border-top: 3px solid var(--vert-fonce); box-shadow: 0 -6px 12px rgb(0 0 0 / .2);
 }
 .actions-prepa { flex-direction: column; align-items: center; gap: 6px; }
 .actions-prepa .btn { min-width: min(320px, 100%); }
 .resume-choix { margin: 0; color: #fff; font-weight: 700; text-align: center; text-shadow: 0 1px 0 var(--vert-fonce); }
+
+/* Choix des aventuriers : onglets des joueurs + grille de portraits.
+   --c = couleur du joueur (pion et tas de cartes). */
+.joueur-rouge { --c: var(--rouge); }
+.joueur-jaune { --c: #f2c400; }
+.joueur-bleu { --c: #2e55c9; }
+.joueur-vert { --c: var(--vert-pion); }
+.choix-joueurs { clear: both; display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.onglet-joueur {
+  display: flex; align-items: center; gap: 8px; padding: 4px 12px 4px 4px; cursor: pointer;
+  font: inherit; color: var(--encre); text-align: left; line-height: 1.15;
+  background: #fff; border: 3px solid var(--parchemin-bord); border-left: 8px solid var(--c); border-radius: 12px;
+}
+.onglet-joueur img { width: 40px; height: 44px; border-radius: 8px; }
+.onglet-joueur span { font-size: .8rem; display: flex; flex-direction: column; }
+.onglet-joueur strong { font-size: 1rem; }
+.onglet-joueur[aria-pressed="true"] { border-color: var(--encre); border-left-color: var(--c); box-shadow: 0 0 0 3px var(--c); }
+.aventuriers { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); }
+@media (min-width: 700px) { .aventuriers { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 10px; } }
+.aventurier {
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 6px 6px 8px;
+  font: inherit; color: var(--encre); cursor: pointer; text-align: center; line-height: 1.15;
+  background: #fff; border: 3px solid var(--parchemin-bord); border-radius: 12px;
+}
+.aventurier img { width: 100%; height: auto; border-radius: 10px; margin-bottom: 4px; }
+.aventurier-nom { font: 700 .98rem/1.15 "Rockwell", "Roboto Slab", Georgia, serif; }
+.aventurier-titre { font-size: .72rem; color: var(--encre-douce); }
+.aventurier.pris { border-color: var(--c); box-shadow: 0 0 0 2px var(--c); }
+.aventurier[aria-pressed="true"] { border-color: var(--encre); box-shadow: 0 0 0 4px var(--c); }
+.aventurier:disabled { cursor: not-allowed; }
+.aventurier-pris:not(:empty) {
+  position: absolute; top: 2px; right: 2px; min-width: 30px; padding: 2px 6px; border-radius: 99px;
+  background: var(--c); color: #fff; border: 2px solid var(--encre); font-weight: 800; font-size: .8rem;
+  text-shadow: 0 1px 0 var(--encre);
+}
+.joueur-jaune .aventurier-pris:not(:empty) { color: var(--encre); text-shadow: none; }
 
 /* ---------- Plateau ---------- */
 .plateau-ecran { width: 100%; max-width: 1280px; margin: 0 auto; padding: 8px 12px 16px; }
@@ -187,10 +224,12 @@ main:focus { outline: none; }
 .pions { position: absolute; inset: 0; pointer-events: none; }
 /* Pion : galet plat cerné de noir, comme ceux du nid illustré au centre du plateau. */
 .pion {
-  position: absolute; width: clamp(16px, 3.6%, 44px); aspect-ratio: 1; border-radius: 50%;
+  position: absolute; width: clamp(22px, 4.4%, 52px); aspect-ratio: 1; border-radius: 50%;
   transform: translate(-50%, -50%);
-  border: 2px solid #1d1510;
-  box-shadow: inset -3px -4px 0 rgb(0 0 0 / .22), inset 3px 3px 0 rgb(255 255 255 / .35), 0 3px 3px rgb(0 0 0 / .35);
+  border: 3px solid var(--c, #1d1510);
+  /* Portrait de l'aventurier dans le pion (visage centré), bordure à la couleur du joueur. */
+  background-size: 165%; background-position: 50% 38%; background-repeat: no-repeat;
+  box-shadow: 0 0 0 2px #1d1510, 0 3px 3px rgb(0 0 0 / .35);
   animation: poser .5s ease-out backwards;
 }
 .pion:nth-child(2) { animation-delay: .08s; }
@@ -198,10 +237,10 @@ main:focus { outline: none; }
 .pion:nth-child(4) { animation-delay: .24s; }
 @keyframes poser { from { transform: translate(-50%, -140%); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .pion { animation: none; } }
-.pion-rouge { background: var(--rouge); }
-.pion-jaune { background: var(--jaune); }
-.pion-bleu { background: #2e55c9; }
-.pion-vert { background: var(--vert-pion); }
+.pion-rouge { background-color: var(--rouge); --c: var(--rouge); }
+.pion-jaune { background-color: var(--jaune); --c: #f2c400; }
+.pion-bleu { background-color: #2e55c9; --c: #2e55c9; }
+.pion-vert { background-color: var(--vert-pion); --c: var(--vert-pion); }
 
 /* ---------- Panneau de la table de jeu ---------- */
 .panneau {
@@ -225,6 +264,7 @@ main:focus { outline: none; }
 .joueurs li { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; font-weight: 600; }
 .joueur-couleur { font-weight: 400; color: var(--encre-douce); }
 .joueur-case { font-size: .78rem; font-weight: 700; color: var(--encre); background: #fff; border: 1px solid var(--parchemin-bord); border-radius: 99px; padding: 1px 8px; }
+.portrait-mini { width: 34px; height: 37px; border-radius: 8px; border: 3px solid var(--c); background: #fff; }
 .pion-mini { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #1d1510; box-shadow: inset -2px -3px 0 rgb(0 0 0 / .2); }
 
 /* Dés : faces blanches à points de couleur (comme le dé illustré sur la boîte).

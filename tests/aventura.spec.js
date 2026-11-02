@@ -34,6 +34,7 @@ test('accueil : tout tient à l\'écran, sans défilement horizontal', async ({ 
 });
 
 test('plateau : illustration, 6 cases, 4 pions sur la case DÉPART @smoke', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' }); // positions lues sans l'animation d'arrivée des pions
   await lancerPartie(page, { joueurs: 4 });
   await imageChargee(page.getByRole('img', { name: /Plateau d'Aventura/ }));
   await expect(page.locator('#cases li')).toHaveCount(6);

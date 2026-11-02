@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 220" width="200" height="220" role="img" aria-label="Awa">
+  <!-- Awa — aventurier d'Aventura (portrait original, généré par outils/aventuriers.js) -->
+  <rect width="200" height="220" rx="24" fill="#8fd0b0"/>
+  <circle cx="160" cy="40" r="46" fill="#fff" opacity=".18"/>
+  
+  
+  <path d="M18 220 C20 182 50 166 100 166 C150 166 180 182 182 220 Z" fill="#6b3fa0" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M84 166 L100 190 L116 166" fill="none" stroke="#fff" stroke-width="7"/>
+  <path d="M84 166 L100 190 L116 166" fill="none" stroke="#1d1510" stroke-width="3"/>
+  
+  
+  <rect x="88" y="136" width="24" height="36" rx="8" fill="#6e4128" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+  <circle cx="60" cy="106" r="10" fill="#6e4128" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><circle cx="140" cy="106" r="10" fill="#6e4128" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+  <ellipse cx="100" cy="102" rx="40" ry="46" fill="#6e4128" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+  <circle cx="78" cy="120" r="8" fill="#e86a5a" opacity=".45"/><circle cx="122" cy="120" r="8" fill="#e86a5a" opacity=".45"/>
+  <circle cx="84" cy="104" r="5" fill="#1d1510"/><circle cx="116" cy="104" r="5" fill="#1d1510"/>
+  <circle cx="85.6" cy="102.4" r="1.6" fill="#fff"/><circle cx="117.6" cy="102.4" r="1.6" fill="#fff"/>
+  <path d="M76 92 q8 -6 16 -1 M108 91 q8 -5 16 1" fill="none" stroke="#1d1510" stroke-width="4" stroke-linecap="round"/>
+  <path d="M101 108 q-6 9 1 12" fill="none" stroke="#1d1510" stroke-width="3" stroke-linecap="round"/>
+  <path d="M86 127 Q100 140 114 127 Q100 133 86 127 Z" fill="#7a2a1a" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+  
+  
+  <path d="M56 92 C48 40 152 40 144 92 C128 80 72 80 56 92 Z" fill="#ffb000" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M62 74 C84 58 120 56 140 70 M66 60 C86 46 116 46 134 58" fill="none" stroke="#e3262a" stroke-width="7"/>
+    <path d="M62 74 C84 58 120 56 140 70 M66 60 C86 46 116 46 134 58" fill="none" stroke="#1d1510" stroke-width="2"/>
+  <circle cx="58" cy="122" r="6" fill="#ffd23f" stroke="#1d1510" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><circle cx="142" cy="122" r="6" fill="#ffd23f" stroke="#1d1510" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+</svg>

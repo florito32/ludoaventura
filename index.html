@@ -63,7 +63,14 @@
       </fieldset>
 
       <fieldset class="bloc etape">
-        <legend><span class="etape-num">2</span> Choisissez votre aventure</legend>
+        <legend><span class="etape-num">2</span> Chaque joueur choisit son aventurier</legend>
+        <!-- Onglets : le joueur qui choisit ; la grille : les 10 aventuriers (js/plateau.js). -->
+        <div class="choix-joueurs" id="choix-joueurs" role="group" aria-label="Joueur qui choisit"></div>
+        <div class="aventuriers" id="grille-aventuriers"></div>
+      </fieldset>
+
+      <fieldset class="bloc etape">
+        <legend><span class="etape-num">3</span> Choisissez votre aventure</legend>
         <div class="aventures" id="liste-aventures"><!-- cartes générées par js/plateau.js --></div>
         <div class="aventure-detail" id="aventure-detail" aria-live="polite"></div>
       </fieldset>
@@ -152,6 +159,7 @@
 
 <script src="js/des.js"></script>
 <script src="js/aventures.js"></script>
+<script src="js/aventuriers.js"></script>
 <script src="js/plateau.js"></script>
 <script src="js/version.js"></script>
 <script src="js/pwa.js"></script>
