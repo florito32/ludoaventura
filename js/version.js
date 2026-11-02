@@ -4,9 +4,15 @@
 (function () {
   'use strict';
 
-  var VERSION = '2.1';
+  var VERSION = '2.2';
 
   var HISTORY = [
+    { v: '2.2', date: '2026-11-02', changes: [
+      'Nouvel écran « Préparer la partie » : nombre de joueurs (1 à 4) et choix de l\u2019aventure parmi 10.',
+      'Le nom et l\u2019image de l\u2019aventure s\u2019affichent sur le rouleau du plateau, à la place de « MISSION ».',
+      'Objectif de l\u2019équipe affiché avec une jauge : 15, 18 ou 21 points par joueur selon la difficulté de l\u2019aventure.',
+      'Chaque joueur a son propre tas de cartes, de la couleur de son pion (rouge, jaune, bleu, vert).'
+    ] },
     { v: '2.1', date: '2026-11-02', changes: [
       'Les dés se lancent en les touchant.',
       'Dé FAIBLE : 2 faces à 1, 2 faces à 2, 2 faces à 3 points. Dé FORT : 2 faces à 4, 2 faces à 5, 2 faces à 6 points.'

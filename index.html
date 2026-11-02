@@ -43,10 +43,42 @@
     </div>
   </section>
 
-  <!-- ÉCRAN 2 : le plateau de jeu -->
+  <!-- ÉCRAN 2 : préparation de la partie (nombre de joueurs, aventure) -->
+  <section class="ecran preparation" id="ecran-preparation" aria-labelledby="titre-preparation" hidden>
+    <header class="barre">
+      <button type="button" class="btn-retour" data-vers="ecran-accueil"><span aria-hidden="true">←</span> Accueil</button>
+      <h2 id="titre-preparation">Préparer la partie</h2>
+      <span class="barre-vide" aria-hidden="true"></span>
+    </header>
+
+    <form id="form-preparation" class="prepa">
+      <fieldset class="bloc etape">
+        <legend><span class="etape-num">1</span> Combien de joueurs ?</legend>
+        <div class="nb-joueurs">
+          <label><input type="radio" name="nb" value="1"><span>1</span></label>
+          <label><input type="radio" name="nb" value="2" checked><span>2</span></label>
+          <label><input type="radio" name="nb" value="3"><span>3</span></label>
+          <label><input type="radio" name="nb" value="4"><span>4</span></label>
+        </div>
+      </fieldset>
+
+      <fieldset class="bloc etape">
+        <legend><span class="etape-num">2</span> Choisissez votre aventure</legend>
+        <div class="aventures" id="liste-aventures"><!-- cartes générées par js/plateau.js --></div>
+        <div class="aventure-detail" id="aventure-detail" aria-live="polite"></div>
+      </fieldset>
+
+      <div class="actions-prepa">
+        <p class="resume-choix" id="resume-choix"></p>
+        <button type="submit" class="btn btn-principal" id="btn-lancer">Lancer la partie</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ÉCRAN 3 : le plateau de jeu -->
   <section class="ecran plateau-ecran" id="ecran-plateau" aria-labelledby="titre-plateau" hidden>
     <header class="barre">
-      <button type="button" class="btn-retour" id="btn-accueil"><span aria-hidden="true">←</span> Accueil</button>
+      <button type="button" class="btn-retour" data-vers="ecran-preparation"><span aria-hidden="true">←</span> Préparation</button>
       <h2 id="titre-plateau">Le plateau</h2>
       <span class="barre-vide" aria-hidden="true"></span>
     </header>
@@ -55,16 +87,22 @@
       <!-- Plateau illustré + pions posés sur les cases (positions en % de l'image, voir js/plateau.js) -->
       <figure class="plateau" id="plateau">
         <img id="plateau-img" src="img/plateau-jour.webp" width="1600" height="1071"
-             alt="Plateau d'Aventura : un chemin part de la flèche DÉPART, passe par une croix dans la prairie, le pont sur le lac, le marais et les collines, et finit au volcan, case ARRIVÉE. Au centre, un parchemin MISSION.">
+             alt="Plateau d'Aventura : un chemin part de la flèche DÉPART, passe par une croix dans la prairie, le pont sur le lac, le marais et les collines, et finit au volcan, case ARRIVÉE. Au centre, le parchemin de l'aventure.">
+        <!-- Rouleau : l'aventure choisie remplace le mot MISSION -->
+        <div class="rouleau" id="rouleau">
+          <img id="rouleau-img" src="" alt="" width="640" height="400">
+          <p id="rouleau-nom"></p>
+        </div>
         <ol class="cases" id="cases" aria-label="Cases du parcours"></ol>
         <div class="pions" id="pions" aria-hidden="true"></div>
       </figure>
 
       <aside class="panneau" aria-label="Table de jeu">
         <div class="bloc points">
-          <h3>Points de l'équipe</h3>
-          <p class="points-valeur"><span id="points">0</span></p>
-          <p class="points-objectif">Objectif : indiqué par la carte AVENTURE</p>
+          <h3 id="titre-points">Points de l'équipe</h3>
+          <p class="points-valeur"><span id="points">0</span><span class="points-sur"> / <span id="objectif">0</span></span></p>
+          <div class="jauge" role="progressbar" aria-labelledby="titre-points" aria-valuemin="0" id="jauge"><span id="jauge-barre"></span></div>
+          <p class="points-objectif" id="objectif-texte"></p>
         </div>
 
         <div class="bloc">
@@ -91,13 +129,9 @@
         </div>
 
         <div class="bloc">
-          <h3>Les cartes</h3>
-          <ul class="cartes">
-            <li class="pile pile-aventure"><span class="carte" aria-hidden="true"></span>AVENTURE</li>
-            <li class="pile pile-rouge"><span class="carte" aria-hidden="true"></span>JEU rouge</li>
-            <li class="pile pile-jaune"><span class="carte" aria-hidden="true"></span>JEU jaune</li>
-            <li class="pile pile-bleue"><span class="carte" aria-hidden="true"></span>JEU bleu</li>
-          </ul>
+          <h3>Les tas de cartes</h3>
+          <!-- Chaque joueur a son propre tas, de la couleur de son pion. -->
+          <ul class="cartes" id="tas"></ul>
         </div>
 
         <div class="bloc">
@@ -117,6 +151,7 @@
 </footer>
 
 <script src="js/des.js"></script>
+<script src="js/aventures.js"></script>
 <script src="js/plateau.js"></script>
 <script src="js/version.js"></script>
 <script src="js/pwa.js"></script>
