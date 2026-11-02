@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" width="640" height="400">
+  <!-- Aventure « mayas » : illustration originale (générée par outils/aventures.js). -->
+  <defs><linearGradient id="c" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4fa3e0"/><stop offset="1" stop-color="#bfe3f5"/></linearGradient></defs>
+    <rect width="640" height="400" fill="url(#c)"/>
+    <circle cx="530" cy="80" r="40" fill="#ffd23f" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><path d="M80 90 c-3.6 -19.8 27 -25.2 34.2 -10.8 c9 -16.2 39.6 -10.8 36 9 c16.2 0 19.8 19.8 1.8 19.8 h-64.8 c-16.2 0 -18 -18 -7.2 -18 z" fill="#fff" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M0 300 C60 250 120 280 160 250 C200 280 250 250 300 270 V400 H0 Z" fill="#2f8a4e" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M340 270 C400 240 460 280 520 250 C570 270 600 250 640 260 V400 H340 Z" fill="#2f8a4e" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    <g fill="#d8cfb8">
+      <path d="M150 340 H490 L460 300 H180 Z" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M180 300 H460 L432 262 H208 Z" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M208 262 H432 L404 224 H236 Z" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M236 224 H404 L378 188 H262 Z" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+      <rect x="282" y="140" width="76" height="48" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    </g>
+    <path d="M300 340 H340 L330 188 H310 Z" fill="#b9ae93" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M304 314 H336 M306 290 H334 M308 266 H332 M309 242 H331 M310 218 H330" stroke="#1d1510" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <rect x="308" y="156" width="24" height="32" fill="#1d1510"/>
+    <path d="M0 400 V350 C80 330 160 360 240 350 C320 340 420 370 640 345 V400 Z" fill="#4caf50" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+</svg>

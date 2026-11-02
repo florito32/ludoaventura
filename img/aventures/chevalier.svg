@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" width="640" height="400">
+  <!-- Aventure « chevalier » : illustration originale (générée par outils/aventures.js). -->
+  <defs><linearGradient id="c" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7cc0ea"/><stop offset="1" stop-color="#cfeaf8"/></linearGradient></defs>
+    <rect width="640" height="400" fill="url(#c)"/>
+    <path d="M470 80 c-4 -22 30 -28 38 -12 c10 -18 44 -12 40 10 c18 0 22 22 2 22 h-72 c-18 0 -20 -20 -8 -20 z" fill="#fff" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><circle cx="90" cy="80" r="36" fill="#ffd23f" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M0 330 C150 250 480 250 640 320 V400 H0 Z" fill="#7cb342" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    <g fill="#c9c2b4">
+      <rect x="230" y="170" width="180" height="120" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+      <rect x="190" y="130" width="70" height="160" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+      <rect x="380" y="130" width="70" height="160" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+      <path d="M190 130 v-18 h14 v18 h14 v-18 h14 v18 h14 v-18 h14 v18 M380 130 v-18 h14 v18 h14 v-18 h14 v18 h14 v-18 h14 v18 M230 170 v-16 h18 v16 h18 v-16 h18 v16 h18 v-16 h18 v16 h18 v-16 h18 v16 h18 v-16 h18 v16" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    </g>
+    <path d="M290 290 V230 C290 200 350 200 350 230 V290 Z" fill="#6b3f1d" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M305 290 V232 M320 290 V222 M335 290 V232" stroke="#1d1510" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <rect x="212" y="170" width="16" height="26" rx="8" fill="#1d1510"/><rect x="412" y="170" width="16" height="26" rx="8" fill="#1d1510"/>
+    <path d="M225 112 V60" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/><path d="M225 62 L270 74 L225 88 Z" fill="#e3262a" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M415 112 V60" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/><path d="M415 62 L460 74 L415 88 Z" fill="#2e55c9" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M90 360 L170 290 M170 360 L90 290" stroke="#d9dde2" stroke-width="12" stroke-linecap="round"/>
+    <path d="M90 360 L170 290 M170 360 L90 290" fill="none" stroke="#1d1510" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M100 330 l12 12 M160 330 l-12 12" stroke="#8a5a2b" stroke-width="10"/>
+</svg>

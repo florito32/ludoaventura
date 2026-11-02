@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" width="640" height="400">
+  <!-- Aventure « chine » : illustration originale (générée par outils/aventures.js). -->
+  <defs><linearGradient id="c" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fc8ea"/><stop offset="1" stop-color="#e2f2fa"/></linearGradient></defs>
+    <rect width="640" height="400" fill="url(#c)"/>
+    <path d="M80 80 c-4 -22 30 -28 38 -12 c10 -18 44 -12 40 10 c18 0 22 22 2 22 h-72 c-18 0 -20 -20 -8 -20 z" fill="#fff" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><path d="M430 60 c-3.2 -17.6 24 -22.400000000000002 30.400000000000002 -9.600000000000001 c8 -14.4 35.2 -9.600000000000001 32 8 c14.4 0 17.6 17.6 1.6 17.6 h-57.6 c-14.4 0 -16 -16 -6.4 -16 z" fill="#fff" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M0 230 C80 160 160 200 240 160 C330 120 420 190 520 150 C580 130 620 160 640 170 V400 H0 Z" fill="#6aa84f" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M0 300 C120 250 220 300 320 260 C420 220 520 280 640 250 V400 H0 Z" fill="#3f7a46" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M-10 330 C80 300 140 250 220 240 C300 230 340 200 420 190 C480 182 540 150 650 140" fill="none" stroke="#1d1510" stroke-width="34" stroke-linecap="round"/>
+    <path d="M-10 330 C80 300 140 250 220 240 C300 230 340 200 420 190 C480 182 540 150 650 140" fill="none" stroke="#c9b18a" stroke-width="24" stroke-linecap="round"/>
+    <path d="M-10 330 C80 300 140 250 220 240 C300 230 340 200 420 190 C480 182 540 150 650 140" fill="none" stroke="#1d1510" stroke-width="6" stroke-dasharray="10 12" transform="translate(0 -14)"/>
+    <g fill="#c9b18a" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+      <rect x="174" y="176" width="52" height="56"/>
+      <path d="M166 176 L200 146 L234 176 Z" fill="#e3262a"/>
+      <rect x="192" y="194" width="16" height="20" fill="#1d1510"/></g><g fill="#c9b18a" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+      <rect x="404" y="124" width="52" height="56"/>
+      <path d="M396 124 L430 94 L464 124 Z" fill="#e3262a"/>
+      <rect x="422" y="142" width="16" height="20" fill="#1d1510"/></g>
+</svg>

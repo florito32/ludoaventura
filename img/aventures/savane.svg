@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" width="640" height="400">
+  <!-- Aventure « savane » : illustration originale (générée par outils/aventures.js). -->
+  <defs><linearGradient id="c" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff8a3d"/><stop offset="1" stop-color="#ffd166"/></linearGradient></defs>
+    <rect width="640" height="400" fill="url(#c)"/>
+    <circle cx="320" cy="250" r="90" fill="#ffe600" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M0 290 C160 270 480 270 640 290 V400 H0 Z" fill="#d9a441" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M140 290 C150 230 140 200 120 180 M140 240 C160 210 190 200 210 196" fill="none" stroke="#1d1510" stroke-width="12" stroke-linecap="round"/>
+    <path d="M40 178 C70 140 220 136 260 176 C230 196 90 198 40 178 Z" fill="#3f6b2a" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    <g transform="translate(410 300)" fill="#b5651d" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-30 0 C-30 -18 20 -20 24 -4 L34 -24 L40 -22 L34 2 C30 10 -26 10 -30 0 Z"/>
+      <path d="M-24 6 V30 M-12 6 V30 M12 6 V30 M24 4 V30" fill="none"/>
+      <path d="M34 -24 l-6 -20 M40 -22 l2 -20" fill="none"/></g><g transform="translate(500 312)" fill="#b5651d" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-30 0 C-30 -18 20 -20 24 -4 L34 -24 L40 -22 L34 2 C30 10 -26 10 -30 0 Z"/>
+      <path d="M-24 6 V30 M-12 6 V30 M12 6 V30 M24 4 V30" fill="none"/>
+      <path d="M34 -24 l-6 -20 M40 -22 l2 -20" fill="none"/></g><g transform="translate(580 296)" fill="#b5651d" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-30 0 C-30 -18 20 -20 24 -4 L34 -24 L40 -22 L34 2 C30 10 -26 10 -30 0 Z"/>
+      <path d="M-24 6 V30 M-12 6 V30 M12 6 V30 M24 4 V30" fill="none"/>
+      <path d="M34 -24 l-6 -20 M40 -22 l2 -20" fill="none"/></g>
+    <path d="M0 360 C200 340 440 380 640 350" fill="none" stroke="#b07e2a" stroke-width="6"/>
+</svg>

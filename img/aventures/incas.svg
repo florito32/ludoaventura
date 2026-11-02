@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" width="640" height="400">
+  <!-- Aventure « incas » : illustration originale (générée par outils/aventures.js). -->
+  <defs><linearGradient id="c" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fc8ea"/><stop offset="1" stop-color="#e2f2fa"/></linearGradient></defs>
+    <rect width="640" height="400" fill="url(#c)"/>
+    <path d="M60 80 c-3.6 -19.8 27 -25.2 34.2 -10.8 c9 -16.2 39.6 -10.8 36 9 c16.2 0 19.8 19.8 1.8 19.8 h-64.8 c-16.2 0 -18 -18 -7.2 -18 z" fill="#fff" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M300 300 L430 60 L470 90 L560 300 Z" fill="#4f7d4a" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M430 60 L470 90 L452 130 L420 110 Z" fill="#6aa84f" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M0 300 C80 250 200 250 320 280 V400 H0 Z" fill="#6aa84f" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M40 300 H560 V322 H40 Z" fill="#8bc34a" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><path d="M70 322 H550 V344 H70 Z" fill="#7cb342" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><path d="M100 344 H540 V366 H100 Z" fill="#8bc34a" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><path d="M130 366 H530 V388 H130 Z" fill="#7cb342" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+    <g fill="#c9c2b4" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+      <rect x="140" y="250" width="60" height="44"/><path d="M134 250 L170 226 L206 250 Z" fill="#8a5a2b"/>
+      <rect x="230" y="262" width="50" height="34"/><path d="M224 262 L255 242 L286 262 Z" fill="#8a5a2b"/>
+    </g>
+    <g transform="translate(470 330)" fill="#fff6e6" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-40 0 C-40 -20 20 -22 26 -6 L28 -46 C28 -56 44 -56 44 -46 L42 0 C40 14 -36 14 -40 0 Z"/>
+      <path d="M-30 8 V36 M-14 10 V36 M16 10 V36 M32 6 V36" fill="none"/>
+      <path d="M30 -54 l-2 -12 M40 -54 l4 -12" fill="none"/>
+    </g>
+</svg>

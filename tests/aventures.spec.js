@@ -11,8 +11,21 @@ test.describe('données des aventures', () => {
     expect(new Set(A.LISTE.map((a) => a.id)).size).toBe(10);
     for (const a of A.LISTE) {
       expect(a.nom).toBeTruthy();
-      expect(a.image).toMatch(/^img\/aventures\//);
+      expect(a.image).toMatch(/^img\/aventures\/[a-z-]+\.svg$/);
       expect(['facile', 'moyen', 'difficile']).toContain(a.difficulte);
+    }
+  });
+
+  test('chaque illustration d\'aventure est un SVG valide', () => {
+    const fs = require('fs');
+    for (const a of A.LISTE) {
+      const svg = fs.readFileSync(a.image, 'utf8');
+      expect(svg, a.image).toMatch(/^<svg[\s\S]*<\/svg>\s*$/);
+      // Un attribut répété dans une balise rend le SVG invalide (bug déjà rencontré sur les portraits).
+      for (const balise of svg.match(/<[a-zA-Z][^>]*>/g)) {
+        const noms = (balise.match(/\s([a-zA-Z:-]+)=/g) || []).map((n) => n.trim());
+        expect(new Set(noms).size, a.image + ' : ' + balise).toBe(noms.length);
+      }
     }
   });
 

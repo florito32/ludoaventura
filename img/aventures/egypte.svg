@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" width="640" height="400">
+  <!-- Aventure « egypte » : illustration originale (générée par outils/aventures.js). -->
+  <defs><linearGradient id="c" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6ab8ea"/><stop offset="1" stop-color="#d5effa"/></linearGradient></defs>
+    <rect width="640" height="400" fill="url(#c)"/>
+    <circle cx="540" cy="80" r="40" fill="#ffd23f" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M60 300 L200 120 L340 300 Z" fill="#e8c06a" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M200 120 L250 300 L340 300 Z" fill="#c99a3e" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M300 300 L400 170 L500 300 Z" fill="#e8c06a" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M400 170 L436 300 L500 300 Z" fill="#c99a3e" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    <path d="M0 300 C120 280 240 310 360 290 C460 274 560 300 640 288 V400 H0 Z" fill="#f2d48a" stroke="#1d1510" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+    <g transform="translate(470 320)" fill="#b97a3c" stroke="#1d1510" stroke-width="4" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-50 0 C-50 -30 -20 -40 -6 -24 C6 -44 30 -40 34 -20 L56 -34 C66 -40 74 -30 66 -24 L50 -10 C46 6 -46 10 -50 0 Z"/>
+      <path d="M-40 4 V44 M-24 6 V44 M24 6 V44 M38 2 V44" fill="none"/>
+    </g>
+    <path d="M30 360 c40 -10 80 10 120 0 M380 380 c40 -10 80 10 120 0" fill="none" stroke="#d9b25e" stroke-width="5" stroke-linecap="round"/>
+</svg>
