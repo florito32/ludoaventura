@@ -11,6 +11,7 @@
   --encre: #3b2a1e;       /* brun foncé des contours et du mot MISSION */
   --encre-douce: #5e4a3a;
   --rouge: #e3262a;
+  --rouge-texte: #a8161b; /* rouge pour du texte sur fond clair (contraste ≥ 4,5:1) */
   --jaune: #ffe600;
   --bleu: #1c3473;
   --vert-pion: #2f9e5b;
@@ -141,7 +142,7 @@ main:focus { outline: none; }
 .aventure-detail p { margin: 0 0 8px; max-width: 60em; }
 .a-venir { color: var(--encre-douce); font-style: italic; }
 .detail-objectif { font-size: 1.05rem; }
-.detail-objectif strong { color: var(--rouge); }
+.detail-objectif strong { color: var(--rouge-texte); }
 .actions-prepa {
   position: sticky; bottom: 0; display: flex; justify-content: center; padding: 10px 0 calc(6px + env(safe-area-inset-bottom));
   background: linear-gradient(transparent, var(--vert) 35%);
