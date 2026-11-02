@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '4.0';
+  var VERSION = '4.1';
 
   var HISTORY = [
+    { v: '4.1', date: '2026-11-02', changes: [
+      'Les personnages suivent la route pour aller d\u2019une croix à l\u2019autre (et non plus en ligne droite) : chemin pavé, pont, sentier du marais, descente vers le volcan. Chaque déplacement dure 1,5 seconde.'
+    ] },
     { v: '4.0', date: '2026-11-02', changes: [
       'La partie en cours n\u2019est plus perdue : rafraîchir la page, aller sur une autre page ou mettre l\u2019écran en veille, on reprend au même endroit. Elle ne repart de l\u2019accueil que si la page est fermée.'
     ] },
