@@ -50,7 +50,7 @@ test('un tour complet : piocher, répondre, lancer, joueur suivant', async ({ pa
   await expect(page.locator('#tour-manche')).toContainText('Croix 1 sur 5');
   await expect(page.locator('#tas .pile').nth(0)).toHaveClass(/a-piocher/);
   await page.getByRole('button', { name: 'Piocher une carte' }).click();
-  await expect(page.locator('#carte-titre')).toHaveText('Carte n° 1 du tas de Léa');
+  await expect(page.locator('#carte-titre')).toContainText('Carte n° 1 de Léa');
   await page.getByRole('button', { name: 'Bonne réponse' }).click();
   await page.getByRole('button', { name: 'Lancer le dé FORT' }).click();
   const pts = Number(await page.locator('#points').textContent());

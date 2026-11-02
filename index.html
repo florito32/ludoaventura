@@ -55,18 +55,33 @@
       <fieldset class="bloc etape">
         <legend><span class="etape-num">1</span> Combien de joueurs ?</legend>
         <div class="nb-joueurs">
-          <label><input type="radio" name="nb" value="1"><span>1</span></label>
-          <label><input type="radio" name="nb" value="2" checked><span>2</span></label>
-          <label><input type="radio" name="nb" value="3"><span>3</span></label>
-          <label><input type="radio" name="nb" value="4"><span>4</span></label>
+          <label><input type="radio" name="nb" value="1"><span>1<span class="visually-hidden"> joueur</span></span></label>
+          <label><input type="radio" name="nb" value="2" checked><span>2<span class="visually-hidden"> joueurs</span></span></label>
+          <label><input type="radio" name="nb" value="3"><span>3<span class="visually-hidden"> joueurs</span></span></label>
+          <label><input type="radio" name="nb" value="4"><span>4<span class="visually-hidden"> joueurs</span></span></label>
         </div>
       </fieldset>
 
       <fieldset class="bloc etape">
-        <legend><span class="etape-num">2</span> Chaque joueur choisit son aventurier</legend>
+        <legend><span class="etape-num">2</span> Chaque joueur choisit son aventurier et ses cartes</legend>
         <!-- Onglets : le joueur qui choisit ; la grille : les 10 aventuriers (js/plateau.js). -->
         <div class="choix-joueurs" id="choix-joueurs" role="group" aria-label="Joueur qui choisit"></div>
         <div class="aventuriers" id="grille-aventuriers"></div>
+
+        <!-- Cartes du joueur actif : packs où il pioche et niveau (js/cartes.js, généré depuis l'Excel). -->
+        <div class="reglages-joueur" id="reglages-joueur">
+          <h3 id="reglages-titre"></h3>
+          <div class="reglage">
+            <p class="reglage-titre" id="packs-titre">Packs où piocher <span>(au moins un)</span></p>
+            <div class="packs" id="packs" role="group" aria-labelledby="packs-titre"></div>
+          </div>
+          <div class="reglage">
+            <p class="reglage-titre" id="niveau-titre">Niveau</p>
+            <div class="niveaux-cartes" id="niveaux-cartes" role="radiogroup" aria-labelledby="niveau-titre"></div>
+          </div>
+          <p class="reglage-alerte" id="packs-alerte" role="status" aria-live="polite"></p>
+          <button type="button" class="btn btn-secondaire" id="btn-joueur-suivant"></button>
+        </div>
       </fieldset>
 
       <fieldset class="bloc etape">
@@ -113,9 +128,15 @@
             <img id="tour-portrait" src="img/aventuriers/lea.svg" alt="" width="200" height="220">
             <p>À <strong id="tour-nom"></strong> de jouer</p>
           </div>
+          <!-- Carte JEU piochée : dictée (mot caché, « Voir le mot ») ou lettre affichée ; bouton de lecture vocale. -->
           <div class="carte-piochee" id="carte-piochee" hidden>
-            <p class="carte-titre" id="carte-titre"></p>
-            <p class="carte-texte">Le maître du jeu pose la question de la carte.<br><em>(Les questions arriveront plus tard.)</em></p>
+            <div class="carte-entete">
+              <p class="carte-titre" id="carte-titre"></p>
+              <button type="button" class="btn-ecouter" id="btn-ecouter"><span aria-hidden="true">🔊</span> Écouter</button>
+            </div>
+            <p class="carte-consigne" id="carte-consigne"></p>
+            <p class="carte-mot" id="carte-mot"></p>
+            <button type="button" class="btn-voir" id="btn-voir" aria-controls="carte-mot" aria-expanded="false">Voir le mot</button>
           </div>
           <p class="tour-consigne" id="tour-consigne" role="status" aria-live="polite"></p>
           <div class="tour-actions" id="tour-actions"></div>
@@ -187,6 +208,8 @@
 <script src="js/des.js"></script>
 <script src="js/aventures.js"></script>
 <script src="js/aventuriers.js"></script>
+<script src="js/cartes.js"></script>
+<script src="js/voix.js"></script>
 <script src="js/regles.js"></script>
 <script src="js/plateau.js"></script>
 <script src="js/version.js"></script>

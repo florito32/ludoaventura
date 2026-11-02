@@ -50,7 +50,7 @@ test('préparation : 4 choix de joueurs, 10 aventures avec image, objectif mis �
   await expect(page.locator('input[name="nb"]')).toHaveCount(4);
   await expect(page.locator('.aventure')).toHaveCount(10);
   await expect(page.locator('#aventure-detail')).toContainText('30 troncs d’arbre à couper'); // Viking, 2 joueurs par défaut
-  await page.getByRole('radio', { name: '4', exact: true }).check();
+  await page.getByRole('radio', { name: '4 joueurs' }).check();
   await page.getByRole('radio', { name: /^Savane/ }).check();
   await expect(page.locator('#aventure-detail')).toContainText('84 gazelles à chasser');
   // Le rappel du choix est visible à côté du bouton, sans défiler.

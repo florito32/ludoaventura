@@ -23,10 +23,16 @@
   var $ = function (id) { return document.getElementById(id); };
   var A = window.Aventures;
   var P = window.Aventuriers;
+  var C = window.Cartes;
+  var TOUS_PACKS = C.PACKS.map(function (p) { return p.id; });
 
   // État de la partie (en mémoire : une nouvelle ouverture repart de zéro).
-  // choix[i] = aventurier du joueur i (par défaut : les 4 premiers de la liste).
-  var partie = { nbJoueurs: 2, aventure: A.LISTE[0], joueurs: [], choix: ['lea', 'tom', 'nour', 'malo'], actif: 0, regles: null };
+  // choix[i] = aventurier du joueur i (par défaut : les 4 premiers de la liste) ;
+  // packs[i] / niveaux[i] = packs où le joueur i pioche et son niveau (tous les packs, niveau 1 par défaut).
+  var partie = {
+    nbJoueurs: 2, aventure: A.LISTE[0], joueurs: [], choix: ['lea', 'tom', 'nour', 'malo'], actif: 0, regles: null,
+    packs: [0, 1, 2, 3].map(function () { return TOUS_PACKS.slice(); }), niveaux: [1, 1, 1, 1], carte: null
+  };
 
   function afficher(id) {
     document.querySelectorAll('.ecran').forEach(function (s) { s.hidden = s.id !== id; });
@@ -60,7 +66,7 @@
 
   // ---------- Choix des aventuriers ----------
   // Un onglet par joueur (le joueur qui choisit), puis une grille de 10 portraits.
-  // Toucher un portrait le donne au joueur actif, puis passe au joueur suivant.
+  // Toucher un portrait le donne au joueur actif ; « Joueur suivant » passe au joueur d'après.
   // Un aventurier déjà pris par un autre joueur n'est pas disponible.
   function construireAventuriers() {
     var grille = $('grille-aventuriers');
@@ -74,12 +80,57 @@
         '<span class="aventurier-pris" aria-hidden="true"></span><span class="visually-hidden aventurier-proprio"></span>';
       b.addEventListener('click', function () {
         partie.choix[partie.actif] = a.id;
-        if (partie.actif < partie.nbJoueurs - 1) partie.actif++;
         majAventuriers();
       });
       grille.appendChild(b);
     });
+    construireReglages();
     majAventuriers();
+  }
+
+  // Packs (cases à cocher) et niveau (1 à 3) du joueur actif.
+  function construireReglages() {
+    var box = $('packs');
+    C.PACKS.forEach(function (p) {
+      var l = document.createElement('label');
+      l.className = 'pack';
+      l.innerHTML = '<input type="checkbox" name="pack" value="' + p.id + '"><span>' + p.nom + '</span>';
+      box.appendChild(l);
+    });
+    var niv = $('niveaux-cartes');
+    [1, 2, 3].forEach(function (n) {
+      var l = document.createElement('label');
+      l.className = 'niveau-carte';
+      l.innerHTML = '<input type="radio" name="niveau-cartes" value="' + n + '"><span><span class="visually-hidden">Niveau </span>' + n + '</span>';
+      niv.appendChild(l);
+    });
+    box.addEventListener('change', function (e) {
+      var j = partie.actif;
+      var coches = Array.prototype.filter.call(box.querySelectorAll('input'), function (i) { return i.checked; })
+        .map(function (i) { return i.value; });
+      if (!coches.length) { // au moins un pack, sinon le joueur ne pourrait rien piocher
+        e.target.checked = true;
+        $('packs-alerte').textContent = 'Il faut garder au moins un pack.';
+        return;
+      }
+      $('packs-alerte').textContent = '';
+      partie.packs[j] = coches;
+      majAventuriers();
+    });
+    niv.addEventListener('change', function (e) {
+      partie.niveaux[partie.actif] = Number(e.target.value);
+      majAventuriers();
+    });
+    $('btn-joueur-suivant').addEventListener('click', function () {
+      partie.actif++;
+      majAventuriers();
+      $('choix-joueurs').querySelectorAll('button')[partie.actif].focus();
+    });
+  }
+
+  function resumeCartes(i) {
+    var n = partie.packs[i].length;
+    return 'Niveau ' + partie.niveaux[i] + ' · ' + (n === TOUS_PACKS.length ? 'tous les packs' : n + ' pack' + (n > 1 ? 's' : ''));
   }
 
   function majAventuriers() {
@@ -94,7 +145,7 @@
       o.className = 'onglet-joueur joueur-' + COULEURS[i];
       o.setAttribute('aria-pressed', String(i === partie.actif));
       o.innerHTML = '<img src="' + a.image + '" alt="" width="200" height="220"><span>Joueur ' + (i + 1) +
-        '<strong>' + a.nom + '</strong></span>';
+        '<strong>' + a.nom + '</strong><small>' + resumeCartes(i) + '</small></span>';
       o.addEventListener('click', (function (k) { return function () { partie.actif = k; majAventuriers(); }; })(i));
       onglets.appendChild(o);
     }
@@ -108,6 +159,43 @@
       // Nom accessible = texte visible + précision pour les lecteurs d'écran (WCAG 2.5.3).
       b.querySelector('.aventurier-proprio').textContent = proprio >= 0 ? ' — choisi par Joueur ' + (proprio + 1) : '';
     });
+    // Réglages des cartes du joueur actif.
+    var actif = P.trouver(partie.choix[partie.actif]);
+    $('reglages-joueur').className = 'reglages-joueur joueur-' + COULEURS[partie.actif];
+    $('reglages-titre').textContent = 'Cartes de ' + actif.nom + ' (Joueur ' + (partie.actif + 1) + ')';
+    $('packs').querySelectorAll('input').forEach(function (i) { i.checked = partie.packs[partie.actif].indexOf(i.value) >= 0; });
+    $('niveaux-cartes').querySelectorAll('input').forEach(function (i) { i.checked = Number(i.value) === partie.niveaux[partie.actif]; });
+    var suivant = $('btn-joueur-suivant');
+    suivant.hidden = partie.actif >= nb - 1;
+    suivant.textContent = 'Joueur suivant →';
+  }
+
+  // ---------- Paquets de cartes ----------
+  function melanger(t) {
+    for (var i = t.length - 1; i > 0; i--) {
+      var k = Math.floor(Math.random() * (i + 1));
+      var x = t[i]; t[i] = t[k]; t[k] = x;
+    }
+    return t;
+  }
+
+  // Toutes les cartes que le joueur i peut piocher : ses packs, à son niveau.
+  function cartesDuJoueur(i) {
+    var niveau = String(partie.niveaux[i]);
+    var liste = [];
+    C.PACKS.forEach(function (p) {
+      if (partie.packs[i].indexOf(p.id) === -1) return;
+      p.niveaux[niveau].forEach(function (mot) {
+        liste.push({ pack: p.id, packNom: p.nom, niveau: Number(niveau), mot: mot, lettre: p.id === 'lettres' && mot.length === 1 });
+      });
+    });
+    return liste;
+  }
+
+  // Pioche dans le tas du joueur ; tas vide → on remélange toutes ses cartes.
+  function piocherCarte(j) {
+    if (!j.tas.length) j.tas = melanger(cartesDuJoueur(j.index));
+    return j.tas.pop();
   }
 
   function lireChoix() {
@@ -153,7 +241,7 @@
     partie.joueurs = [];
     for (var i = 0; i < partie.nbJoueurs; i++) {
       var perso = P.trouver(partie.choix[i]);
-      partie.joueurs.push({ nom: perso.nom, aventurier: perso, couleur: COULEURS[i] });
+      partie.joueurs.push({ nom: perso.nom, aventurier: perso, couleur: COULEURS[i], index: i, tas: melanger(cartesDuJoueur(i)) });
     }
     partie.objectif = A.objectif(av, partie.nbJoueurs);
     partie.regles = R.nouvellePartie(partie.nbJoueurs, partie.objectif);
@@ -254,12 +342,14 @@
     if (r.etape === 'piocher') {
       $('carte-piochee').hidden = true;
       consigne.textContent = j.nom + ' avance sur la croix et pioche une carte dans son tas.';
-      bouton('Piocher une carte', 'btn-principal', function () { R.piocher(r); rendre(); });
+      bouton('Piocher une carte', 'btn-principal', function () {
+        partie.carte = piocherCarte(j);
+        R.piocher(r);
+        montrerCarte(j);
+        rendre();
+      });
     } else if (r.etape === 'repondre') {
-      $('carte-piochee').hidden = false;
-      $('carte-piochee').className = 'carte-piochee joueur-' + j.couleur;
-      $('carte-titre').textContent = 'Carte n° ' + r.pioches[r.joueur] + ' du tas de ' + j.nom;
-      consigne.textContent = 'Le joueur a-t-il bien répondu ?';
+      consigne.textContent = 'La réponse de ' + j.nom + ' est-elle bonne ?';
       bouton('Bonne réponse', 'btn-bonne', function () { R.repondre(r, true); rendre(); });
       bouton('Mauvaise réponse', 'btn-mauvaise', function () { R.repondre(r, false); rendre(); });
     } else if (r.etape === 'lancer') {
@@ -277,6 +367,53 @@
         bouton('Voir le résultat', 'btn-principal', montrerFin);
       }
     }
+  }
+
+  // Affiche la carte piochée : dictée (mot caché) ou lettre (affichée), avec la lecture vocale.
+  function montrerCarte(j) {
+    var c = partie.carte;
+    var box = $('carte-piochee');
+    box.hidden = false;
+    box.className = 'carte-piochee joueur-' + j.couleur;
+    $('carte-titre').innerHTML = 'Carte n° ' + partie.regles.pioches[j.index] + ' de ' + j.nom +
+      '<small>' + c.packNom + ' · niveau ' + c.niveau + '</small>';
+    $('carte-consigne').textContent = c.lettre ? 'Quelle est cette lettre ?' : 'Épelle le mot :';
+    var mot = $('carte-mot');
+    var voir = $('btn-voir');
+    if (c.lettre) {
+      mot.textContent = c.mot;
+      mot.className = 'carte-mot lettre';
+      voir.hidden = true;
+    } else {
+      cacherMot();
+      voir.hidden = false;
+    }
+  }
+
+  function cacherMot() {
+    var mot = $('carte-mot');
+    mot.className = 'carte-mot cache';
+    mot.innerHTML = '<span aria-hidden="true">' + partie.carte.mot.replace(/[^\s'’-]/g, '•') + '</span><span class="visually-hidden">Mot caché</span>';
+    $('btn-voir').textContent = 'Voir le mot';
+    $('btn-voir').setAttribute('aria-expanded', 'false');
+  }
+
+  function brancherCarte() {
+    $('btn-voir').addEventListener('click', function () {
+      var mot = $('carte-mot');
+      if (mot.classList.contains('cache')) {
+        mot.className = 'carte-mot';
+        mot.textContent = partie.carte.mot;
+        this.textContent = 'Cacher le mot';
+        this.setAttribute('aria-expanded', 'true');
+      } else cacherMot();
+    });
+    var ecouter = $('btn-ecouter');
+    if (!window.Voix.disponible()) {
+      ecouter.disabled = true;
+      ecouter.title = 'La lecture à voix haute n\u2019est pas disponible sur cet appareil';
+    }
+    ecouter.addEventListener('click', function () { window.Voix.lire(window.Voix.texteCarte(partie.carte)); });
   }
 
   // ---------- Dés ----------
@@ -351,9 +488,10 @@
   construireCases();
   brancherAmbiance();
   brancherDes();
+  brancherCarte();
 
   // Préchargement discret du plateau pendant que l'accueil est affiché.
   window.addEventListener('load', function () { new Image().src = 'img/plateau-jour.webp'; });
 
-  window.Aventura = { cases: CASES, partie: partie };
+  window.Aventura = { cases: CASES, partie: partie, cartesDuJoueur: cartesDuJoueur };
 })();
