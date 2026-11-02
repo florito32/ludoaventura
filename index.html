@@ -74,16 +74,20 @@
 
         <div class="bloc">
           <h3>Les dés</h3>
+          <!-- Toucher un dé le lance. Faces : FAIBLE 1-1-2-2-3-3, FORT 4-4-5-5-6-6 (js/des.js). -->
           <div class="des">
-            <figure class="de-fig">
-              <span class="de" aria-hidden="true"><i></i><i></i><i></i></span>
-              <figcaption>Dé <strong>FAIBLE</strong></figcaption>
-            </figure>
-            <figure class="de-fig">
-              <span class="de de-fort" aria-hidden="true"><i></i><i></i><i></i></span>
-              <figcaption>Dé <strong>FORT</strong></figcaption>
-            </figure>
+            <button type="button" class="de-btn" data-de="faible" aria-describedby="de-faible-faces">
+              <span class="de" aria-hidden="true"></span>
+              <span class="de-nom">Dé <strong>FAIBLE</strong></span>
+              <span class="de-faces" id="de-faible-faces">1 · 2 · 3</span>
+            </button>
+            <button type="button" class="de-btn" data-de="fort" aria-describedby="de-fort-faces">
+              <span class="de de-fort" aria-hidden="true"></span>
+              <span class="de-nom">Dé <strong>FORT</strong></span>
+              <span class="de-faces" id="de-fort-faces">4 · 5 · 6</span>
+            </button>
           </div>
+          <p class="de-resultat" id="de-resultat" role="status" aria-live="polite">Touche un dé pour le lancer.</p>
         </div>
 
         <div class="bloc">
@@ -112,6 +116,7 @@
   <p>Ludoaventura · Aventura <span data-version></span></p>
 </footer>
 
+<script src="js/des.js"></script>
 <script src="js/plateau.js"></script>
 <script src="js/version.js"></script>
 <script src="js/pwa.js"></script>

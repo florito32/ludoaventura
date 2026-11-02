@@ -78,10 +78,37 @@
     });
   }
 
+  // ----- Dés -----
+  // Dessine la face d'un dé (points placés sur une grille 3 × 3).
+  function dessinerFace(de, valeur) {
+    var cases = window.Des.POINTS[valeur];
+    var html = '';
+    for (var k = 0; k < 9; k++) html += cases.indexOf(k) >= 0 ? '<i style="grid-area:' + (Math.floor(k / 3) + 1) + '/' + (k % 3 + 1) + '"></i>' : '';
+    de.innerHTML = html;
+    de.dataset.valeur = valeur;
+  }
+
+  function brancherDes() {
+    document.querySelectorAll('.de-btn').forEach(function (btn) {
+      var type = btn.dataset.de;
+      var de = btn.querySelector('.de');
+      dessinerFace(de, type === 'fort' ? 6 : 3);
+      btn.addEventListener('click', function () {
+        var v = window.Des.lancer(type);
+        de.classList.remove('roule');
+        void de.offsetWidth; // relance l'animation
+        de.classList.add('roule');
+        dessinerFace(de, v);
+        $('de-resultat').textContent = 'Dé ' + type.toUpperCase() + ' : ' + v + ' point' + (v > 1 ? 's' : '');
+      });
+    });
+  }
+
   $('btn-commencer').addEventListener('click', function () { afficher('ecran-plateau'); });
   $('btn-accueil').addEventListener('click', function () { afficher('ecran-accueil'); });
   construirePlateau();
   brancherAmbiance();
+  brancherDes();
 
   // Préchargement discret du plateau pendant que l'accueil est affiché.
   window.addEventListener('load', function () { new Image().src = 'img/plateau-jour.webp'; });

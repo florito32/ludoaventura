@@ -61,8 +61,8 @@ test('plateau : points à 0, dés FAIBLE et FORT, piles de cartes', async ({ pag
   await page.goto('./');
   await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
   await expect(page.locator('#points')).toHaveText('0');
-  await expect(page.getByText('Dé FAIBLE')).toBeVisible();
-  await expect(page.getByText('Dé FORT')).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Dé FAIBLE/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Dé FORT/ })).toBeVisible();
   await expect(page.locator('.pile')).toHaveCount(4);
   await expect(page.locator('.pile').first()).toContainText('AVENTURE');
 });
