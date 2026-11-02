@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '3.2';
+  var VERSION = '3.3';
 
   var HISTORY = [
+    { v: '3.3', date: '2026-11-02', changes: [
+      'Préparation : bouton « Mêmes réglages pour tous les joueurs » (mêmes packs, même niveau, mêmes questions).'
+    ] },
     { v: '3.2', date: '2026-11-02', changes: [
       'Huit types de questions : épeler, nombre de lettres, syllabes, consonnes, voyelles, première lettre, lettres muettes, réécrire le mot.',
       'À la préparation, chaque joueur coche les questions qu\u2019il veut ; chaque carte en tire une au hasard.',

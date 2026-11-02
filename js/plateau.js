@@ -113,6 +113,7 @@
         .map(function (i) { return i.value; });
       if (!coches.length) { // au moins un pack, sinon le joueur ne pourrait rien piocher
         e.target.checked = true;
+        $('packs-alerte').className = 'reglage-alerte';
         $('packs-alerte').textContent = 'Il faut garder au moins un pack.';
         return;
       }
@@ -137,12 +138,25 @@
         .map(function (i) { return i.value; });
       if (!coches.length) {
         e.target.checked = true;
+        $('packs-alerte').className = 'reglage-alerte';
         $('packs-alerte').textContent = 'Il faut garder au moins un type de question.';
         return;
       }
       $('packs-alerte').textContent = '';
       partie.types[partie.actif] = coches;
       majAventuriers();
+    });
+    // Copie les packs, le niveau et les questions du joueur affiché vers tous les joueurs.
+    $('btn-memes-reglages').addEventListener('click', function () {
+      var a = partie.actif;
+      for (var k = 0; k < 4; k++) {
+        partie.packs[k] = partie.packs[a].slice();
+        partie.niveaux[k] = partie.niveaux[a];
+        partie.types[k] = partie.types[a].slice();
+      }
+      majAventuriers();
+      $('packs-alerte').className = 'reglage-alerte ok';
+      $('packs-alerte').textContent = 'Tous les joueurs ont maintenant les mêmes réglages.';
     });
     $('btn-joueur-suivant').addEventListener('click', function () {
       partie.actif++;
@@ -193,6 +207,7 @@
     $('types-questions').querySelectorAll('input').forEach(function (i) { i.checked = partie.types[partie.actif].indexOf(i.value) >= 0; });
     var suivant = $('btn-joueur-suivant');
     suivant.hidden = partie.actif >= nb - 1;
+    $('btn-memes-reglages').hidden = nb < 2;
     suivant.textContent = 'Joueur suivant →';
   }
 
