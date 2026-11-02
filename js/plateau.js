@@ -231,11 +231,16 @@
     });
   }
 
-  // Noms courts des cases (liste des joueurs).
-  var COURT = ['DÉPART', 'Croix 1', 'Croix 2', 'Croix 3', 'Croix 4', 'ARRIVÉE'];
   var R = window.Regles;
+  // Pause (ms) pendant laquelle on lit le message « +5 points ! Au tour de… » avant de passer au joueur suivant.
+  // Les tests automatiques la raccourcissent avec window.AVENTURA_PAUSE.
+  var PAUSE = typeof window.AVENTURA_PAUSE === 'number' ? window.AVENTURA_PAUSE : 2200;
+  var minuteurs = [];
+  function plusTard(fn, ms) { minuteurs.push(setTimeout(fn, ms)); }
+  function annulerMinuteurs() { minuteurs.forEach(clearTimeout); minuteurs = []; }
 
   function lancerPartie() {
+    annulerMinuteurs();
     lireChoix();
     var av = partie.aventure;
     partie.joueurs = [];
@@ -246,39 +251,37 @@
     partie.objectif = A.objectif(av, partie.nbJoueurs);
     partie.regles = R.nouvellePartie(partie.nbJoueurs, partie.objectif);
 
+    // Ambiance du plateau choisie selon l'aventure (jour ou soir).
+    $('plateau-img').src = 'img/plateau-' + av.ambiance + '.webp';
+    $('plateau').classList.toggle('soir', av.ambiance === 'soir');
+
     // Rouleau : nom et image de l'aventure à la place de « MISSION ».
     $('rouleau-img').src = av.image;
     $('rouleau-img').alt = 'Aventure ' + av.nom;
     $('rouleau-nom').textContent = av.nom;
     $('objectif').textContent = partie.objectif;
-    $('objectif-texte').textContent = 'Objectif : ' + libelleObjectif(av, partie.nbJoueurs);
+    $('objectif-texte').textContent = libelleObjectif(av, partie.nbJoueurs);
     $('jauge').setAttribute('aria-valuemax', partie.objectif);
 
-    // Pions (tous sur DÉPART), liste des joueurs et tas de cartes.
-    var pions = $('pions'), liste = $('joueurs'), tas = $('tas');
-    pions.innerHTML = ''; liste.innerHTML = ''; tas.innerHTML = '';
-    partie.joueurs.forEach(function (j) {
+    // Pions : tous posés sur DÉPART…
+    var pions = $('pions');
+    pions.innerHTML = '';
+    partie.joueurs.forEach(function (j, k) {
       var p = document.createElement('span');
       p.className = 'pion pion-' + j.couleur;
       p.style.backgroundImage = 'url("' + j.aventurier.image + '")';
+      p.style.left = (CASES[0].x + DECALAGES[k][0]) + '%';
+      p.style.top = (CASES[0].y + DECALAGES[k][1] * RAPPORT) + '%';
+      p.dataset.case = '0';
       pions.appendChild(p);
-
-      var li = document.createElement('li');
-      li.innerHTML = '<img class="portrait-mini joueur-' + j.couleur + '" src="' + j.aventurier.image + '" alt="" width="200" height="220">' +
-        '<span>' + j.nom + ' <span class="joueur-couleur">(' + j.couleur + ')</span></span>' +
-        '<span class="joueur-case">DÉPART</span>';
-      liste.appendChild(li);
-
-      var t = document.createElement('li');
-      t.className = 'pile pile-' + j.couleur;
-      t.innerHTML = '<span class="carte" aria-hidden="true"></span>' + j.nom;
-      tas.appendChild(t);
     });
 
     $('carte-piochee').hidden = true;
-    $('de-resultat').textContent = '';
+    $('bandeau').hidden = true;
     afficher('ecran-plateau');
-    rendre();
+    // …puis le premier joueur se déplace de DÉPART jusqu'à la première croix (animation de début de partie).
+    rendre({ sansDeplacement: true });
+    plusTard(function () { rendre(); }, 450);
   }
 
   // Place un pion sur sa case ; les pions d'une même case sont décalés pour rester visibles.
@@ -303,38 +306,35 @@
     return b;
   }
 
+  // Message écrit sur le plateau (et lu par les lecteurs d'écran via la consigne du tour).
+  function bandeau(texte) {
+    var b = $('bandeau');
+    b.textContent = texte;
+    b.hidden = false;
+    b.classList.remove('montre');
+    void b.offsetWidth;
+    b.classList.add('montre');
+  }
+
+  function points(n) { return n + ' point' + (n > 1 ? 's' : ''); }
+
   // Met tout l'écran à jour selon l'état de la partie (js/regles.js).
-  function rendre() {
+  function rendre(options) {
     var r = partie.regles;
     var j = partie.joueurs[r.joueur];
     var c = CASES[r.manche];
 
-    placerPions();
+    if (!(options && options.sansDeplacement)) placerPions();
     $('points').textContent = r.points;
     $('jauge').setAttribute('aria-valuenow', r.points);
     $('jauge-barre').style.width = Math.min(100, r.points / r.objectif * 100) + '%';
     $('jauge').classList.toggle('atteint', r.points >= r.objectif);
-
-    document.querySelectorAll('#joueurs li').forEach(function (li, i) {
-      li.querySelector('.joueur-case').textContent = COURT[r.positions[i]];
-      li.classList.toggle('actif', i === r.joueur && r.etape !== 'fin');
-    });
-    document.querySelectorAll('#tas .pile').forEach(function (t, i) {
-      t.classList.toggle('a-piocher', i === r.joueur && r.etape === 'piocher');
-    });
 
     $('tour-manche').textContent = (c.arrivee ? 'ARRIVÉE' : 'Croix ' + r.manche) + ' sur ' + R.NB_CROIX + ' — ' + c.nom.replace(/^.*— /, '');
     $('tour-portrait').src = j.aventurier.image;
     $('tour-portrait').className = 'joueur-' + j.couleur;
     $('tour-nom').textContent = j.nom;
     $('tour').className = 'bloc tour joueur-' + j.couleur;
-
-    // Dés : seul le dé à lancer est actif.
-    document.querySelectorAll('.de-btn').forEach(function (b) {
-      var attendu = r.etape === 'lancer' && b.dataset.de === r.de;
-      b.disabled = !attendu;
-      b.classList.toggle('a-lancer', attendu);
-    });
 
     var actions = $('tour-actions');
     actions.innerHTML = '';
@@ -358,15 +358,28 @@
         : 'Les autres joueurs et le maître du jeu aident à trouver la bonne réponse, puis ' + j.nom + ' lance le dé FAIBLE.';
       bouton('Lancer le dé ' + r.de.toUpperCase(), 'btn-principal', function () { lancerDe(r.de); });
     } else if (r.etape === 'suivant' || r.etape === 'fin') {
-      consigne.textContent = '+' + r.dernierLancer + ' point' + (r.dernierLancer > 1 ? 's' : '') + ' pour l’équipe !';
+      // Points ajoutés : on l'écrit, puis on passe tout seul au joueur suivant (ou au résultat).
+      var gain = j.nom + ' gagne ' + points(r.dernierLancer) + ' !';
+      var suite;
       if (r.etape === 'suivant') {
-        var prochain = r.joueur + 1 < r.nbJoueurs ? partie.joueurs[r.joueur + 1].nom : partie.joueurs[0].nom;
-        var croix = r.joueur + 1 < r.nbJoueurs ? '' : ' (croix suivante)';
-        bouton('Au tour de ' + prochain + croix, 'btn-principal', function () { R.suivant(r); rendre(); });
+        var k = r.joueur + 1 < r.nbJoueurs ? r.joueur + 1 : 0;
+        suite = 'Au tour de ' + partie.joueurs[k].nom + (k === 0 ? ', croix suivante' : '') + '.';
       } else {
-        bouton('Voir le résultat', 'btn-principal', montrerFin);
+        suite = 'Tout le monde est arrivé au volcan !';
       }
+      consigne.textContent = gain + ' ' + suite;
+      bandeau(gain + ' ' + suite);
     }
+  }
+
+  // Après le lancer : pause de lecture, puis joueur suivant (ou résultat de la partie).
+  function enchainer() {
+    var r = partie.regles;
+    plusTard(function () {
+      $('bandeau').hidden = true;
+      if (r.etape === 'suivant') { R.suivant(r); rendre(); }
+      else if (r.etape === 'fin') montrerFin();
+    }, PAUSE);
   }
 
   // Affiche la carte piochée : dictée (mot caché) ou lettre (affichée), avec la lecture vocale.
@@ -417,35 +430,14 @@
   }
 
   // ---------- Dés ----------
-  // Dessine la face d'un dé (points placés sur une grille 3 × 3).
-  function dessinerFace(de, valeur) {
-    var cases = window.Des.POINTS[valeur];
-    var html = '';
-    for (var k = 0; k < 9; k++) html += cases.indexOf(k) >= 0 ? '<i style="grid-area:' + (Math.floor(k / 3) + 1) + '/' + (k % 3 + 1) + '"></i>' : '';
-    de.innerHTML = html;
-    de.dataset.valeur = valeur;
-  }
-
   // Lance le dé demandé par la règle et ajoute ses points à l'équipe.
   function lancerDe(type) {
     var r = partie.regles;
     if (r.etape !== 'lancer' || r.de !== type) return;
     var v = window.Des.lancer(type);
-    var de = document.querySelector('.de-btn[data-de="' + type + '"] .de');
-    de.classList.remove('roule');
-    void de.offsetWidth; // relance l'animation
-    de.classList.add('roule');
-    dessinerFace(de, v);
-    $('de-resultat').textContent = 'Dé ' + type.toUpperCase() + ' : ' + v + ' point' + (v > 1 ? 's' : '');
     R.lancer(r, v);
     rendre();
-  }
-
-  function brancherDes() {
-    document.querySelectorAll('.de-btn').forEach(function (btn) {
-      dessinerFace(btn.querySelector('.de'), btn.dataset.de === 'fort' ? 6 : 3);
-      btn.addEventListener('click', function () { lancerDe(btn.dataset.de); });
-    });
+    enchainer();
   }
 
   // ---------- Fin de partie ----------
@@ -460,34 +452,18 @@
     $('fin').showModal();
   }
   $('btn-rejouer').addEventListener('click', function () { $('fin').close(); lancerPartie(); });
-  $('btn-nouvelle').addEventListener('click', function () { $('fin').close(); afficher('ecran-preparation'); });
-
-  // Ambiance jour / soir : les deux versions du plateau illustré.
-  function brancherAmbiance() {
-    document.querySelectorAll('.ambiance-btn').forEach(function (b) {
-      b.addEventListener('click', function () {
-        var a = b.dataset.ambiance;
-        $('plateau-img').src = 'img/plateau-' + a + '.webp';
-        document.querySelectorAll('.ambiance-btn').forEach(function (x) {
-          x.setAttribute('aria-pressed', String(x === b));
-        });
-        $('plateau').classList.toggle('soir', a === 'soir');
-      });
-    });
-  }
+  $('btn-nouvelle').addEventListener('click', function () { $('fin').close(); annulerMinuteurs(); afficher('ecran-preparation'); });
 
   // ---------- Navigation ----------
   $('btn-commencer').addEventListener('click', function () { afficher('ecran-preparation'); });
   document.querySelectorAll('[data-vers]').forEach(function (b) {
-    b.addEventListener('click', function () { afficher(b.dataset.vers); });
+    b.addEventListener('click', function () { annulerMinuteurs(); afficher(b.dataset.vers); });
   });
   $('form-preparation').addEventListener('submit', function (e) { e.preventDefault(); lancerPartie(); });
 
   construireAventures();
   construireAventuriers();
   construireCases();
-  brancherAmbiance();
-  brancherDes();
   brancherCarte();
 
   // Préchargement discret du plateau pendant que l'accueil est affiché.

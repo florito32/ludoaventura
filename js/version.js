@@ -4,9 +4,16 @@
 (function () {
   'use strict';
 
-  var VERSION = '2.7';
+  var VERSION = '2.8';
 
   var HISTORY = [
+    { v: '2.8', date: '2026-11-02', changes: [
+      'Les points de l\u2019équipe sont affichés dans un encadré en haut à gauche du plateau.',
+      'Plateau épuré : plus d\u2019encadrés Joueurs, Dés, Tas de cartes ni Ambiance.',
+      'L\u2019ambiance jour ou soir se règle toute seule selon l\u2019aventure.',
+      'En début de partie, le premier aventurier part de DÉPART et marche jusqu\u2019à la prairie.',
+      'Après le dé, c\u2019est écrit (« Léa gagne 5 points ! Au tour de Tom. ») et on passe tout seul au joueur suivant.'
+    ] },
     { v: '2.7', date: '2026-11-02', changes: [
       'Illustrations des aventures plus élaborées, dans l\u2019esprit du dessin de l\u2019aventurier : trait d\u2019encre irrégulier, hachures dans les ombres, couleurs peintes et grain de papier, plus de détails.'
     ] },

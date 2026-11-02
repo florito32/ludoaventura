@@ -1,7 +1,7 @@
 // Tours de jeu : pioche dans son tas, bonne / mauvaise réponse, dé, points cumulés, fin de partie.
 const { test, expect } = require('@playwright/test');
 const R = require('../js/regles.js');
-const { lancerPartie } = require('./aide');
+const { lancerPartie, attendreJoueur } = require('./aide');
 
 test.describe('règles du déroulement', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
@@ -44,11 +44,10 @@ test.describe('règles du déroulement', () => {
   });
 });
 
-test('un tour complet : piocher, répondre, lancer, joueur suivant', async ({ page }) => {
+test('un tour complet : piocher, répondre, lancer, message écrit puis joueur suivant automatiquement', async ({ page }) => {
   await lancerPartie(page, { joueurs: 2 });
   await expect(page.locator('#tour-nom')).toHaveText('Léa');
   await expect(page.locator('#tour-manche')).toContainText('Croix 1 sur 5');
-  await expect(page.locator('#tas .pile').nth(0)).toHaveClass(/a-piocher/);
   await page.getByRole('button', { name: 'Piocher une carte' }).click();
   await expect(page.locator('#carte-titre')).toContainText('Carte n° 1 de Léa');
   await page.getByRole('button', { name: 'Bonne réponse' }).click();
@@ -56,11 +55,10 @@ test('un tour complet : piocher, répondre, lancer, joueur suivant', async ({ pa
   const pts = Number(await page.locator('#points').textContent());
   expect(pts).toBeGreaterThanOrEqual(4);
   expect(pts).toBeLessThanOrEqual(6);
-  await expect(page.locator('#tour-consigne')).toHaveText(`+${pts} points pour l’équipe !`);
-  await page.getByRole('button', { name: 'Au tour de Tom' }).click();
-  await expect(page.locator('#tour-nom')).toHaveText('Tom');
-  await expect(page.locator('.joueur-case').nth(1)).toHaveText('Croix 1');
-  await expect(page.locator('#tas .pile').nth(1)).toHaveClass(/a-piocher/);
+  // C'est écrit (consigne + bandeau sur le plateau), puis on passe tout seul au joueur suivant.
+  await expect(page.locator('#tour-consigne')).toHaveText(`Léa gagne ${pts} points ! Au tour de Tom.`);
+  await attendreJoueur(page, 'Tom');
+  await expect(page.locator('.pion').nth(1)).toHaveAttribute('data-case', '1');
 });
 
 async function jouerPartie(page, bonne) {
@@ -68,9 +66,9 @@ async function jouerPartie(page, bonne) {
     await page.getByRole('button', { name: 'Piocher une carte' }).click();
     await page.getByRole('button', { name: bonne ? 'Bonne réponse' : 'Mauvaise réponse' }).click();
     await page.getByRole('button', { name: /^Lancer le dé/ }).click();
-    if (t < 9) await page.getByRole('button', { name: /^Au tour de/ }).click();
+    if (t < 9) await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
   }
-  await page.getByRole('button', { name: 'Voir le résultat' }).click();
+  // Après le dernier lancer, le résultat s'affiche tout seul.
 }
 
 test('partie entière gagnée : toutes les réponses bonnes → aventure réussie @smoke', async ({ page }) => {

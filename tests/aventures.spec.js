@@ -70,7 +70,7 @@ test('plateau : nom et image de l\'aventure sur le rouleau, objectif affiché @s
   await expect(img).toHaveAttribute('src', /mayas/);
   await expect.poll(() => img.evaluate((i) => i.complete && i.naturalWidth > 0)).toBe(true);
   await expect(page.locator('#objectif')).toHaveText('54');
-  await expect(page.locator('#objectif-texte')).toHaveText('Objectif : 54 pierres à tailler');
+  await expect(page.locator('#objectif-texte')).toHaveText('54 pierres à tailler');
   // Le rouleau reste dans le parchemin du plateau.
   const r = await page.locator('#rouleau').boundingBox();
   const p = await page.locator('#plateau').boundingBox();
@@ -81,13 +81,12 @@ test('plateau : nom et image de l\'aventure sur le rouleau, objectif affiché @s
   expect(nom.width).toBeLessThanOrEqual(r.width);
 });
 
-test('plateau : autant de pions, de joueurs et de tas de cartes que de joueurs choisis', async ({ page }) => {
+test('plateau : autant de pions que de joueurs choisis, à leur couleur', async ({ page }) => {
   for (const n of [1, 3]) {
     await lancerPartie(page, { joueurs: n });
     await expect(page.locator('.pion')).toHaveCount(n);
-    await expect(page.locator('#joueurs li')).toHaveCount(n);
-    await expect(page.locator('#tas .pile')).toHaveCount(n);
+
   }
-  await expect(page.locator('#tas .pile').nth(0)).toHaveClass(/pile-rouge/);
-  await expect(page.locator('#tas .pile').nth(2)).toHaveClass(/pile-bleu/);
+  await expect(page.locator('.pion').nth(0)).toHaveClass(/pion-rouge/);
+  await expect(page.locator('.pion').nth(2)).toHaveClass(/pion-bleu/);
 });
