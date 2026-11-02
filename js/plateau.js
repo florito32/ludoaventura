@@ -1,9 +1,10 @@
-// Aventura — affichage de l'accueil et du plateau (visuel seulement, pas encore de questions).
+// Aventura — écrans du jeu : accueil → préparation (joueurs, aventure) → plateau.
+// Dépend de js/des.js (window.Des) et js/aventures.js (window.Aventures).
 (function () {
   'use strict';
 
   // Cases du parcours, dans l'ordre, en % de l'image du plateau (img/plateau-*.webp, 1600 × 1071).
-  // Relevées sur les croix rouges de l'illustration.
+  // Relevées sur les croix rouges de l'illustration : DÉPART puis 5 croix, la dernière au volcan.
   var CASES = [
     { nom: 'DÉPART', x: 19, y: 88, depart: true },
     { nom: 'Croix 1 — la prairie', x: 18.8, y: 63.5 },
@@ -13,17 +14,17 @@
     { nom: 'ARRIVÉE — le volcan', x: 72.5, y: 93, arrivee: true }
   ];
 
-  // 4 pions (couleurs : hypothèse à valider avec le matériel du jeu de société).
-  var JOUEURS = [
-    { nom: 'Joueur 1', couleur: 'rouge' },
-    { nom: 'Joueur 2', couleur: 'jaune' },
-    { nom: 'Joueur 3', couleur: 'bleu' },
-    { nom: 'Joueur 4', couleur: 'vert' }
-  ];
+  // Couleur de chaque joueur : son pion et son tas de cartes (1 à 4 joueurs, le 4e a des cartes vertes).
+  var COULEURS = ['rouge', 'jaune', 'bleu', 'vert'];
   // Décalage des pions posés sur une même case (en % de la largeur du plateau).
   var DECALAGES = [[-2.2, -2.2], [2.2, -2.2], [-2.2, 2.6], [2.2, 2.6]];
+  var RAPPORT = 1600 / 1071; // largeur / hauteur du plateau
 
   var $ = function (id) { return document.getElementById(id); };
+  var A = window.Aventures;
+
+  // État de la partie (en mémoire : une nouvelle ouverture repart de zéro).
+  var partie = { nbJoueurs: 2, aventure: A.LISTE[0], points: 0, joueurs: [] };
 
   function afficher(id) {
     document.querySelectorAll('.ecran').forEach(function (s) { s.hidden = s.id !== id; });
@@ -32,8 +33,50 @@
     window.scrollTo(0, 0);
   }
 
-  function construirePlateau() {
-    // Repères des cases (lus par les lecteurs d'écran, discrets à l'écran).
+  function libelleObjectif(av, nb) {
+    return A.objectif(av, nb) + ' ' + av.unite;
+  }
+
+  // ---------- Préparation ----------
+  var DIFF = { facile: 'Facile', moyen: 'Moyen', difficile: 'Difficile' };
+
+  function construireAventures() {
+    var box = $('liste-aventures');
+    A.LISTE.forEach(function (av, i) {
+      var label = document.createElement('label');
+      label.className = 'aventure';
+      label.innerHTML =
+        '<input type="radio" name="aventure" value="' + av.id + '"' + (i === 0 ? ' checked' : '') + '>' +
+        '<img src="' + av.image + '" alt="" width="640" height="400" loading="lazy">' +
+        '<span class="aventure-nom">' + av.nom + '</span>' +
+        '<span class="aventure-diff diff-' + av.difficulte + '">' + DIFF[av.difficulte] + '</span>';
+      box.appendChild(label);
+    });
+    $('form-preparation').addEventListener('change', majDetail);
+    majDetail();
+  }
+
+  function lireChoix() {
+    partie.nbJoueurs = Number(document.querySelector('input[name="nb"]:checked').value);
+    partie.aventure = A.trouver(document.querySelector('input[name="aventure"]:checked').value);
+  }
+
+  // Résumé de l'aventure choisie : histoire et objectif pour le nombre de joueurs choisi.
+  function majDetail() {
+    lireChoix();
+    var av = partie.aventure;
+    $('aventure-detail').innerHTML =
+      '<h3>' + av.nom + '</h3>' +
+      (av.histoire ? '<p>' + av.histoire + '</p>' : '<p class="a-venir">Histoire à venir.</p>') +
+      '<p class="detail-objectif">Objectif de l’équipe (' + partie.nbJoueurs + ' joueur' + (partie.nbJoueurs > 1 ? 's' : '') + ') : <strong>' +
+      libelleObjectif(av, partie.nbJoueurs) + '</strong></p>';
+    // Rappel au-dessus du bouton (visible même quand le détail est hors de l'écran).
+    $('resume-choix').textContent = av.nom + ' · ' + partie.nbJoueurs + ' joueur' + (partie.nbJoueurs > 1 ? 's' : '') +
+      ' · objectif ' + libelleObjectif(av, partie.nbJoueurs);
+  }
+
+  // ---------- Plateau ----------
+  function construireCases() {
     var ol = $('cases');
     CASES.forEach(function (c, i) {
       var li = document.createElement('li');
@@ -44,15 +87,39 @@
       li.innerHTML = '<span class="visually-hidden">' + c.nom + '</span>';
       ol.appendChild(li);
     });
+  }
 
-    // Pions : tous sur la case DÉPART au début de la partie (règle : « tous les pions rassemblés à l'emplacement DÉPART »).
-    var pions = $('pions');
-    var liste = $('joueurs');
-    JOUEURS.forEach(function (j, i) {
+  function lancerPartie() {
+    lireChoix();
+    var av = partie.aventure;
+    partie.points = 0;
+    partie.joueurs = [];
+    for (var i = 0; i < partie.nbJoueurs; i++) {
+      partie.joueurs.push({ nom: 'Joueur ' + (i + 1), couleur: COULEURS[i], kase: 0 });
+    }
+
+    // Rouleau : nom et image de l'aventure à la place de « MISSION ».
+    $('rouleau-img').src = av.image;
+    $('rouleau-img').alt = 'Aventure ' + av.nom;
+    $('rouleau-nom').textContent = av.nom;
+
+    // Points et objectif.
+    var obj = A.objectif(av, partie.nbJoueurs);
+    $('points').textContent = partie.points;
+    $('objectif').textContent = obj;
+    $('objectif-texte').textContent = 'Objectif : ' + libelleObjectif(av, partie.nbJoueurs);
+    $('jauge').setAttribute('aria-valuemax', obj);
+    $('jauge').setAttribute('aria-valuenow', partie.points);
+    $('jauge-barre').style.width = Math.min(100, partie.points / obj * 100) + '%';
+
+    // Pions sur DÉPART (règle : « tous les pions rassemblés à l'emplacement DÉPART »).
+    var pions = $('pions'), liste = $('joueurs'), tas = $('tas');
+    pions.innerHTML = ''; liste.innerHTML = ''; tas.innerHTML = '';
+    partie.joueurs.forEach(function (j, i) {
       var p = document.createElement('span');
       p.className = 'pion pion-' + j.couleur;
       p.style.left = (CASES[0].x + DECALAGES[i][0]) + '%';
-      p.style.top = (CASES[0].y + DECALAGES[i][1] * 1.49) + '%'; // 1,49 = rapport largeur / hauteur du plateau
+      p.style.top = (CASES[0].y + DECALAGES[i][1] * RAPPORT) + '%';
       p.dataset.case = '0';
       pions.appendChild(p);
 
@@ -61,7 +128,15 @@
         '<span>' + j.nom + ' <span class="joueur-couleur">(' + j.couleur + ')</span></span>' +
         '<span class="joueur-case">DÉPART</span>';
       liste.appendChild(li);
+
+      // Tas de cartes du joueur, de sa couleur.
+      var t = document.createElement('li');
+      t.className = 'pile pile-' + j.couleur;
+      t.innerHTML = '<span class="carte" aria-hidden="true"></span>' + j.nom;
+      tas.appendChild(t);
     });
+
+    afficher('ecran-plateau');
   }
 
   // Ambiance jour / soir : les deux versions du plateau illustré.
@@ -78,7 +153,7 @@
     });
   }
 
-  // ----- Dés -----
+  // ---------- Dés ----------
   // Dessine la face d'un dé (points placés sur une grille 3 × 3).
   function dessinerFace(de, valeur) {
     var cases = window.Des.POINTS[valeur];
@@ -104,14 +179,20 @@
     });
   }
 
-  $('btn-commencer').addEventListener('click', function () { afficher('ecran-plateau'); });
-  $('btn-accueil').addEventListener('click', function () { afficher('ecran-accueil'); });
-  construirePlateau();
+  // ---------- Navigation ----------
+  $('btn-commencer').addEventListener('click', function () { afficher('ecran-preparation'); });
+  document.querySelectorAll('[data-vers]').forEach(function (b) {
+    b.addEventListener('click', function () { afficher(b.dataset.vers); });
+  });
+  $('form-preparation').addEventListener('submit', function (e) { e.preventDefault(); lancerPartie(); });
+
+  construireAventures();
+  construireCases();
   brancherAmbiance();
   brancherDes();
 
   // Préchargement discret du plateau pendant que l'accueil est affiché.
   window.addEventListener('load', function () { new Image().src = 'img/plateau-jour.webp'; });
 
-  window.Aventura = { cases: CASES, joueurs: JOUEURS };
+  window.Aventura = { cases: CASES, partie: partie };
 })();

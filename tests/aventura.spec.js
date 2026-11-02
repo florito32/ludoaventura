@@ -1,6 +1,7 @@
 // Visuel Aventura : accueil façon boîte, puis plateau avec les pions sur DÉPART.
 // Formats testés : téléphone, téléphone carré, tablette, ordinateur (playwright.config.js).
 const { test, expect } = require('@playwright/test');
+const { lancerPartie } = require('./aide');
 
 // Vérifie qu'une image est réellement chargée et affichée.
 async function imageChargee(loc) {
@@ -33,9 +34,7 @@ test('accueil : tout tient à l\'écran, sans défilement horizontal', async ({ 
 });
 
 test('plateau : illustration, 6 cases, 4 pions sur la case DÉPART @smoke', async ({ page }) => {
-  await page.goto('./');
-  await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
-  await expect(page.getByRole('heading', { name: 'Le plateau' })).toBeVisible();
+  await lancerPartie(page, { joueurs: 4 });
   await imageChargee(page.getByRole('img', { name: /Plateau d'Aventura/ }));
   await expect(page.locator('#cases li')).toHaveCount(6);
   await expect(page.locator('#cases li').first()).toHaveText('DÉPART');
@@ -57,19 +56,17 @@ test('plateau : illustration, 6 cases, 4 pions sur la case DÉPART @smoke', asyn
   await expect(page.locator('.joueur-case').first()).toHaveText('DÉPART');
 });
 
-test('plateau : points à 0, dés FAIBLE et FORT, piles de cartes', async ({ page }) => {
-  await page.goto('./');
-  await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
+test('plateau : points à 0, dés FAIBLE et FORT, un tas de cartes par joueur', async ({ page }) => {
+  await lancerPartie(page, { joueurs: 4 });
   await expect(page.locator('#points')).toHaveText('0');
   await expect(page.getByRole('button', { name: /^Dé FAIBLE/ })).toBeVisible();
   await expect(page.getByRole('button', { name: /^Dé FORT/ })).toBeVisible();
-  await expect(page.locator('.pile')).toHaveCount(4);
-  await expect(page.locator('.pile').first()).toContainText('AVENTURE');
+  await expect(page.locator('#tas .pile')).toHaveCount(4);
+  await expect(page.locator('#tas .pile').nth(3)).toHaveClass(/pile-vert/);
 });
 
 test('plateau : ambiance Soir puis Jour', async ({ page }) => {
-  await page.goto('./');
-  await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
+  await lancerPartie(page, { joueurs: 4 });
   const img = page.locator('#plateau-img');
   await page.getByRole('button', { name: 'Soir' }).click();
   await expect(page.getByRole('button', { name: 'Soir' })).toHaveAttribute('aria-pressed', 'true');
@@ -79,11 +76,12 @@ test('plateau : ambiance Soir puis Jour', async ({ page }) => {
   await expect(img).toHaveAttribute('src', /plateau-jour/);
 });
 
-test('plateau : pas de défilement horizontal et retour à l\'accueil', async ({ page }) => {
-  await page.goto('./');
-  await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
+test('plateau : pas de défilement horizontal et retour à la préparation puis à l\'accueil', async ({ page }) => {
+  await lancerPartie(page, { joueurs: 4 });
   const sw = await page.evaluate(() => document.documentElement.scrollWidth);
   expect(sw).toBeLessThanOrEqual(page.viewportSize().width);
+  await page.getByRole('button', { name: /Préparation/ }).click();
+  await expect(page.getByRole('heading', { name: 'Préparer la partie' })).toBeVisible();
   await page.getByRole('button', { name: /Accueil/ }).click();
   await expect(page.getByRole('button', { name: 'Commencer l\'aventure' })).toBeVisible();
 });

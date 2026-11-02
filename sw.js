@@ -1,8 +1,8 @@
 // Service worker Ludoaventura.
 // Stratégie « réseau d'abord » : en ligne, on sert toujours la dernière version publiée
 // (mise à jour automatique, sans bouton) ; hors ligne, on sert la copie en cache.
-const CACHE = 'ludoaventura-v2.1'; // à incrémenter avec js/version.js
-const PRECACHE = ['./', 'index.html', 'css/site.css', 'js/des.js', 'js/plateau.js', 'js/version.js', 'js/pwa.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/favicon.png', 'img/fond.webp', 'img/arche.webp', 'img/perso.webp', 'img/herbe.webp', 'img/plateau-jour.webp', 'img/plateau-soir.webp'];
+const CACHE = 'ludoaventura-v2.2'; // à incrémenter avec js/version.js
+const PRECACHE = ['./', 'index.html', 'css/site.css', 'js/des.js', 'js/aventures.js', 'js/plateau.js', 'js/version.js', 'js/pwa.js', 'manifest.webmanifest', 'icons/icon-192.png', 'icons/favicon.png', 'img/fond.webp', 'img/arche.webp', 'img/perso.webp', 'img/herbe.webp', 'img/plateau-jour.webp', 'img/plateau-soir.webp', 'img/aventures/viking.webp', 'img/aventures/chevalier.webp', 'img/aventures/prehistoire.svg', 'img/aventures/mayas.webp', 'img/aventures/savane.webp', 'img/aventures/egypte.webp', 'img/aventures/chine.webp', 'img/aventures/far-west.webp', 'img/aventures/druides.webp', 'img/aventures/incas.webp'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((c) => c.addAll(PRECACHE)));

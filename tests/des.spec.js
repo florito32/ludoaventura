@@ -1,6 +1,7 @@
 // Dés : faces conformes aux règles, lancer à l'écran.
 const { test, expect } = require('@playwright/test');
 const Des = require('../js/des.js');
+const { lancerPartie } = require('./aide');
 
 test.describe('règles des dés', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
@@ -23,8 +24,7 @@ test.describe('règles des dés', () => {
 });
 
 test('toucher un dé le lance et affiche le résultat', async ({ page }) => {
-  await page.goto('./');
-  await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
+  await lancerPartie(page);
   for (const [type, ok] of [['faible', /^Dé FAIBLE : [123] points?$/], ['fort', /^Dé FORT : [456] points$/]]) {
     for (let i = 0; i < 5; i++) {
       await page.locator(`.de-btn[data-de="${type}"]`).click();
