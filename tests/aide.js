@@ -2,7 +2,7 @@
 // Va de l'accueil au plateau : nombre de joueurs et aventure au choix.
 // Les tests raccourcissent la pause entre deux joueurs (2,2 s en vrai).
 async function rapide(page) {
-  await page.addInitScript(() => { window.AVENTURA_PAUSE = 80; });
+  await page.addInitScript(() => { window.AVENTURA_PAUSE = 80; window.AVENTURA_DUREE_DE = 0; });
 }
 
 async function lancerPartie(page, { joueurs = 2, aventure = 'Viking' } = {}) {

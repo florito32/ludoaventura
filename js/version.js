@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '2.8';
+  var VERSION = '2.9';
 
   var HISTORY = [
+    { v: '2.9', date: '2026-11-02', changes: [
+      'Quand on lance le dé, un vrai dé roule sur le plateau, rebondit et montre les points gagnés.'
+    ] },
     { v: '2.8', date: '2026-11-02', changes: [
       'Les points de l\u2019équipe sont affichés dans un encadré en haut à gauche du plateau.',
       'Plateau épuré : plus d\u2019encadrés Joueurs, Dés, Tas de cartes ni Ambiance.',
