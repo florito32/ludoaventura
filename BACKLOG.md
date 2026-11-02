@@ -43,3 +43,9 @@ Statuts : à faire / en cours / fait à valider / terminé / question en attente
 | 37 | Le bon dé se lance automatiquement après l'animation de réponse | fait à valider (v3.4) — le dé FORT (bonne) ou FAIBLE (mauvaise) se lance seul 1,6 s après la réponse, à la fin de « Bravo ! » / « Oups ! » ; consigne « Le dé se lance tout seul dans un instant. » ; hypothèse : le bouton « Lancer le dé » reste pour lancer plus tôt | ✅ local 172/172 (4 formats) + CI |
 | 38 | Bouton « Voir le mot » à côté de « Voir la réponse » : le mot seul, comme une aide avant la solution | fait à valider (v3.5) — « Voir le mot » / « Cacher le mot » et « Voir la réponse » / « Cacher la réponse » côte à côte | ✅ local + CI |
 | 39 | Téléphone : l'encadré des points, trop vertical, cache la croix de la prairie → image en haut à gauche, points à sa droite, encadré horizontal | fait à valider (v3.6) — encadré en 2 colonnes (construction | points), plus large que haut ; test : la croix de la prairie reste dégagée sur téléphone, téléphone carré, tablette et ordinateur | ✅ local + CI |
+| 40 | Points cumulés : deux écritures se superposent, ne garder que l'écriture rouge | fait à valider (v3.7) — l'ombre sombre décalée sous le chiffre rouge est retirée ; taille minimale portée à 1,2 rem pour garder un contraste suffisant (texte large, 3,97:1 ≥ 3:1) | ✅ local + CI |
+| 41 | La partie ne redémarre depuis l'accueil que si la page est fermée : changer de page, rafraîchir ou mise en veille → la partie continue | à faire | — |
+| 42 | Les personnages suivent la route d'une croix à l'autre (pas en ligne droite) | à faire | — |
+| 43 | Personnages debout sur le plateau (pas un visage dans un cercle), qui marchent d'une croix à l'autre ; déplacement de 1,5 s | à faire | — |
+| 44 | Préparation : packs et types de questions décochés au départ, c'est au joueur de les cocher | à faire | — |
+| 45 | Tour de jeu : ne plus afficher « Croix 1 sur 5 — la prairie » | à faire | — |
