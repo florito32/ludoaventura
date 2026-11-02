@@ -143,3 +143,24 @@ test('🔊 Écouter : la voix lit la consigne et le mot (en français), sans dir
   await page.getByRole('button', { name: 'Écouter' }).click();
   expect((await page.evaluate(() => window.__lu)).pop().text).toBe('Quelle est cette lettre ?');
 });
+
+test('« Mêmes réglages pour tous les joueurs » copie packs, niveau et questions', async ({ page }) => {
+  await preparer(page, 3);
+  await page.getByRole('checkbox', { name: 'Temps', exact: true }).uncheck();
+  await page.getByRole('radio', { name: 'Niveau 3' }).check();
+  await page.getByRole('checkbox', { name: 'Syllabes', exact: true }).uncheck();
+  await page.getByRole('button', { name: 'Mêmes réglages pour tous les joueurs' }).click();
+  await expect(page.locator('#packs-alerte')).toHaveText('Tous les joueurs ont maintenant les mêmes réglages.');
+  for (const k of [1, 2]) {
+    await page.locator('.onglet-joueur').nth(k).click();
+    await expect(page.getByRole('checkbox', { name: 'Temps', exact: true })).not.toBeChecked();
+    await expect(page.getByRole('radio', { name: 'Niveau 3' })).toBeChecked();
+    await expect(page.getByRole('checkbox', { name: 'Syllabes', exact: true })).not.toBeChecked();
+    await expect(page.locator('.onglet-joueur').nth(k)).toContainText('Niveau 3 · 4 packs · 7 questions');
+  }
+});
+
+test('le bouton « Mêmes réglages » n\'apparaît pas pour un seul joueur', async ({ page }) => {
+  await preparer(page, 1);
+  await expect(page.getByRole('button', { name: 'Mêmes réglages pour tous les joueurs' })).toBeHidden();
+});

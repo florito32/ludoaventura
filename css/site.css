@@ -221,6 +221,9 @@ main:focus { outline: none; }
 .niveau-carte input:checked + span { background: var(--encre); color: #fff; border-color: var(--encre); }
 .pack input:focus-visible + span, .niveau-carte input:focus-visible + span { outline: 3px solid var(--rouge); outline-offset: 3px; }
 .reglage-alerte { margin: 0 0 8px; color: var(--rouge-texte); font-weight: 700; min-height: 0; }
+.reglage-alerte.ok { color: #1f5a2f; }
+.reglages-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.reglages-actions .btn { min-height: 48px; padding: 8px 16px; font-size: 1rem; }
 .reglage-alerte:empty { display: none; }
 
 /* ---------- Plateau ---------- */
