@@ -16,9 +16,24 @@ async function cocherTout(page, joueurs) {
   await page.locator('.onglet-joueur').nth(0).click();
 }
 
+// Depuis v4.0 la partie est gardée dans l'onglet (sessionStorage) : pour une nouvelle partie dans la
+// même page de test, on efface cette sauvegarde, comme si l'onglet avait été fermé.
+async function ouvrirNeuf(page) {
+  // (la page sauvegarde aussi en partant : on efface après ses sauvegardes de pagehide et visibilitychange.)
+  if (page.url().startsWith('http')) {
+    await page.evaluate(() => {
+      const effacer = () => sessionStorage.clear();
+      effacer();
+      window.addEventListener('pagehide', effacer);
+      document.addEventListener('visibilitychange', effacer); // déclenché après pagehide quand la page se décharge
+    });
+  }
+  await page.goto('./');
+}
+
 async function lancerPartie(page, { joueurs = 2, aventure = 'Viking' } = {}) {
   if (!page.__rapide) { await rapide(page); page.__rapide = true; }
-  await page.goto('./');
+  await ouvrirNeuf(page);
   await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
   await page.getByRole('radio', { name: new RegExp('^' + joueurs + ' joueurs?$') }).check();
   await page.getByRole('radio', { name: new RegExp('^' + aventure) }).check();
@@ -32,4 +47,4 @@ async function attendreJoueur(page, nom) {
   await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
 }
 
-module.exports = { lancerPartie, rapide, attendreJoueur, cocherTout };
+module.exports = { lancerPartie, rapide, attendreJoueur, cocherTout, ouvrirNeuf };

@@ -4,12 +4,9 @@
 (function () {
   'use strict';
 
-  // Retour sur une page avec le bouton « précédent » : le navigateur peut la restaurer
-  // telle qu'on l'a quittée (cache de navigation). On la recharge pour que le jeu
-  // reparte toujours de zéro quand on revient d'un autre jeu.
-  window.addEventListener('pageshow', function (e) {
-    if (e.persisted) location.reload();
-  });
+  // Retour sur la page avec « précédent » : le navigateur peut la restaurer telle qu'on l'a quittée
+  // (cache de navigation) ; la partie continue donc là où elle en était. Sinon, js/plateau.js
+  // la reprend depuis le stockage de session (la partie ne repart de zéro que si l'onglet est fermé).
 
   if (!('serviceWorker' in navigator)) return;
   // sw.js est à la racine du site, à côté du dossier js/ : on le localise depuis ce script

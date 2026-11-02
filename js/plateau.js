@@ -28,7 +28,9 @@
   var Q = window.Questions;
   var TOUS_TYPES = Q.TYPES.map(function (t) { return t.id; });
 
-  // État de la partie (en mémoire : une nouvelle ouverture repart de zéro).
+  // État de la partie. Il est sauvegardé dans le stockage de session (sessionStorage) :
+  // il survit aux rechargements, aux changements de page et à la mise en veille,
+  // et n'est effacé qu'à la fermeture de l'onglet (la partie repart alors de l'accueil).
   // choix[i] = aventurier du joueur i (par défaut : les 4 premiers de la liste) ;
   // packs[i] / niveaux[i] = packs où le joueur i pioche et son niveau (niveau 1 par défaut).
   // Packs et types de questions sont décochés au départ : c'est au joueur de les cocher (demande du 02/11/2026).
@@ -39,6 +41,8 @@
   };
 
   function afficher(id) {
+    partie.ecran = id;
+    sauver();
     document.querySelectorAll('.ecran').forEach(function (s) { s.hidden = s.id !== id; });
     var titre = $(id).querySelector('h1, h2');
     if (titre) { titre.setAttribute('tabindex', '-1'); titre.focus({ preventScroll: true }); }
@@ -232,6 +236,7 @@
     suivant.hidden = partie.actif >= nb - 1;
     $('btn-memes-reglages').hidden = nb < 2;
     suivant.textContent = 'Joueur suivant →';
+    sauver();
   }
 
   // ---------- Paquets de cartes ----------
@@ -290,6 +295,7 @@
     // Rappel au-dessus du bouton (visible même quand le détail est hors de l'écran).
     $('resume-choix').textContent = av.nom + ' · ' + partie.nbJoueurs + ' joueur' + (partie.nbJoueurs > 1 ? 's' : '') +
       ' · objectif ' + libelleObjectif(av, partie.nbJoueurs);
+    sauver();
   }
 
   // ---------- Plateau ----------
@@ -325,7 +331,19 @@
     }
     partie.objectif = A.objectif(av, partie.nbJoueurs);
     partie.regles = R.nouvellePartie(partie.nbJoueurs, partie.objectif);
+    partie.carte = null;
+    partie.etapesVues = 0;
+    preparerPlateau(true);
+    afficher('ecran-plateau');
+    // …puis le premier joueur se déplace de DÉPART jusqu'à la première croix (animation de début de partie).
+    rendre({ sansDeplacement: true });
+    plusTard(function () { rendre(); }, 450);
+  }
 
+  // Habille le plateau pour la partie en cours (aventure, points, pions).
+  // depart = vrai : tous les pions sur DÉPART (nouvelle partie) ; faux : chacun sur sa case (reprise).
+  function preparerPlateau(depart) {
+    var av = partie.aventure;
     // Ambiance du plateau choisie selon l'aventure (jour ou soir).
     $('plateau-img').src = 'img/plateau-' + av.ambiance + '.webp';
     $('plateau').classList.toggle('soir', av.ambiance === 'soir');
@@ -338,18 +356,22 @@
     $('objectif-texte').textContent = libelleObjectif(av, partie.nbJoueurs);
     $('jauge').setAttribute('aria-valuemax', partie.objectif);
     $('construction').innerHTML = window.Constructions.svg(av.id);
-    partie.etapesVues = 0;
+    var vues = partie.etapesVues;
+    partie.etapesVues = depart ? 0 : 99; // reprise : pas d'animation « nouvelle étape »
+    majConstruction(partie.regles.points);
+    partie.etapesVues = depart ? 0 : vues;
 
-    // Pions : tous posés sur DÉPART…
+    // Pions : sur DÉPART (nouvelle partie) ou sur leur case (reprise).
     var pions = $('pions');
     pions.innerHTML = '';
     partie.joueurs.forEach(function (j, k) {
       var p = document.createElement('span');
+      var c = CASES[depart ? 0 : partie.regles.positions[k]];
       p.className = 'pion pion-' + j.couleur;
       p.style.backgroundImage = 'url("' + j.aventurier.image + '")';
-      p.style.left = (CASES[0].x + DECALAGES[k][0]) + '%';
-      p.style.top = (CASES[0].y + DECALAGES[k][1] * RAPPORT) + '%';
-      p.dataset.case = '0';
+      p.style.left = (c.x + DECALAGES[k][0]) + '%';
+      p.style.top = (c.y + DECALAGES[k][1] * RAPPORT) + '%';
+      p.dataset.case = depart ? '0' : String(partie.regles.positions[k]);
       pions.appendChild(p);
     });
 
@@ -358,10 +380,6 @@
     $('de-plateau').hidden = true;
     $('reaction').hidden = true;
     partie.roule = false;
-    afficher('ecran-plateau');
-    // …puis le premier joueur se déplace de DÉPART jusqu'à la première croix (animation de début de partie).
-    rendre({ sansDeplacement: true });
-    plusTard(function () { rendre(); }, 450);
   }
 
   // Place un pion sur sa case ; les pions d'une même case sont décalés pour rester visibles.
@@ -450,6 +468,7 @@
       consigne.textContent = gain + ' ' + suite;
       bandeau(gain + ' ' + suite);
     }
+    sauver();
   }
 
   // La construction de l'aventure avance avec les points (complète quand l'objectif est atteint).
@@ -556,6 +575,7 @@
     mot.setAttribute('aria-expanded', String(partie.vue === 'mot'));
     rep.textContent = partie.vue === 'reponse' ? 'Cacher la réponse' : 'Voir la réponse';
     rep.setAttribute('aria-expanded', String(partie.vue === 'reponse'));
+    sauver();
   }
 
   // Aide : le mot seul, sans la réponse.
@@ -683,6 +703,102 @@
   $('btn-rejouer').addEventListener('click', function () { $('fin').close(); lancerPartie(); });
   $('btn-nouvelle').addEventListener('click', function () { $('fin').close(); annulerMinuteurs(); afficher('ecran-preparation'); });
 
+  // ---------- Sauvegarde de la partie (stockage de session) ----------
+  // sessionStorage : « survit aux rechargements et restaurations de la page ; fermer l'onglet efface les données »
+  // (MDN, Window.sessionStorage). Les objets (aventure, aventuriers, questions) sont enregistrés par leur identifiant.
+  var CLE = 'ludoaventura-partie';
+  var pretASauver = false; // pas de sauvegarde pendant la construction initiale de la page
+
+  function carteVersDonnees(c) {
+    if (!c) return null;
+    var d = {};
+    for (var k in c) d[k] = c[k];
+    d.question = c.question ? c.question.id : null;
+    return d;
+  }
+  function donneesVersCarte(d) {
+    if (!d) return null;
+    d.question = d.question ? Q.trouver(d.question) : null;
+    return d;
+  }
+
+  function sauver() {
+    if (!pretASauver) return;
+    var nb = document.querySelector('input[name="nb"]:checked');
+    var avRadio = document.querySelector('input[name="aventure"]:checked');
+    var d = {
+      ecran: partie.ecran || 'ecran-accueil',
+      nb: nb ? Number(nb.value) : partie.nbJoueurs,
+      aventure: avRadio ? avRadio.value : partie.aventure.id,
+      choix: partie.choix, packs: partie.packs, niveaux: partie.niveaux, types: partie.types, actif: partie.actif
+    };
+    if (partie.regles && partie.joueurs.length) {
+      d.jeu = {
+        aventure: partie.aventure.id, objectif: partie.objectif, regles: partie.regles,
+        joueurs: partie.joueurs.map(function (j) { return { id: j.aventurier.id, tas: j.tas.map(carteVersDonnees) }; }),
+        carte: carteVersDonnees(partie.carte), vue: partie.vue || 'cache', etapesVues: partie.etapesVues || 0
+      };
+    }
+    try { sessionStorage.setItem(CLE, JSON.stringify(d)); } catch (e) { /* stockage indisponible : la partie reste en mémoire */ }
+  }
+
+  // Reprend la partie sauvegardée dans l'onglet (rechargement, retour sur la page…). Renvoie vrai si c'est le cas.
+  function reprendre() {
+    var d;
+    try { d = JSON.parse(sessionStorage.getItem(CLE) || 'null'); } catch (e) { d = null; }
+    if (!d || !d.ecran || d.ecran === 'ecran-accueil') return false;
+    try {
+      // Préparation : nombre de joueurs, aventure, aventuriers et réglages des cartes.
+      var nb = document.querySelector('input[name="nb"][value="' + d.nb + '"]');
+      if (nb) nb.checked = true;
+      var av = document.querySelector('input[name="aventure"][value="' + d.aventure + '"]');
+      if (av) av.checked = true;
+      partie.choix = d.choix; partie.packs = d.packs; partie.niveaux = d.niveaux; partie.types = d.types; partie.actif = d.actif || 0;
+      majDetail();
+      majAventuriers();
+
+      if (d.jeu) {
+        var g = d.jeu;
+        partie.aventure = A.trouver(g.aventure);
+        partie.nbJoueurs = g.joueurs.length;
+        partie.objectif = g.objectif;
+        partie.regles = g.regles;
+        partie.joueurs = g.joueurs.map(function (s, i) {
+          var perso = P.trouver(s.id);
+          return { nom: perso.nom, aventurier: perso, couleur: COULEURS[i], index: i, tas: s.tas.map(donneesVersCarte) };
+        });
+        partie.carte = donneesVersCarte(g.carte);
+        partie.etapesVues = g.etapesVues;
+        preparerPlateau(false);
+      }
+      if (d.ecran !== 'ecran-plateau' || !d.jeu) { afficher(d.ecran); return true; }
+
+      // Plateau : on reprend l'étape en cours. Une animation interrompue (dé, pause de lecture) est rejouée ou terminée.
+      var r = partie.regles;
+      afficher('ecran-plateau');
+      if (r.etape === 'suivant') R.suivant(r); // les points étaient déjà comptés : on passe au joueur suivant
+      var j = partie.joueurs[r.joueur];
+      if ((r.etape === 'repondre' || r.etape === 'lancer') && partie.carte) {
+        montrerCarte(j);
+        if (!partie.carte.lettre) {
+          if (d.jeu.vue === 'mot') montrerMotSeul(); else if (d.jeu.vue === 'reponse') montrerReponse();
+        }
+      }
+      rendre();
+      if (r.etape === 'lancer') lancerApresReaction();
+      if (r.etape === 'fin') montrerFin();
+      return true;
+    } catch (e) {
+      // Sauvegarde illisible (ancienne version du jeu…) : on repart de l'accueil.
+      try { sessionStorage.removeItem(CLE); } catch (e2) { /* rien */ }
+      return false;
+    }
+  }
+
+  // Sauvegarde aussi au moment où la page est quittée ou masquée (veille, autre application).
+  window.addEventListener('pagehide', sauver);
+  document.addEventListener('visibilitychange', function () { if (document.hidden) sauver(); });
+
   // ---------- Navigation ----------
   $('btn-commencer').addEventListener('click', function () { afficher('ecran-preparation'); });
   document.querySelectorAll('[data-vers]').forEach(function (b) {
@@ -694,6 +810,9 @@
   construireAventuriers();
   construireCases();
   brancherCarte();
+  reprendre();
+  pretASauver = true;
+  sauver();
 
   // Préchargement discret du plateau pendant que l'accueil est affiché.
   window.addEventListener('load', function () { new Image().src = 'img/plateau-jour.webp'; });
