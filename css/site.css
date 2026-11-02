@@ -283,22 +283,25 @@ main:focus { outline: none; }
 .pion-bleu { background-color: #2e55c9; --c: #2e55c9; }
 .pion-vert { background-color: var(--vert-pion); --c: var(--vert-pion); }
 
-/* Points de l'équipe en haut à gauche du plateau (tailles en cqw = % de la largeur du plateau). */
+/* Points de l'équipe en haut à gauche du plateau (tailles en cqw = % de la largeur du plateau).
+   Encadré horizontal : la construction à gauche, les points à droite, pour rester peu haut
+   et ne pas cacher la croix de la prairie sur téléphone. */
 .points-plateau {
-  position: absolute; left: 1.4%; top: 2.2%; width: clamp(116px, 25%, 240px); z-index: 3;
-  padding: clamp(4px, .9cqw, 12px) clamp(6px, 1.2cqw, 14px); text-align: center;
+  position: absolute; left: 1.4%; top: 2.2%; width: clamp(196px, 40%, 400px); z-index: 3;
+  display: grid; grid-template-columns: 42% 1fr; gap: clamp(5px, 1.2cqw, 14px); align-items: center;
+  padding: clamp(4px, .8cqw, 10px) clamp(6px, 1.1cqw, 14px); text-align: center;
   background: rgb(246 238 219 / .95); border: 3px solid var(--encre); border-radius: 12px;
   box-shadow: 0 3px 0 rgb(0 0 0 / .25);
 }
 .points-titre { margin: 0; font: 700 clamp(.62rem, 1.45cqw, 1rem)/1.15 "Rockwell", "Roboto Slab", Georgia, serif; }
-.points-plateau .points-valeur { font-size: clamp(1.25rem, 3.8cqw, 2.6rem); margin: 1px 0 0; }
+.points-plateau .points-valeur { font-size: clamp(1.15rem, 3.6cqw, 2.4rem); margin: 1px 0 0; line-height: 1; }
 .points-plateau .points-sur { font-size: clamp(.75rem, 1.9cqw, 1.3rem); }
 .points-plateau .jauge { height: clamp(6px, 1cqw, 12px); margin-top: clamp(3px, .5cqw, 8px); }
 .points-plateau .points-objectif { margin: clamp(2px, .4cqw, 6px) 0 0; font-size: clamp(.56rem, 1.2cqw, .85rem); line-height: 1.2; font-weight: 600; }
 .points-valeur.gagne { animation: gonfle .6s ease-out; }
 /* Construction de l'aventure : les étapes apparaissent au fil des points. */
 .construction {
-  margin-top: clamp(3px, .6cqw, 8px); border-radius: 8px; overflow: hidden; background: #dcefd8; border: 2px solid var(--encre);
+  border-radius: 8px; overflow: hidden; background: #dcefd8; border: 2px solid var(--encre);
 }
 .construction svg { display: block; width: 100%; height: auto; }
 .construction .etape { opacity: .14; filter: grayscale(1); transition: opacity .4s, filter .4s; } /* en filigrane : ce qu'il reste à construire */
