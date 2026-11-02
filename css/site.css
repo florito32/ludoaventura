@@ -235,7 +235,7 @@ main:focus { outline: none; }
 }
 .table { display: grid; gap: 14px; grid-template-columns: 1fr; align-items: start; }
 @media (min-width: 900px) {
-  .table { grid-template-columns: minmax(0, 1fr) 290px; }
+  .table { grid-template-columns: minmax(0, 1fr) 300px; }
 }
 
 .plateau {
@@ -279,6 +279,33 @@ main:focus { outline: none; }
 .pion-jaune { background-color: var(--jaune); --c: #f2c400; }
 .pion-bleu { background-color: #2e55c9; --c: #2e55c9; }
 .pion-vert { background-color: var(--vert-pion); --c: var(--vert-pion); }
+
+/* Points de l'équipe en haut à gauche du plateau (tailles en cqw = % de la largeur du plateau). */
+.points-plateau {
+  position: absolute; left: 1.4%; top: 2.2%; width: clamp(116px, 25%, 240px); z-index: 3;
+  padding: clamp(4px, .9cqw, 12px) clamp(6px, 1.2cqw, 14px); text-align: center;
+  background: rgb(246 238 219 / .95); border: 3px solid var(--encre); border-radius: 12px;
+  box-shadow: 0 3px 0 rgb(0 0 0 / .25);
+}
+.points-titre { margin: 0; font: 700 clamp(.62rem, 1.45cqw, 1rem)/1.15 "Rockwell", "Roboto Slab", Georgia, serif; }
+.points-plateau .points-valeur { font-size: clamp(1.25rem, 3.8cqw, 2.6rem); margin: 1px 0 0; }
+.points-plateau .points-sur { font-size: clamp(.75rem, 1.9cqw, 1.3rem); }
+.points-plateau .jauge { height: clamp(6px, 1cqw, 12px); margin-top: clamp(3px, .5cqw, 8px); }
+.points-plateau .points-objectif { margin: clamp(2px, .4cqw, 6px) 0 0; font-size: clamp(.56rem, 1.2cqw, .85rem); line-height: 1.2; font-weight: 600; }
+.points-valeur.gagne { animation: gonfle .6s ease-out; }
+@keyframes gonfle { 40% { transform: scale(1.35); } }
+
+/* Message écrit sur le plateau : points gagnés et joueur suivant. */
+.bandeau {
+  position: absolute; left: 50%; top: 38%; z-index: 4; transform: translate(-50%, -50%);
+  max-width: 82%; margin: 0; padding: clamp(6px, 1.4cqw, 16px) clamp(10px, 2.4cqw, 28px); text-align: center;
+  background: var(--encre); color: #fff; border: 3px solid #fff; border-radius: 14px;
+  font: 800 clamp(.9rem, 2.6cqw, 1.7rem)/1.25 "Rockwell", "Roboto Slab", Georgia, serif;
+  box-shadow: 0 6px 18px rgb(0 0 0 / .45);
+}
+.bandeau.montre { animation: apparait .35s ease-out; }
+@keyframes apparait { from { opacity: 0; transform: translate(-50%, -30%) scale(.9); } }
+@media (prefers-reduced-motion: reduce) { .bandeau.montre, .points-valeur.gagne { animation: none; } }
 
 /* ---------- Tour de jeu ---------- */
 .tour { border-left: 10px solid var(--c, var(--encre)); }

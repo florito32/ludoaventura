@@ -33,9 +33,13 @@ test('accueil : tout tient à l\'écran, sans défilement horizontal', async ({ 
   expect(dessus).toBe('btn-commencer');
 });
 
-test('plateau : illustration, 6 cases, 1er pion sur la croix 1 et les autres sur DÉPART @smoke', async ({ page }) => {
+test('plateau : illustration, 6 cases ; le 1er pion part de DÉPART et va sur la croix 1 @smoke', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' }); // positions lues sans l'animation d'arrivée des pions
+  await page.clock.install(); // horloge contrôlée : on voit le pion partir de DÉPART
   await lancerPartie(page, { joueurs: 4 });
+  await expect(page.locator('.pion').nth(0)).toHaveAttribute('data-case', '0');
+  await page.clock.runFor(600);
+  await expect(page.locator('.pion').nth(0)).toHaveAttribute('data-case', '1');
   await imageChargee(page.getByRole('img', { name: /Plateau d'Aventura/ }));
   await expect(page.locator('#cases li')).toHaveCount(6);
   await expect(page.locator('#cases li').first()).toHaveText('DÉPART');
@@ -53,29 +57,27 @@ test('plateau : illustration, 6 cases, 1er pion sur la croix 1 et les autres sur
   // Règle : le 1er joueur pose son pion sur la première croix, les autres attendent sur DÉPART.
   expect(await proche(pions.nth(0), 1)).toBe(true);
   for (let i = 1; i < 4; i++) expect(await proche(pions.nth(i), 0)).toBe(true);
-  await expect(page.locator('#joueurs li')).toHaveCount(4);
-  await expect(page.locator('.joueur-case').nth(0)).toHaveText('Croix 1');
-  await expect(page.locator('.joueur-case').nth(1)).toHaveText('DÉPART');
+  await expect(page.locator('.pion').nth(0)).toHaveAttribute('data-case', '1');
+  await expect(page.locator('.pion').nth(1)).toHaveAttribute('data-case', '0');
 });
 
-test('plateau : points à 0, dés FAIBLE et FORT, un tas de cartes par joueur', async ({ page }) => {
+test('plateau : points à 0 dans l\'encadré en haut à gauche ; plus d\'encadrés joueurs, dés, tas, ambiance', async ({ page }) => {
   await lancerPartie(page, { joueurs: 4 });
   await expect(page.locator('#points')).toHaveText('0');
-  await expect(page.getByRole('button', { name: /^Dé FAIBLE/ })).toBeVisible();
-  await expect(page.getByRole('button', { name: /^Dé FORT/ })).toBeVisible();
-  await expect(page.locator('#tas .pile')).toHaveCount(4);
-  await expect(page.locator('#tas .pile').nth(3)).toHaveClass(/pile-vert/);
+  const boite = await page.locator('#points-plateau').boundingBox();
+  const plateau = await page.locator('#plateau').boundingBox();
+  // Encadré dans le quart haut-gauche du plateau.
+  expect(boite.x).toBeLessThan(plateau.x + plateau.width * 0.05);
+  expect(boite.y).toBeLessThan(plateau.y + plateau.height * 0.06);
+  expect(boite.x + boite.width).toBeLessThan(plateau.x + plateau.width * 0.5);
+  for (const absent of ['#joueurs', '#tas', '.de-btn', '.ambiance-btn']) await expect(page.locator(absent)).toHaveCount(0);
 });
 
-test('plateau : ambiance Soir puis Jour', async ({ page }) => {
-  await lancerPartie(page, { joueurs: 4 });
-  const img = page.locator('#plateau-img');
-  await page.getByRole('button', { name: 'Soir' }).click();
-  await expect(page.getByRole('button', { name: 'Soir' })).toHaveAttribute('aria-pressed', 'true');
-  await expect(img).toHaveAttribute('src', /plateau-soir/);
-  await imageChargee(img);
-  await page.getByRole('button', { name: 'Jour' }).click();
-  await expect(img).toHaveAttribute('src', /plateau-jour/);
+test('ambiance automatique : soir pour la Savane, jour pour les Vikings', async ({ page }) => {
+  await lancerPartie(page, { aventure: 'Savane' });
+  await expect(page.locator('#plateau-img')).toHaveAttribute('src', /plateau-soir/);
+  await lancerPartie(page, { aventure: 'Viking' });
+  await expect(page.locator('#plateau-img')).toHaveAttribute('src', /plateau-jour/);
 });
 
 test('plateau : pas de défilement horizontal et retour à la préparation puis à l\'accueil', async ({ page }) => {

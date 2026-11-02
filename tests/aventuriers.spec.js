@@ -41,15 +41,13 @@ test('un onglet par joueur ; toucher un portrait le donne au joueur actif, « Jo
   await expect(page.getByRole('button', { name: /^Zoé/ })).toBeEnabled();
 });
 
-test('sur le plateau : nom et portrait de chaque aventurier, dans la liste et sur les pions @smoke', async ({ page }) => {
+test('sur le plateau : nom de l\'aventurier qui joue et portrait sur chaque pion @smoke', async ({ page }) => {
   await preparation(page, 2);
   await page.getByRole('button', { name: /^Inès/ }).click();
   await page.getByRole('button', { name: 'Joueur suivant →' }).click();
   await page.getByRole('button', { name: /^Papi Jo/ }).click();
   await page.getByRole('button', { name: 'Lancer la partie' }).click();
-  await expect(page.locator('#joueurs li').nth(0)).toContainText('Inès');
-  await expect(page.locator('#joueurs li').nth(1)).toContainText('Papi Jo');
-  await expect(page.locator('#tas .pile').nth(0)).toContainText('Inès');
+  await expect(page.locator('#tour-nom')).toHaveText('Inès');
   await expect(page.locator('.pion').nth(0)).toHaveAttribute('style', /aventuriers\/ines\.svg/);
   await expect(page.locator('.pion').nth(1)).toHaveAttribute('style', /aventuriers\/jo\.svg/);
 });
