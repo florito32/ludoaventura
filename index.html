@@ -105,6 +105,22 @@
       </figure>
 
       <aside class="panneau" aria-label="Table de jeu">
+        <!-- Tour de jeu : qui joue, sur quelle croix, et l'étape en cours (js/regles.js). -->
+        <section class="bloc tour" id="tour" aria-labelledby="tour-titre">
+          <h3 id="tour-titre">Tour de jeu</h3>
+          <p class="tour-manche" id="tour-manche"></p>
+          <div class="tour-joueur">
+            <img id="tour-portrait" src="img/aventuriers/lea.svg" alt="" width="200" height="220">
+            <p>À <strong id="tour-nom"></strong> de jouer</p>
+          </div>
+          <div class="carte-piochee" id="carte-piochee" hidden>
+            <p class="carte-titre" id="carte-titre"></p>
+            <p class="carte-texte">Le maître du jeu pose la question de la carte.<br><em>(Les questions arriveront plus tard.)</em></p>
+          </div>
+          <p class="tour-consigne" id="tour-consigne" role="status" aria-live="polite"></p>
+          <div class="tour-actions" id="tour-actions"></div>
+        </section>
+
         <div class="bloc points">
           <h3 id="titre-points">Points de l'équipe</h3>
           <p class="points-valeur"><span id="points">0</span><span class="points-sur"> / <span id="objectif">0</span></span></p>
@@ -132,7 +148,7 @@
               <span class="de-faces" id="de-fort-faces">4 · 5 · 6</span>
             </button>
           </div>
-          <p class="de-resultat" id="de-resultat" role="status" aria-live="polite">Touche un dé pour le lancer.</p>
+          <p class="de-resultat" id="de-resultat" aria-live="polite"></p>
         </div>
 
         <div class="bloc">
@@ -153,6 +169,17 @@
   </section>
 </main>
 
+<!-- Fin de partie : l'équipe a-t-elle atteint l'objectif de l'aventure ? -->
+<dialog class="fin" id="fin" aria-labelledby="fin-titre">
+  <p class="fin-icone" id="fin-icone" aria-hidden="true"></p>
+  <h2 id="fin-titre"></h2>
+  <p id="fin-texte"></p>
+  <div class="fin-actions">
+    <button type="button" class="btn btn-principal" id="btn-rejouer">Rejouer cette aventure</button>
+    <button type="button" class="btn btn-secondaire" id="btn-nouvelle">Nouvelle partie</button>
+  </div>
+</dialog>
+
 <footer class="pied">
   <p>Ludoaventura · Aventura <span data-version></span></p>
 </footer>
@@ -160,6 +187,7 @@
 <script src="js/des.js"></script>
 <script src="js/aventures.js"></script>
 <script src="js/aventuriers.js"></script>
+<script src="js/regles.js"></script>
 <script src="js/plateau.js"></script>
 <script src="js/version.js"></script>
 <script src="js/pwa.js"></script>

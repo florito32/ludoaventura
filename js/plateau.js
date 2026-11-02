@@ -1,5 +1,5 @@
-// Aventura — écrans du jeu : accueil → préparation (joueurs, aventure) → plateau.
-// Dépend de js/des.js (window.Des) et js/aventures.js (window.Aventures).
+// Aventura — écrans du jeu : accueil → préparation (joueurs, aventuriers, aventure) → plateau (tours de jeu).
+// Dépend de js/des.js, js/aventures.js, js/aventuriers.js et js/regles.js (déroulement d'une partie).
 (function () {
   'use strict';
 
@@ -26,7 +26,7 @@
 
   // État de la partie (en mémoire : une nouvelle ouverture repart de zéro).
   // choix[i] = aventurier du joueur i (par défaut : les 4 premiers de la liste).
-  var partie = { nbJoueurs: 2, aventure: A.LISTE[0], points: 0, joueurs: [], choix: ['lea', 'tom', 'nour', 'malo'], actif: 0 };
+  var partie = { nbJoueurs: 2, aventure: A.LISTE[0], joueurs: [], choix: ['lea', 'tom', 'nour', 'malo'], actif: 0, regles: null };
 
   function afficher(id) {
     document.querySelectorAll('.ecran').forEach(function (s) { s.hidden = s.id !== id; });
@@ -143,40 +143,36 @@
     });
   }
 
+  // Noms courts des cases (liste des joueurs).
+  var COURT = ['DÉPART', 'Croix 1', 'Croix 2', 'Croix 3', 'Croix 4', 'ARRIVÉE'];
+  var R = window.Regles;
+
   function lancerPartie() {
     lireChoix();
     var av = partie.aventure;
-    partie.points = 0;
     partie.joueurs = [];
     for (var i = 0; i < partie.nbJoueurs; i++) {
       var perso = P.trouver(partie.choix[i]);
-      partie.joueurs.push({ nom: perso.nom, aventurier: perso, couleur: COULEURS[i], kase: 0 });
+      partie.joueurs.push({ nom: perso.nom, aventurier: perso, couleur: COULEURS[i] });
     }
+    partie.objectif = A.objectif(av, partie.nbJoueurs);
+    partie.regles = R.nouvellePartie(partie.nbJoueurs, partie.objectif);
 
     // Rouleau : nom et image de l'aventure à la place de « MISSION ».
     $('rouleau-img').src = av.image;
     $('rouleau-img').alt = 'Aventure ' + av.nom;
     $('rouleau-nom').textContent = av.nom;
-
-    // Points et objectif.
-    var obj = A.objectif(av, partie.nbJoueurs);
-    $('points').textContent = partie.points;
-    $('objectif').textContent = obj;
+    $('objectif').textContent = partie.objectif;
     $('objectif-texte').textContent = 'Objectif : ' + libelleObjectif(av, partie.nbJoueurs);
-    $('jauge').setAttribute('aria-valuemax', obj);
-    $('jauge').setAttribute('aria-valuenow', partie.points);
-    $('jauge-barre').style.width = Math.min(100, partie.points / obj * 100) + '%';
+    $('jauge').setAttribute('aria-valuemax', partie.objectif);
 
-    // Pions sur DÉPART (règle : « tous les pions rassemblés à l'emplacement DÉPART »).
+    // Pions (tous sur DÉPART), liste des joueurs et tas de cartes.
     var pions = $('pions'), liste = $('joueurs'), tas = $('tas');
     pions.innerHTML = ''; liste.innerHTML = ''; tas.innerHTML = '';
-    partie.joueurs.forEach(function (j, i) {
+    partie.joueurs.forEach(function (j) {
       var p = document.createElement('span');
       p.className = 'pion pion-' + j.couleur;
       p.style.backgroundImage = 'url("' + j.aventurier.image + '")';
-      p.style.left = (CASES[0].x + DECALAGES[i][0]) + '%';
-      p.style.top = (CASES[0].y + DECALAGES[i][1] * RAPPORT) + '%';
-      p.dataset.case = '0';
       pions.appendChild(p);
 
       var li = document.createElement('li');
@@ -185,28 +181,102 @@
         '<span class="joueur-case">DÉPART</span>';
       liste.appendChild(li);
 
-      // Tas de cartes du joueur, de sa couleur.
       var t = document.createElement('li');
       t.className = 'pile pile-' + j.couleur;
       t.innerHTML = '<span class="carte" aria-hidden="true"></span>' + j.nom;
       tas.appendChild(t);
     });
 
+    $('carte-piochee').hidden = true;
+    $('de-resultat').textContent = '';
     afficher('ecran-plateau');
+    rendre();
   }
 
-  // Ambiance jour / soir : les deux versions du plateau illustré.
-  function brancherAmbiance() {
-    document.querySelectorAll('.ambiance-btn').forEach(function (b) {
-      b.addEventListener('click', function () {
-        var a = b.dataset.ambiance;
-        $('plateau-img').src = 'img/plateau-' + a + '.webp';
-        document.querySelectorAll('.ambiance-btn').forEach(function (x) {
-          x.setAttribute('aria-pressed', String(x === b));
-        });
-        $('plateau').classList.toggle('soir', a === 'soir');
-      });
+  // Place un pion sur sa case ; les pions d'une même case sont décalés pour rester visibles.
+  function placerPions() {
+    var r = partie.regles;
+    document.querySelectorAll('.pion').forEach(function (p, i) {
+      var c = CASES[r.positions[i]];
+      p.style.left = (c.x + DECALAGES[i][0]) + '%';
+      p.style.top = (c.y + DECALAGES[i][1] * RAPPORT) + '%';
+      p.dataset.case = r.positions[i];
+      p.classList.toggle('pion-actif', i === r.joueur && r.etape !== 'fin');
     });
+  }
+
+  function bouton(texte, classe, action) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'btn ' + classe;
+    b.textContent = texte;
+    b.addEventListener('click', action);
+    $('tour-actions').appendChild(b);
+    return b;
+  }
+
+  // Met tout l'écran à jour selon l'état de la partie (js/regles.js).
+  function rendre() {
+    var r = partie.regles;
+    var j = partie.joueurs[r.joueur];
+    var c = CASES[r.manche];
+
+    placerPions();
+    $('points').textContent = r.points;
+    $('jauge').setAttribute('aria-valuenow', r.points);
+    $('jauge-barre').style.width = Math.min(100, r.points / r.objectif * 100) + '%';
+    $('jauge').classList.toggle('atteint', r.points >= r.objectif);
+
+    document.querySelectorAll('#joueurs li').forEach(function (li, i) {
+      li.querySelector('.joueur-case').textContent = COURT[r.positions[i]];
+      li.classList.toggle('actif', i === r.joueur && r.etape !== 'fin');
+    });
+    document.querySelectorAll('#tas .pile').forEach(function (t, i) {
+      t.classList.toggle('a-piocher', i === r.joueur && r.etape === 'piocher');
+    });
+
+    $('tour-manche').textContent = (c.arrivee ? 'ARRIVÉE' : 'Croix ' + r.manche) + ' sur ' + R.NB_CROIX + ' — ' + c.nom.replace(/^.*— /, '');
+    $('tour-portrait').src = j.aventurier.image;
+    $('tour-portrait').className = 'joueur-' + j.couleur;
+    $('tour-nom').textContent = j.nom;
+    $('tour').className = 'bloc tour joueur-' + j.couleur;
+
+    // Dés : seul le dé à lancer est actif.
+    document.querySelectorAll('.de-btn').forEach(function (b) {
+      var attendu = r.etape === 'lancer' && b.dataset.de === r.de;
+      b.disabled = !attendu;
+      b.classList.toggle('a-lancer', attendu);
+    });
+
+    var actions = $('tour-actions');
+    actions.innerHTML = '';
+    var consigne = $('tour-consigne');
+    if (r.etape === 'piocher') {
+      $('carte-piochee').hidden = true;
+      consigne.textContent = j.nom + ' avance sur la croix et pioche une carte dans son tas.';
+      bouton('Piocher une carte', 'btn-principal', function () { R.piocher(r); rendre(); });
+    } else if (r.etape === 'repondre') {
+      $('carte-piochee').hidden = false;
+      $('carte-piochee').className = 'carte-piochee joueur-' + j.couleur;
+      $('carte-titre').textContent = 'Carte n° ' + r.pioches[r.joueur] + ' du tas de ' + j.nom;
+      consigne.textContent = 'Le joueur a-t-il bien répondu ?';
+      bouton('Bonne réponse', 'btn-bonne', function () { R.repondre(r, true); rendre(); });
+      bouton('Mauvaise réponse', 'btn-mauvaise', function () { R.repondre(r, false); rendre(); });
+    } else if (r.etape === 'lancer') {
+      consigne.textContent = r.de === 'fort'
+        ? 'Bravo ! ' + j.nom + ' lance le dé FORT.'
+        : 'Les autres joueurs et le maître du jeu aident à trouver la bonne réponse, puis ' + j.nom + ' lance le dé FAIBLE.';
+      bouton('Lancer le dé ' + r.de.toUpperCase(), 'btn-principal', function () { lancerDe(r.de); });
+    } else if (r.etape === 'suivant' || r.etape === 'fin') {
+      consigne.textContent = '+' + r.dernierLancer + ' point' + (r.dernierLancer > 1 ? 's' : '') + ' pour l’équipe !';
+      if (r.etape === 'suivant') {
+        var prochain = r.joueur + 1 < r.nbJoueurs ? partie.joueurs[r.joueur + 1].nom : partie.joueurs[0].nom;
+        var croix = r.joueur + 1 < r.nbJoueurs ? '' : ' (croix suivante)';
+        bouton('Au tour de ' + prochain + croix, 'btn-principal', function () { R.suivant(r); rendre(); });
+      } else {
+        bouton('Voir le résultat', 'btn-principal', montrerFin);
+      }
+    }
   }
 
   // ---------- Dés ----------
@@ -219,18 +289,52 @@
     de.dataset.valeur = valeur;
   }
 
+  // Lance le dé demandé par la règle et ajoute ses points à l'équipe.
+  function lancerDe(type) {
+    var r = partie.regles;
+    if (r.etape !== 'lancer' || r.de !== type) return;
+    var v = window.Des.lancer(type);
+    var de = document.querySelector('.de-btn[data-de="' + type + '"] .de');
+    de.classList.remove('roule');
+    void de.offsetWidth; // relance l'animation
+    de.classList.add('roule');
+    dessinerFace(de, v);
+    $('de-resultat').textContent = 'Dé ' + type.toUpperCase() + ' : ' + v + ' point' + (v > 1 ? 's' : '');
+    R.lancer(r, v);
+    rendre();
+  }
+
   function brancherDes() {
     document.querySelectorAll('.de-btn').forEach(function (btn) {
-      var type = btn.dataset.de;
-      var de = btn.querySelector('.de');
-      dessinerFace(de, type === 'fort' ? 6 : 3);
-      btn.addEventListener('click', function () {
-        var v = window.Des.lancer(type);
-        de.classList.remove('roule');
-        void de.offsetWidth; // relance l'animation
-        de.classList.add('roule');
-        dessinerFace(de, v);
-        $('de-resultat').textContent = 'Dé ' + type.toUpperCase() + ' : ' + v + ' point' + (v > 1 ? 's' : '');
+      dessinerFace(btn.querySelector('.de'), btn.dataset.de === 'fort' ? 6 : 3);
+      btn.addEventListener('click', function () { lancerDe(btn.dataset.de); });
+    });
+  }
+
+  // ---------- Fin de partie ----------
+  function montrerFin() {
+    var r = partie.regles, av = partie.aventure;
+    var ok = R.reussie(r);
+    $('fin-icone').textContent = ok ? '🏆' : '🌋';
+    $('fin-titre').textContent = ok ? 'Aventure réussie !' : 'Aventure manquée…';
+    $('fin-texte').textContent = 'L’équipe a gagné ' + r.points + ' points pour un objectif de ' + r.objectif + ' ' + av.unite + '. ' +
+      (ok ? 'Bravo, vous avez tous réussi l’aventure ' + av.nom + ' !' : 'Vous ferez mieux la prochaine fois !');
+    $('fin').className = 'fin ' + (ok ? 'gagne' : 'perdu');
+    $('fin').showModal();
+  }
+  $('btn-rejouer').addEventListener('click', function () { $('fin').close(); lancerPartie(); });
+  $('btn-nouvelle').addEventListener('click', function () { $('fin').close(); afficher('ecran-preparation'); });
+
+  // Ambiance jour / soir : les deux versions du plateau illustré.
+  function brancherAmbiance() {
+    document.querySelectorAll('.ambiance-btn').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var a = b.dataset.ambiance;
+        $('plateau-img').src = 'img/plateau-' + a + '.webp';
+        document.querySelectorAll('.ambiance-btn').forEach(function (x) {
+          x.setAttribute('aria-pressed', String(x === b));
+        });
+        $('plateau').classList.toggle('soir', a === 'soir');
       });
     });
   }

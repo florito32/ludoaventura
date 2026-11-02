@@ -33,7 +33,7 @@ test('accueil : tout tient à l\'écran, sans défilement horizontal', async ({ 
   expect(dessus).toBe('btn-commencer');
 });
 
-test('plateau : illustration, 6 cases, 4 pions sur la case DÉPART @smoke', async ({ page }) => {
+test('plateau : illustration, 6 cases, 1er pion sur la croix 1 et les autres sur DÉPART @smoke', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' }); // positions lues sans l'animation d'arrivée des pions
   await lancerPartie(page, { joueurs: 4 });
   await imageChargee(page.getByRole('img', { name: /Plateau d'Aventura/ }));
@@ -44,17 +44,18 @@ test('plateau : illustration, 6 cases, 4 pions sur la case DÉPART @smoke', asyn
   const pions = page.locator('.pion');
   await expect(pions).toHaveCount(4);
   const plateau = await page.locator('#plateau').boundingBox();
-  const depart = await page.locator('.case-depart').boundingBox();
-  for (let i = 0; i < 4; i++) {
-    const b = await pions.nth(i).boundingBox();
-    const cx = b.x + b.width / 2, cy = b.y + b.height / 2;
-    // Pions dans le plateau et regroupés autour de DÉPART (à moins de 8 % de la largeur).
-    expect(cx).toBeGreaterThan(plateau.x);
-    expect(cy).toBeLessThan(plateau.y + plateau.height);
-    expect(Math.hypot(cx - depart.x, cy - depart.y)).toBeLessThan(plateau.width * 0.08);
-  }
+  const centre = async (loc) => { const b = await loc.boundingBox(); return [b.x + b.width / 2, b.y + b.height / 2]; };
+  const proche = async (pion, kase) => {
+    const [cx, cy] = await centre(pion);
+    const c = await page.locator('#cases li').nth(kase).boundingBox();
+    return Math.hypot(cx - c.x, cy - c.y) < plateau.width * 0.08;
+  };
+  // Règle : le 1er joueur pose son pion sur la première croix, les autres attendent sur DÉPART.
+  expect(await proche(pions.nth(0), 1)).toBe(true);
+  for (let i = 1; i < 4; i++) expect(await proche(pions.nth(i), 0)).toBe(true);
   await expect(page.locator('#joueurs li')).toHaveCount(4);
-  await expect(page.locator('.joueur-case').first()).toHaveText('DÉPART');
+  await expect(page.locator('.joueur-case').nth(0)).toHaveText('Croix 1');
+  await expect(page.locator('.joueur-case').nth(1)).toHaveText('DÉPART');
 });
 
 test('plateau : points à 0, dés FAIBLE et FORT, un tas de cartes par joueur', async ({ page }) => {
