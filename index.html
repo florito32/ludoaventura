@@ -123,6 +123,8 @@
           <p class="points-valeur"><span id="points">0</span><span class="points-sur"> / <span id="objectif">0</span></span></p>
           <div class="jauge" role="progressbar" aria-labelledby="titre-points" aria-valuemin="0" id="jauge"><span id="jauge-barre"></span></div>
           <p class="points-objectif" id="objectif-texte"></p>
+          <!-- Ce que l'équipe construit, étape par étape, au fil des points (js/constructions.js). -->
+          <div class="construction" id="construction" role="img"></div>
         </div>
         <!-- Dé en 3D qui roule sur le plateau au moment du lancer (js/plateau.js → lancerDe). -->
         <div class="de-plateau" id="de-plateau" aria-hidden="true" hidden>
@@ -183,6 +185,7 @@
 <script src="js/aventuriers.js"></script>
 <script src="js/cartes.js"></script>
 <script src="js/voix.js"></script>
+<script src="js/constructions.js"></script>
 <script src="js/regles.js"></script>
 <script src="js/plateau.js"></script>
 <script src="js/version.js"></script>
