@@ -408,12 +408,13 @@
       });
     } else if (r.etape === 'repondre') {
       consigne.textContent = 'La réponse de ' + j.nom + ' est-elle bonne ?';
-      bouton('Bonne réponse', 'btn-bonne', function () { R.repondre(r, true); reagir(true); rendre(); });
-      bouton('Mauvaise réponse', 'btn-mauvaise', function () { R.repondre(r, false); reagir(false); rendre(); });
+      bouton('Bonne réponse', 'btn-bonne', function () { R.repondre(r, true); reagir(true); rendre(); lancerApresReaction(); });
+      bouton('Mauvaise réponse', 'btn-mauvaise', function () { R.repondre(r, false); reagir(false); rendre(); lancerApresReaction(); });
     } else if (r.etape === 'lancer') {
       consigne.textContent = r.de === 'fort'
         ? 'Bravo ! ' + j.nom + ' lance le dé FORT.'
         : 'Les autres joueurs et le maître du jeu aident à trouver la bonne réponse, puis ' + j.nom + ' lance le dé FAIBLE.';
+      consigne.textContent += ' Le dé se lance tout seul dans un instant.';
       bouton('Lancer le dé ' + r.de.toUpperCase(), 'btn-principal', function () { lancerDe(r.de); });
     } else if (r.etape === 'suivant' || r.etape === 'fin') {
       // Points ajoutés : on l'écrit, puis on passe tout seul au joueur suivant (ou au résultat).
@@ -447,6 +448,7 @@
 
   // Petite animation après la réponse : le pion saute et des confettis éclatent (bonne réponse),
   // ou le pion tremble avec un « Oups ! » (mauvaise réponse).
+  var DUREE_REACTION = 1600; // durée de l'animation « Bravo ! » / « Oups ! » (ms)
   var COULEURS_CONFETTIS = ['#e3262a', '#ffe600', '#2e55c9', '#2f9e5b', '#ff8a1f', '#fff'];
   function reagir(bonne) {
     var r = partie.regles;
@@ -468,7 +470,20 @@
     pion.classList.remove('saute', 'secoue');
     void pion.offsetWidth;
     pion.classList.add(bonne ? 'saute' : 'secoue');
-    plusTard(function () { zone.hidden = true; pion.classList.remove('saute', 'secoue'); }, 1600);
+    plusTard(function () { zone.hidden = true; pion.classList.remove('saute', 'secoue'); }, DUREE_REACTION);
+  }
+
+  // Une fois l'animation de réponse terminée, le bon dé (FORT ou FAIBLE) se lance tout seul.
+  // Le bouton « Lancer le dé » reste là pour lancer plus tôt. Les tests règlent ce délai avec window.AVENTURA_AUTO_DE.
+  var DELAI_AUTO_DE = typeof window.AVENTURA_AUTO_DE === 'number' ? window.AVENTURA_AUTO_DE : DUREE_REACTION;
+  var minuteurDe = null;
+  function lancerApresReaction() {
+    var r = partie.regles;
+    if (r.etape !== 'lancer') return;
+    var de = r.de;
+    clearTimeout(minuteurDe);
+    minuteurDe = setTimeout(function () { minuteurDe = null; lancerDe(de); }, DELAI_AUTO_DE);
+    minuteurs.push(minuteurDe);
   }
 
   // Après le lancer : pause de lecture, puis joueur suivant (ou résultat de la partie).
@@ -572,6 +587,7 @@
   function lancerDe(type) {
     var r = partie.regles;
     if (r.etape !== 'lancer' || r.de !== type || partie.roule) return;
+    clearTimeout(minuteurDe); minuteurDe = null; // lancé à la main avant le lancer automatique
     partie.roule = true;
     $('tour-actions').innerHTML = '';
     var v = window.Des.lancer(type);

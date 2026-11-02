@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '3.3';
+  var VERSION = '3.4';
 
   var HISTORY = [
+    { v: '3.4', date: '2026-11-02', changes: [
+      'Après l\u2019animation « Bravo ! » ou « Oups ! », le bon dé (FORT ou FAIBLE) se lance tout seul. Le bouton reste là pour le lancer plus tôt.'
+    ] },
     { v: '3.3', date: '2026-11-02', changes: [
       'Préparation : bouton « Mêmes réglages pour tous les joueurs » (mêmes packs, même niveau, mêmes questions).'
     ] },

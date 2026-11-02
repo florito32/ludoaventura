@@ -1,8 +1,9 @@
 // Outils partagés par les tests.
 // Va de l'accueil au plateau : nombre de joueurs et aventure au choix.
-// Les tests raccourcissent la pause entre deux joueurs (2,2 s en vrai).
-async function rapide(page) {
-  await page.addInitScript(() => { window.AVENTURA_PAUSE = 80; window.AVENTURA_DUREE_DE = 0; });
+// Les tests raccourcissent la pause entre deux joueurs (2,2 s en vrai) et repoussent le lancer
+// automatique du dé (1,6 s en vrai) pour pouvoir cliquer « Lancer le dé » sans course.
+async function rapide(page, { autoDe = 600000 } = {}) {
+  await page.addInitScript((a) => { window.AVENTURA_PAUSE = 80; window.AVENTURA_DUREE_DE = 0; window.AVENTURA_AUTO_DE = a; }, autoDe);
 }
 
 async function lancerPartie(page, { joueurs = 2, aventure = 'Viking' } = {}) {
