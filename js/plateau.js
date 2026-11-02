@@ -30,11 +30,12 @@
 
   // État de la partie (en mémoire : une nouvelle ouverture repart de zéro).
   // choix[i] = aventurier du joueur i (par défaut : les 4 premiers de la liste) ;
-  // packs[i] / niveaux[i] = packs où le joueur i pioche et son niveau (tous les packs, niveau 1 par défaut).
+  // packs[i] / niveaux[i] = packs où le joueur i pioche et son niveau (niveau 1 par défaut).
+  // Packs et types de questions sont décochés au départ : c'est au joueur de les cocher (demande du 02/11/2026).
   var partie = {
     nbJoueurs: 2, aventure: A.LISTE[0], joueurs: [], choix: ['lea', 'tom', 'nour', 'malo'], actif: 0, regles: null,
-    packs: [0, 1, 2, 3].map(function () { return TOUS_PACKS.slice(); }), niveaux: [1, 1, 1, 1], carte: null,
-    types: [0, 1, 2, 3].map(function () { return TOUS_TYPES.slice(); }) // types de questions cochés par chaque joueur
+    packs: [[], [], [], []], niveaux: [1, 1, 1, 1], carte: null,
+    types: [[], [], [], []] // types de questions cochés par chaque joueur
   };
 
   function afficher(id) {
@@ -107,16 +108,11 @@
       l.innerHTML = '<input type="radio" name="niveau-cartes" value="' + n + '"><span><span class="visually-hidden">Niveau </span>' + n + '</span>';
       niv.appendChild(l);
     });
-    box.addEventListener('change', function (e) {
+    box.addEventListener('change', function () {
       var j = partie.actif;
       var coches = Array.prototype.filter.call(box.querySelectorAll('input'), function (i) { return i.checked; })
         .map(function (i) { return i.value; });
-      if (!coches.length) { // au moins un pack, sinon le joueur ne pourrait rien piocher
-        e.target.checked = true;
-        $('packs-alerte').className = 'reglage-alerte';
-        $('packs-alerte').textContent = 'Il faut garder au moins un pack.';
-        return;
-      }
+      // Au moins un pack est demandé, mais on ne le vérifie qu'au lancement de la partie.
       $('packs-alerte').textContent = '';
       partie.packs[j] = coches;
       majAventuriers();
@@ -133,15 +129,9 @@
       l.innerHTML = '<input type="checkbox" name="type" value="' + t.id + '"><span>' + t.nom + '</span>';
       types.appendChild(l);
     });
-    types.addEventListener('change', function (e) {
+    types.addEventListener('change', function () {
       var coches = Array.prototype.filter.call(types.querySelectorAll('input'), function (i) { return i.checked; })
         .map(function (i) { return i.value; });
-      if (!coches.length) {
-        e.target.checked = true;
-        $('packs-alerte').className = 'reglage-alerte';
-        $('packs-alerte').textContent = 'Il faut garder au moins un type de question.';
-        return;
-      }
       $('packs-alerte').textContent = '';
       partie.types[partie.actif] = coches;
       majAventuriers();
@@ -168,8 +158,41 @@
   function resumeCartes(i) {
     var n = partie.packs[i].length;
     var t = partie.types[i].length;
-    return 'Niveau ' + partie.niveaux[i] + ' · ' + (n === TOUS_PACKS.length ? 'tous les packs' : n + ' pack' + (n > 1 ? 's' : '')) +
-      ' · ' + (t === TOUS_TYPES.length ? 'toutes les questions' : t + ' question' + (t > 1 ? 's' : ''));
+    return 'Niveau ' + partie.niveaux[i] + ' · ' + (n === TOUS_PACKS.length ? 'tous les packs' : n ? n + ' pack' + (n > 1 ? 's' : '') : 'aucun pack') +
+      ' · ' + (t === TOUS_TYPES.length ? 'toutes les questions' : t ? t + ' question' + (t > 1 ? 's' : '') : 'aucune question');
+  }
+
+  // Ce qui manque au joueur i pour pouvoir jouer (null si tout est coché).
+  // Les cartes « Lettres » n'ont pas de type de question : un joueur qui ne pioche que des lettres n'en a pas besoin.
+  function manque(i) {
+    var packs = partie.packs[i];
+    if (!packs.length) return 'pack';
+    var queLettres = packs.length === 1 && packs[0] === 'lettres';
+    if (!queLettres && !partie.types[i].length) return 'type';
+    return null;
+  }
+
+  // Avant de lancer la partie : chaque joueur doit avoir coché ses packs et ses questions.
+  // Sinon on affiche ses réglages avec un message et on met le focus sur ce qu'il doit cocher.
+  function verifierReglages() {
+    var nb = Number(document.querySelector('input[name="nb"]:checked').value);
+    for (var i = 0; i < nb; i++) {
+      var m = manque(i);
+      if (!m) continue;
+      partie.actif = i;
+      majAventuriers();
+      var nom = P.trouver(partie.choix[i]).nom;
+      var alerte = $('packs-alerte');
+      alerte.className = 'reglage-alerte';
+      alerte.textContent = m === 'pack'
+        ? nom + ' (Joueur ' + (i + 1) + ') doit cocher au moins un pack.'
+        : nom + ' (Joueur ' + (i + 1) + ') doit cocher au moins un type de question.';
+      var cible = $(m === 'pack' ? 'packs' : 'types-questions').querySelector('input');
+      cible.focus({ preventScroll: true });
+      $('reglages-joueur').scrollIntoView({ block: 'center' });
+      return false;
+    }
+    return true;
   }
 
   function majAventuriers() {
@@ -665,7 +688,7 @@
   document.querySelectorAll('[data-vers]').forEach(function (b) {
     b.addEventListener('click', function () { annulerMinuteurs(); afficher(b.dataset.vers); });
   });
-  $('form-preparation').addEventListener('submit', function (e) { e.preventDefault(); lancerPartie(); });
+  $('form-preparation').addEventListener('submit', function (e) { e.preventDefault(); if (verifierReglages()) lancerPartie(); });
 
   construireAventures();
   construireAventuriers();
