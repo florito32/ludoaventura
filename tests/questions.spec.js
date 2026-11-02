@@ -2,7 +2,7 @@
 const { test, expect } = require('@playwright/test');
 const Q = require('../js/questions.js');
 const C = require('../js/cartes.js');
-const { rapide, cocherTout, lancerLeDe } = require('./aide');
+const { rapide, lancerLeDe, versReglages, cocherJoueur, lancer } = require('./aide');
 
 const rep = (id, mot) => Q.trouver(id).reponse(mot, C.INFOS[mot]);
 const possible = (id, mot) => Q.possibles(mot, C.INFOS[mot], [id]).length === 1;
@@ -50,9 +50,8 @@ test.describe('réponses attendues', () => {
 async function preparer(page) {
   await rapide(page);
   await page.goto('./');
-  await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
-  await page.getByRole('radio', { name: '1 joueur' }).check();
-  await cocherTout(page, 1);
+  await versReglages(page, 1);
+  await cocherJoueur(page);
 }
 
 test('le joueur choisit ses questions ; « Lettres muettes » seule → la réponse surligne les lettres muettes @smoke', async ({ page }) => {
@@ -61,9 +60,9 @@ test('le joueur choisit ses questions ; « Lettres muettes » seule → la répo
   for (const t of ['Épeler', 'Nombre de lettres', 'Syllabes', 'Consonnes', 'Voyelles', 'Première lettre', 'Réécrire le mot']) {
     await page.getByRole('checkbox', { name: t, exact: true }).uncheck();
   }
-  await expect(page.locator('.onglet-joueur').nth(0)).toContainText('1 question');
+  expect(await page.evaluate(() => window.Aventura.partie.types[0])).toEqual(['muettes']);
   await page.getByRole('checkbox', { name: 'Lettres', exact: true }).uncheck(); // pas de lettres seules
-  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await lancer(page);
   for (let t = 0; t < 3; t++) {
     await page.getByRole('button', { name: 'Piocher une carte' }).click();
     await expect(page.locator('#carte-consigne')).toHaveText('Quelles sont les lettres muettes du mot :');
@@ -89,7 +88,7 @@ test('la voix lit la question tirée, puis le mot', async ({ page }) => {
     await page.getByRole('checkbox', { name: t, exact: true }).uncheck();
   }
   await page.getByRole('checkbox', { name: 'Lettres', exact: true }).uncheck();
-  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await lancer(page);
   await page.getByRole('button', { name: 'Piocher une carte' }).click();
   await page.getByRole('button', { name: 'Écouter' }).click();
   await page.getByRole('button', { name: 'Voir la réponse' }).click();

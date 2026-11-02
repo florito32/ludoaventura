@@ -1,12 +1,14 @@
 // Aventuriers : 10 portraits, chaque joueur choisit le sien en début de partie.
 const { test, expect } = require('@playwright/test');
 const P = require('../js/aventuriers.js');
-const { cocherTout } = require('./aide');
+const { cocherTout, valider } = require('./aide');
 
+// Va jusqu'à l'écran 2 (choix de l'aventurier du joueur 1).
 async function preparation(page, joueurs) {
   await page.goto('./');
   await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
   await page.getByRole('radio', { name: new RegExp('^' + joueurs + ' joueurs?$') }).check();
+  await valider(page);
 }
 
 test('10 aventuriers différents, chacun avec un nom et un portrait', async ({ page }) => {
@@ -16,37 +18,51 @@ test('10 aventuriers différents, chacun avec un nom et un portrait', async ({ p
   const portraits = page.locator('.aventurier img');
   await expect(portraits).toHaveCount(10);
   for (const img of await portraits.all()) {
-    await img.scrollIntoViewIfNeeded();
     await expect.poll(() => img.evaluate((i) => i.complete && i.naturalWidth > 0)).toBe(true);
   }
 });
 
-test('un onglet par joueur ; toucher un portrait le donne au joueur actif, « Joueur suivant » passe au suivant', async ({ page }) => {
+test('un écran par joueur : il touche un portrait puis « Valider » ; un aventurier déjà pris est grisé', async ({ page }) => {
   await preparation(page, 3);
-  const onglets = page.locator('.onglet-joueur');
-  await expect(onglets).toHaveCount(3);
-  await expect(onglets.nth(0)).toHaveAttribute('aria-pressed', 'true');
+  const legende = page.locator('#aventurier-legende');
+  await expect(legende).toHaveText('Joueur 1, choisis ton aventurier');
+  await expect(page.locator('#prepa-progres')).toHaveText('Étape 2 sur 4 · Joueur 1 sur 3');
+  // Les joueurs suivants n'ont pas encore choisi : seul le joueur 1 apparaît sur les portraits.
+  await expect(page.locator('.aventurier-pris:not(:empty)')).toHaveCount(1);
   await page.getByRole('button', { name: /^Zoé/ }).click();
-  await expect(onglets.nth(0)).toContainText('Zoé');
-  await expect(onglets.nth(0)).toHaveAttribute('aria-pressed', 'true'); // reste sur le joueur pour choisir ses cartes
-  await page.getByRole('button', { name: 'Joueur suivant →' }).click();
-  await expect(onglets.nth(1)).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: /^Zoé/ })).toHaveAttribute('aria-pressed', 'true');
+  await valider(page);
+  await expect(legende).toHaveText('Joueur 2, choisis ton aventurier');
   // Un aventurier pris par un autre joueur n'est plus disponible.
   await expect(page.getByRole('button', { name: /^Zoé/ })).toBeDisabled();
   await page.getByRole('button', { name: /^Awa/ }).click();
-  await expect(onglets.nth(1)).toContainText('Awa');
-  // Revenir sur un joueur pour changer son choix.
-  await onglets.nth(0).click();
+  await valider(page);
+  await expect(legende).toHaveText('Joueur 3, choisis ton aventurier');
+  // Revenir sur le joueur 1 pour changer son choix.
+  await page.getByRole('button', { name: /Retour/ }).click();
+  await page.getByRole('button', { name: /Retour/ }).click();
+  await expect(legende).toHaveText('Joueur 1, choisis ton aventurier');
   await page.getByRole('button', { name: /^Kenji/ }).click();
-  await expect(onglets.nth(0)).toContainText('Kenji');
   await expect(page.getByRole('button', { name: /^Zoé/ })).toBeEnabled();
+  expect((await page.evaluate(() => window.Aventura.partie.choix)).slice(0, 2)).toEqual(['kenji', 'awa']);
+});
+
+test('si son aventurier par défaut est déjà pris, le joueur suivant en reçoit un libre', async ({ page }) => {
+  await preparation(page, 2);
+  await page.getByRole('button', { name: /^Tom/ }).click(); // Tom est le choix par défaut du joueur 2
+  await valider(page);
+  const choix = await page.evaluate(() => window.Aventura.partie.choix);
+  expect(choix[0]).toBe('tom');
+  expect(choix[1]).not.toBe('tom');
+  await expect(page.locator('.aventurier[aria-pressed="true"]')).toHaveCount(1);
 });
 
 test('sur le plateau : nom de l\'aventurier qui joue et son personnage debout sur chaque case @smoke', async ({ page }) => {
   await preparation(page, 2);
   await page.getByRole('button', { name: /^Inès/ }).click();
-  await page.getByRole('button', { name: 'Joueur suivant →' }).click();
+  await valider(page);
   await page.getByRole('button', { name: /^Papi Jo/ }).click();
+  await valider(page);
   await cocherTout(page, 2);
   await page.getByRole('button', { name: 'Lancer la partie' }).click();
   await expect(page.locator('#tour-nom')).toHaveText('Inès');
@@ -54,15 +70,30 @@ test('sur le plateau : nom de l\'aventurier qui joue et son personnage debout su
   await expect(page.locator('.pion').nth(1)).toHaveAttribute('data-aventurier', 'jo');
 });
 
-test('passer de 4 à 2 joueurs garde les choix des 2 premiers', async ({ page }) => {
+test('v4.6 : chaque écran de la préparation tient sans défiler', async ({ page }) => {
+  // La page ne défile pas et le contenu de l'écran tient dans sa zone (rien de caché à faire défiler).
+  const tient = async (nom) => {
+    const r = await page.evaluate(() => ({
+      page: document.documentElement.scrollHeight - innerHeight,
+      corps: Math.max(...[...document.querySelectorAll('.etape:not([hidden]) .etape-corps')].map((c) => c.scrollHeight - c.clientHeight))
+    }));
+    expect(r.page, nom + ' : la page défile').toBeLessThanOrEqual(1);
+    expect(r.corps, nom + ' : le contenu dépasse').toBeLessThanOrEqual(1);
+  };
   await preparation(page, 4);
-  await expect(page.locator('.onglet-joueur')).toHaveCount(4);
-  await page.locator('.onglet-joueur').nth(3).click();
-  await expect(page.locator('.onglet-joueur').nth(3)).toHaveAttribute('aria-pressed', 'true');
-  await page.getByRole('radio', { name: '2 joueurs' }).check();
-  await expect(page.locator('.onglet-joueur')).toHaveCount(2);
-  await expect(page.locator('.onglet-joueur').nth(1)).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('.onglet-joueur').nth(0)).toContainText('Léa');
+  await tient('aventuriers');
+  for (let k = 0; k < 4; k++) await valider(page);
+  await tient('cartes');
+  await valider(page); // rien de coché : message
+  await expect(page.locator('#packs-alerte')).not.toBeEmpty();
+  await tient('cartes avec message');
+  await cocherTout(page, 4);
+  await page.getByRole('radio', { name: /^Savane/ }).check(); // histoire la plus longue
+  await tient('aventure');
+  // « Retour » remonte joueur par joueur et écran par écran : 4 → 3 (×4) → 2 (×4) → 1.
+  for (let k = 0; k < 9; k++) await page.getByRole('button', { name: /Retour/ }).click();
+  await expect(page.locator('#prepa-progres')).toHaveText('Étape 1 sur 4');
+  await tient('nombre de joueurs');
 });
 
 test('chaque portrait est un SVG valide (un attribut en double l\'empêchait de s\'afficher)', async ({ page, baseURL }) => {

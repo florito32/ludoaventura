@@ -107,124 +107,154 @@ main:focus { outline: none; }
   .accueil-actions { right: 4%; bottom: 5%; width: 54%; }
 }
 
-/* ---------- Préparation de la partie ---------- */
-.preparation { width: 100%; max-width: 1100px; margin: 0 auto; padding: 8px 12px 16px; }
-.prepa { display: grid; gap: 14px; }
-.etape { margin: 0; min-width: 0; }
-.etape legend {
-  float: left; width: 100%; display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
-  font: 700 1.15rem/1.2 "Rockwell", "Roboto Slab", Georgia, serif;
+/* ---------- Préparation de la partie ----------
+   Un seul écran à la fois (v4.6) : il occupe la hauteur de la fenêtre, sans défiler.
+   La page est limitée à la hauteur de l'écran ; le contenu de l'étape (.etape-corps) prend la place libre
+   et les grilles (aventuriers, aventures) se dimensionnent pour y tenir ; les boutons restent en bas. */
+body:has(#ecran-preparation:not([hidden])) { height: 100vh; height: 100dvh; overflow: hidden; }
+body:has(#ecran-preparation:not([hidden])) main { min-height: 0; }
+body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px + env(safe-area-inset-bottom)); font-size: .8rem; }
+.preparation {
+  flex: 1; min-height: 0; width: 100%; max-width: 1100px; margin: 0 auto; padding: 8px 12px 8px;
+  display: flex; flex-direction: column;
 }
+.preparation .barre { margin-bottom: 8px; }
+.prepa-progres { justify-self: end; margin: 0; color: #fff; font-weight: 700; font-size: .85rem; text-align: right; line-height: 1.2; }
+.prepa { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.etape { flex: 1; min-height: 0; min-width: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; padding: 10px 12px; }
+.etape:focus { outline: none; }
+.etape legend {
+  float: left; width: 100%; display: flex; align-items: center; gap: 10px;
+  font: 700 clamp(1rem, 3.6vw, 1.2rem)/1.2 "Rockwell", "Roboto Slab", Georgia, serif;
+}
+.etape legend + * { clear: both; }
 .etape-num {
-  display: inline-grid; place-items: center; width: 32px; height: 32px; border-radius: 50%;
+  flex: none; display: inline-grid; place-items: center; width: 30px; height: 30px; border-radius: 50%;
   background: var(--rouge); color: #fff; border: 2px solid var(--encre); font-family: system-ui, sans-serif; font-size: 1rem;
 }
-.nb-joueurs { clear: both; display: flex; gap: 10px; }
-.nb-joueurs label { flex: 1; max-width: 90px; position: relative; }
+/* Nom du joueur dans le titre, souligné de sa couleur. */
+.legende-joueur { display: inline-flex; align-items: center; gap: 8px; border-bottom: 4px solid var(--c); padding-bottom: 2px; }
+.legende-joueur img { width: 34px; height: 37px; border-radius: 8px; flex: none; }
+.etape-corps { flex: 1; min-height: 0; overflow: auto; }
+.etape-actions { flex: none; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+.etape-actions .btn { min-height: 48px; padding: 8px 22px; }
+.etape-actions .btn-principal { flex: 0 1 260px; }
+
+/* 1. Nombre de joueurs : 4 grands boutons centrés. */
+.etape[data-etape="1"] .etape-corps { display: grid; place-items: center; }
+.nb-joueurs { display: flex; gap: 12px; width: min(100%, 480px); }
+.nb-joueurs label { flex: 1; position: relative; }
 .nb-joueurs input, .aventure input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
 .nb-joueurs span {
-  display: grid; place-items: center; height: 56px; border-radius: 12px; cursor: pointer;
-  background: #fff; border: 3px solid var(--parchemin-bord); font: 800 1.5rem/1 system-ui, sans-serif;
+  display: grid; place-items: center; height: clamp(64px, 18vw, 96px); border-radius: 14px; cursor: pointer;
+  background: #fff; border: 3px solid var(--parchemin-bord); font: 800 clamp(1.6rem, 6vw, 2.4rem)/1 system-ui, sans-serif;
 }
 .nb-joueurs input:checked + span { background: var(--encre); color: #fff; border-color: var(--encre); }
 .nb-joueurs input:focus-visible + span, .aventure:has(input:focus-visible) { outline: 3px solid var(--rouge); outline-offset: 3px; }
 
-.aventures { clear: both; display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
-.aventure {
-  position: relative; display: flex; flex-direction: column; cursor: pointer; overflow: hidden;
-  background: #fff; border: 3px solid var(--parchemin-bord); border-radius: 12px;
+/* 2. Aventuriers et 4. aventures : grilles qui remplissent la place libre (lignes de hauteur égale).
+   Écran haut (portrait) : 3 colonnes ; sinon (paysage, carré) : 5 colonnes. */
+.aventuriers, .aventures {
+  height: 100%; display: grid; gap: clamp(4px, 1.2vmin, 10px);
+  grid-template-columns: repeat(5, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr);
 }
-.aventure img { width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; display: block; }
-.aventure-nom { font: 700 1rem/1.2 "Rockwell", "Roboto Slab", Georgia, serif; padding: 6px 8px 0; }
-.aventure-diff { font-size: .78rem; font-weight: 700; padding: 0 8px 7px; color: var(--encre-douce); }
-.aventure-diff::before { content: "●"; margin-right: 4px; }
-.diff-facile::before { color: #2f8a4e; }
-.diff-moyen::before { color: #c98a00; }
-.diff-difficile::before { color: var(--rouge); }
-.aventure:has(input:checked) { border-color: var(--encre); box-shadow: 0 0 0 3px var(--rouge); }
-.aventure-detail { margin-top: 14px; padding-top: 12px; border-top: 2px dashed var(--parchemin-bord); }
-.aventure-detail h3 { font-size: 1.15rem; margin-bottom: 4px; }
-.aventure-detail p { margin: 0 0 8px; max-width: 60em; }
-.a-venir { color: var(--encre-douce); font-style: italic; }
-.detail-objectif { font-size: 1.05rem; }
-.detail-objectif strong { color: var(--rouge-texte); }
-.actions-prepa {
-  position: sticky; bottom: 0; z-index: 2; display: flex; justify-content: center;
-  margin: 0 -12px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
-  background: var(--vert); border-top: 3px solid var(--vert-fonce); box-shadow: 0 -6px 12px rgb(0 0 0 / .2);
-}
-.actions-prepa { flex-direction: column; align-items: center; gap: 6px; }
-.actions-prepa .btn { min-width: min(320px, 100%); }
-.resume-choix { margin: 0; color: #fff; font-weight: 700; text-align: center; text-shadow: 0 1px 0 var(--vert-fonce); }
-
-/* Choix des aventuriers : onglets des joueurs + grille de portraits.
-   --c = couleur du joueur (pion et tas de cartes). */
+@media (max-aspect-ratio: 3/4) { .aventuriers, .aventures { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.etape[data-etape="2"] .etape-corps { overflow: hidden; }
 .joueur-rouge { --c: var(--rouge); }
 .joueur-jaune { --c: #f2c400; }
 .joueur-bleu { --c: #2e55c9; }
 .joueur-vert { --c: var(--vert-pion); }
-.choix-joueurs { clear: both; display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
-.onglet-joueur {
-  display: flex; align-items: center; gap: 8px; padding: 4px 12px 4px 4px; cursor: pointer;
-  font: inherit; color: var(--encre); text-align: left; line-height: 1.15;
-  background: #fff; border: 3px solid var(--parchemin-bord); border-left: 8px solid var(--c); border-radius: 12px;
-}
-.onglet-joueur img { width: 40px; height: 44px; border-radius: 8px; }
-.onglet-joueur span { font-size: .8rem; display: flex; flex-direction: column; }
-.onglet-joueur strong { font-size: 1rem; }
-.onglet-joueur[aria-pressed="true"] { border-color: var(--encre); border-left-color: var(--c); box-shadow: 0 0 0 3px var(--c); }
-.aventuriers { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); }
-@media (min-width: 700px) { .aventuriers { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 10px; } }
 .aventurier {
-  position: relative; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 6px 6px 8px;
-  font: inherit; color: var(--encre); cursor: pointer; text-align: center; line-height: 1.15;
+  position: relative; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 1px;
+  padding: 4px 4px 6px; font: inherit; color: var(--encre); cursor: pointer; text-align: center; line-height: 1.1;
   background: #fff; border: 3px solid var(--parchemin-bord); border-radius: 12px;
 }
-.aventurier img { width: 100%; height: auto; border-radius: 10px; margin-bottom: 4px; }
-.aventurier-nom { font: 700 .98rem/1.15 "Rockwell", "Roboto Slab", Georgia, serif; }
-.aventurier-titre { font-size: .72rem; color: var(--encre-douce); }
+.aventurier img { flex: 1 1 0; min-height: 0; width: 100%; object-fit: contain; border-radius: 10px; margin-bottom: 2px; }
+.aventurier-nom { font: 700 clamp(.78rem, 2.2vmin, .98rem)/1.1 "Rockwell", "Roboto Slab", Georgia, serif; }
+.aventurier-titre { font-size: clamp(.62rem, 1.6vmin, .72rem); color: var(--encre-douce); }
+@media (max-height: 620px) { .aventurier-titre { display: none; } }
 .aventurier.pris { border-color: var(--c); box-shadow: 0 0 0 2px var(--c); }
 .aventurier[aria-pressed="true"] { border-color: var(--encre); box-shadow: 0 0 0 4px var(--c); }
-.aventurier:disabled { cursor: not-allowed; }
+.aventurier:disabled { cursor: not-allowed; opacity: .55; }
 .aventurier-pris:not(:empty) {
-  position: absolute; top: 2px; right: 2px; min-width: 30px; padding: 2px 6px; border-radius: 99px;
-  background: var(--c); color: #fff; border: 2px solid var(--encre); font-weight: 800; font-size: .8rem;
+  position: absolute; top: 2px; right: 2px; min-width: 28px; padding: 1px 5px; border-radius: 99px;
+  background: var(--c); color: #fff; border: 2px solid var(--encre); font-weight: 800; font-size: .75rem;
   text-shadow: 0 1px 0 var(--encre);
 }
 .joueur-jaune .aventurier-pris:not(:empty) { color: var(--encre); text-shadow: none; }
 
-/* Réglages des cartes du joueur actif : packs (plusieurs) et niveau (un seul). */
-.onglet-joueur small { font-size: .72rem; color: var(--encre-douce); }
-.reglages-joueur {
-  margin-top: 14px; padding: 12px 14px; border-radius: 12px; background: #fff;
-  border: 3px solid var(--parchemin-bord); border-left: 8px solid var(--c);
-}
-.reglages-joueur h3 { font-size: 1.05rem; margin-bottom: 8px; }
-.reglage { margin-bottom: 10px; }
+/* 3. Réglages des cartes du joueur : niveau (un seul), packs et questions (plusieurs). */
+.reglage { margin-bottom: clamp(6px, 1.6vmin, 14px); }
 .reglage-titre { margin: 0 0 6px; font-weight: 700; }
 .reglage-titre span { font-weight: 400; color: var(--encre-douce); font-size: .85rem; }
-.packs { display: flex; flex-wrap: wrap; gap: 8px; }
+.packs { display: flex; flex-wrap: wrap; gap: 6px 8px; }
 .pack, .niveau-carte { position: relative; }
 .pack input, .niveau-carte input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
 .pack span {
-  display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 6px 14px; cursor: pointer;
-  border: 2px solid var(--parchemin-bord); border-radius: 99px; background: var(--parchemin); font-weight: 600;
+  display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 4px 12px; cursor: pointer;
+  border: 2px solid var(--parchemin-bord); border-radius: 99px; background: #fff; font-weight: 600;
 }
 .pack span::before { content: ""; width: 16px; height: 16px; border: 2px solid var(--encre); border-radius: 4px; background: #fff; }
 .pack input:checked + span { background: var(--encre); color: #fff; border-color: var(--encre); }
 .pack input:checked + span::before { content: "✓"; content: "✓" / ""; display: grid; place-items: center; font-size: .75rem; color: var(--encre); }
 .niveaux-cartes { display: flex; gap: 8px; }
 .niveau-carte span {
-  display: grid; place-items: center; width: 52px; height: 44px; cursor: pointer; font-weight: 800; font-size: 1.15rem;
-  border: 2px solid var(--parchemin-bord); border-radius: 10px; background: var(--parchemin);
+  display: grid; place-items: center; width: 52px; height: 40px; cursor: pointer; font-weight: 800; font-size: 1.15rem;
+  border: 2px solid var(--parchemin-bord); border-radius: 10px; background: #fff;
 }
 .niveau-carte input:checked + span { background: var(--encre); color: #fff; border-color: var(--encre); }
 .pack input:focus-visible + span, .niveau-carte input:focus-visible + span { outline: 3px solid var(--rouge); outline-offset: 3px; }
-.reglage-alerte { margin: 0 0 8px; color: var(--rouge-texte); font-weight: 700; min-height: 0; }
-.reglage-alerte.ok { color: #1f5a2f; }
-.reglages-actions { display: flex; flex-wrap: wrap; gap: 10px; }
-.reglages-actions .btn { min-height: 48px; padding: 8px 16px; font-size: 1rem; }
+/* Écrans peu hauts (téléphone en paysage, format carré) : boutons un peu plus serrés (cible ≥ 24 px, WCAG 2.5.8). */
+@media (max-height: 620px) {
+  .pack span { padding: 2px 10px; font-size: .9rem; }
+  .niveau-carte span { height: 30px; }
+  .reglage-titre { margin-bottom: 3px; font-size: .92rem; }
+  .reglage-titre span { display: none; }
+  .etape { gap: 6px; padding: 8px 10px; }
+  .etape-actions { flex-wrap: nowrap; }
+  .etape-actions .btn { min-height: 40px; padding: 4px 12px; font-size: .95rem; }
+  /* Niveau sur une seule ligne : titre à gauche, 1-2-3 à droite. */
+  .reglage-niveau { display: flex; align-items: center; gap: 10px; }
+  .reglage-niveau .reglage-titre { margin: 0; }
+  .pack span { min-height: 30px; }
+  .packs { gap: 5px 6px; }
+  .legende-joueur img { width: 28px; height: 31px; }
+  .etape-actions .btn-secondaire { white-space: nowrap; font-size: .85rem; }
+  .preparation .barre { margin-bottom: 4px; }
+  .preparation .btn-retour { min-height: 36px; padding: 2px 12px; }
+}
+/* Message « doit cocher… » : posé au-dessus des boutons, sans pousser le contenu (rien ne défile). */
+.etape-actions { position: relative; }
+.reglage-alerte {
+  position: absolute; left: 0; right: 0; bottom: calc(100% + 6px); margin: 0; z-index: 2;
+  padding: 6px 10px; border-radius: 10px; background: #fff; border: 2px solid var(--rouge-texte);
+  color: var(--rouge-texte); font-weight: 700; box-shadow: 0 4px 10px rgb(0 0 0 / .2);
+}
 .reglage-alerte:empty { display: none; }
+
+/* 4. Aventures : la grille au-dessus, le résumé de l'aventure choisie en dessous. */
+.etape-aventure { display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
+.etape-aventure .aventures { flex: 1; min-height: 0; height: auto; }
+.aventure {
+  position: relative; min-height: 0; display: flex; flex-direction: column; cursor: pointer; overflow: hidden;
+  background: #fff; border: 3px solid var(--parchemin-bord); border-radius: 12px;
+}
+.aventure img { flex: 1 1 0; min-height: 0; width: 100%; object-fit: cover; display: block; }
+.aventure-nom { font: 700 clamp(.72rem, 2vmin, 1rem)/1.15 "Rockwell", "Roboto Slab", Georgia, serif; padding: 3px 6px 0; }
+.aventure-diff { font-size: clamp(.62rem, 1.6vmin, .78rem); font-weight: 700; padding: 0 6px 4px; color: var(--encre-douce); }
+.aventure-diff::before { content: "●"; margin-right: 4px; }
+.diff-facile::before { color: #2f8a4e; }
+.diff-moyen::before { color: #c98a00; }
+.diff-difficile::before { color: var(--rouge); }
+.aventure:has(input:checked) { border-color: var(--encre); box-shadow: 0 0 0 3px var(--rouge); }
+.aventure-detail { flex: none; padding-top: 6px; border-top: 2px dashed var(--parchemin-bord); }
+.aventure-detail h3 { font-size: 1.05rem; margin-bottom: 2px; }
+.aventure-detail p { margin: 0 0 4px; max-width: 60em; font-size: .92rem; line-height: 1.3; }
+/* L'histoire est coupée à 2 lignes pour que tout tienne à l'écran. */
+.aventure-histoire { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; }
+.a-venir { color: var(--encre-douce); font-style: italic; }
+.detail-objectif { font-size: 1rem; }
+.detail-objectif strong { color: var(--rouge-texte); }
 
 /* ---------- Plateau ---------- */
 .plateau-ecran { width: 100%; max-width: 1280px; margin: 0 auto; padding: 8px 12px 16px; }

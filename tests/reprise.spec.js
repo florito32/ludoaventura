@@ -1,7 +1,7 @@
 // La partie continue après un rafraîchissement, un changement de page ou une mise en veille ;
 // elle ne repart de l'accueil que si l'onglet est fermé (stockage de session, demande du 02/11/2026).
 const { test, expect } = require('@playwright/test');
-const { lancerPartie, attendreJoueur, rapide, lancerLeDe } = require('./aide');
+const { lancerPartie, attendreJoueur, rapide, lancerLeDe, versReglages, cocherJoueur, valider } = require('./aide');
 
 async function unTour(page) {
   await page.getByRole('button', { name: 'Piocher une carte' }).click();
@@ -75,21 +75,26 @@ test('écran mis en veille (page masquée puis réaffichée) : rien ne change', 
   await expect(page.locator('#tour-nom')).toHaveText('Tom');
 });
 
-test('rafraîchir la préparation garde les choix (joueurs, aventure, cases cochées)', async ({ page }) => {
+test('rafraîchir la préparation garde l\'écran et les choix (joueurs, joueur en cours, cases cochées, aventure)', async ({ page }) => {
   await rapide(page);
   await page.goto('./');
-  await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
-  await page.getByRole('radio', { name: '3 joueurs' }).check();
-  await page.getByRole('radio', { name: /^Savane/ }).check();
+  await versReglages(page, 3);
   await page.getByRole('checkbox', { name: 'Temps', exact: true }).check();
   await page.getByRole('checkbox', { name: 'Syllabes', exact: true }).check();
+  await valider(page); // joueur 2
   await page.reload();
   await expect(page.getByRole('heading', { name: /Préparer/ })).toBeVisible();
-  await expect(page.getByRole('radio', { name: '3 joueurs' })).toBeChecked();
-  await expect(page.getByRole('radio', { name: /^Savane/ })).toBeChecked();
+  await expect(page.locator('#prepa-progres')).toHaveText('Étape 3 sur 4 · Joueur 2 sur 3');
+  await page.getByRole('button', { name: /Retour/ }).click();
   await expect(page.getByRole('checkbox', { name: 'Temps', exact: true })).toBeChecked();
   await expect(page.getByRole('checkbox', { name: 'Syllabes', exact: true })).toBeChecked();
   await expect(page.getByRole('checkbox', { name: 'Lettres', exact: true })).not.toBeChecked();
+  for (let k = 0; k < 3; k++) { await cocherJoueur(page); await valider(page); }
+  await page.getByRole('radio', { name: /^Savane/ }).check();
+  await page.reload();
+  await expect(page.getByRole('radio', { name: /^Savane/ })).toBeChecked();
+  await expect(page.locator('#prepa-progres')).toHaveText('Étape 4 sur 4');
+  await expect(page.locator('#aventure-detail')).toContainText('3 joueurs');
 });
 
 test('fermer la page (nouvel onglet) : on repart de l\'accueil', async ({ page, context }) => {

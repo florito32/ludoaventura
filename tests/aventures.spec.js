@@ -1,7 +1,7 @@
 // Aventures : 10 aventures, objectif selon difficulté × joueurs, affichage sur le rouleau.
 const { test, expect } = require('@playwright/test');
 const A = require('../js/aventures.js');
-const { lancerPartie } = require('./aide');
+const { lancerPartie, versReglages, cocherTout } = require('./aide');
 
 test.describe('données des aventures', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
@@ -46,16 +46,15 @@ test.describe('données des aventures', () => {
 
 test('préparation : 4 choix de joueurs, 10 aventures avec image, objectif mis à jour', async ({ page }) => {
   await page.goto('./');
-  await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
   await expect(page.locator('input[name="nb"]')).toHaveCount(4);
+  await versReglages(page, 4);
+  await cocherTout(page, 4);
   await expect(page.locator('.aventure')).toHaveCount(10);
-  await expect(page.locator('#aventure-detail')).toContainText('30 troncs d’arbre à couper'); // Viking, 2 joueurs par défaut
-  await page.getByRole('radio', { name: '4 joueurs' }).check();
+  await expect(page.locator('#aventure-detail')).toContainText('60 troncs d’arbre à couper'); // Viking par défaut, 4 joueurs
   await page.getByRole('radio', { name: /^Savane/ }).check();
+  // L'objectif est visible à côté du bouton, sans défiler.
   await expect(page.locator('#aventure-detail')).toContainText('84 gazelles à chasser');
-  // Le rappel du choix est visible à côté du bouton, sans défiler.
-  await expect(page.locator('#resume-choix')).toHaveText('Savane · 4 joueurs · objectif 84 gazelles à chasser');
-  await expect(page.locator('#resume-choix')).toBeInViewport();
+  await expect(page.locator('#aventure-detail .detail-objectif')).toBeInViewport();
   // Toutes les images d'aventure se chargent.
   for (const img of await page.locator('.aventure img').all()) {
     await img.scrollIntoViewIfNeeded();

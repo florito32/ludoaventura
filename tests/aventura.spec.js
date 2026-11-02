@@ -87,6 +87,10 @@ test('plateau : pas de défilement horizontal et retour à la préparation puis 
   expect(sw).toBeLessThanOrEqual(page.viewportSize().width);
   await page.getByRole('button', { name: /Préparation/ }).click();
   await expect(page.getByRole('heading', { name: 'Préparer la partie' })).toBeVisible();
+  // On revient sur le choix de l'aventure ; « Retour » remonte les écrans jusqu'à l'accueil.
+  await expect(page.getByRole('button', { name: 'Lancer la partie' })).toBeVisible();
+  while (!(await page.getByRole('button', { name: /Accueil/ }).isVisible())) await page.getByRole('button', { name: /Retour/ }).click();
+  await expect(page.locator('#prepa-progres')).toHaveText('Étape 1 sur 4');
   await page.getByRole('button', { name: /Accueil/ }).click();
   await expect(page.getByRole('button', { name: 'Commencer l\'aventure' })).toBeVisible();
 });

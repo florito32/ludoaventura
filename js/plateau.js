@@ -55,6 +55,7 @@
   // Packs et types de questions sont décochés au départ : c'est au joueur de les cocher (demande du 02/11/2026).
   var partie = {
     nbJoueurs: 2, aventure: A.LISTE[0], joueurs: [], choix: ['lea', 'tom', 'nour', 'malo'], actif: 0, regles: null,
+    etapePrepa: 1, // écran de la préparation affiché (1 à 4), voir montrerEtape
     packs: [[], [], [], []], niveaux: [1, 1, 1, 1], carte: null,
     types: [[], [], [], []] // types de questions cochés par chaque joueur
   };
@@ -92,8 +93,7 @@
   }
 
   // ---------- Choix des aventuriers ----------
-  // Un onglet par joueur (le joueur qui choisit), puis une grille de 10 portraits.
-  // Toucher un portrait le donne au joueur actif ; « Joueur suivant » passe au joueur d'après.
+  // Étape 2 : chaque joueur, à son tour, touche un des 10 portraits puis « Valider ».
   // Un aventurier déjà pris par un autre joueur n'est pas disponible.
   function construireAventuriers() {
     var grille = $('grille-aventuriers');
@@ -159,30 +159,18 @@
       partie.types[partie.actif] = coches;
       majAventuriers();
     });
-    // Copie les packs, le niveau et les questions du joueur affiché vers tous les joueurs.
+    // Copie les packs, le niveau et les questions du joueur affiché vers tous les joueurs,
+    // puis passe directement au choix de l'aventure (tous les joueurs sont réglés).
     $('btn-memes-reglages').addEventListener('click', function () {
+      if (!reglagesComplets(partie.actif)) return;
       var a = partie.actif;
       for (var k = 0; k < 4; k++) {
         partie.packs[k] = partie.packs[a].slice();
         partie.niveaux[k] = partie.niveaux[a];
         partie.types[k] = partie.types[a].slice();
       }
-      majAventuriers();
-      $('packs-alerte').className = 'reglage-alerte ok';
-      $('packs-alerte').textContent = 'Tous les joueurs ont maintenant les mêmes réglages.';
+      montrerEtape(4);
     });
-    $('btn-joueur-suivant').addEventListener('click', function () {
-      partie.actif++;
-      majAventuriers();
-      $('choix-joueurs').querySelectorAll('button')[partie.actif].focus();
-    });
-  }
-
-  function resumeCartes(i) {
-    var n = partie.packs[i].length;
-    var t = partie.types[i].length;
-    return 'Niveau ' + partie.niveaux[i] + ' · ' + (n === TOUS_PACKS.length ? 'tous les packs' : n ? n + ' pack' + (n > 1 ? 's' : '') : 'aucun pack') +
-      ' · ' + (t === TOUS_TYPES.length ? 'toutes les questions' : t ? t + ' question' + (t > 1 ? 's' : '') : 'aucune question');
   }
 
   // Ce qui manque au joueur i pour pouvoir jouer (null si tout est coché).
@@ -195,48 +183,92 @@
     return null;
   }
 
-  // Avant de lancer la partie : chaque joueur doit avoir coché ses packs et ses questions.
-  // Sinon on affiche ses réglages avec un message et on met le focus sur ce qu'il doit cocher.
+  // Le joueur i a-t-il coché ce qu'il faut ? Sinon, message sous ses réglages et focus sur ce qui manque.
+  function reglagesComplets(i) {
+    var m = manque(i);
+    if (!m) return true;
+    var nom = P.trouver(partie.choix[i]).nom;
+    var alerte = $('packs-alerte');
+    alerte.className = 'reglage-alerte';
+    alerte.textContent = m === 'pack'
+      ? nom + ' (Joueur ' + (i + 1) + ') doit cocher au moins un pack.'
+      : nom + ' (Joueur ' + (i + 1) + ') doit cocher au moins un type de question.';
+    $(m === 'pack' ? 'packs' : 'types-questions').querySelector('input').focus({ preventScroll: true });
+    return false;
+  }
+
+  // Avant de lancer la partie : chaque joueur doit avoir coché ses packs et ses questions
+  // (sécurité : « Valider » le vérifie déjà). Sinon on revient sur ses réglages.
   function verifierReglages() {
-    var nb = Number(document.querySelector('input[name="nb"]:checked').value);
+    var nb = nbChoisi();
     for (var i = 0; i < nb; i++) {
-      var m = manque(i);
-      if (!m) continue;
-      partie.actif = i;
-      majAventuriers();
-      var nom = P.trouver(partie.choix[i]).nom;
-      var alerte = $('packs-alerte');
-      alerte.className = 'reglage-alerte';
-      alerte.textContent = m === 'pack'
-        ? nom + ' (Joueur ' + (i + 1) + ') doit cocher au moins un pack.'
-        : nom + ' (Joueur ' + (i + 1) + ') doit cocher au moins un type de question.';
-      var cible = $(m === 'pack' ? 'packs' : 'types-questions').querySelector('input');
-      cible.focus({ preventScroll: true });
-      $('reglages-joueur').scrollIntoView({ block: 'center' });
-      return false;
+      if (manque(i)) {
+        partie.actif = i;
+        montrerEtape(3);
+        reglagesComplets(i);
+        return false;
+      }
     }
     return true;
   }
 
-  function majAventuriers() {
-    var nb = Number(document.querySelector('input[name="nb"]:checked').value);
+  function nbChoisi() { return Number(document.querySelector('input[name="nb"]:checked').value); }
+
+  // ---------- Écrans de la préparation ----------
+  // 1 nombre de joueurs → 2 aventurier (un écran par joueur) → 3 cartes (un écran par joueur) → 4 aventure.
+  var NB_ETAPES = 4;
+  function montrerEtape(n) {
+    partie.etapePrepa = n;
+    var nb = nbChoisi();
     if (partie.actif >= nb) partie.actif = nb - 1;
-    var onglets = $('choix-joueurs');
-    onglets.innerHTML = '';
-    for (var i = 0; i < nb; i++) {
-      var a = P.trouver(partie.choix[i]);
-      var o = document.createElement('button');
-      o.type = 'button';
-      o.className = 'onglet-joueur joueur-' + COULEURS[i];
-      o.setAttribute('aria-pressed', String(i === partie.actif));
-      o.innerHTML = '<img src="' + a.image + '" alt="" width="200" height="220"><span>Joueur ' + (i + 1) +
-        '<strong>' + a.nom + '</strong><small>' + resumeCartes(i) + '</small></span>';
-      o.addEventListener('click', (function (k) { return function () { partie.actif = k; majAventuriers(); }; })(i));
-      onglets.appendChild(o);
+    document.querySelectorAll('#form-preparation .etape').forEach(function (f) { f.hidden = Number(f.dataset.etape) !== n; });
+    $('packs-alerte').textContent = '';
+    majAventuriers();
+    majDetail();
+    // Progression : « Étape 2 sur 4 · Joueur 1 sur 3 ».
+    $('prepa-progres').textContent = 'Étape ' + n + ' sur ' + NB_ETAPES +
+      ((n === 2 || n === 3) && nb > 1 ? ' · Joueur ' + (partie.actif + 1) + ' sur ' + nb : '');
+    $('prepa-retour-texte').textContent = n === 1 ? 'Accueil' : 'Retour';
+    var f = document.querySelector('#form-preparation .etape[data-etape="' + n + '"]');
+    if (!$('ecran-preparation').hidden) f.focus({ preventScroll: true });
+    sauver();
+  }
+
+  // « Valider » de chaque écran : joueur suivant, ou écran suivant après le dernier joueur.
+  function valider() {
+    var n = partie.etapePrepa, nb = nbChoisi();
+    if (n === 1) { partie.actif = 0; montrerEtape(2); return; }
+    if (n === 3 && !reglagesComplets(partie.actif)) return;
+    if ((n === 2 || n === 3) && partie.actif < nb - 1) { partie.actif++; montrerEtape(n); return; }
+    if (n === 2 || n === 3) { partie.actif = 0; montrerEtape(n + 1); }
+  }
+
+  // « ← Retour » : joueur précédent, ou écran précédent (l'accueil depuis le premier écran).
+  function revenir() {
+    var n = partie.etapePrepa, nb = nbChoisi();
+    if (n === 1) { afficher('ecran-accueil'); return; }
+    if ((n === 2 || n === 3) && partie.actif > 0) { partie.actif--; montrerEtape(n); return; }
+    partie.actif = n === 2 ? 0 : nb - 1; // on revient sur le dernier joueur de l'écran précédent
+    montrerEtape(n - 1);
+  }
+
+  // Met à jour les écrans 2 et 3 pour le joueur actif (aventurier choisi, réglages des cartes).
+  function majAventuriers() {
+    var nb = nbChoisi();
+    if (partie.actif >= nb) partie.actif = nb - 1;
+    var couleur = COULEURS[partie.actif];
+    $('aventurier-legende').textContent = 'Joueur ' + (partie.actif + 1) + ', choisis ton aventurier';
+    $('aventurier-legende').className = 'legende-joueur joueur-' + couleur;
+    // Sur l'écran 2, seuls les joueurs qui ont déjà choisi (et le joueur actif) apparaissent :
+    // les joueurs suivants n'ont pas encore choisi. Si le choix par défaut du joueur actif
+    // est déjà pris par un joueur précédent, il reçoit le premier aventurier libre.
+    var visibles = partie.etapePrepa === 2 ? partie.actif + 1 : nb;
+    var avant = partie.choix.slice(0, partie.actif);
+    if (avant.indexOf(partie.choix[partie.actif]) >= 0) {
+      partie.choix[partie.actif] = P.LISTE.filter(function (a) { return avant.indexOf(a.id) === -1; })[0].id;
     }
     document.querySelectorAll('.aventurier').forEach(function (b) {
-      var proprio = partie.choix.slice(0, nb).indexOf(b.dataset.id);
-      var a = P.trouver(b.dataset.id);
+      var proprio = partie.choix.slice(0, visibles).indexOf(b.dataset.id);
       b.className = 'aventurier' + (proprio >= 0 ? ' pris joueur-' + COULEURS[proprio] : '');
       b.setAttribute('aria-pressed', String(proprio === partie.actif));
       b.disabled = proprio >= 0 && proprio !== partie.actif;
@@ -246,15 +278,14 @@
     });
     // Réglages des cartes du joueur actif.
     var actif = P.trouver(partie.choix[partie.actif]);
-    $('reglages-joueur').className = 'reglages-joueur joueur-' + COULEURS[partie.actif];
-    $('reglages-titre').textContent = 'Cartes de ' + actif.nom + ' (Joueur ' + (partie.actif + 1) + ')';
+    $('reglages-joueur').className = 'etape-corps reglages-joueur joueur-' + couleur;
+    $('reglages-titre').innerHTML = '<img src="' + actif.image + '" alt="" width="200" height="220">' +
+      actif.nom + ' (Joueur ' + (partie.actif + 1) + ') : niveau, packs et questions';
+    $('reglages-titre').className = 'legende-joueur joueur-' + couleur;
     $('packs').querySelectorAll('input').forEach(function (i) { i.checked = partie.packs[partie.actif].indexOf(i.value) >= 0; });
     $('niveaux-cartes').querySelectorAll('input').forEach(function (i) { i.checked = Number(i.value) === partie.niveaux[partie.actif]; });
     $('types-questions').querySelectorAll('input').forEach(function (i) { i.checked = partie.types[partie.actif].indexOf(i.value) >= 0; });
-    var suivant = $('btn-joueur-suivant');
-    suivant.hidden = partie.actif >= nb - 1;
     $('btn-memes-reglages').hidden = nb < 2;
-    suivant.textContent = 'Joueur suivant →';
     sauver();
   }
 
@@ -308,12 +339,9 @@
     var av = partie.aventure;
     $('aventure-detail').innerHTML =
       '<h3>' + av.nom + '</h3>' +
-      (av.histoire ? '<p>' + av.histoire + '</p>' : '<p class="a-venir">Histoire à venir.</p>') +
+      (av.histoire ? '<p class="aventure-histoire">' + av.histoire + '</p>' : '<p class="a-venir">Histoire à venir.</p>') +
       '<p class="detail-objectif">Objectif de l’équipe (' + partie.nbJoueurs + ' joueur' + (partie.nbJoueurs > 1 ? 's' : '') + ') : <strong>' +
       libelleObjectif(av, partie.nbJoueurs) + '</strong></p>';
-    // Rappel au-dessus du bouton (visible même quand le détail est hors de l'écran).
-    $('resume-choix').textContent = av.nom + ' · ' + partie.nbJoueurs + ' joueur' + (partie.nbJoueurs > 1 ? 's' : '') +
-      ' · objectif ' + libelleObjectif(av, partie.nbJoueurs);
     sauver();
   }
 
@@ -791,7 +819,7 @@
     $('fin').showModal();
   }
   $('btn-rejouer').addEventListener('click', function () { $('fin').close(); lancerPartie(); });
-  $('btn-nouvelle').addEventListener('click', function () { $('fin').close(); annulerMinuteurs(); afficher('ecran-preparation'); });
+  $('btn-nouvelle').addEventListener('click', function () { $('fin').close(); annulerMinuteurs(); preparer(1); });
 
   // ---------- Sauvegarde de la partie (stockage de session) ----------
   // sessionStorage : « survit aux rechargements et restaurations de la page ; fermer l'onglet efface les données »
@@ -820,7 +848,8 @@
       ecran: partie.ecran || 'ecran-accueil',
       nb: nb ? Number(nb.value) : partie.nbJoueurs,
       aventure: avRadio ? avRadio.value : partie.aventure.id,
-      choix: partie.choix, packs: partie.packs, niveaux: partie.niveaux, types: partie.types, actif: partie.actif
+      choix: partie.choix, packs: partie.packs, niveaux: partie.niveaux, types: partie.types, actif: partie.actif,
+      etapePrepa: partie.etapePrepa
     };
     if (partie.regles && partie.joueurs.length) {
       d.jeu = {
@@ -844,6 +873,7 @@
       var av = document.querySelector('input[name="aventure"][value="' + d.aventure + '"]');
       if (av) av.checked = true;
       partie.choix = d.choix; partie.packs = d.packs; partie.niveaux = d.niveaux; partie.types = d.types; partie.actif = d.actif || 0;
+      partie.etapePrepa = d.etapePrepa || 1;
       majDetail();
       majAventuriers();
 
@@ -861,7 +891,12 @@
         partie.etapesVues = g.etapesVues;
         preparerPlateau(false);
       }
-      if (d.ecran !== 'ecran-plateau' || !d.jeu) { afficher(d.ecran); return true; }
+      if (d.ecran !== 'ecran-plateau' || !d.jeu) {
+        afficher(d.ecran);
+        montrerEtape(partie.etapePrepa); // même écran de la préparation, même joueur
+        return true;
+      }
+      montrerEtape(partie.etapePrepa);
 
       // Plateau : on reprend l'étape en cours. Une animation interrompue (dé, pause de lecture) est rejouée ou terminée.
       var r = partie.regles;
@@ -890,16 +925,34 @@
   document.addEventListener('visibilitychange', function () { if (document.hidden) sauver(); });
 
   // ---------- Navigation ----------
-  $('btn-commencer').addEventListener('click', function () { afficher('ecran-preparation'); });
+  // Ouvre la préparation sur l'écran n (1 = nombre de joueurs).
+  function preparer(n) {
+    if (n === 1) partie.actif = 0;
+    afficher('ecran-preparation');
+    montrerEtape(n);
+  }
+  $('btn-commencer').addEventListener('click', function () { preparer(1); });
+  // Depuis le plateau, « ← Préparation » revient sur le choix de l'aventure (dernier écran).
   document.querySelectorAll('[data-vers]').forEach(function (b) {
-    b.addEventListener('click', function () { annulerMinuteurs(); afficher(b.dataset.vers); });
+    b.addEventListener('click', function () {
+      annulerMinuteurs();
+      if (b.dataset.vers === 'ecran-preparation') preparer(4); else afficher(b.dataset.vers);
+    });
   });
-  $('form-preparation').addEventListener('submit', function (e) { e.preventDefault(); if (verifierReglages()) lancerPartie(); });
+  $('btn-prepa-retour').addEventListener('click', revenir);
+  ['btn-valider-nb', 'btn-valider-aventurier', 'btn-valider-reglages'].forEach(function (id) { $(id).addEventListener('click', valider); });
+  // Entrée dans le formulaire : « Valider » sur les premiers écrans, « Lancer la partie » sur le dernier.
+  $('form-preparation').addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (partie.etapePrepa < NB_ETAPES) { valider(); return; }
+    if (verifierReglages()) lancerPartie();
+  });
 
   construireAventures();
   construireAventuriers();
   construireCases();
   brancherCarte();
+  montrerEtape(1);
   reprendre();
   pretASauver = true;
   sauver();

@@ -1,6 +1,6 @@
 // Accessibilité : audit axe-core (WCAG 2.1 A et AA) sur l'accueil et le plateau.
 const { test, expect } = require('@playwright/test');
-const { lancerPartie } = require('./aide');
+const { lancerPartie, valider, cocherTout } = require('./aide');
 const AxeBuilder = require('@axe-core/playwright').default;
 
 async function audit(page) {
@@ -14,7 +14,13 @@ test('aucune violation WCAG A/AA : accueil, préparation et plateau', async ({ p
   expect(await audit(page)).toEqual([]);
   await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
   await expect(page.getByRole('heading', { name: 'Préparer la partie' })).toBeVisible();
-  expect(await audit(page)).toEqual([]);
+  expect(await audit(page)).toEqual([]); // écran 1 : nombre de joueurs
+  await valider(page);
+  expect(await audit(page)).toEqual([]); // écran 2 : aventuriers
+  await valider(page); await valider(page);
+  expect(await audit(page)).toEqual([]); // écran 3 : cartes du joueur
+  await cocherTout(page, 2);
+  expect(await audit(page)).toEqual([]); // écran 4 : aventure
   await lancerPartie(page, { joueurs: 3, aventure: 'Mayas' });
   expect(await audit(page)).toEqual([]);
 });
