@@ -1,7 +1,7 @@
 // Tours de jeu : pioche dans son tas, bonne / mauvaise réponse, dé, points cumulés, fin de partie.
 const { test, expect } = require('@playwright/test');
 const R = require('../js/regles.js');
-const { lancerPartie, attendreJoueur } = require('./aide');
+const { lancerPartie, attendreJoueur, rapide } = require('./aide');
 
 test.describe('règles du déroulement', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
@@ -115,4 +115,35 @@ test('animation de réponse : « Bravo ! » et confettis si bonne, « Oups ! » 
   await expect(reaction).toHaveClass(/mauvaise/);
   await expect(reaction).toContainText('Oups !');
   await expect(page.locator('.pion').nth(1)).toHaveClass(/secoue/);
+});
+
+test('après l\u2019animation de réponse, le bon dé se lance tout seul (FORT si bonne, FAIBLE si mauvaise)', async ({ page }) => {
+  await rapide(page, { autoDe: 300 });
+  page.__rapide = true;
+  await lancerPartie(page, { joueurs: 2 });
+  for (const [reponse, min, max, nom] of [['Bonne réponse', 4, 6, 'Tom'], ['Mauvaise réponse', 1, 3, 'Léa']]) {
+    const avant = Number(await page.locator('#points').textContent());
+    await page.getByRole('button', { name: 'Piocher une carte' }).click();
+    await page.getByRole('button', { name: reponse }).click();
+    await expect(page.locator('#tour-consigne')).toContainText('Le dé se lance tout seul');
+    // Aucun clic sur « Lancer le dé » : le dé roule seul, les points arrivent et le tour passe.
+    await attendreJoueur(page, nom);
+    const gain = Number(await page.locator('#points').textContent()) - avant;
+    expect(gain).toBeGreaterThanOrEqual(min);
+    expect(gain).toBeLessThanOrEqual(max);
+  }
+});
+
+test('lancer le dé à la main avant le lancer automatique ne le lance pas deux fois', async ({ page }) => {
+  await rapide(page, { autoDe: 400 });
+  page.__rapide = true;
+  await lancerPartie(page, { joueurs: 1 });
+  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await page.getByRole('button', { name: 'Bonne réponse' }).click();
+  await page.getByRole('button', { name: 'Lancer le dé FORT' }).click();
+  const pts = Number(await page.locator('#points').textContent());
+  await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
+  await page.waitForTimeout(800);
+  await expect(page.locator('#points')).toHaveText(String(pts));
+  await expect(page.getByRole('button', { name: 'Piocher une carte' })).toBeVisible();
 });
