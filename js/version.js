@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '3.5';
+  var VERSION = '3.6';
 
   var HISTORY = [
+    { v: '3.6', date: '2026-11-02', changes: [
+      'Encadré des points horizontal : la construction à gauche, le comptage des points à sa droite. Sur téléphone, il ne cache plus la croix de la prairie.'
+    ] },
     { v: '3.5', date: '2026-11-02', changes: [
       'Sur la carte, nouveau bouton « Voir le mot » à côté de « Voir la réponse » : le mot seul, comme une aide avant la solution.'
     ] },

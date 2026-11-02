@@ -69,7 +69,7 @@ test('plateau : points à 0 dans l\'encadré en haut à gauche ; plus d\'encadr�
   // Encadré dans le quart haut-gauche du plateau.
   expect(boite.x).toBeLessThan(plateau.x + plateau.width * 0.05);
   expect(boite.y).toBeLessThan(plateau.y + plateau.height * 0.06);
-  expect(boite.x + boite.width).toBeLessThan(plateau.x + plateau.width * 0.5);
+  expect(boite.x + boite.width).toBeLessThan(plateau.x + plateau.width * 0.6);
   for (const absent of ['#joueurs', '#tas', '.de-btn', '.ambiance-btn']) await expect(page.locator(absent)).toHaveCount(0);
 });
 
@@ -88,4 +88,19 @@ test('plateau : pas de défilement horizontal et retour à la préparation puis 
   await expect(page.getByRole('heading', { name: 'Préparer la partie' })).toBeVisible();
   await page.getByRole('button', { name: /Accueil/ }).click();
   await expect(page.getByRole('button', { name: 'Commencer l\'aventure' })).toBeVisible();
+});
+
+test('encadré des points horizontal : construction à gauche, points à droite, sans cacher la croix de la prairie', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await lancerPartie(page, { joueurs: 2, aventure: 'Mayas' });
+  const boite = await page.locator('#points-plateau').boundingBox();
+  expect(boite.width).toBeGreaterThan(boite.height); // plus large que haut
+  const image = await page.locator('#construction').boundingBox();
+  const points = await page.locator('#points').boundingBox();
+  expect(points.x).toBeGreaterThan(image.x + image.width - 2); // les points sont à droite de l'image
+  // La croix de la prairie (case 1) reste dégagée, sur tous les formats.
+  const croix = await page.locator('#cases li').nth(1).boundingBox();
+  const dedans = croix.x >= boite.x && croix.x <= boite.x + boite.width && croix.y >= boite.y && croix.y <= boite.y + boite.height;
+  expect(dedans).toBe(false);
+  expect(boite.y + boite.height).toBeLessThan(croix.y - 10);
 });
