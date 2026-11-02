@@ -99,6 +99,7 @@ test('partie entière perdue : toutes les réponses mauvaises → aventure manqu
   await expect(page.getByRole('dialog').getByRole('heading')).toHaveText(pts >= 30 ? 'Aventure réussie !' : 'Aventure manquée…');
   await page.getByRole('button', { name: 'Nouvelle partie' }).click();
   await expect(page.getByRole('heading', { name: 'Préparer la partie' })).toBeVisible();
+  await expect(page.locator('#prepa-progres')).toHaveText('Étape 1 sur 4'); // une nouvelle partie repart du nombre de joueurs
 });
 
 test('animation de réponse : « Bravo ! » et confettis si bonne, « Oups ! » si mauvaise', async ({ page }) => {

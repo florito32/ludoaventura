@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '4.5';
+  var VERSION = '4.6';
 
   var HISTORY = [
+    { v: '4.6', date: '2026-11-02', changes: [
+      'Préparation en écrans successifs, sans défiler : 1) nombre de joueurs, 2) chaque joueur choisit son aventurier, 3) chaque joueur choisit son niveau, ses packs et ses questions, 4) l\u2019aventure, puis « Lancer la partie ». Chaque écran a son bouton « Valider » ; « Retour » revient au joueur ou à l\u2019écran précédent.'
+    ] },
     { v: '4.5', date: '2026-11-02', changes: [
       'Quand le dé est lancé, le personnage reste sur sa croix : il ne disparaît plus pour réapparaître.'
     ] },
