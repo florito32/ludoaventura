@@ -1,7 +1,7 @@
 // Dés : faces conformes aux règles, lancer à l'écran.
 const { test, expect } = require('@playwright/test');
 const Des = require('../js/des.js');
-const { lancerPartie } = require('./aide');
+const { lancerPartie, rapide } = require('./aide');
 
 test.describe('règles des dés', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
@@ -24,6 +24,7 @@ test.describe('règles des dés', () => {
 });
 
 test('bonne réponse → dé FORT (4 à 6 points), mauvaise → dé FAIBLE (1 à 3 points)', async ({ page }) => {
+  await rapide(page, { pause: 1500 }); // le message « … gagne … » reste affiché assez longtemps pour être lu par le test
   await lancerPartie(page);
   let total = 0;
   for (const [reponse, min, max] of [['Bonne réponse', 4, 6], ['Mauvaise réponse', 1, 3]]) {
