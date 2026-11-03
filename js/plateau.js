@@ -1076,14 +1076,13 @@
   // Sur téléphone, la page ne défile pas : si le contenu du tour de jeu (carte, correction, tableau « ? »)
   // ne tient plus sous le plateau, l'encadré remonte sur le plateau. Il redescend dès que le contenu tient
   // (au tour suivant) et pendant que le dé roule, pour qu'on le voie.
-  var ECRAN_ETROIT = window.matchMedia ? window.matchMedia('(max-width: 899px)') : { matches: false };
   function ajusterTour() {
     var table = document.querySelector('.table'), tour = $('tour');
     if (!table) return;
     var r = partie.regles;
     var deEnCours = r && (r.etape === 'lancer' && !(partie.carte && partie.carte.attente) || r.etape === 'suivant' || r.etape === 'fin');
     table.classList.remove('tour-monte');
-    if (!ECRAN_ETROIT.matches || deEnCours || $('ecran-plateau').hidden) return;
+    if (deEnCours || $('ecran-plateau').hidden) return; // tous les écrans depuis la v6.8
     if (tour.scrollHeight > tour.clientHeight + 1) table.classList.add('tour-monte');
   }
   window.addEventListener('resize', ajusterTour);
