@@ -891,3 +891,61 @@ body:has(#ecran-plateau:not([hidden])) .pied { padding-block: 2px calc(2px + env
   .tour .carte-reponse { font-size: .95rem; line-height: 1.3; }
   .tour .carte-entete .btn-ecouter { min-height: 40px; padding: 4px 10px; }
 }
+
+/* ---------- Ludo, le guide (v6.9, js/ludo.js) ----------
+   Le petit Ludo (portrait rond) est posé à gauche du pied de page : il ne recouvre jamais le jeu.
+   Sur l'accueil, il est caché : le grand Ludo de l'illustration le remplace (il se touche aussi). */
+.pied { position: relative; min-height: 54px; display: flex; flex-direction: column; justify-content: center; }
+body:has(#ecran-preparation:not([hidden])) .pied, body:has(#ecran-plateau:not([hidden])) .pied { min-height: 52px; }
+.ludo-bouton {
+  position: absolute; left: max(8px, env(safe-area-inset-left)); top: 50%; translate: 0 -50%;
+  width: 46px; height: 46px; padding: 0; border-radius: 50%; cursor: pointer;
+  background: var(--parchemin); border: 3px solid #fff; box-shadow: 0 2px 6px rgb(0 0 0 / .35);
+}
+.ludo-bouton img { display: block; width: 100%; height: 100%; border-radius: 50%; }
+.ludo-bouton:hover { scale: 1.06; }
+.ludo-bouton.parle { border-color: var(--jaune); }
+body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
+.calque.perso.ludo-touchable { pointer-events: auto; cursor: pointer; }
+
+/* Bulle de bande dessinée : fond clair, gros trait d'encre, petite queue tournée vers Ludo. */
+.ludo-bulle {
+  position: fixed; z-index: 50; left: 8px; top: 8px; max-width: calc(100vw - 16px);
+  background: #fffdf6; color: var(--encre); border: 3px solid var(--encre); border-radius: 22px;
+  padding: 10px 14px 12px; box-shadow: 4px 5px 0 rgb(0 0 0 / .25);
+  animation: ludo-apparait .25s ease-out;
+}
+.ludo-bulle[hidden] { display: none; }
+.ludo-nom { margin: 0 0 2px; font: 800 .8rem/1 system-ui, sans-serif; text-transform: uppercase; letter-spacing: .06em; color: #a11d1d; }
+.ludo-texte { margin: 0; font-weight: 600; font-size: clamp(.95rem, 2.6vw, 1.05rem); line-height: 1.35; }
+.ludo-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: flex-end; margin-top: 10px; }
+.ludo-actions:empty { display: none; }
+.ludo-actions .btn { min-height: 40px; padding: 6px 14px; font-size: .95rem; }
+/* Queue de la bulle : un triangle bordé d'encre (deux couches). */
+.ludo-bulle[data-queue]:not([data-queue=""])::before,
+.ludo-bulle[data-queue]:not([data-queue=""])::after { content: ""; position: absolute; border: solid transparent; }
+.ludo-bulle[data-queue="bas-gauche"]::before { left: 16px; bottom: -19px; border-width: 19px 14px 0 2px; border-top-color: var(--encre); }
+.ludo-bulle[data-queue="bas-gauche"]::after { left: 19px; bottom: -13px; border-width: 14px 10px 0 1px; border-top-color: #fffdf6; }
+.ludo-bulle[data-queue="bas"]::before { left: calc(50% - 12px); bottom: -19px; border-width: 19px 12px 0; border-top-color: var(--encre); }
+.ludo-bulle[data-queue="bas"]::after { left: calc(50% - 8px); bottom: -13px; border-width: 14px 8px 0; border-top-color: #fffdf6; }
+.ludo-bulle[data-queue="gauche"]::before { left: -20px; top: 55%; border-width: 10px 20px 10px 0; border-right-color: var(--encre); }
+.ludo-bulle[data-queue="gauche"]::after { left: -13px; top: calc(55% + 4px); border-width: 6px 14px 6px 0; border-right-color: #fffdf6; }
+@keyframes ludo-apparait { from { opacity: 0; scale: .9; } to { opacity: 1; scale: 1; } }
+
+/* Flèche rouge qui grandit et rétrécit, pointe sur l'endroit à toucher (elle ne bloque pas le toucher). */
+.ludo-fleche { position: fixed; z-index: 49; width: 48px; height: 64px; pointer-events: none;
+  transform-origin: 50% 100%; animation: ludo-pulse .7s ease-in-out infinite alternate;
+  filter: drop-shadow(0 2px 2px rgb(0 0 0 / .35)); }
+.ludo-fleche[hidden] { display: none; }
+.ludo-fleche svg { display: block; }
+.ludo-fleche.vers-haut { transform-origin: 50% 0; }
+.ludo-fleche.vers-haut svg { rotate: 180deg; }
+@keyframes ludo-pulse { from { scale: .78; } to { scale: 1.15; } }
+@media (prefers-reduced-motion: reduce) { .ludo-fleche, .ludo-bulle { animation: none; } }
+/* Petits écrans (hauteur réduite) : bulle plus compacte pour cacher le moins possible du jeu. */
+@media (max-height: 560px), (max-width: 380px) {
+  .ludo-bulle { padding: 6px 10px 8px; border-radius: 16px; }
+  .ludo-texte { font-size: .9rem; line-height: 1.25; }
+  .ludo-actions { margin-top: 6px; }
+  .ludo-actions .btn { min-height: 36px; padding: 4px 12px; font-size: .88rem; }
+}
