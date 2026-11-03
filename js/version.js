@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '5.1';
+  var VERSION = '5.2';
 
   var HISTORY = [
+    { v: '5.2', date: '2026-11-03', changes: [
+      'Tour de jeu : « Léa gagne 3 points ! Au tour de Tom. » n\u2019est plus écrit dans l\u2019encadré, seulement sur le plateau.'
+    ] },
     { v: '5.1', date: '2026-11-03', changes: [
       'Dé : les points sont noirs (plus de couleurs).'
     ] },

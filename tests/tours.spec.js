@@ -57,8 +57,13 @@ test('un tour complet : piocher, répondre, lancer, message écrit puis joueur s
   const pts = Number(await page.locator('#points').textContent());
   expect(pts).toBeGreaterThanOrEqual(4);
   expect(pts).toBeLessThanOrEqual(6);
-  // C'est écrit (consigne + bandeau sur le plateau), puis on passe tout seul au joueur suivant.
-  await expect(page.locator('#tour-consigne')).toHaveText(`Léa gagne ${pts} points ! Au tour de Tom.`);
+  // C'est écrit sur le plateau (bandeau), puis on passe tout seul au joueur suivant.
+  await expect(page.locator('#bandeau')).toHaveText(`Léa gagne ${pts} points ! Au tour de Tom.`);
+  await expect(page.locator('#bandeau')).toBeVisible();
+  // v5.2 : plus écrit dans l'encadré Tour de jeu (seulement pour les lecteurs d'écran).
+  await expect(page.locator('#tour-consigne .visually-hidden')).toHaveText(`Léa gagne ${pts} points ! Au tour de Tom.`);
+  expect(await page.locator('#tour-consigne').evaluate((el) => el.offsetHeight > 0 && [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()))).toBe(false);
+  await expect(page.locator('#tour')).not.toContainText(/gagne \d+ points?/, { useInnerText: true });
   await attendreJoueur(page, 'Tom');
   await expect(page.locator('.pion').nth(1)).toHaveAttribute('data-case', '1');
 });

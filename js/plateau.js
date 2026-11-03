@@ -572,7 +572,9 @@
       } else {
         suite = 'Tout le monde est arrivé au volcan !';
       }
-      consigne.textContent = gain + ' ' + suite;
+      // Écrit sur le plateau (bandeau) seulement : plus dans le Tour de jeu (demande du 03/11/2026),
+      // mais toujours annoncé aux lecteurs d'écran (le bandeau leur est masqué).
+      annoncer(gain + ' ' + suite);
       bandeau(gain + ' ' + suite);
     }
     sauver();
