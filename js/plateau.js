@@ -57,7 +57,13 @@
     moyen: 'Moyen : 2 signes par calcul.', difficile: 'Difficile : 3 signes par calcul.', expert: 'Expert : 4 signes par calcul.'
   };
   function mathsVides() { return { signes: [], nombres: [], niveau: 'facile' }; }
-  function conjVide() { return { temps: [], groupes: [], niveau: 'facile' }; }
+  function conjVide() { return { modes: [], temps: [], groupes: [], niveau: 'facile' }; }
+  // Écran de l'étape 3 où se règle chaque chose qui manque.
+  function ecranDe(m) {
+    if (m === 'matiere' || m === 'francais') return 'matiere';
+    if (m === 'mode' || m === 'temps') return 'modes';
+    return 'reglages';
+  }
 
   // État de la partie. Il est sauvegardé dans le stockage de session (sessionStorage) :
   // il survit aux rechargements, aux changements de page et à la mise en veille,
@@ -69,6 +75,7 @@
     nbJoueurs: 2, aventure: A.LISTE[0], joueurs: [], choix: ['lea', 'tom', 'nour', 'malo'], actif: 0, regles: null,
     etapePrepa: 1, // écran de la préparation affiché (1 à 4), voir montrerEtape
     // Étape 3 en deux écrans par joueur (v5.8, choix de l'utilisateur) : 'matiere' puis 'reglages'.
+    // Conjugaison (v6.0) : trois écrans, 'matiere' → 'modes' → 'reglages'.
     sousEtape: 'matiere',
     packs: [[], [], [], []], carte: null,
     types: [[], [], [], []], // types de questions cochés par chaque joueur
@@ -171,8 +178,11 @@
     K.NOMBRES.forEach(function (n) { choix($('nombres'), 'checkbox', 'nombre', n, String(n), 'Nombre ' + n); });
     K.NIVEAUX.forEach(function (nv) { choix($('niveau-maths'), 'radio', 'niveau-maths', nv.id, nv.nom); });
     // Conjugaison : temps rangés par mode (une ligne par mode), groupes de verbes, niveau.
+    // Les modes d'abord : seuls les temps des modes choisis apparaissent dessous.
+    V.MODES.forEach(function (m) { choix($('modes-conj'), 'checkbox', 'mode-conj', m.id, m.nom); });
     V.MODES.forEach(function (m) {
       var ligne = document.createElement('div');
+      ligne.dataset.mode = m.id;
       ligne.className = 'mode-ligne';
       ligne.setAttribute('role', 'group');
       ligne.setAttribute('aria-label', m.nom);
@@ -187,11 +197,13 @@
     });
     V.GROUPES.forEach(function (g) { choix($('groupes'), 'checkbox', 'groupe', g.id, g.nom.split(' ')[0], g.nom); }); // « 1er », « 2e », « 3e »
     V.NIVEAUX.forEach(function (nv) { choix($('niveau-conj'), 'radio', 'niveau-conj', nv.id, nv.nom); });
-    ['temps-conj', 'groupes', 'niveau-conj'].forEach(function (id) {
+    ['modes-conj', 'temps-conj', 'groupes', 'niveau-conj'].forEach(function (id) {
       $(id).addEventListener('change', function () {
         var c = partie.conj[partie.actif];
         $('packs-alerte').textContent = '';
-        c.temps = valeursCochees($('temps-conj'));
+        c.modes = valeursCochees($('modes-conj'));
+        // Un mode retiré emporte ses temps.
+        c.temps = valeursCochees($('temps-conj')).filter(function (t) { return c.modes.indexOf(t.split('.')[0]) >= 0; });
         c.groupes = valeursCochees($('groupes')).map(Number);
         c.niveau = valeursCochees($('niveau-conj'))[0] || 'facile';
         majAventuriers();
@@ -266,6 +278,7 @@
       return null;
     }
     if (m === 'conjugaison') {
+      if (!partie.conj[i].modes.length) return 'mode';
       if (!partie.conj[i].temps.length) return 'temps';
       if (!partie.conj[i].groupes.length) return 'groupe';
       return null;
@@ -278,6 +291,7 @@
   var MANQUES = {
     matiere: ['choisir une matière.', 'matieres'],
     francais: ['choisir Orthographe ou Conjugaison.', 'francais'],
+    mode: ['choisir au moins un mode.', 'modes-conj'],
     temps: ['choisir au moins un temps.', 'temps-conj'],
     groupe: ['choisir au moins un groupe de verbes.', 'groupes'],
     signe: ['choisir au moins un signe.', 'signes'],
@@ -307,7 +321,7 @@
       if (manque(i)) {
         partie.actif = i;
         var m = manque(i);
-        partie.sousEtape = m === 'matiere' || m === 'francais' ? 'matiere' : 'reglages';
+        partie.sousEtape = ecranDe(m);
         montrerEtape(3);
         reglagesComplets(i);
         return false;
@@ -345,7 +359,14 @@
     // Étape 3, premier écran : la matière choisie, on passe à ses réglages.
     if (n === 3 && partie.sousEtape === 'matiere') {
       var m = manque(partie.actif);
-      if (m === 'matiere' || m === 'francais') { reglagesComplets(partie.actif); return; }
+      if (ecranDe(m) === 'matiere') { reglagesComplets(partie.actif); return; }
+      partie.sousEtape = partie.matiere[partie.actif] === 'conjugaison' ? 'modes' : 'reglages';
+      montrerEtape(3);
+      return;
+    }
+    // Conjugaison, deuxième écran : modes et temps choisis, on passe aux groupes et au niveau.
+    if (n === 3 && partie.sousEtape === 'modes') {
+      if (ecranDe(manque(partie.actif)) === 'modes') { reglagesComplets(partie.actif); return; }
       partie.sousEtape = 'reglages';
       montrerEtape(3);
       return;
@@ -360,7 +381,12 @@
   function revenir() {
     var n = partie.etapePrepa, nb = nbChoisi();
     // Étape 3 : des réglages on revient à la matière ; de la matière, aux réglages du joueur précédent.
-    if (n === 3 && partie.sousEtape === 'reglages') { partie.sousEtape = 'matiere'; montrerEtape(3); return; }
+    if (n === 3 && partie.sousEtape === 'reglages') {
+      partie.sousEtape = partie.matiere[partie.actif] === 'conjugaison' ? 'modes' : 'matiere';
+      montrerEtape(3);
+      return;
+    }
+    if (n === 3 && partie.sousEtape === 'modes') { partie.sousEtape = 'matiere'; montrerEtape(3); return; }
     if (n === 3 && partie.actif > 0) { partie.actif--; partie.sousEtape = 'reglages'; montrerEtape(3); return; }
     if (n === 4) partie.sousEtape = 'reglages';
     if (n === 1) { afficher('ecran-accueil'); return; }
@@ -411,6 +437,9 @@
     $('reglages-ortho').hidden = mat !== 'orthographe';
     $('reglages-conj').hidden = mat !== 'conjugaison';
     var cc = partie.conj[a];
+    $('modes-conj').querySelectorAll('input').forEach(function (i) { i.checked = cc.modes.indexOf(i.value) >= 0; });
+    $('temps-conj').querySelectorAll('.mode-ligne').forEach(function (l) { l.hidden = cc.modes.indexOf(l.dataset.mode) === -1; });
+    $('temps-conj-vide').hidden = cc.modes.length > 0;
     $('temps-conj').querySelectorAll('input').forEach(function (i) { i.checked = cc.temps.indexOf(i.value) >= 0; });
     $('groupes').querySelectorAll('input').forEach(function (i) { i.checked = cc.groupes.indexOf(Number(i.value)) >= 0; });
     $('niveau-conj').querySelectorAll('input').forEach(function (i) { i.checked = i.value === cc.niveau; });
@@ -421,13 +450,17 @@
     $('packs').querySelectorAll('input').forEach(function (i) { i.checked = partie.packs[partie.actif].indexOf(i.value) >= 0; });
     $('types-questions').querySelectorAll('input').forEach(function (i) { i.checked = partie.types[partie.actif].indexOf(i.value) >= 0; });
     // Étape 3 : écran de la matière ou écran de ses réglages.
-    var surMatiere = partie.sousEtape !== 'reglages';
+    var ecran = partie.sousEtape, surMatiere = ecran === 'matiere';
+    if (ecran === 'modes' && mat !== 'conjugaison') ecran = partie.sousEtape = 'reglages';
     $('choix-matiere').hidden = !surMatiere;
-    if (surMatiere) { $('reglages-maths').hidden = $('reglages-ortho').hidden = $('reglages-conj').hidden = true; }
+    $('conj-temps').hidden = ecran !== 'modes';
+    if (ecran !== 'reglages') { $('reglages-maths').hidden = $('reglages-ortho').hidden = $('reglages-conj').hidden = true; }
     var NOMS_MATIERES = { maths: 'Mathématiques', orthographe: 'Orthographe', conjugaison: 'Conjugaison' };
+    var sousTitre = surMatiere ? 'quelle matière ?' : NOMS_MATIERES[mat] +
+      (mat === 'conjugaison' ? (ecran === 'modes' ? ', les temps' : ', les verbes') : '');
     $('reglages-titre').innerHTML = '<img src="' + actif.image + '" alt="" width="200" height="220">' +
-      actif.nom + ' (Joueur ' + (partie.actif + 1) + ') : ' + (surMatiere ? 'quelle matière ?' : NOMS_MATIERES[mat]);
-    $('btn-memes-reglages').hidden = nb < 2 || surMatiere;
+      actif.nom + ' (Joueur ' + (partie.actif + 1) + ') : ' + sousTitre;
+    $('btn-memes-reglages').hidden = nb < 2 || ecran !== 'reglages';
     sauver();
   }
 
@@ -1150,7 +1183,11 @@
         partie.matiere = d.matiere.map(function (m) { return MATIERES.indexOf(m) >= 0 ? m : null; });
         partie.francais = d.francais || partie.francais;
         partie.maths = d.maths || partie.maths;
-        partie.conj = d.conj || partie.conj;
+        partie.conj = (d.conj || partie.conj).map(function (c) {
+          // Sauvegarde d'avant la v6.0 : les modes se déduisent des temps choisis.
+          if (!c.modes) c.modes = c.temps.map(function (t) { return t.split('.')[0]; }).filter(function (m, k, l) { return l.indexOf(m) === k; });
+          return c;
+        });
       } else {
         // Sauvegarde d'avant la v5.7 : un joueur qui avait des packs jouait en orthographe.
         partie.matiere = partie.packs.map(function (l) { return l.length ? 'orthographe' : null; });

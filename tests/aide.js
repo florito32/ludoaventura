@@ -21,7 +21,7 @@ async function matiere(page, valeur) {
     await page.locator('#francais input[value="' + valeur + '"]').check();
   }
   await valider(page);
-  await page.locator(valeur === 'maths' ? '#reglages-maths' : valeur === 'orthographe' ? '#reglages-ortho' : '#reglages-conj').waitFor();
+  await page.locator(valeur === 'maths' ? '#reglages-maths' : valeur === 'orthographe' ? '#reglages-ortho' : '#conj-temps').waitFor();
 }
 // Français → Orthographe, puis coche tous les packs et toutes les questions du joueur affiché.
 async function orthographe(page) { await matiere(page, 'orthographe'); }
@@ -101,8 +101,12 @@ async function attendreJoueur(page, nom) {
 
 // Écran 3 : Français → Conjugaison avec les temps, groupes et niveau donnés.
 async function conjugaison(page, { temps = ['indicatif.present'], groupes = [1], niveau = 'facile' } = {}) {
+  // v6.0 : écran des modes et des temps, puis écran des groupes et du niveau.
   await matiere(page, 'conjugaison');
+  for (const m of [...new Set(temps.map((t) => t.split('.')[0]))]) await page.locator('#modes-conj input[value="' + m + '"]').check();
   for (const t of temps) await page.locator('#temps-conj input[value="' + t + '"]').check();
+  await valider(page);
+  await page.locator('#reglages-conj').waitFor();
   for (const g of groupes) await page.locator('#groupes input[value="' + g + '"]').check();
   await page.locator('#niveau-conj input[value="' + niveau + '"]').check();
 }

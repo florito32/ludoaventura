@@ -223,6 +223,9 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 /* Conjugaison (v5.8) : une ligne par mode, le nom du mode à gauche, ses temps à droite. */
 .temps-modes { display: flex; flex-direction: column; gap: 5px; }
 .mode-ligne { display: flex; align-items: center; gap: 8px; }
+.mode-ligne[hidden] { display: none; }
+.aide-gauche { text-align: left; font-style: italic; }
+.reglage-aide[hidden] { display: none; }
 .mode-nom { flex: none; width: 6.6em; font-weight: 700; font-size: .85rem; color: var(--encre-douce); }
 .mode-ligne .packs { flex: 1; min-width: 0; }
 .mode-nom .court { display: none; }
@@ -233,14 +236,21 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
   .reglages-joueur .reglage { margin-bottom: 6px; }
   .reglages-joueur .reglage-titre { font-size: .92rem; }
   .nombres .pack span { min-width: 34px; padding: 1px 6px; }
-  .temps-modes .pack span { min-height: 28px; padding: 0 8px; font-size: .82rem; }
-  .temps-modes .packs { gap: 3px 4px; }
-  .temps-modes { gap: 4px; }
+  /* Écran des temps (v6.0) : le nom du mode au-dessus de ses temps. */
+  .mode-ligne { flex-direction: column; align-items: flex-start; gap: 3px; }
+  .mode-nom { width: auto; }
+}
+/* Téléphones étroits (360 px) : les deux boutons côte à côte, titre « Temps » retiré (les modes suffisent). */
+/* Téléphones étroits et peu hauts (360 × 640…) : temps serrés, nom du mode abrégé à gauche. */
+@media (max-width: 520px) and (max-height: 760px) {
+  .mode-ligne { flex-direction: row; align-items: center; gap: 6px; }
   .mode-nom { width: 3.6em; font-size: .74rem; }
   .mode-nom .long { display: none; }
   .mode-nom .court { display: inline; }
+  .temps-modes .pack span { min-height: 28px; padding: 0 8px; font-size: .82rem; }
+  .temps-modes .packs { gap: 3px 4px; }
+  .temps-modes { gap: 4px; }
 }
-/* Téléphones étroits (360 px) : les deux boutons côte à côte, titre « Temps » retiré (les modes suffisent). */
 @media (max-width: 420px) {
   .etape-actions { flex-wrap: nowrap; }
   .etape-actions .btn { min-height: 44px; padding: 4px 10px; font-size: .95rem; }
@@ -260,6 +270,7 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
   .temps-modes { gap: 3px; }
   .temps-modes .pack span { min-height: 26px; padding: 0 8px; font-size: .8rem; }
   .temps-modes .packs { gap: 3px 4px; }
+  .mode-ligne { flex-direction: row; align-items: center; }
   .mode-nom { font-size: .72rem; width: 3.6em; }
   .mode-nom .long { display: none; }
   .mode-nom .court { display: inline; }

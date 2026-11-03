@@ -123,12 +123,21 @@
             </div>
           </div>
 
-          <!-- Conjugaison (v5.8) : temps rangés par mode, groupes de verbes, niveau (js/conjugaison.js). -->
-          <div class="reglages-matiere" id="reglages-conj" hidden>
+          <!-- Conjugaison (v6.0) : deux écrans après la matière (js/conjugaison.js).
+               Écran « modes » : les modes (indicatif, conditionnel…), puis seulement les temps de ces modes.
+               Écran « réglages » : groupes de verbes et niveau. -->
+          <div class="reglages-matiere" id="conj-temps" hidden>
+            <div class="reglage reglage-ligne">
+              <p class="reglage-titre" id="modes-conj-titre">Modes</p>
+              <div class="packs" id="modes-conj" role="group" aria-labelledby="modes-conj-titre"></div>
+            </div>
             <div class="reglage">
               <p class="reglage-titre titre-temps" id="temps-conj-titre">Temps <span>(au moins un)</span></p>
+              <p class="reglage-aide aide-gauche" id="temps-conj-vide">Choisis d’abord un mode.</p>
               <div class="temps-modes" id="temps-conj" role="group" aria-labelledby="temps-conj-titre"></div>
             </div>
+          </div>
+          <div class="reglages-matiere" id="reglages-conj" hidden>
             <div class="reglage reglage-duo">
               <div class="reglage-ligne">
                 <p class="reglage-titre" id="groupes-titre">Groupes</p>

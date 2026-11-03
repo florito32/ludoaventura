@@ -87,28 +87,61 @@ async function preparer(page, joueurs = 1) {
   await versReglages(page, joueurs);
 }
 
-test('étape 3 : matière d\'abord, puis temps rangés par mode, groupes et niveau ; tout tient sans défiler', async ({ page }) => {
-  await preparer(page);
-  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : quelle matière ?');
-  await matiere(page, 'conjugaison');
-  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Conjugaison');
-  await expect(page.locator('#temps-conj [role="group"]')).toHaveCount(4);
-  await expect(page.locator('#temps-conj input')).toHaveCount(16);
-  await expect(page.getByRole('checkbox', { name: 'Subjonctif imparfait' })).toHaveCount(1);
-  await expect(page.locator('#groupes input')).toHaveCount(3);
-  await expect(page.locator('#niveau-conj input')).toHaveCount(4);
-  // Pas de case à cocher visible : choix entourés (v5.6).
+// v6.0 : trois écrans pour la conjugaison (choix de l'utilisateur).
+async function tient(page) {
   const r = await page.evaluate(() => ({
     page: document.documentElement.scrollHeight - innerHeight,
     corps: (() => { const c = document.querySelector('#reglages-joueur'); return c.scrollHeight - c.clientHeight; })()
   }));
   expect(r.page).toBeLessThanOrEqual(1);
   expect(r.corps).toBeLessThanOrEqual(1);
+}
+
+test('conjugaison en 3 écrans : matière → modes et leurs temps seulement → groupes et niveau ; tout tient sans défiler', async ({ page }) => {
+  await preparer(page);
+  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : quelle matière ?');
+  await matiere(page, 'conjugaison');
+  // Écran 2 : les 4 modes ; aucun temps tant qu'aucun mode n'est choisi.
+  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Conjugaison, les temps');
+  await expect(page.locator('#modes-conj input')).toHaveCount(4);
+  await expect(page.locator('#temps-conj input:visible')).toHaveCount(0);
+  await expect(page.locator('#temps-conj-vide')).toBeVisible();
+  await expect(page.locator('#groupes')).toBeHidden();
+  await valider(page);
+  await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir au moins un mode.');
+  // Subjonctif : seulement ses 4 temps.
+  await page.locator('#modes-conj label', { hasText: 'Subjonctif' }).click();
+  await expect(page.locator('#temps-conj input:visible')).toHaveCount(4);
+  await expect(page.getByRole('checkbox', { name: 'Subjonctif imparfait' })).toBeVisible();
+  await expect(page.getByRole('checkbox', { name: 'Indicatif présent' })).toBeHidden();
+  // Tous les modes : les 16 temps tiennent sans défiler.
+  for (const m of ['Indicatif', 'Conditionnel', 'Impératif']) await page.locator('#modes-conj label', { hasText: m }).click();
+  await expect(page.locator('#temps-conj input:visible')).toHaveCount(16);
+  await tient(page);
   await valider(page);
   await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir au moins un temps.');
-  await page.locator('#temps-conj input[value="indicatif.futur"]').check();
+  await page.getByRole('checkbox', { name: 'Conditionnel passé' }).check();
+  // Retirer le mode retire aussi ses temps.
+  await page.locator('#modes-conj label', { hasText: 'Conditionnel' }).click();
+  expect(await page.evaluate(() => window.Aventura.partie.conj[0].temps)).toEqual([]);
+  await page.getByRole('checkbox', { name: 'Indicatif futur simple' }).check();
+  await valider(page);
+  // Écran 3 : groupes et niveau.
+  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Conjugaison, les verbes');
+  await expect(page.locator('#groupes input')).toHaveCount(3);
+  await expect(page.locator('#niveau-conj input')).toHaveCount(4);
+  await expect(page.locator('#modes-conj')).toBeHidden();
+  await tient(page);
   await valider(page);
   await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir au moins un groupe de verbes.');
+  // Retour : écran des temps (choix gardés), puis la matière.
+  await page.getByRole('button', { name: /Retour/ }).click();
+  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Conjugaison, les temps');
+  await expect(page.getByRole('checkbox', { name: 'Indicatif futur simple' })).toBeChecked();
+  await page.getByRole('button', { name: /Retour/ }).click();
+  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : quelle matière ?');
+  await valider(page);
+  await valider(page);
   await page.locator('#groupes input[value="2"]').check();
   await valider(page);
   await expect(page.getByRole('button', { name: 'Lancer la partie' })).toBeVisible();

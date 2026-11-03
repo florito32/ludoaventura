@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '5.9';
+  var VERSION = '6.0';
 
   var HISTORY = [
+    { v: '6.0', date: '2026-11-03', changes: [
+      'Conjugaison en trois petits écrans : la matière (Français → Conjugaison), puis les modes (indicatif, conditionnel, subjonctif, impératif) avec seulement les temps de ces modes, puis les groupes de verbes et le niveau.'
+    ] },
     { v: '5.9', date: '2026-11-03', changes: [
       'Mathématiques : le niveau se choisit tout de suite, sur le même écran que « Mathématiques ».',
       'Niveau Facile : les nombres choisis sont des tables. Table de 2 → 2 × 8, 2 + 6, 12 − 2, 16 ÷ 2…, selon les signes choisis. Les autres niveaux ne changent pas.'
