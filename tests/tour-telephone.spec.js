@@ -1,0 +1,71 @@
+// v6.2 : sur téléphone et tablette en hauteur, le tour de jeu tient dans l'écran, sans jamais faire défiler ;
+// quand la correction ou le tableau « ? » ne tiennent plus sous le plateau, l'encadré remonte sur le plateau.
+const { test, expect } = require('@playwright/test');
+const { rapide, versReglages, valider, maths, conjugaison, cocherJoueur, lancer } = require('./aide');
+
+// Rien ne dépasse : ni la page, ni l'encadré du tour de jeu (rien de caché qu'il faudrait faire défiler).
+async function tient(page, quand) {
+  const r = await page.evaluate(() => {
+    const t = document.querySelector('#tour');
+    return { page: document.documentElement.scrollHeight - innerHeight, tour: t.scrollHeight - t.clientHeight };
+  });
+  expect(r.page, quand + ' : la page défile').toBeLessThanOrEqual(1);
+  expect(r.tour, quand + ' : le tour de jeu dépasse').toBeLessThanOrEqual(1);
+}
+
+async function partie(page, reglage) {
+  await rapide(page, { autoDe: 50 });
+  page.__rapide = true;
+  await page.goto('./');
+  await versReglages(page, 1);
+  await reglage(page);
+  await lancer(page);
+  await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
+}
+
+test.beforeEach(() => test.skip(test.info().project.name === 'ordinateur', 'sur ordinateur, le tour de jeu est à côté du plateau'));
+
+test('conjugaison fausse puis « ? » : tout reste à l\'écran, l\'encadré remonte puis redescend après « J\'ai compris »', async ({ page }) => {
+  await partie(page, (p) => conjugaison(p, { temps: ['subjonctif.plus-que-parfait'], groupes: [3], niveau: 'expert' }));
+  await tient(page, 'avant de piocher');
+  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await tient(page, 'carte');
+  await page.getByLabel('Ta réponse').fill('faux');
+  await page.getByRole('button', { name: 'Valider' }).click();
+  await tient(page, 'correction');
+  await page.locator('#btn-tableau').click();
+  await expect(page.locator('#carte-tableau li')).toHaveCount(6);
+  await tient(page, 'tableau « ? »');
+  // Toutes les lignes du tableau et « J'ai compris » sont visibles à l'écran.
+  for (const el of await page.locator('#carte-tableau li').all()) await expect(el).toBeInViewport();
+  await expect(page.getByRole('button', { name: 'J’ai compris' })).toBeInViewport();
+  await page.getByRole('button', { name: 'J’ai compris' }).click();
+  // Le dé roule sur le plateau : l'encadré est redescendu pour qu'on le voie.
+  await expect(page.locator('.table')).not.toHaveClass(/tour-monte/);
+  await tient(page, 'dé');
+});
+
+test('calcul faux (niveau Expert) : correction et « J\'ai compris » à l\'écran, sans défiler', async ({ page }) => {
+  await partie(page, (p) => maths(p, { signes: ['plus', 'fois'], nombres: [7, 8], niveau: 'expert' }));
+  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await tient(page, 'carte');
+  await expect(page.getByLabel('Ta réponse')).toBeInViewport();
+  await page.getByLabel('Ta réponse').fill('1');
+  await page.getByRole('button', { name: 'Valider' }).click();
+  await expect(page.locator('#carte-reponse')).toContainText('tu as écrit « 1 »');
+  await tient(page, 'correction');
+  await expect(page.locator('#carte-reponse')).toBeInViewport();
+  await expect(page.getByRole('button', { name: 'J’ai compris' })).toBeInViewport();
+});
+
+test('orthographe : carte, « Voir la réponse » et « Mauvaise réponse » sans défiler', async ({ page }) => {
+  await partie(page, (p) => cocherJoueur(p));
+  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await tient(page, 'carte');
+  await expect(page.getByRole('button', { name: 'Mauvaise réponse' })).toBeInViewport();
+  await page.getByRole('button', { name: 'Voir la réponse' }).click();
+  await tient(page, 'réponse');
+  await page.getByRole('button', { name: 'Mauvaise réponse' }).click();
+  await tient(page, 'après « Mauvaise réponse »');
+  await expect(page.getByRole('button', { name: 'J’ai compris' })).toBeInViewport();
+});

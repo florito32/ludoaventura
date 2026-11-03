@@ -151,7 +151,8 @@ test('conjugaison en 3 écrans : matière → modes et leurs temps seulement →
 async function repondre(page, bonne) {
   const c = await page.evaluate(() => window.Aventura.partie.carte);
   const juste = await page.evaluate((c) => window.Conjugaison.formes(c.verbe, c.temps, c.personne)[0], c);
-  await page.getByLabel('Ta réponse').fill(bonne ? juste : juste + 'x');
+  c.ecrit = bonne ? juste : juste + 'x';
+  await page.getByLabel('Ta réponse').fill(c.ecrit);
   await page.getByRole('button', { name: 'Valider' }).click();
   return c;
 }
@@ -180,7 +181,7 @@ test('conjugaison fausse : bonne réponse affichée, « ? » montre tout le verb
   await lancer(page);
   await page.getByRole('button', { name: 'Piocher une carte' }).click();
   const c = await repondre(page, false);
-  await expect(page.locator('#carte-reponse')).toHaveText('Ce n’est pas ça. La bonne réponse : ' + c.bonne + '.');
+  await expect(page.locator('#carte-reponse')).toHaveText('Ce n’est pas ça (tu as écrit « ' + c.ecrit + ' »). La bonne réponse : ' + c.bonne + '.');
   await expect(page.locator('#reaction')).toHaveClass(/mauvaise/);
   const aide = page.locator('#btn-tableau');
   await expect(aide).toBeVisible();
