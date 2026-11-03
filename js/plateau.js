@@ -180,8 +180,8 @@
     var alerte = $('packs-alerte');
     alerte.className = 'reglage-alerte';
     alerte.textContent = m === 'pack'
-      ? nom + ' (Joueur ' + (i + 1) + ') doit cocher au moins un pack.'
-      : nom + ' (Joueur ' + (i + 1) + ') doit cocher au moins un type de question.';
+      ? nom + ' (Joueur ' + (i + 1) + ') doit choisir au moins un pack.'
+      : nom + ' (Joueur ' + (i + 1) + ') doit choisir au moins un type de question.';
     $(m === 'pack' ? 'packs' : 'types-questions').querySelector('input').focus({ preventScroll: true });
     return false;
   }

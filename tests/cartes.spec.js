@@ -88,18 +88,18 @@ test('packs et questions décochés au départ ; « Valider » demande au moins 
   // Rien de coché : on reste sur le joueur 1 avec un message.
   await valider(page);
   await expect(page.locator('#reglages-titre')).toContainText('Léa (Joueur 1)');
-  await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit cocher au moins un pack.');
+  await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir au moins un pack.');
   await expect(page.locator('#packs input').first()).toBeFocused();
   // Un pack coché mais aucune question → message pour les questions.
   await page.getByRole('checkbox', { name: 'Temps', exact: true }).check();
   await valider(page);
-  await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit cocher au moins un type de question.');
+  await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir au moins un type de question.');
   await page.getByRole('checkbox', { name: 'Épeler', exact: true }).check();
   await valider(page);
   // Joueur 2 : il faut aussi au moins un pack.
   for (const c of await page.locator('#packs input, #types-questions input').all()) await expect(c).not.toBeChecked();
   await valider(page);
-  await expect(page.locator('#packs-alerte')).toHaveText('Tom (Joueur 2) doit cocher au moins un pack.');
+  await expect(page.locator('#packs-alerte')).toHaveText('Tom (Joueur 2) doit choisir au moins un pack.');
   await page.getByRole('checkbox', { name: 'Numérique', exact: true }).check();
   await page.getByRole('checkbox', { name: 'Épeler', exact: true }).check();
   await valider(page);
@@ -214,4 +214,28 @@ test('« Voir le mot » est juste sous « Écouter », avec une icône d\'œil',
   expect(Math.abs(b.x + b.width / 2 - (a.x + a.width / 2))).toBeLessThan(2); // aligné
   await voir.click();
   await expect(page.getByRole('button', { name: 'Cacher le mot' }).locator('[aria-hidden="true"]')).toHaveText('👁️');
+});
+
+// v5.6 : plus de cases à cocher à l'étape 3 : le choix est entouré, fond transparent ;
+// une fois choisi, il se remplit de couleur.
+test('étape 3 : choix entourés sans case à cocher, colorés quand ils sont choisis', async ({ page }) => {
+  if (!page.__rapide) { await rapide(page); page.__rapide = true; }
+  await page.goto('./');
+  await versReglages(page, 1);
+  const pastille = page.locator('#packs .pack').first().locator('span').first();
+  const style = (el) => el.evaluate((s) => {
+    const c = getComputedStyle(s), b = getComputedStyle(s, '::before');
+    return { fond: c.backgroundColor, avant: b.content, largeurAvant: b.width };
+  });
+  const avant = await style(pastille);
+  expect(avant.fond).toBe('rgba(0, 0, 0, 0)'); // fond transparent
+  expect(['none', 'normal']).toContain(avant.avant); // aucune case dessinée devant le texte
+  await page.locator('#packs .pack').first().click();
+  await expect(page.locator('#packs input').first()).toBeChecked();
+  // Rempli de couleur (après la petite transition) : brun foncé.
+  await expect.poll(async () => (await style(pastille)).fond).toBe('rgb(59, 42, 30)');
+  expect(['none', 'normal']).toContain((await style(pastille)).avant);
+  // Un deuxième toucher retire le choix.
+  await page.locator('#packs .pack').first().click();
+  await expect(page.locator('#packs input').first()).not.toBeChecked();
 });
