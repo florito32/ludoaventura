@@ -195,13 +195,15 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 .packs { display: flex; flex-wrap: wrap; gap: 6px 8px; }
 .pack { position: relative; }
 .pack input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+/* Choix « entourés » (v5.6) : pas de case à cocher ; un choix non retenu est seulement entouré, fond transparent,
+   un choix retenu se remplit de couleur (brun foncé, texte blanc : contraste ≥ 4,5:1). */
 .pack span {
-  display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 4px 12px; cursor: pointer;
-  border: 2px solid var(--parchemin-bord); border-radius: 99px; background: #fff; font-weight: 600;
+  display: inline-flex; align-items: center; min-height: 40px; padding: 4px 14px; cursor: pointer;
+  border: 2px solid var(--encre-douce); border-radius: 99px; background: transparent; color: var(--encre); font-weight: 600;
+  transition: background-color .15s, color .15s, border-color .15s;
 }
-.pack span::before { content: ""; width: 16px; height: 16px; border: 2px solid var(--encre); border-radius: 4px; background: #fff; }
+.pack:hover span { border-color: var(--encre); }
 .pack input:checked + span { background: var(--encre); color: #fff; border-color: var(--encre); }
-.pack input:checked + span::before { content: "✓"; content: "✓" / ""; display: grid; place-items: center; font-size: .75rem; color: var(--encre); }
 .pack input:focus-visible + span { outline: 3px solid var(--rouge); outline-offset: 3px; }
 /* Écrans peu hauts (téléphone en paysage, format carré) : boutons un peu plus serrés (cible ≥ 24 px, WCAG 2.5.8). */
 @media (max-height: 620px) {
