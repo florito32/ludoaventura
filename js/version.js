@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.2';
+  var VERSION = '6.3';
 
   var HISTORY = [
+    { v: '6.3', date: '2026-11-03', changes: [
+      "Conjugaison : chaque mode choisi doit avoir au moins un de ses temps. Avec Indicatif et Conditionnel, choisir seulement un temps de l\u2019indicatif est maintenant refusé, avec un message qui dit quel mode n\u2019a pas de temps."
+    ] },
     { v: '6.2', date: '2026-11-03', changes: [
       'Téléphones et tablettes : le jeu tient dans l\u2019écran, on n\u2019a plus à faire défiler. Quand la correction ou le tableau « ? » ne tiennent plus sous le plateau, l\u2019encadré Tour de jeu remonte sur le plateau, juste de ce qu\u2019il faut ; il redescend quand le dé roule.',
       'Après une réponse écrite, la case disparaît et la correction rappelle ce qui a été écrit (« tu as écrit … »).'

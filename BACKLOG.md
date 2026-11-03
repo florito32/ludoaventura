@@ -84,3 +84,9 @@ Statuts : à faire / en cours / fait à valider / terminé / question en attente
 | 78 | Le bouton « C'est bon pour moi » s'appelle « J'ai compris » | fait à valider (v6.1) | ✅ local (4 formats) + CI |
 | 79 | Bug trouvé par la CI : pendant le dé, sur téléphone carré, un texte pour lecteurs d'écran sortait de l'encadré et allongeait la page | terminé (v6.2) — texte gardé dans l'encadré ; le tableau « ? » se referme à « J'ai compris » ; test ajouté | ✅ local (4 formats) + CI |
 | 80 | Livraison des lignes 73 à 79 (03/11/2026) | terminé — v5.9 (PR #51), v6.0 (PR #52), v6.1 (PR #53), v6.2 (PR #54) en ligne, tests GitHub passés à chaque fois ; test en ligne GitHub Pages passé après la v6.2 | ✅ CI + en ligne |
+| 81 | Étape 3, réglages Mathématiques : informations centrées, pas d'écran presque vide ; nombres et signes plus grands, sur deux lignes (+ et − / × et ÷ ; 1 à 5 / 6 à 10) | en cours | — |
+| 82 | Étape 3, Orthographe : le moins d'espace vide possible dans la sélection des packs et des questions | à faire | — |
+| 83 | Étape 3, Conjugaison : temps en colonne, chaque mode entouré avec ses propres temps pour ne pas se tromper | à faire | — |
+| 84 | Bug : modes Indicatif + Conditionnel choisis, un temps de l'indicatif et aucun du conditionnel → pas de blocage ; à corriger | fait à valider (v6.3) — chaque mode choisi doit avoir au moins un de ses temps ; message « … doit choisir au moins un temps du conditionnel. », retour sur les temps de ce mode ; test ajouté | ✅ local (4 formats) + CI |
+| 85 | Écran suivant (groupes et niveau de conjugaison) : les choix prennent le plus d'espace possible | à faire | — |
+| 86 | Plateau : jamais de défilement, dans tous les cas (question, réponse, jeu) ; l'encadré Tour de jeu se superpose au plateau si besoin, les boutons toujours à l'écran | à faire | — |
