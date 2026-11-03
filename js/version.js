@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '5.8';
+  var VERSION = '5.9';
 
   var HISTORY = [
+    { v: '5.9', date: '2026-11-03', changes: [
+      'Mathématiques : le niveau se choisit tout de suite, sur le même écran que « Mathématiques ».',
+      'Niveau Facile : les nombres choisis sont des tables. Table de 2 → 2 × 8, 2 + 6, 12 − 2, 16 ÷ 2…, selon les signes choisis. Les autres niveaux ne changent pas.'
+    ] },
     { v: '5.8', date: '2026-11-03', changes: [
       'Français → Conjugaison : chaque joueur choisit ses temps (rangés par mode : indicatif, conditionnel, subjonctif, impératif), les groupes de verbes et le niveau (des verbes de plus en plus rares).',
       'À chaque carte : un pronom, un verbe et un temps ; le joueur écrit la forme et le jeu la corrige. Si c\u2019est faux, la bonne réponse s\u2019affiche avec un « ? » qui montre toute la conjugaison du verbe à ce temps ; « C\u2019est bon pour moi » lance le dé.'

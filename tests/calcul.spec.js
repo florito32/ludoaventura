@@ -23,7 +23,9 @@ test.describe('logique des calculs', () => {
         const c = K.generer({ signes: ['plus', 'moins', 'fois', 'divise'], nombres: [2, 5, 7, 10], niveau });
         expect(c.operations).toHaveLength(n);
         expect(c.nombres).toHaveLength(n + 1);
-        for (const x of c.nombres) expect([2, 5, 7, 10]).toContain(x);
+        // (au niveau Facile, ce sont des tables : seul le nombre de la table vient de la liste)
+        if (niveau !== 'facile') for (const x of c.nombres) expect([2, 5, 7, 10]).toContain(x);
+        else expect([2, 5, 7, 10]).toContain(c.table);
         expect(c.resultat).toBeGreaterThanOrEqual(0);
         expect(Math.round(c.resultat * 10)).toBeCloseTo(c.resultat * 10, 9);
         expect(c.resultat).toBe(K.evaluer(c.nombres, c.operations));
@@ -31,9 +33,25 @@ test.describe('logique des calculs', () => {
         if (!c.operations.includes('divise')) expect(Number.isInteger(c.resultat)).toBe(true);
       }
     }
-    const seul = K.generer({ signes: ['fois'], nombres: [3], niveau: 'moyen' });
+    const seul = K.generer({ signes: ['fois'], nombres: [3], niveau: 'moyen' }); // 2 signes
     expect(seul.formule).toBe('3 × 3 × 3');
     expect(seul.resultatTexte).toBe('27');
+  });
+
+  test('niveau Facile = tables : n × k, n + k, (n + k) − n, (n × k) ÷ n, k de 1 à 10, résultat entier', () => {
+    const vus = new Set();
+    for (let i = 0; i < 2000; i++) {
+      const c = K.generer({ signes: ['plus', 'moins', 'fois', 'divise'], nombres: [2, 9], niveau: 'facile' });
+      expect([2, 9]).toContain(c.table);
+      expect(c.operations).toHaveLength(1);
+      expect(Number.isInteger(c.resultat)).toBe(true);
+      expect(c.resultat).toBe(K.evaluer(c.nombres, c.operations));
+      const [a, b] = c.nombres, op = c.operations[0], n = c.table;
+      if (op === 'plus' || op === 'fois') { expect(a).toBe(n); expect(b).toBeGreaterThanOrEqual(1); expect(b).toBeLessThanOrEqual(10); }
+      else { expect(b).toBe(n); expect(c.resultat).toBeGreaterThanOrEqual(1); expect(c.resultat).toBeLessThanOrEqual(10); }
+      vus.add(c.formule);
+    }
+    for (const f of ['2 × 8', '9 × 10', '2 + 1', '16 ÷ 2', '12 − 2']) expect(vus.has(f)).toBe(true);
   });
 
   test('réponse écrite : virgule ou point, espaces tolérés', () => {
@@ -52,18 +70,25 @@ async function versMaths(page, joueurs = 1) {
   await versReglages(page, joueurs);
 }
 
-test('étape 3 : Mathématiques propose 4 signes, les nombres 1 à 10 et 4 niveaux ; il faut un signe et un nombre', async ({ page }) => {
+test('étape 3 : Mathématiques et son niveau sur le même écran, puis signes et tables (Facile) ; il faut un signe et une table', async ({ page }) => {
   await versMaths(page);
-  await expect(page.locator('#reglages-maths')).toBeHidden();
+  await expect(page.locator('#reglage-niveau-maths')).toBeHidden();
   await page.locator('#matieres label', { hasText: 'Mathématiques' }).click();
-  await valider(page); // deuxième écran : les réglages de la matière (v5.8)
-  await expect(page.locator('#reglages-maths')).toBeVisible();
-  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Mathématiques');
-  await expect(page.locator('#reglages-ortho')).toBeHidden();
-  await expect(page.locator('#signes input')).toHaveCount(4);
-  await expect(page.locator('#nombres input')).toHaveCount(10);
+  // v5.9 : le niveau est proposé tout de suite, sur l'écran de la matière.
+  await expect(page.locator('#reglage-niveau-maths')).toBeVisible();
   await expect(page.locator('#niveau-maths input')).toHaveCount(4);
   await expect(page.locator('#niveau-maths input[value="facile"]')).toBeChecked();
+  await expect(page.locator('#niveau-maths-aide')).toContainText('les tables');
+  await page.locator('#niveau-maths label', { hasText: 'Moyen' }).click();
+  await expect(page.locator('#niveau-maths-aide')).toHaveText('Moyen : 2 signes par calcul.');
+  await page.locator('#niveau-maths label', { hasText: 'Facile' }).click();
+  await valider(page); // deuxième écran : signes et tables
+  await expect(page.locator('#reglages-maths')).toBeVisible();
+  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Mathématiques');
+  await expect(page.locator('#reglages-maths #niveau-maths')).toHaveCount(0);
+  await expect(page.locator('#signes input')).toHaveCount(4);
+  await expect(page.locator('#nombres input')).toHaveCount(10);
+  await expect(page.locator('#nombres-titre')).toContainText('Tables');
   // Chaque écran de la préparation tient sans défiler.
   const deborde = await page.evaluate(() => document.documentElement.scrollHeight > window.innerHeight + 1);
   expect(deborde).toBe(false);
@@ -73,10 +98,25 @@ test('étape 3 : Mathématiques propose 4 signes, les nombres 1 à 10 et 4 nivea
   await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir au moins un signe.');
   await page.locator('#signes label', { hasText: 'Additionner' }).click();
   await valider(page);
-  await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir au moins un nombre.');
+  await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir au moins une table.');
   await page.locator('#nombres label', { hasText: /^\s*4\s*$/ }).click();
   await valider(page);
   await expect(page.getByRole('button', { name: 'Lancer la partie' })).toBeVisible();
+  // Retour sur Léa à un autre niveau : les nombres ne sont plus des tables.
+  await page.getByRole('button', { name: /Retour/ }).click();
+  await page.getByRole('button', { name: /Retour/ }).click();
+  await page.locator('#niveau-maths label', { hasText: 'Expert' }).click();
+  await valider(page);
+  await expect(page.locator('#nombres-titre')).toContainText('Nombres');
+});
+
+test('niveau Facile : la carte est une question de la table choisie', async ({ page }) => {
+  await versMaths(page);
+  await maths(page, { signes: ['fois'], nombres: [7], niveau: 'facile' });
+  await lancer(page);
+  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await expect(page.locator('#carte-mot')).toHaveText(/^7\s×\s([1-9]|10)\s=\s\?$/);
+  await expect(page.locator('#carte-titre')).toContainText('table de 7');
 });
 
 test('partie en mathématiques : bonne réponse → dé FORT, mauvaise → correction et dé FAIBLE @smoke', async ({ page }) => {
@@ -157,15 +197,15 @@ test('un joueur en mathématiques, l\'autre en orthographe ; « Mêmes réglages
 
 test('rafraîchir après la réponse : la correction reste et les points ne comptent qu\'une fois', async ({ page }) => {
   await versMaths(page);
-  await maths(page, { signes: ['plus'], nombres: [3] });
+  await maths(page, { signes: ['plus'], nombres: [3], niveau: 'moyen' });
   await lancer(page);
   await page.getByRole('button', { name: 'Piocher une carte' }).click();
-  await page.getByLabel('Ta réponse').fill('6');
+  await page.getByLabel('Ta réponse').fill('9');
   await page.getByRole('button', { name: 'Valider' }).click();
   await expect(page.locator('#carte-reponse')).toContainText('Bonne réponse !');
   await page.reload();
-  await expect(page.locator('#carte-reponse')).toContainText('Bonne réponse ! 3 + 3 = 6');
-  await expect(page.getByLabel('Ta réponse')).toHaveValue('6');
+  await expect(page.locator('#carte-reponse')).toContainText('Bonne réponse ! 3 + 3 + 3 = 9');
+  await expect(page.getByLabel('Ta réponse')).toHaveValue('9');
   await lancerLeDe(page);
   await expect.poll(async () => Number(await page.locator('#points').textContent())).toBeGreaterThanOrEqual(4);
   expect(Number(await page.locator('#points').textContent())).toBeLessThanOrEqual(6);
