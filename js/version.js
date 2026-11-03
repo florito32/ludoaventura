@@ -4,9 +4,14 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.8';
+  var VERSION = '6.9';
 
   var HISTORY = [
+    { v: '6.9', date: '2026-11-03', changes: [
+      "Ludo, l\u2019aventurier de l\u2019accueil, devient le guide du jeu. Au premier démarrage, il se présente et propose de montrer comment jouer ; le bouton « Didacticiel avec Ludo » de l\u2019accueil le relance.",
+      "Didacticiel : à chaque écran de la préparation et pendant le premier tour, Ludo explique l\u2019étape dans une bulle de bande dessinée et une flèche rouge, qui grandit et rétrécit, montre où toucher.",
+      "Pendant une partie, Ludo attend en bas à gauche : touche-le pour savoir quoi faire sur l\u2019écran en cours."
+    ] },
     { v: '6.8', date: '2026-11-03', changes: [
       "Plateau : la page ne défile plus jamais, sur tous les écrans (ordinateur et téléphone en paysage compris). Sur un écran large, le plateau prend toute la hauteur et le tour de jeu est à droite ; s\u2019il manque de place (correction, tableau « ? »), l\u2019encadré s\u2019élargit par-dessus le plateau. Les boutons restent toujours à l\u2019écran.",
       "Correction : au tout début de la partie, toucher « Piocher une carte » au mauvais moment pouvait ne rien faire."
