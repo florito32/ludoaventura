@@ -17,10 +17,10 @@ async function voixEspion(page) {
 
 // Ne garder que certains types de questions pour le joueur actif.
 async function seulement(page, types) {
-  for (const t of ['Épeler', 'Nombre de lettres', 'Syllabes', 'Consonnes', 'Voyelles', 'Première lettre', 'Lettres muettes', 'Réécrire le mot']) {
+  for (const t of ['Épeler', 'Nombre de lettres', 'Syllabes', 'Consonnes', 'Voyelles', 'Lettres muettes', 'Réécrire le mot']) {
     if (types.includes(t)) await page.getByRole('checkbox', { name: t, exact: true }).check();
   }
-  for (const t of ['Épeler', 'Nombre de lettres', 'Syllabes', 'Consonnes', 'Voyelles', 'Première lettre', 'Lettres muettes', 'Réécrire le mot']) {
+  for (const t of ['Épeler', 'Nombre de lettres', 'Syllabes', 'Consonnes', 'Voyelles', 'Lettres muettes', 'Réécrire le mot']) {
     if (!types.includes(t)) await page.getByRole('checkbox', { name: t, exact: true }).uncheck();
   }
 }
@@ -169,7 +169,7 @@ test('« Mêmes réglages pour tous » copie packs et questions, puis passe au c
   for (const k of [1, 2]) {
     expect(p.packs[k]).toEqual(p.packs[0]);
     expect(p.packs[k]).not.toContain('temps');
-    expect(p.types[k]).toHaveLength(7);
+    expect(p.types[k]).toHaveLength(6);
     expect(p.types[k]).not.toContain('syllabes');
   }
   // En revenant en arrière, le joueur 3 a bien ces réglages.

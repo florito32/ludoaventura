@@ -11,7 +11,7 @@ test.describe('réponses attendues', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
 
   test('8 types de questions', () => {
-    expect(Q.TYPES.map((t) => t.nom)).toEqual(['Épeler', 'Nombre de lettres', 'Syllabes', 'Consonnes', 'Voyelles', 'Première lettre', 'Lettres muettes', 'Réécrire le mot']);
+    expect(Q.TYPES.map((t) => t.nom)).toEqual(['Épeler', 'Nombre de lettres', 'Syllabes', 'Consonnes', 'Voyelles', 'Lettres muettes', 'Réécrire le mot']);
   });
 
   test('AVION', () => {
@@ -20,7 +20,7 @@ test.describe('réponses attendues', () => {
     expect(rep('syllabes', 'AVION')).toBe('A · VION (2 syllabes)');
     expect(rep('consonnes', 'AVION')).toBe('V, N');
     expect(rep('voyelles', 'AVION')).toBe('A, I, O');
-    expect(rep('premiere', 'AVION')).toBe('A');
+    expect(Q.trouver('premiere')).toBeNull(); // « Première lettre » n'est plus proposée (v4.9)
     expect(rep('ecrire', 'AVION')).toBe('AVION');
     expect(possible('muettes', 'AVION')).toBe(false); // pas de lettre muette : la question n'est pas posée
   });
@@ -56,8 +56,9 @@ async function preparer(page) {
 
 test('le joueur choisit ses questions ; « Lettres muettes » seule → la réponse surligne les lettres muettes @smoke', async ({ page }) => {
   await preparer(page);
-  await expect(page.locator('#types-questions input')).toHaveCount(8);
-  for (const t of ['Épeler', 'Nombre de lettres', 'Syllabes', 'Consonnes', 'Voyelles', 'Première lettre', 'Réécrire le mot']) {
+  await expect(page.locator('#types-questions input')).toHaveCount(7);
+  await expect(page.getByRole('checkbox', { name: 'Première lettre', exact: true })).toHaveCount(0);
+  for (const t of ['Épeler', 'Nombre de lettres', 'Syllabes', 'Consonnes', 'Voyelles', 'Réécrire le mot']) {
     await page.getByRole('checkbox', { name: t, exact: true }).uncheck();
   }
   expect(await page.evaluate(() => window.Aventura.partie.types[0])).toEqual(['muettes']);
@@ -83,7 +84,7 @@ test('la voix lit la question tirée, puis le mot', async ({ page }) => {
     Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: { speak: (u) => window.__lu.push(u.text), cancel() {}, getVoices: () => [] } });
   });
   await preparer(page);
-  for (const t of ['Épeler', 'Nombre de lettres', 'Consonnes', 'Voyelles', 'Première lettre', 'Lettres muettes', 'Réécrire le mot']) {
+  for (const t of ['Épeler', 'Nombre de lettres', 'Consonnes', 'Voyelles', 'Lettres muettes', 'Réécrire le mot']) {
     await page.getByRole('checkbox', { name: t, exact: true }).uncheck();
   }
   await lancer(page);

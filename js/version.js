@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '4.8';
+  var VERSION = '4.9';
 
   var HISTORY = [
+    { v: '4.9', date: '2026-11-03', changes: [
+      'La question « Première lettre » n\u2019est plus proposée.'
+    ] },
     { v: '4.8', date: '2026-11-03', changes: [
       'Préparation : plus de choix du niveau. Chaque joueur coche ses packs et pioche dans tous leurs mots, niveaux 1, 2 et 3 mélangés.',
       'Le pack « Lettres » n\u2019est plus proposé.'
