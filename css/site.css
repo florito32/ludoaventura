@@ -299,23 +299,36 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 .reglages-joueur { container-type: size; }
 .reglages-remplir {
   --rangs: 4;
-  --h: clamp(30px, calc((100cqh - 4.6rem) / var(--rangs) - 2cqh), 150px); /* 4,6 rem : les titres et les espaces */
+  --cols: 2; /* boutons par ligne : le texte ne dépasse pas la largeur d'un bouton (2 lignes au plus) */
+  --larg: min(100cqi, 760px);
+  --h: clamp(30px, calc((100cqh - 5.2rem) / var(--rangs) - 2cqh), 150px); /* 5,2 rem : les titres et les espaces */
   height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center;
   gap: clamp(6px, 3cqh, 28px);
 }
 .reglages-remplir[hidden] { display: none; }
-.reglages-remplir .reglage { width: min(100%, 760px); margin: 0; }
+.reglages-remplir .reglage { width: min(100%, var(--larg)); margin: 0; }
 .reglages-remplir .reglage-titre { text-align: center; font-size: clamp(.92rem, 3.6cqh, 1.35rem); }
+.reglages-remplir .reglage-titre { margin-bottom: clamp(3px, 1cqh, 8px); }
+@container (max-width: 520px) { .reglages-remplir .reglage-titre span { display: none; } } /* titres sur une seule ligne */
 .reglages-remplir .packs { display: grid; gap: clamp(5px, 1.6cqh, 14px) clamp(6px, 1.6cqi, 14px); }
 .reglages-joueur .reglages-remplir .pack span {
   width: 100%; height: var(--h); min-height: 0; justify-content: center; text-align: center; line-height: 1.1;
-  padding: 2px 8px; font-size: clamp(.85rem, min(calc(var(--h) * .36), 5.2cqi), 1.9rem);
+  padding: 2px 8px; font-size: clamp(.85rem, min(calc(var(--h) * .36), calc(var(--larg) / var(--cols) / 6.5)), 1.9rem);
 }
 /* Mathématiques : + et − sur une ligne, × et ÷ sur la suivante ; nombres 1 à 5 puis 6 à 10. */
 #signes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 #nombres { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 .reglages-joueur #nombres .pack span { font-size: clamp(1rem, min(calc(var(--h) * .45), 7cqi), 2.4rem); font-weight: 800; }
 .reglages-joueur #signes .pack span b { font-size: 1.3em; }
+
+/* Orthographe : 4 packs et 7 questions ; en largeur, 4 par ligne (3 lignes), en hauteur 2 par ligne (6 lignes). */
+#reglages-ortho { --rangs: 3; --cols: 4; --larg: min(100cqi, 1000px); }
+#reglages-ortho .packs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.reglages-joueur #reglages-ortho .pack span { border-radius: 18px; } /* boutons hauts : coins arrondis plutôt qu'ovales */
+@container (max-aspect-ratio: 1/1) {
+  #reglages-ortho { --rangs: 6; --cols: 2; }
+  #reglages-ortho .packs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 
 /* 4. Aventures : la grille au-dessus, le résumé de l'aventure choisie en dessous. */
 .etape-aventure { display: flex; flex-direction: column; gap: 8px; overflow: hidden; }

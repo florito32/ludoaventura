@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.4';
+  var VERSION = '6.5';
 
   var HISTORY = [
+    { v: '6.5', date: '2026-11-03', changes: [
+      "Préparation, réglages Orthographe : packs et questions en grille de boutons de même taille, qui remplit l\u2019écran (4 par ligne sur un écran large, 2 sur un écran en hauteur)."
+    ] },
     { v: '6.4', date: '2026-11-03', changes: [
       "Préparation, réglages Mathématiques : les choix sont centrés et prennent toute la place de l\u2019écran. Signes en grand sur deux lignes (Additionner et Soustraire, puis Multiplier et Diviser), nombres sur deux lignes (1 à 5, puis 6 à 10)."
     ] },
