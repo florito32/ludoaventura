@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.3';
+  var VERSION = '6.4';
 
   var HISTORY = [
+    { v: '6.4', date: '2026-11-03', changes: [
+      "Préparation, réglages Mathématiques : les choix sont centrés et prennent toute la place de l\u2019écran. Signes en grand sur deux lignes (Additionner et Soustraire, puis Multiplier et Diviser), nombres sur deux lignes (1 à 5, puis 6 à 10)."
+    ] },
     { v: '6.3', date: '2026-11-03', changes: [
       "Conjugaison : chaque mode choisi doit avoir au moins un de ses temps. Avec Indicatif et Conditionnel, choisir seulement un temps de l\u2019indicatif est maintenant refusé, avec un message qui dit quel mode n\u2019a pas de temps."
     ] },
