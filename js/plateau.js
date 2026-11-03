@@ -661,9 +661,11 @@
       mot.textContent = c.mot;
       mot.className = 'carte-mot lettre';
       boutons.hidden = true;
+      $('btn-voir-mot').hidden = true;
     } else {
       cacherMot();
       boutons.hidden = false;
+      $('btn-voir-mot').hidden = false;
     }
   }
 
@@ -679,7 +681,7 @@
   // Textes des deux boutons selon ce qui est affiché : rien, le mot seul (aide) ou la réponse.
   function majBoutonsCarte() {
     var mot = $('btn-voir-mot'), rep = $('btn-voir');
-    mot.textContent = partie.vue === 'mot' ? 'Cacher le mot' : 'Voir le mot';
+    mot.querySelector('.lib').textContent = partie.vue === 'mot' ? 'Cacher le mot' : 'Voir le mot'; // l'icône d'œil reste
     mot.setAttribute('aria-expanded', String(partie.vue === 'mot'));
     rep.textContent = partie.vue === 'reponse' ? 'Cacher la réponse' : 'Voir la réponse';
     rep.setAttribute('aria-expanded', String(partie.vue === 'reponse'));

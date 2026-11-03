@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '4.9';
+  var VERSION = '5.0';
 
   var HISTORY = [
+    { v: '5.0', date: '2026-11-03', changes: [
+      'Sur la carte, le bouton « Voir le mot » est juste sous « Écouter », avec une icône d\u2019œil.'
+    ] },
     { v: '4.9', date: '2026-11-03', changes: [
       'La question « Première lettre » n\u2019est plus proposée.'
     ] },

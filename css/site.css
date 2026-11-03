@@ -460,6 +460,8 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
   flex: none; font: inherit; font-weight: 700; cursor: pointer; min-height: 44px; padding: 6px 12px;
   background: var(--encre); color: #fff; border: 2px solid var(--encre); border-radius: 99px;
 }
+.carte-outils { flex: none; display: flex; flex-direction: column; align-items: stretch; gap: 6px; }
+.carte-outils .btn-ecouter { text-align: left; white-space: nowrap; }
 .btn-ecouter:disabled { opacity: .5; cursor: not-allowed; }
 .carte-consigne { margin-top: 8px !important; font-weight: 600; }
 .carte-mot {

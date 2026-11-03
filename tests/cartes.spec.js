@@ -183,6 +183,25 @@ test('le bouton « Mêmes réglages » n\'apparaît pas pour un seul joueur', as
   await expect(page.getByRole('button', { name: 'Mêmes réglages pour tous' })).toBeHidden();
 });
 
+test('« Voir le mot » est juste sous « Écouter », avec une icône d\'œil', async ({ page }) => {
+  await preparer(page, 1);
+  await lancer(page);
+  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  const ecouter = page.locator('#btn-ecouter');
+  const voir = page.getByRole('button', { name: 'Voir le mot' });
+  await expect(voir).toBeVisible();
+  await expect(voir).toContainText('👁️');
+  const a = await ecouter.boundingBox();
+  const b = await voir.boundingBox();
+  // Sous « Écouter » (pas à côté), aligné à gauche avec lui, sans chevauchement.
+  expect(b.y).toBeGreaterThanOrEqual(a.y + a.height - 1);
+  expect(b.y - (a.y + a.height)).toBeLessThan(16);
+  expect(Math.abs(b.x - a.x)).toBeLessThan(2);
+  // L'icône reste quand le texte devient « Cacher le mot ».
+  await voir.click();
+  await expect(page.getByRole('button', { name: 'Cacher le mot' })).toContainText('👁️');
+});
+
 test('« Voir le mot » montre le mot seul (aide), « Voir la réponse » montre aussi la solution', async ({ page }) => {
   await preparer(page, 1);
   await lancer(page);
