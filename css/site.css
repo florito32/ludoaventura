@@ -205,6 +205,12 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 .pack:hover span { border-color: var(--encre); }
 .pack input:checked + span { background: var(--encre); color: #fff; border-color: var(--encre); }
 .pack input:focus-visible + span { outline: 3px solid var(--rouge); outline-offset: 3px; }
+/* Matière (v5.7) : le titre et les choix sur une même ligne. Nombres 1 à 10 : petites pastilles rondes. */
+.reglage-ligne { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.reglage-ligne .reglage-titre { margin: 0; }
+.nombres .pack span { min-width: 44px; justify-content: center; padding: 4px 8px; }
+.pack span b { font-size: 1.15em; margin-right: 4px; }
+.reglages-matiere[hidden], .reglage[hidden] { display: none; }
 /* Écrans peu hauts (téléphone en paysage, format carré) : boutons un peu plus serrés (cible ≥ 24 px, WCAG 2.5.8). */
 @media (max-height: 620px) {
   .pack span { padding: 2px 10px; font-size: .9rem; }
@@ -214,6 +220,7 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
   .etape-actions { flex-wrap: nowrap; }
   .etape-actions .btn { min-height: 40px; padding: 4px 12px; font-size: .95rem; }
   .pack span { min-height: 30px; }
+  .nombres .pack span { min-width: 36px; padding: 2px 6px; }
   .packs { gap: 5px 6px; }
   .legende-joueur img { width: 28px; height: 31px; }
   .etape-actions .btn-secondaire { white-space: nowrap; font-size: .85rem; }
@@ -223,7 +230,7 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 /* Message « doit cocher… » : posé au-dessus des boutons, sans pousser le contenu (rien ne défile). */
 .etape-actions { position: relative; }
 .reglage-alerte {
-  position: absolute; left: 0; right: 0; bottom: calc(100% + 6px); margin: 0; z-index: 2;
+  position: absolute; left: 0; right: 0; bottom: calc(100% + 6px); margin: 0; z-index: 2; pointer-events: none; /* le choix dessous reste touchable (le message disparaît alors) */
   padding: 6px 10px; border-radius: 10px; background: #fff; border: 2px solid var(--rouge-texte);
   color: var(--rouge-texte); font-weight: 700; box-shadow: 0 4px 10px rgb(0 0 0 / .2);
 }
@@ -479,6 +486,21 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 .carte-mot.cache { letter-spacing: .15em; color: var(--encre-douce); }
 .carte-mot.lettre { font-size: 4rem; }
 .carte-reponse { margin: 0 0 8px !important; text-align: center; font-weight: 700; color: #1f5a2f; }
+.carte-mot.calcul { letter-spacing: .02em; white-space: nowrap; font-size: clamp(1.3rem, 5.4vw, 2rem); overflow-wrap: normal; }
+.carte-reponse.fausse { color: var(--rouge-texte); }
+.carte-reponse.alerte { color: var(--rouge-texte); font-weight: 600; }
+/* Réponse écrite par le joueur (calcul, v5.7) : la case et « Valider » sur une ligne. */
+.carte-saisie { margin: 4px 0 8px; }
+.carte-saisie label { display: block; font-weight: 700; margin-bottom: 4px; }
+.saisie-ligne { display: flex; gap: 8px; }
+.saisie-ligne input {
+  flex: 1; min-width: 0; min-height: 48px; padding: 6px 12px; font: 700 1.3rem/1.2 system-ui, sans-serif; color: var(--encre);
+  background: #fff; border: 3px solid var(--encre); border-radius: 10px;
+}
+.saisie-ligne input:disabled { background: var(--parchemin); }
+.saisie-ligne input[aria-invalid="true"] { border-color: var(--rouge-texte); }
+.saisie-ligne .btn { flex: none; min-height: 48px; padding: 6px 16px; }
+.saisie-ligne .btn:disabled { opacity: .6; cursor: default; }
 .carte-mot .muette { color: var(--rouge-texte); text-decoration: underline wavy; text-underline-offset: 4px; }
 .carte-boutons { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
 .btn-voir {

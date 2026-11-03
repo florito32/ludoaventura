@@ -49,6 +49,9 @@
   var TOUS_PACKS = PACKS.map(function (p) { return p.id; });
   var Q = window.Questions;
   var TOUS_TYPES = Q.TYPES.map(function (t) { return t.id; });
+  var K = window.Calcul;
+  var MATIERES = ['maths', 'orthographe']; // matières jouables (Français → Orthographe)
+  function mathsVides() { return { signes: [], nombres: [], niveau: 'facile' }; }
 
   // État de la partie. Il est sauvegardé dans le stockage de session (sessionStorage) :
   // il survit aux rechargements, aux changements de page et à la mise en veille,
@@ -60,7 +63,12 @@
     nbJoueurs: 2, aventure: A.LISTE[0], joueurs: [], choix: ['lea', 'tom', 'nour', 'malo'], actif: 0, regles: null,
     etapePrepa: 1, // écran de la préparation affiché (1 à 4), voir montrerEtape
     packs: [[], [], [], []], carte: null,
-    types: [[], [], [], []] // types de questions cochés par chaque joueur
+    types: [[], [], [], []], // types de questions cochés par chaque joueur
+    // Matière de chaque joueur (v5.7) : null (pas encore choisie), 'maths' ou 'orthographe' ;
+    // francais[i] = vrai si le joueur a touché « Français » (il choisit alors Orthographe…).
+    matiere: [null, null, null, null], francais: [false, false, false, false],
+    // Réglages de calcul de chaque joueur : signes, nombres (1 à 10), niveau (rien de choisi au départ, niveau Facile).
+    maths: [mathsVides(), mathsVides(), mathsVides(), mathsVides()]
   };
 
   function afficher(id) {
@@ -118,8 +126,51 @@
     majAventuriers();
   }
 
-  // Packs (cases à cocher) du joueur actif.
+  // Ajoute un choix « entouré » (case à cocher ou bouton radio invisibles, v5.6) dans une boîte.
+  function choix(box, type, nom, valeur, texte, etiquette) {
+    var l = document.createElement('label');
+    l.className = 'pack';
+    l.innerHTML = '<input type="' + type + '" name="' + nom + '" value="' + valeur + '"' +
+      (etiquette ? ' aria-label="' + etiquette + '"' : '') + '><span>' + texte + '</span>';
+    box.appendChild(l);
+  }
+  function valeursCochees(box) {
+    return Array.prototype.filter.call(box.querySelectorAll('input'), function (i) { return i.checked; })
+      .map(function (i) { return i.value; });
+  }
+
+  // Matière, réglages de calcul, packs et questions du joueur actif.
   function construireReglages() {
+    // Matière : Mathématiques ou Français ; Français → Orthographe.
+    $('matieres').addEventListener('change', function () {
+      var j = partie.actif, v = valeursCochees($('matieres'))[0];
+      $('packs-alerte').textContent = '';
+      if (v === 'maths') { partie.matiere[j] = 'maths'; partie.francais[j] = false; }
+      else { partie.francais[j] = true; partie.matiere[j] = valeursCochees($('francais'))[0] || null; }
+      majAventuriers();
+    });
+    $('francais').addEventListener('change', function () {
+      $('packs-alerte').textContent = '';
+      partie.matiere[partie.actif] = valeursCochees($('francais'))[0] || null;
+      majAventuriers();
+    });
+    // Mathématiques : signes (plusieurs), nombres de 1 à 10 (plusieurs), niveau (un seul).
+    K.SIGNES.forEach(function (sg) {
+      choix($('signes'), 'checkbox', 'signe', sg.id, '<b aria-hidden="true">' + sg.symbole + '</b> ' + sg.nom);
+    });
+    K.NOMBRES.forEach(function (n) { choix($('nombres'), 'checkbox', 'nombre', n, String(n), 'Nombre ' + n); });
+    K.NIVEAUX.forEach(function (nv) { choix($('niveau-maths'), 'radio', 'niveau-maths', nv.id, nv.nom); });
+    ['signes', 'nombres', 'niveau-maths'].forEach(function (id) {
+      $(id).addEventListener('change', function () {
+        var m = partie.maths[partie.actif];
+        $('packs-alerte').textContent = '';
+        m.signes = valeursCochees($('signes'));
+        m.nombres = valeursCochees($('nombres')).map(Number);
+        m.niveau = valeursCochees($('niveau-maths'))[0] || 'facile';
+        majAventuriers();
+      });
+    });
+
     var box = $('packs');
     PACKS.forEach(function (p) {
       var l = document.createElement('label');
@@ -159,6 +210,9 @@
       for (var k = 0; k < 4; k++) {
         partie.packs[k] = partie.packs[a].slice();
         partie.types[k] = partie.types[a].slice();
+        partie.matiere[k] = partie.matiere[a];
+        partie.francais[k] = partie.francais[a];
+        partie.maths[k] = JSON.parse(JSON.stringify(partie.maths[a]));
       }
       montrerEtape(4);
     });
@@ -166,11 +220,26 @@
 
   // Ce qui manque au joueur i pour pouvoir jouer (null si tout est coché).
   function manque(i) {
-    var packs = partie.packs[i];
-    if (!packs.length) return 'pack';
+    var m = partie.matiere[i];
+    if (!m) return partie.francais[i] ? 'francais' : 'matiere';
+    if (m === 'maths') {
+      if (!partie.maths[i].signes.length) return 'signe';
+      if (!partie.maths[i].nombres.length) return 'nombre';
+      return null;
+    }
+    if (!partie.packs[i].length) return 'pack';
     if (!partie.types[i].length) return 'type';
     return null;
   }
+  // Message et endroit où mettre le focus pour chaque chose qui manque.
+  var MANQUES = {
+    matiere: ['choisir une matière.', 'matieres'],
+    francais: ['choisir Orthographe.', 'francais'],
+    signe: ['choisir au moins un signe.', 'signes'],
+    nombre: ['choisir au moins un nombre.', 'nombres'],
+    pack: ['choisir au moins un pack.', 'packs'],
+    type: ['choisir au moins un type de question.', 'types-questions']
+  };
 
   // Le joueur i a-t-il coché ce qu'il faut ? Sinon, message sous ses réglages et focus sur ce qui manque.
   function reglagesComplets(i) {
@@ -179,10 +248,8 @@
     var nom = P.trouver(partie.choix[i]).nom;
     var alerte = $('packs-alerte');
     alerte.className = 'reglage-alerte';
-    alerte.textContent = m === 'pack'
-      ? nom + ' (Joueur ' + (i + 1) + ') doit choisir au moins un pack.'
-      : nom + ' (Joueur ' + (i + 1) + ') doit choisir au moins un type de question.';
-    $(m === 'pack' ? 'packs' : 'types-questions').querySelector('input').focus({ preventScroll: true });
+    alerte.textContent = nom + ' (Joueur ' + (i + 1) + ') doit ' + MANQUES[m][0];
+    $(MANQUES[m][1]).querySelector('input').focus({ preventScroll: true });
     return false;
   }
 
@@ -269,8 +336,19 @@
     var actif = P.trouver(partie.choix[partie.actif]);
     $('reglages-joueur').className = 'etape-corps reglages-joueur joueur-' + couleur;
     $('reglages-titre').innerHTML = '<img src="' + actif.image + '" alt="" width="200" height="220">' +
-      actif.nom + ' (Joueur ' + (partie.actif + 1) + ') : packs et questions';
+      actif.nom + ' (Joueur ' + (partie.actif + 1) + ') : ses cartes';
     $('reglages-titre').className = 'legende-joueur joueur-' + couleur;
+    // Matière choisie : seuls ses réglages s'affichent.
+    var a = partie.actif, mat = partie.matiere[a], fr = partie.francais[a] || (mat && mat !== 'maths');
+    $('matieres').querySelectorAll('input').forEach(function (i) { i.checked = i.value === 'maths' ? mat === 'maths' : !!fr; });
+    $('francais').querySelectorAll('input').forEach(function (i) { i.checked = i.value === mat; });
+    $('reglage-francais').hidden = !fr;
+    $('reglages-maths').hidden = mat !== 'maths';
+    $('reglages-ortho').hidden = mat !== 'orthographe';
+    var mm = partie.maths[a];
+    $('signes').querySelectorAll('input').forEach(function (i) { i.checked = mm.signes.indexOf(i.value) >= 0; });
+    $('nombres').querySelectorAll('input').forEach(function (i) { i.checked = mm.nombres.indexOf(Number(i.value)) >= 0; });
+    $('niveau-maths').querySelectorAll('input').forEach(function (i) { i.checked = i.value === mm.niveau; });
     $('packs').querySelectorAll('input').forEach(function (i) { i.checked = partie.packs[partie.actif].indexOf(i.value) >= 0; });
     $('types-questions').querySelectorAll('input').forEach(function (i) { i.checked = partie.types[partie.actif].indexOf(i.value) >= 0; });
     $('btn-memes-reglages').hidden = nb < 2;
@@ -305,6 +383,13 @@
   // une question parmi les types cochés par le joueur qui ont du sens pour ce mot.
   // Si aucun type coché ne convient à la carte, elle repart sous le tas et on en prend une autre.
   function piocherCarte(j) {
+    // Mathématiques : une formule tirée au hasard selon les réglages du joueur (pas de tas).
+    if (partie.matiere[j.index] === 'maths') {
+      var m = partie.maths[j.index], f = K.generer(m);
+      f.type = 'calcul';
+      f.packNom = 'Calcul · ' + K.niveau(m.niveau).nom;
+      return f;
+    }
     var choisis = partie.types[j.index];
     for (var essai = 0; essai < 400; essai++) {
       if (!j.tas.length) j.tas = melanger(cartesDuJoueur(j.index));
@@ -554,7 +639,12 @@
         R.piocher(r);
         montrerCarte(j);
         rendre();
+        // Calcul : le curseur est mis dans la case de réponse (sans faire défiler la page).
+        if (aSaisir(partie.carte)) $('reponse-joueur').focus({ preventScroll: true });
       });
+    } else if (r.etape === 'repondre' && aSaisir(partie.carte)) {
+      // Calcul : le joueur écrit sa réponse dans la carte, le jeu la corrige (pas de maître du jeu).
+      annoncer(j.nom + ' écrit sa réponse puis valide.');
     } else if (r.etape === 'repondre') {
       consigne.textContent = 'La réponse de ' + j.nom + ' est-elle bonne ?';
       bouton('Bonne réponse', 'btn-bonne', function () { R.repondre(r, true); reagir(true); rendre(); lancerApresReaction(); });
@@ -647,12 +737,71 @@
     }, PAUSE);
   }
 
+  // Cartes où le joueur écrit lui-même sa réponse, corrigée par le jeu (calcul, v5.7).
+  function aSaisir(c) { return !!(c && c.type === 'calcul'); }
+
+  // Carte de calcul : la formule, la case de réponse ; après validation, la correction.
+  function montrerCalcul(c) {
+    $('carte-consigne').textContent = 'Combien font :';
+    var mot = $('carte-mot');
+    mot.className = 'carte-mot calcul';
+    mot.textContent = c.formule + ' = ?';
+    $('btn-voir-mot').hidden = true;
+    $('carte-boutons').hidden = true;
+    var saisie = $('carte-saisie'), champ = $('reponse-joueur');
+    saisie.hidden = false;
+    champ.setAttribute('inputmode', 'decimal');
+    var corrigee = c.reponseDonnee != null;
+    champ.value = corrigee ? c.reponseDonnee : '';
+    champ.disabled = corrigee;
+    $('btn-valider-reponse').disabled = corrigee;
+    champ.removeAttribute('aria-invalid');
+    var rep = $('carte-reponse');
+    if (corrigee) {
+      rep.hidden = false;
+      rep.className = 'carte-reponse ' + (c.juste ? 'juste' : 'fausse');
+      rep.textContent = c.juste ? 'Bonne réponse ! ' + c.formule + ' = ' + c.resultatTexte
+        : 'Ce n\u2019est pas ça. La bonne réponse est ' + c.formule + ' = ' + c.resultatTexte + '.';
+    } else { rep.hidden = true; rep.className = 'carte-reponse'; }
+  }
+
+  // « Valider » la réponse écrite : le jeu la corrige, puis le bon dé se lance tout seul.
+  function validerSaisie(e) {
+    e.preventDefault();
+    var r = partie.regles, c = partie.carte;
+    if (!r || r.etape !== 'repondre' || !aSaisir(c)) return;
+    var champ = $('reponse-joueur'), texte = champ.value.trim();
+    var rep = $('carte-reponse');
+    if (!texte || isNaN(K.lire(texte))) {
+      rep.hidden = false;
+      rep.className = 'carte-reponse alerte';
+      rep.textContent = texte ? 'Écris un nombre, par exemple 12 ou 3,5.' : 'Écris ta réponse dans la case.';
+      champ.setAttribute('aria-invalid', 'true');
+      champ.focus();
+      return;
+    }
+    c.reponseDonnee = texte;
+    c.juste = K.juste(texte, c.resultat);
+    montrerCalcul(c);
+    R.repondre(r, c.juste);
+    reagir(c.juste);
+    rendre();
+    lancerApresReaction();
+  }
+
   // Affiche la carte piochée : la question tirée et le mot caché (ou la lettre affichée), avec la lecture vocale.
   function montrerCarte(j) {
     var c = partie.carte;
     var box = $('carte-piochee');
     box.hidden = false;
     box.className = 'carte-piochee joueur-' + j.couleur;
+    $('carte-saisie').hidden = true;
+    if (aSaisir(c)) {
+      $('carte-titre').innerHTML = 'Carte n° ' + partie.regles.pioches[j.index] + ' de ' + j.nom + '<small>' + c.packNom + '</small>';
+      montrerCalcul(c);
+      return;
+    }
+    $('carte-reponse').className = 'carte-reponse';
     $('carte-titre').innerHTML = 'Carte n° ' + partie.regles.pioches[j.index] + ' de ' + j.nom +
       '<small>' + c.packNom + (c.question ? ' · ' + c.question.nom : '') + '</small>';
     $('carte-consigne').textContent = c.lettre ? 'Quelle est cette lettre ?' : c.question.consigne;
@@ -716,6 +865,7 @@
   }
 
   function brancherCarte() {
+    $('carte-saisie').addEventListener('submit', validerSaisie);
     $('btn-voir-mot').addEventListener('click', function () { if (partie.vue === 'mot') cacherMot(); else montrerMotSeul(); });
     $('btn-voir').addEventListener('click', function () { if (partie.vue === 'reponse') cacherMot(); else montrerReponse(); });
     var ecouter = $('btn-ecouter');
@@ -841,6 +991,7 @@
       nb: nb ? Number(nb.value) : partie.nbJoueurs,
       aventure: avRadio ? avRadio.value : partie.aventure.id,
       choix: partie.choix, packs: partie.packs, types: partie.types, actif: partie.actif,
+      matiere: partie.matiere, francais: partie.francais, maths: partie.maths,
       etapePrepa: partie.etapePrepa
     };
     if (partie.regles && partie.joueurs.length) {
@@ -866,6 +1017,15 @@
       if (av) av.checked = true;
       partie.choix = d.choix; partie.packs = d.packs.map(function (l) { return l.filter(function (id) { return TOUS_PACKS.indexOf(id) >= 0; }); }); partie.types = d.types.map(function (l) { return l.filter(function (id) { return TOUS_TYPES.indexOf(id) >= 0; }); }); partie.actif = d.actif || 0;
       partie.etapePrepa = d.etapePrepa || 1;
+      if (d.matiere) {
+        partie.matiere = d.matiere.map(function (m) { return MATIERES.indexOf(m) >= 0 ? m : null; });
+        partie.francais = d.francais || partie.francais;
+        partie.maths = d.maths || partie.maths;
+      } else {
+        // Sauvegarde d'avant la v5.7 : un joueur qui avait des packs jouait en orthographe.
+        partie.matiere = partie.packs.map(function (l) { return l.length ? 'orthographe' : null; });
+        partie.francais = partie.matiere.map(function (m) { return !!m; });
+      }
       majDetail();
       majAventuriers();
 
@@ -897,7 +1057,7 @@
       var j = partie.joueurs[r.joueur];
       if ((r.etape === 'repondre' || r.etape === 'lancer') && partie.carte) {
         montrerCarte(j);
-        if (!partie.carte.lettre) {
+        if (!partie.carte.lettre && !aSaisir(partie.carte)) {
           if (d.jeu.vue === 'mot') montrerMotSeul(); else if (d.jeu.vue === 'reponse') montrerReponse();
         }
       }

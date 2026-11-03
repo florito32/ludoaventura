@@ -82,15 +82,49 @@
 
       <fieldset class="bloc etape" data-etape="3" tabindex="-1" hidden>
         <legend><span class="etape-num">3</span> <span id="reglages-titre"></span></legend>
-        <!-- Cartes du joueur : packs où il pioche, questions posées (js/cartes.js, js/questions.js). -->
+        <!-- Cartes du joueur (v5.7) : d'abord la matière (Mathématiques ou Français), puis ses réglages.
+             Mathématiques : signes, nombres de 1 à 10, niveau (js/calcul.js).
+             Français → Orthographe : packs où il pioche, questions posées (js/cartes.js, js/questions.js).
+             Les choix sont « entourés » (pas de case à cocher visible, v5.6). -->
         <div class="etape-corps reglages-joueur" id="reglages-joueur">
-          <div class="reglage">
-            <p class="reglage-titre" id="packs-titre">Packs où piocher <span>(au moins un)</span></p>
-            <div class="packs" id="packs" role="group" aria-labelledby="packs-titre"></div>
+          <div class="reglage reglage-ligne">
+            <p class="reglage-titre" id="matiere-titre">Matière</p>
+            <div class="packs" id="matieres" role="radiogroup" aria-labelledby="matiere-titre">
+              <label class="pack"><input type="radio" name="matiere" value="maths"><span>Mathématiques</span></label>
+              <label class="pack"><input type="radio" name="matiere" value="francais"><span>Français</span></label>
+            </div>
           </div>
-          <div class="reglage">
-            <p class="reglage-titre" id="types-titre">Questions posées <span>(une au hasard à chaque carte)</span></p>
-            <div class="packs" id="types-questions" role="group" aria-labelledby="types-titre"></div>
+          <div class="reglage reglage-ligne" id="reglage-francais" hidden>
+            <p class="reglage-titre" id="francais-titre">Français</p>
+            <div class="packs" id="francais" role="radiogroup" aria-labelledby="francais-titre">
+              <label class="pack"><input type="radio" name="francais" value="orthographe"><span>Orthographe</span></label>
+            </div>
+          </div>
+
+          <div class="reglages-matiere" id="reglages-maths" hidden>
+            <div class="reglage">
+              <p class="reglage-titre" id="signes-titre">Signes <span>(au moins un)</span></p>
+              <div class="packs" id="signes" role="group" aria-labelledby="signes-titre"></div>
+            </div>
+            <div class="reglage">
+              <p class="reglage-titre" id="nombres-titre">Nombres <span>(au moins un)</span></p>
+              <div class="packs nombres" id="nombres" role="group" aria-labelledby="nombres-titre"></div>
+            </div>
+            <div class="reglage">
+              <p class="reglage-titre" id="niveau-maths-titre">Niveau <span>(1 à 4 signes par calcul)</span></p>
+              <div class="packs" id="niveau-maths" role="radiogroup" aria-labelledby="niveau-maths-titre"></div>
+            </div>
+          </div>
+
+          <div class="reglages-matiere" id="reglages-ortho" hidden>
+            <div class="reglage">
+              <p class="reglage-titre" id="packs-titre">Packs où piocher <span>(au moins un)</span></p>
+              <div class="packs" id="packs" role="group" aria-labelledby="packs-titre"></div>
+            </div>
+            <div class="reglage">
+              <p class="reglage-titre" id="types-titre">Questions posées <span>(une au hasard à chaque carte)</span></p>
+              <div class="packs" id="types-questions" role="group" aria-labelledby="types-titre"></div>
+            </div>
           </div>
         </div>
         <div class="etape-actions">
@@ -175,6 +209,14 @@
             </div>
             <p class="carte-consigne" id="carte-consigne"></p>
             <p class="carte-mot" id="carte-mot"></p>
+            <!-- Calcul (et conjugaison) : le joueur écrit sa réponse, le jeu la corrige (v5.7). -->
+            <form class="carte-saisie" id="carte-saisie" novalidate hidden>
+              <label for="reponse-joueur">Ta réponse</label>
+              <div class="saisie-ligne">
+                <input id="reponse-joueur" name="reponse" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done">
+                <button type="submit" class="btn btn-principal" id="btn-valider-reponse">Valider</button>
+              </div>
+            </form>
             <p class="carte-reponse" id="carte-reponse" hidden></p>
             <!-- « Voir la réponse » : le mot et la solution. -->
             <div class="carte-boutons" id="carte-boutons">
@@ -210,6 +252,7 @@
 <script src="js/aventuriers.js"></script>
 <script src="js/cartes.js"></script>
 <script src="js/questions.js"></script>
+<script src="js/calcul.js"></script>
 <script src="js/voix.js"></script>
 <script src="js/constructions.js"></script>
 <script src="js/regles.js"></script>

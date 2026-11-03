@@ -13,9 +13,21 @@ async function valider(page) {
   await page.getByRole('button', { name: 'Valider', exact: true }).click();
 }
 
-// Coche tous les packs et toutes les questions du joueur affiché (écran 3).
+// Écran 3 (v5.7) : choisit Français → Orthographe, puis coche tous les packs et toutes les questions du joueur affiché.
+async function orthographe(page) {
+  await page.locator('#matieres input[value="francais"]').check();
+  await page.locator('#francais input[value="orthographe"]').check();
+}
 async function cocherJoueur(page) {
+  await orthographe(page);
   for (const c of await page.locator('#packs input, #types-questions input').all()) await c.check();
+}
+// Écran 3 : Mathématiques avec les signes, nombres et niveau donnés.
+async function maths(page, { signes = ['plus'], nombres = [2, 3], niveau = 'facile' } = {}) {
+  await page.locator('#matieres input[value="maths"]').check();
+  for (const s of signes) await page.locator('#signes input[value="' + s + '"]').check();
+  for (const n of nombres) await page.locator('#nombres input[value="' + n + '"]').check();
+  await page.locator('#niveau-maths input[value="' + niveau + '"]').check();
 }
 
 // Écran 3 : packs et questions sont décochés au départ (v3.9) : coche tout pour chaque joueur et valide
@@ -77,4 +89,4 @@ async function attendreJoueur(page, nom) {
   await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
 }
 
-module.exports = { valider, cocherJoueur, versReglages, lancer, lancerLeDe, lancerPartie, rapide, attendreJoueur, cocherTout, ouvrirNeuf };
+module.exports = { valider, cocherJoueur, orthographe, maths, versReglages, lancer, lancerLeDe, lancerPartie, rapide, attendreJoueur, cocherTout, ouvrirNeuf };
