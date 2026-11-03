@@ -777,6 +777,9 @@
       annoncer(j.nom + ' lit la correction, puis touche « J\u2019ai compris ».');
       bouton('J\u2019ai compris', 'btn-principal', function () {
         partie.carte.attente = false;
+        // Le tableau « ? » se referme : l'encadré redescend et laisse voir le dé.
+        $('carte-tableau').hidden = true;
+        $('btn-tableau').setAttribute('aria-expanded', 'false');
         rendre();
         lancerDe(r.de);
       });

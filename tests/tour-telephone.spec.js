@@ -42,7 +42,9 @@ test('conjugaison fausse puis « ? » : tout reste à l\'écran, l\'encadré rem
   await page.getByRole('button', { name: 'J’ai compris' }).click();
   // Le dé roule sur le plateau : l'encadré est redescendu pour qu'on le voie.
   await expect(page.locator('.table')).not.toHaveClass(/tour-monte/);
-  await tient(page, 'dé');
+  await expect(page.locator('#carte-tableau')).toBeHidden();
+  // Pendant le dé, la page ne défile pas (bug trouvé par la CI : un texte pour lecteurs d'écran sortait de l'encadré).
+  expect(await page.evaluate(() => document.documentElement.scrollHeight - innerHeight)).toBeLessThanOrEqual(1);
 });
 
 test('calcul faux (niveau Expert) : correction et « J\'ai compris » à l\'écran, sans défiler', async ({ page }) => {

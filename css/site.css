@@ -721,7 +721,7 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
   .table { --tour-min: 132px; flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: stretch; gap: 8px; position: relative; container-type: size; }
   .table .plateau { flex: none; align-self: center; width: min(100cqw, (100cqh - var(--tour-min) - 8px) * 1.494); }
   .panneau { flex: 1; min-height: 0; display: flex; flex-direction: column; }
-  .panneau .tour { flex: 1; min-height: 0; overflow: auto; padding: 8px 10px; }
+  .panneau .tour { flex: 1; min-height: 0; overflow: auto; padding: 8px 10px; position: relative; } /* relative : les textes pour lecteurs d'écran (absolus) restent dans l'encadré */
   .tour h3 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); } /* « Tour de jeu » : pour les lecteurs d'écran */
   .tour-joueur img { width: 40px; height: 44px; border-width: 2px; }
   .tour-joueur p { font-size: 1rem; }
