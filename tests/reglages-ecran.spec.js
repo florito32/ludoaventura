@@ -1,7 +1,7 @@
 // Étape 3 : les écrans de réglages remplissent la place (v6.4, lignes 81 à 85 du backlog) :
 // choix centrés, grands, rangés en lignes régulières, sans défiler ni laisser l'écran presque vide.
 const { test, expect } = require('@playwright/test');
-const { rapide, versReglages, maths, orthographe } = require('./aide');
+const { rapide, versReglages, maths, orthographe, matiere } = require('./aide');
 
 // Boîtes (x, y, largeur, hauteur) des choix visibles d'un groupe.
 async function boites(page, sel) {
@@ -61,4 +61,36 @@ test('orthographe : packs et questions en grille régulière qui remplit l\'écr
   await remplit(page, '#reglages-ortho', 0.55);
   await page.locator('#types-questions label', { hasText: 'Syllabes' }).click();
   expect(await page.evaluate(() => window.Aventura.partie.types[0])).toEqual(['syllabes']);
+});
+
+test('conjugaison : chaque mode est un cadre qui entoure ses propres temps, rangés en colonne, sans défiler', async ({ page }) => {
+  await rapide(page);
+  await page.goto('./');
+  await versReglages(page, 1);
+  await matiere(page, 'conjugaison');
+  for (const m of ['Indicatif', 'Conditionnel', 'Subjonctif', 'Impératif']) await page.locator('#modes-conj label', { hasText: m }).click();
+  const cadres = await page.locator('#temps-conj .mode-ligne').evaluateAll((l) => l.map((c) => {
+    const r = c.getBoundingClientRect(), st = getComputedStyle(c);
+    const t = [...c.querySelectorAll('.pack span')].map((e) => e.getBoundingClientRect());
+    const v = [...c.querySelectorAll('input')].map((i) => i.value.split('.')[0]);
+    return { mode: c.dataset.mode, bord: parseFloat(st.borderTopWidth), propres: v.every((m) => m === c.dataset.mode),
+      dedans: t.every((b) => b.left >= r.left && b.right <= r.right && b.top >= r.top && b.bottom <= r.bottom),
+      colonnes: new Set(t.map((b) => Math.round(b.left))).size, lignes: new Set(t.map((b) => Math.round(b.top))).size, n: t.length };
+  }));
+  for (const c of cadres) {
+    expect(c.bord).toBeGreaterThanOrEqual(2); // le cadre est visible
+    expect(c.propres).toBe(true);
+    expect(c.dedans).toBe(true);
+    expect(c.colonnes).toBeLessThanOrEqual(2); // un temps sous l'autre (2 colonnes au plus sur écran bas)
+    expect(c.lignes).toBeGreaterThanOrEqual(c.n / 2);
+  }
+  // Deux cadres ne se chevauchent pas.
+  const r = await page.locator('#temps-conj .mode-ligne').evaluateAll((l) => l.map((c) => c.getBoundingClientRect().toJSON()));
+  for (let a = 0; a < r.length; a++) for (let b = a + 1; b < r.length; b++) {
+    const sep = r[a].right <= r[b].left + 1 || r[b].right <= r[a].left + 1 || r[a].bottom <= r[b].top + 1 || r[b].bottom <= r[a].top + 1;
+    expect(sep).toBe(true);
+  }
+  const deborde = await page.locator('#temps-conj .pack span').evaluateAll((l) => l.some((e) => e.scrollWidth > e.clientWidth + 1));
+  expect(deborde).toBe(false);
+  await remplit(page, '#temps-conj', 0.3);
 });

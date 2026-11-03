@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.5';
+  var VERSION = '6.6';
 
   var HISTORY = [
+    { v: '6.6', date: '2026-11-03', changes: [
+      "Préparation, conjugaison : chaque mode choisi (indicatif, conditionnel…) est un cadre qui entoure ses propres temps, rangés l\u2019un sous l\u2019autre, pour ne pas se tromper de mode. Les cadres et les boutons prennent toute la place de l\u2019écran."
+    ] },
     { v: '6.5', date: '2026-11-03', changes: [
       "Préparation, réglages Orthographe : packs et questions en grille de boutons de même taille, qui remplit l\u2019écran (4 par ligne sur un écran large, 2 sur un écran en hauteur)."
     ] },
