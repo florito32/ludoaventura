@@ -1,7 +1,7 @@
 // Étape 3 : les écrans de réglages remplissent la place (v6.4, lignes 81 à 85 du backlog) :
 // choix centrés, grands, rangés en lignes régulières, sans défiler ni laisser l'écran presque vide.
 const { test, expect } = require('@playwright/test');
-const { rapide, versReglages, maths, orthographe, matiere } = require('./aide');
+const { rapide, versReglages, maths, orthographe, matiere, conjugaison } = require('./aide');
 
 // Boîtes (x, y, largeur, hauteur) des choix visibles d'un groupe.
 async function boites(page, sel) {
@@ -93,4 +93,19 @@ test('conjugaison : chaque mode est un cadre qui entoure ses propres temps, rang
   const deborde = await page.locator('#temps-conj .pack span').evaluateAll((l) => l.some((e) => e.scrollWidth > e.clientWidth + 1));
   expect(deborde).toBe(false);
   await remplit(page, '#temps-conj', 0.3);
+});
+
+test('conjugaison, groupes et niveau : en grand, sur toute la largeur, sans défiler', async ({ page }) => {
+  await rapide(page);
+  await page.goto('./');
+  await versReglages(page, 1);
+  await conjugaison(page, { groupes: [] });
+  const g = await boites(page, '#groupes'), n = await boites(page, '#niveau-conj');
+  expect(new Set(g.map((b) => b[1])).size).toBe(1); // les 3 groupes sur une ligne
+  expect([1, 2]).toContain(new Set(n.map((b) => b[1])).size); // les 4 niveaux sur 1 ligne (2 × 2 en hauteur)
+  const corps = await page.locator('#reglages-joueur').boundingBox();
+  expect(g[2][0] + g[2][2] - g[0][0]).toBeGreaterThan(corps.width * 0.6); // les groupes prennent la largeur
+  await remplit(page, '#reglages-conj', 0.4);
+  await page.locator('#groupes label', { hasText: '2e' }).click();
+  expect(await page.evaluate(() => window.Aventura.partie.conj[0].groupes)).toEqual([2]);
 });

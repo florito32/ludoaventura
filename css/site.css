@@ -390,6 +390,18 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
   #temps-conj [data-mode="subjonctif"] .packs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
+/* Conjugaison, groupes et niveau : les 3 groupes sur une ligne, les 4 niveaux sur une ligne (2 × 2 en hauteur). */
+#reglages-conj { --rangs: 2; --cols: 4; --larg: min(100cqi, 900px); }
+#reglages-conj .reglage { display: flex; flex-direction: column; align-items: stretch; gap: clamp(6px, 3cqh, 28px); }
+#reglages-conj .reglage-ligne { flex-direction: column; align-items: stretch; gap: clamp(4px, 1.2cqh, 10px); }
+.reglages-joueur #reglages-conj .pack span { border-radius: 18px; }
+#groupes { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+#niveau-conj { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@container (max-aspect-ratio: 1/1) {
+  #reglages-conj { --rangs: 3; --cols: 2; }
+  #niveau-conj { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 /* 4. Aventures : la grille au-dessus, le résumé de l'aventure choisie en dessous. */
 .etape-aventure { display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
 .etape-aventure .aventures { flex: 1; min-height: 0; height: auto; }

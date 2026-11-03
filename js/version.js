@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.6';
+  var VERSION = '6.7';
 
   var HISTORY = [
+    { v: '6.7', date: '2026-11-03', changes: [
+      "Préparation, conjugaison : les groupes de verbes et le niveau sont en grands boutons qui prennent toute la place de l\u2019écran."
+    ] },
     { v: '6.6', date: '2026-11-03', changes: [
       "Préparation, conjugaison : chaque mode choisi (indicatif, conditionnel…) est un cadre qui entoure ses propres temps, rangés l\u2019un sous l\u2019autre, pour ne pas se tromper de mode. Les cadres et les boutons prennent toute la place de l\u2019écran."
     ] },
