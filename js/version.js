@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.1';
+  var VERSION = '6.2';
 
   var HISTORY = [
+    { v: '6.2', date: '2026-11-03', changes: [
+      'Téléphones et tablettes : le jeu tient dans l\u2019écran, on n\u2019a plus à faire défiler. Quand la correction ou le tableau « ? » ne tiennent plus sous le plateau, l\u2019encadré Tour de jeu remonte sur le plateau, juste de ce qu\u2019il faut ; il redescend quand le dé roule.',
+      'Après une réponse écrite, la case disparaît et la correction rappelle ce qui a été écrit (« tu as écrit … »).'
+    ] },
     { v: '6.1', date: '2026-11-03', changes: [
       'Après une erreur (mathématiques, orthographe ou conjugaison), la bonne réponse reste affichée et le dé attend que le joueur touche « J\u2019ai compris » (ce bouton s\u2019appelait « C\u2019est bon pour moi »). Une bonne réponse lance toujours le dé tout seul.'
     ] },

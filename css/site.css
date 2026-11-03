@@ -574,7 +574,10 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 }
 .carte-tableau[hidden] { display: none; }
 /* Colonne je / tu / il, puis nous / vous / ils ; une seule colonne si la carte est étroite. */
-@media (max-width: 520px) { .carte-tableau { grid-template-rows: none; grid-auto-flow: row; } }
+/* Une seule colonne seulement si la carte est trop étroite pour deux (v6.2 : deux colonnes gagnent de la hauteur). */
+.carte-piochee { container-type: inline-size; }
+@container (max-width: 340px) { .carte-tableau { grid-template-rows: none; grid-auto-flow: row; } }
+@container (max-width: 440px) { .carte-tableau { font-size: .88rem; gap: 0 10px; padding: 6px 10px; } }
 .carte-tableau .demande { color: var(--rouge-texte); font-weight: 800; }
 .carte-mot .muette { color: var(--rouge-texte); text-decoration: underline wavy; text-underline-offset: 4px; }
 .carte-boutons { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
@@ -703,3 +706,39 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 .version-list > li { margin-bottom: 14px; }
 .version-list ul { margin: 0; padding-left: 20px; }
 .version-close { font: inherit; font-weight: 700; min-height: 44px; padding: 8px 20px; border-radius: 10px; border: 2px solid var(--encre); background: var(--encre); color: #fff; cursor: pointer; }
+
+/* ---------- Téléphones et tablettes en hauteur (v6.2) : le jeu tient dans l'écran, sans défiler ----------
+   La page a la hauteur de l'écran ; le plateau prend la largeur qu'il peut en laissant au moins
+   --tour-min de hauteur au tour de jeu. Quand le contenu du tour ne tient plus (correction, tableau « ? »),
+   l'encadré « remonte » sur le plateau (classe .tour-monte posée par js/plateau.js → ajusterTour). */
+@media (max-width: 899px) {
+  body:has(#ecran-plateau:not([hidden])) { height: 100vh; height: 100dvh; overflow: hidden; }
+  body:has(#ecran-plateau:not([hidden])) main { min-height: 0; }
+  body:has(#ecran-plateau:not([hidden])) .pied { padding-block: 2px calc(2px + env(safe-area-inset-bottom)); font-size: .8rem; }
+  .plateau-ecran:not([hidden]) { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 6px 10px 4px; }
+  .plateau-ecran .barre { margin-bottom: 6px; }
+  .plateau-ecran .btn-retour { min-height: 38px; padding: 2px 12px; }
+  .table { --tour-min: 132px; flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: stretch; gap: 8px; position: relative; container-type: size; }
+  .table .plateau { flex: none; align-self: center; width: min(100cqw, (100cqh - var(--tour-min) - 8px) * 1.494); }
+  .panneau { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .panneau .tour { flex: 1; min-height: 0; overflow: auto; padding: 8px 10px; position: relative; } /* relative : les textes pour lecteurs d'écran (absolus) restent dans l'encadré */
+  .tour h3 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); } /* « Tour de jeu » : pour les lecteurs d'écran */
+  .tour-joueur img { width: 40px; height: 44px; border-width: 2px; }
+  .tour-joueur p { font-size: 1rem; }
+  .tour .carte-piochee { margin-top: 6px; padding: 8px 10px; }
+  .tour .tour-consigne { margin-top: 4px; min-height: 0; }
+  .tour .tour-actions { margin-top: 6px; }
+  .tour .tour-actions .btn { min-height: 44px; padding: 6px 12px; }
+  /* L'encadré remonte sur le plateau : il occupe toute la zone de jeu. */
+  /* … seulement de la hauteur nécessaire : le haut du plateau reste visible si possible. */
+  .table.tour-monte .panneau { position: absolute; left: 0; right: 0; bottom: 0; max-height: 100%; z-index: 6; }
+  .table.tour-monte .panneau .tour { flex: 0 1 auto; }
+  .table.tour-monte .tour { box-shadow: 0 -6px 18px rgb(0 0 0 / .35); }
+  .table.tour-monte .tour-joueur { display: none; } /* la carte dit déjà « Carte n° 1 de Léa » */
+  .table.tour-monte .tour .carte-piochee { margin-top: 0; }
+  .tour .carte-mot { margin: 2px 0 !important; }
+  .tour .carte-consigne { margin-top: 4px !important; }
+  .tour .carte-correction:has(.carte-reponse:not([hidden])) { margin-bottom: 4px; }
+  .tour .carte-reponse { font-size: .95rem; line-height: 1.3; }
+  .tour .carte-entete .btn-ecouter { min-height: 40px; padding: 4px 10px; }
+}

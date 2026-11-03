@@ -777,6 +777,9 @@
       annoncer(j.nom + ' lit la correction, puis touche « J\u2019ai compris ».');
       bouton('J\u2019ai compris', 'btn-principal', function () {
         partie.carte.attente = false;
+        // Le tableau « ? » se referme : l'encadré redescend et laisse voir le dé.
+        $('carte-tableau').hidden = true;
+        $('btn-tableau').setAttribute('aria-expanded', 'false');
         rendre();
         lancerDe(r.de);
       });
@@ -798,6 +801,7 @@
       annoncer(gain + ' ' + suite);
       bandeau(gain + ' ' + suite);
     }
+    ajusterTour();
     sauver();
   }
 
@@ -890,7 +894,8 @@
     $('btn-voir-mot').hidden = true;
     $('carte-boutons').hidden = true;
     var saisie = $('carte-saisie'), champ = $('reponse-joueur');
-    saisie.hidden = false;
+    // Une fois la réponse corrigée, la case disparaît : la correction rappelle ce qui a été écrit (v6.2, gain de place).
+    saisie.hidden = c.reponseDonnee != null;
     champ.setAttribute('inputmode', conj ? 'text' : 'decimal');
     var corrigee = c.reponseDonnee != null;
     champ.value = corrigee ? c.reponseDonnee : '';
@@ -906,7 +911,8 @@
       rep.hidden = false;
       rep.className = 'carte-reponse ' + (c.juste ? 'juste' : 'fausse');
       if (conj) {
-        rep.textContent = c.juste ? 'Bonne réponse ! ' + c.bonne : 'Ce n\u2019est pas ça. La bonne réponse : ' + c.bonne + '.';
+        rep.textContent = c.juste ? 'Bonne réponse ! ' + c.bonne
+          : 'Ce n\u2019est pas ça (tu as écrit « ' + c.reponseDonnee + ' »). La bonne réponse : ' + c.bonne + '.';
         // Réponse fausse : le « ? » montre la conjugaison complète de ce verbe à ce temps.
         if (!c.juste) {
           aide.hidden = false;
@@ -917,7 +923,7 @@
         }
       } else {
         rep.textContent = c.juste ? 'Bonne réponse ! ' + c.formule + ' = ' + c.resultatTexte
-          : 'Ce n\u2019est pas ça. La bonne réponse est ' + c.formule + ' = ' + c.resultatTexte + '.';
+          : 'Ce n\u2019est pas ça (tu as écrit « ' + c.reponseDonnee + ' »). La bonne réponse est ' + c.formule + ' = ' + c.resultatTexte + '.';
       }
     } else { rep.hidden = true; rep.className = 'carte-reponse'; }
   }
@@ -927,6 +933,7 @@
     var t = $('carte-tableau'), b = $('btn-tableau');
     t.hidden = !t.hidden;
     b.setAttribute('aria-expanded', String(!t.hidden));
+    ajusterTour(); // sur téléphone, l'encadré remonte sur le plateau pour montrer tout le tableau
   }
 
   // « Valider » la réponse écrite : le jeu la corrige, puis le bon dé se lance tout seul.
@@ -992,6 +999,7 @@
     $('carte-reponse').hidden = true;
     partie.vue = 'cache';
     majBoutonsCarte();
+    ajusterTour();
   }
 
   // Textes des deux boutons selon ce qui est affiché : rien, le mot seul (aide) ou la réponse.
@@ -1012,6 +1020,7 @@
     $('carte-reponse').hidden = true;
     partie.vue = 'mot';
     majBoutonsCarte();
+    ajusterTour();
   }
 
   // Montre le mot (lettres muettes surlignées si c'est la question) et la réponse attendue.
@@ -1029,6 +1038,7 @@
     rep.hidden = false;
     partie.vue = 'reponse';
     majBoutonsCarte();
+    ajusterTour();
   }
 
   function brancherCarte() {
@@ -1043,6 +1053,22 @@
     }
     ecouter.addEventListener('click', function () { window.Voix.lire(window.Voix.texteCarte(partie.carte)); });
   }
+
+  // ---------- Tour de jeu sur téléphone (v6.2) ----------
+  // Sur téléphone, la page ne défile pas : si le contenu du tour de jeu (carte, correction, tableau « ? »)
+  // ne tient plus sous le plateau, l'encadré remonte sur le plateau. Il redescend dès que le contenu tient
+  // (au tour suivant) et pendant que le dé roule, pour qu'on le voie.
+  var ECRAN_ETROIT = window.matchMedia ? window.matchMedia('(max-width: 899px)') : { matches: false };
+  function ajusterTour() {
+    var table = document.querySelector('.table'), tour = $('tour');
+    if (!table) return;
+    var r = partie.regles;
+    var deEnCours = r && (r.etape === 'lancer' && !(partie.carte && partie.carte.attente) || r.etape === 'suivant' || r.etape === 'fin');
+    table.classList.remove('tour-monte');
+    if (!ECRAN_ETROIT.matches || deEnCours || $('ecran-plateau').hidden) return;
+    if (tour.scrollHeight > tour.clientHeight + 1) table.classList.add('tour-monte');
+  }
+  window.addEventListener('resize', ajusterTour);
 
   // ---------- Dés ----------
   // Durée du roulé du dé (ms). Les tests la raccourcissent avec window.AVENTURA_DUREE_DE.
