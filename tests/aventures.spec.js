@@ -89,3 +89,18 @@ test('plateau : autant de pions que de joueurs choisis, à leur couleur', async 
   await expect(page.locator('.pion').nth(0)).toHaveClass(/pion-rouge/);
   await expect(page.locator('.pion').nth(2)).toHaveClass(/pion-bleu/);
 });
+
+// v5.3 : le cadre rouge de l'aventure choisie était une ombre extérieure, rognée par la grille.
+// Il est maintenant dessiné à l'intérieur de la carte (pseudo-élément ::after, ombre « inset »).
+test('cadre de l\'aventure choisie entier : dessiné à l\'intérieur de la carte', async ({ page }) => {
+  await page.goto('./');
+  await versReglages(page, 1);
+  await cocherTout(page, 1);
+  const choisie = page.locator('.aventure:has(input:checked)');
+  await expect(choisie).toHaveCount(1);
+  expect(await choisie.evaluate((el) => getComputedStyle(el).boxShadow)).toBe('none');
+  expect(await choisie.evaluate((el) => getComputedStyle(el, '::after').boxShadow)).toMatch(/inset/);
+  // Une autre aventure choisie : le cadre suit.
+  await page.getByRole('radio', { name: /^Savane/ }).check();
+  expect(await page.locator('.aventure:has(input:checked)').evaluate((el) => getComputedStyle(el, '::after').boxShadow)).toMatch(/inset/);
+});
