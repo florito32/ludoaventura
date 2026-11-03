@@ -206,11 +206,46 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 .pack input:checked + span { background: var(--encre); color: #fff; border-color: var(--encre); }
 .pack input:focus-visible + span { outline: 3px solid var(--rouge); outline-offset: 3px; }
 /* Matière (v5.7) : le titre et les choix sur une même ligne. Nombres 1 à 10 : petites pastilles rondes. */
+.reglage-duo { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 18px; }
+.reglage-duo > [hidden] { display: none; }
+/* Écran de la matière : choix en grand, l'un sous l'autre, centrés. */
+.reglages-joueur .reglage.choix-matiere { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; min-height: 100%; margin: 0; }
+.choix-matiere[hidden] { display: none; }
+.choix-matiere .reglage-ligne { flex-direction: column; gap: 8px; }
+.choix-matiere .packs { justify-content: center; }
+.reglages-joueur .choix-matiere .pack span { min-height: 52px; padding: 6px 22px; font-size: 1.15rem; }
 .reglage-ligne { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
 .reglage-ligne .reglage-titre { margin: 0; }
 .nombres .pack span { min-width: 44px; justify-content: center; padding: 4px 8px; }
 .pack span b { font-size: 1.15em; margin-right: 4px; }
 .reglages-matiere[hidden], .reglage[hidden] { display: none; }
+/* Conjugaison (v5.8) : une ligne par mode, le nom du mode à gauche, ses temps à droite. */
+.temps-modes { display: flex; flex-direction: column; gap: 5px; }
+.mode-ligne { display: flex; align-items: center; gap: 8px; }
+.mode-nom { flex: none; width: 6.6em; font-weight: 700; font-size: .85rem; color: var(--encre-douce); }
+.mode-ligne .packs { flex: 1; min-width: 0; }
+.mode-nom .court { display: none; }
+/* Petits écrans : pastilles plus serrées (cible ≥ 24 px, WCAG 2.5.8), nom du mode plus étroit. */
+@media (max-width: 520px) {
+  .reglages-joueur .pack span { min-height: 32px; padding: 1px 10px; font-size: .9rem; }
+  .reglages-joueur .packs { gap: 5px 6px; }
+  .reglages-joueur .reglage { margin-bottom: 6px; }
+  .reglages-joueur .reglage-titre { font-size: .92rem; }
+  .nombres .pack span { min-width: 34px; padding: 1px 6px; }
+  .temps-modes .pack span { min-height: 28px; padding: 0 8px; font-size: .82rem; }
+  .temps-modes .packs { gap: 3px 4px; }
+  .temps-modes { gap: 4px; }
+  .mode-nom { width: 3.6em; font-size: .74rem; }
+  .mode-nom .long { display: none; }
+  .mode-nom .court { display: inline; }
+}
+/* Téléphones étroits (360 px) : les deux boutons côte à côte, titre « Temps » retiré (les modes suffisent). */
+@media (max-width: 420px) {
+  .etape-actions { flex-wrap: nowrap; }
+  .etape-actions .btn { min-height: 44px; padding: 4px 10px; font-size: .95rem; }
+  .etape-actions .btn-secondaire { font-size: .8rem; line-height: 1.15; }
+  .titre-temps { display: none; }
+}
 /* Écrans peu hauts (téléphone en paysage, format carré) : boutons un peu plus serrés (cible ≥ 24 px, WCAG 2.5.8). */
 @media (max-height: 620px) {
   .pack span { padding: 2px 10px; font-size: .9rem; }
@@ -221,6 +256,14 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
   .etape-actions .btn { min-height: 40px; padding: 4px 12px; font-size: .95rem; }
   .pack span { min-height: 30px; }
   .nombres .pack span { min-width: 36px; padding: 2px 6px; }
+  .temps-modes { gap: 3px; }
+  .temps-modes .pack span { min-height: 26px; padding: 0 8px; font-size: .8rem; }
+  .temps-modes .packs { gap: 3px 4px; }
+  .mode-nom { font-size: .72rem; width: 3.6em; }
+  .mode-nom .long { display: none; }
+  .mode-nom .court { display: inline; }
+  .reglage-duo { gap: 4px 12px; }
+  .titre-temps { display: none; } /* les noms des modes suffisent */
   .packs { gap: 5px 6px; }
   .legende-joueur img { width: 28px; height: 31px; }
   .etape-actions .btn-secondaire { white-space: nowrap; font-size: .85rem; }
@@ -486,7 +529,7 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 .carte-mot.cache { letter-spacing: .15em; color: var(--encre-douce); }
 .carte-mot.lettre { font-size: 4rem; }
 .carte-reponse { margin: 0 0 8px !important; text-align: center; font-weight: 700; color: #1f5a2f; }
-.carte-mot.calcul { letter-spacing: .02em; white-space: nowrap; font-size: clamp(1.3rem, 5.4vw, 2rem); overflow-wrap: normal; }
+.carte-mot.calcul { letter-spacing: .02em; font-size: clamp(1.3rem, 5.4vw, 2rem); overflow-wrap: normal; }
 .carte-reponse.fausse { color: var(--rouge-texte); }
 .carte-reponse.alerte { color: var(--rouge-texte); font-weight: 600; }
 /* Réponse écrite par le joueur (calcul, v5.7) : la case et « Valider » sur une ligne. */
@@ -494,13 +537,33 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 .carte-saisie label { display: block; font-weight: 700; margin-bottom: 4px; }
 .saisie-ligne { display: flex; gap: 8px; }
 .saisie-ligne input {
-  flex: 1; min-width: 0; min-height: 48px; padding: 6px 12px; font: 700 1.3rem/1.2 system-ui, sans-serif; color: var(--encre);
+  flex: 1 1 0; width: 0; min-width: 0; min-height: 48px; padding: 6px 12px; font: 700 1.3rem/1.2 system-ui, sans-serif; color: var(--encre);
   background: #fff; border: 3px solid var(--encre); border-radius: 10px;
 }
 .saisie-ligne input:disabled { background: var(--parchemin); }
 .saisie-ligne input[aria-invalid="true"] { border-color: var(--rouge-texte); }
 .saisie-ligne .btn { flex: none; min-height: 48px; padding: 6px 16px; }
 .saisie-ligne .btn:disabled { opacity: .6; cursor: default; }
+.carte-mot.conj { font-size: clamp(1.3rem, 5.4vw, 1.9rem); letter-spacing: .02em; }
+.temps-carte { display: inline-block; padding: 0 8px; border-radius: 99px; background: var(--parchemin); border: 1px solid var(--parchemin-bord); font-size: .9rem; }
+/* Correction et « ? » (tableau de conjugaison) côte à côte. */
+.carte-correction { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.carte-correction .carte-reponse { margin-bottom: 0 !important; }
+.carte-correction:has(.carte-reponse:not([hidden])) { margin-bottom: 8px; }
+.btn-aide {
+  flex: none; width: 44px; height: 44px; border-radius: 50%; cursor: pointer; font: 900 1.4rem/1 system-ui, sans-serif;
+  background: var(--jaune); color: var(--encre); border: 3px solid var(--encre); box-shadow: 0 3px 0 var(--encre);
+}
+.btn-aide[aria-expanded="true"] { background: var(--encre); color: #fff; }
+.btn-aide[hidden] { display: none; }
+.carte-tableau {
+  list-style: none; margin: 0 0 8px; padding: 8px 12px; display: grid; grid-template-rows: repeat(3, auto); grid-auto-flow: column; gap: 2px 14px;
+  background: var(--parchemin); border: 2px solid var(--parchemin-bord); border-radius: 10px; font-weight: 600;
+}
+.carte-tableau[hidden] { display: none; }
+/* Colonne je / tu / il, puis nous / vous / ils ; une seule colonne si la carte est étroite. */
+@media (max-width: 520px) { .carte-tableau { grid-template-rows: none; grid-auto-flow: row; } }
+.carte-tableau .demande { color: var(--rouge-texte); font-weight: 800; }
 .carte-mot .muette { color: var(--rouge-texte); text-decoration: underline wavy; text-underline-offset: 4px; }
 .carte-boutons { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
 .btn-voir {

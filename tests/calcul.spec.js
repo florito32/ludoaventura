@@ -56,7 +56,9 @@ test('étape 3 : Mathématiques propose 4 signes, les nombres 1 à 10 et 4 nivea
   await versMaths(page);
   await expect(page.locator('#reglages-maths')).toBeHidden();
   await page.locator('#matieres label', { hasText: 'Mathématiques' }).click();
+  await valider(page); // deuxième écran : les réglages de la matière (v5.8)
   await expect(page.locator('#reglages-maths')).toBeVisible();
+  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Mathématiques');
   await expect(page.locator('#reglages-ortho')).toBeHidden();
   await expect(page.locator('#signes input')).toHaveCount(4);
   await expect(page.locator('#nombres input')).toHaveCount(10);
@@ -83,7 +85,7 @@ test('partie en mathématiques : bonne réponse → dé FORT, mauvaise → corre
   await lancer(page);
   for (const [bonne, min, max] of [[true, 4, 6], [false, 1, 3]]) {
     await page.getByRole('button', { name: 'Piocher une carte' }).click();
-    await expect(page.locator('#carte-mot')).toHaveText(/^\d+ [+×] \d+ [+×] \d+ = \?$/);
+    await expect(page.locator('#carte-mot')).toHaveText(/^\d+\s[+×]\s\d+\s[+×]\s\d+\s=\s\?$/);
     await expect(page.getByLabel('Ta réponse')).toBeFocused();
     // Plus de boutons « Bonne / Mauvaise réponse » : le jeu corrige.
     await expect(page.getByRole('button', { name: 'Bonne réponse' })).toHaveCount(0);
@@ -167,4 +169,18 @@ test('rafraîchir après la réponse : la correction reste et les points ne comp
   await lancerLeDe(page);
   await expect.poll(async () => Number(await page.locator('#points').textContent())).toBeGreaterThanOrEqual(4);
   expect(Number(await page.locator('#points').textContent())).toBeLessThanOrEqual(6);
+});
+
+// Bug corrigé en v5.8 : une longue formule (niveau Expert) ou la case de réponse élargissaient le panneau,
+// et la page défilait de côté sur ordinateur.
+test('formule Expert : la page ne défile jamais de côté', async ({ page }) => {
+  await versMaths(page);
+  await maths(page, { signes: ['plus', 'moins', 'fois', 'divise'], nombres: [10], niveau: 'expert' });
+  await lancer(page);
+  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await expect(page.locator('#carte-mot')).toHaveText(/^10(\s[+−×÷]\s10){4}\s=\s\?$/);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
+  await page.getByLabel('Ta réponse').fill('12345678901234567890');
+  await page.getByRole('button', { name: 'Valider' }).click();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
 });

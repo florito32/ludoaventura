@@ -90,7 +90,9 @@ test('rafraîchir la préparation garde l\'écran et les choix (joueurs, joueur 
   await expect(page.getByRole('checkbox', { name: 'Temps', exact: true })).toBeChecked();
   await expect(page.getByRole('checkbox', { name: 'Syllabes', exact: true })).toBeChecked();
   await expect(page.getByRole('checkbox', { name: 'Numérique', exact: true })).not.toBeChecked();
-  for (let k = 0; k < 3; k++) { await cocherJoueur(page); await valider(page); }
+  // On est revenu sur les réglages du joueur 1 (deuxième écran de l'étape 3) : il valide, puis les joueurs 2 et 3.
+  await valider(page);
+  for (let k = 1; k < 3; k++) { await cocherJoueur(page); await valider(page); }
   await page.getByRole('radio', { name: /^Savane/ }).check();
   await page.reload();
   await expect(page.getByRole('radio', { name: /^Savane/ })).toBeChecked();

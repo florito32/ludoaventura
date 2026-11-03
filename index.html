@@ -87,18 +87,22 @@
              Français → Orthographe : packs où il pioche, questions posées (js/cartes.js, js/questions.js).
              Les choix sont « entourés » (pas de case à cocher visible, v5.6). -->
         <div class="etape-corps reglages-joueur" id="reglages-joueur">
-          <div class="reglage reglage-ligne">
+          <!-- Premier écran de l'étape 3 : la matière (Mathématiques, ou Français puis Orthographe / Conjugaison). -->
+          <div class="reglage choix-matiere" id="choix-matiere">
+          <div class="reglage-ligne">
             <p class="reglage-titre" id="matiere-titre">Matière</p>
             <div class="packs" id="matieres" role="radiogroup" aria-labelledby="matiere-titre">
               <label class="pack"><input type="radio" name="matiere" value="maths"><span>Mathématiques</span></label>
               <label class="pack"><input type="radio" name="matiere" value="francais"><span>Français</span></label>
             </div>
           </div>
-          <div class="reglage reglage-ligne" id="reglage-francais" hidden>
-            <p class="reglage-titre" id="francais-titre">Français</p>
+          <div class="reglage-ligne" id="reglage-francais" hidden>
+            <p class="reglage-titre" id="francais-titre">En français :</p>
             <div class="packs" id="francais" role="radiogroup" aria-labelledby="francais-titre">
               <label class="pack"><input type="radio" name="francais" value="orthographe"><span>Orthographe</span></label>
+              <label class="pack"><input type="radio" name="francais" value="conjugaison"><span>Conjugaison</span></label>
             </div>
+          </div>
           </div>
 
           <div class="reglages-matiere" id="reglages-maths" hidden>
@@ -113,6 +117,24 @@
             <div class="reglage">
               <p class="reglage-titre" id="niveau-maths-titre">Niveau <span>(1 à 4 signes par calcul)</span></p>
               <div class="packs" id="niveau-maths" role="radiogroup" aria-labelledby="niveau-maths-titre"></div>
+            </div>
+          </div>
+
+          <!-- Conjugaison (v5.8) : temps rangés par mode, groupes de verbes, niveau (js/conjugaison.js). -->
+          <div class="reglages-matiere" id="reglages-conj" hidden>
+            <div class="reglage">
+              <p class="reglage-titre titre-temps" id="temps-conj-titre">Temps <span>(au moins un)</span></p>
+              <div class="temps-modes" id="temps-conj" role="group" aria-labelledby="temps-conj-titre"></div>
+            </div>
+            <div class="reglage reglage-duo">
+              <div class="reglage-ligne">
+                <p class="reglage-titre" id="groupes-titre">Groupes</p>
+                <div class="packs" id="groupes" role="group" aria-labelledby="groupes-titre"></div>
+              </div>
+              <div class="reglage-ligne">
+                <p class="reglage-titre" id="niveau-conj-titre">Niveau</p>
+                <div class="packs" id="niveau-conj" role="radiogroup" aria-labelledby="niveau-conj-titre"></div>
+              </div>
             </div>
           </div>
 
@@ -217,7 +239,12 @@
                 <button type="submit" class="btn btn-principal" id="btn-valider-reponse">Valider</button>
               </div>
             </form>
-            <p class="carte-reponse" id="carte-reponse" hidden></p>
+            <div class="carte-correction">
+              <p class="carte-reponse" id="carte-reponse" hidden></p>
+              <!-- Conjugaison, réponse fausse : « ? » montre le verbe conjugué à ce temps pour toutes les personnes. -->
+              <button type="button" class="btn-aide" id="btn-tableau" aria-controls="carte-tableau" aria-expanded="false" hidden><span aria-hidden="true">?</span></button>
+            </div>
+            <ul class="carte-tableau" id="carte-tableau" hidden></ul>
             <!-- « Voir la réponse » : le mot et la solution. -->
             <div class="carte-boutons" id="carte-boutons">
               <button type="button" class="btn-voir" id="btn-voir" aria-controls="carte-mot carte-reponse" aria-expanded="false">Voir la réponse</button>
@@ -253,6 +280,7 @@
 <script src="js/cartes.js"></script>
 <script src="js/questions.js"></script>
 <script src="js/calcul.js"></script>
+<script src="js/conjugaison.js"></script>
 <script src="js/voix.js"></script>
 <script src="js/constructions.js"></script>
 <script src="js/regles.js"></script>
