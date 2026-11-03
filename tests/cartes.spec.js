@@ -59,23 +59,25 @@ test.describe('données des cartes', () => {
   });
 });
 
-test('préparation : chaque joueur choisit son niveau et ses packs, sur son propre écran', async ({ page }) => {
+test('préparation : chaque joueur choisit ses packs, sur son propre écran, sans choix du niveau', async ({ page }) => {
   await preparer(page, 2);
-  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : niveau, packs et questions');
-  await expect(page.locator('#packs input')).toHaveCount(5);
+  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : packs et questions');
+  // Plus de choix du niveau (v4.8).
+  await expect(page.locator('input[name="niveau-cartes"]')).toHaveCount(0);
+  await expect(page.getByText('Niveau', { exact: true })).toHaveCount(0);
+  // Le pack « Lettres » n'est plus proposé (v4.8).
+  await expect(page.locator('#packs input')).toHaveCount(4);
+  await expect(page.getByRole('checkbox', { name: 'Lettres', exact: true })).toHaveCount(0);
   await page.getByRole('checkbox', { name: 'Mots simples', exact: true }).uncheck();
-  await page.getByRole('radio', { name: 'Niveau 3' }).check();
   await valider(page);
-  await expect(page.locator('#reglages-titre')).toHaveText('Tom (Joueur 2) : niveau, packs et questions');
+  await expect(page.locator('#reglages-titre')).toHaveText('Tom (Joueur 2) : packs et questions');
   await expect(page.locator('#prepa-progres')).toHaveText('Étape 3 sur 4 · Joueur 2 sur 2');
-  // Le joueur 2 a ses propres réglages (rien de coché, niveau 1).
+  // Le joueur 2 a ses propres réglages (rien de coché).
   await expect(page.getByRole('checkbox', { name: 'Mots simples', exact: true })).not.toBeChecked();
-  await expect(page.getByRole('radio', { name: 'Niveau 1' })).toBeChecked();
   // Retour au joueur 1 : ses choix sont gardés.
   await page.getByRole('button', { name: /Retour/ }).click();
   await expect(page.locator('#reglages-titre')).toContainText('Léa (Joueur 1)');
   await expect(page.getByRole('checkbox', { name: 'Mots simples', exact: true })).not.toBeChecked();
-  await expect(page.getByRole('radio', { name: 'Niveau 3' })).toBeChecked();
 });
 
 test('packs et questions décochés au départ ; « Valider » demande au moins un pack et une question', async ({ page }) => {
@@ -94,26 +96,27 @@ test('packs et questions décochés au départ ; « Valider » demande au moins 
   await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit cocher au moins un type de question.');
   await page.getByRole('checkbox', { name: 'Épeler', exact: true }).check();
   await valider(page);
-  // Joueur 2 : seulement des lettres → pas besoin de type de question, mais il faut un pack.
+  // Joueur 2 : il faut aussi au moins un pack.
   for (const c of await page.locator('#packs input, #types-questions input').all()) await expect(c).not.toBeChecked();
   await valider(page);
   await expect(page.locator('#packs-alerte')).toHaveText('Tom (Joueur 2) doit cocher au moins un pack.');
-  await page.getByRole('checkbox', { name: 'Lettres', exact: true }).check();
+  await page.getByRole('checkbox', { name: 'Numérique', exact: true }).check();
+  await page.getByRole('checkbox', { name: 'Épeler', exact: true }).check();
   await valider(page);
   await lancer(page);
   await expect(page.getByRole('heading', { name: 'Le plateau' })).toBeVisible();
 });
 
-test('la carte piochée vient des packs et du niveau du joueur ; mot caché puis « Voir la réponse » @smoke', async ({ page }) => {
+test('la carte piochée vient des packs du joueur, tous niveaux mêlés ; mot caché puis « Voir la réponse » @smoke', async ({ page }) => {
   await preparer(page, 1);
-  for (const nom of ['Mots simples', 'Mots compliqués', 'Numérique', 'Lettres']) await page.getByRole('checkbox', { name: nom, exact: true }).uncheck();
-  await page.getByRole('radio', { name: 'Niveau 2' }).check();
+  for (const nom of ['Mots simples', 'Mots compliqués', 'Numérique']) await page.getByRole('checkbox', { name: nom, exact: true }).uncheck();
   await seulement(page, ['Épeler']);
   await lancer(page);
-  const temps2 = C.PACKS.find((p) => p.id === 'temps').niveaux['2'];
+  const temps = Object.values(C.PACKS.find((p) => p.id === 'temps').niveaux).flat();
   for (let t = 0; t < 5; t++) {
     await page.getByRole('button', { name: 'Piocher une carte' }).click();
-    await expect(page.locator('#carte-titre')).toContainText('Temps · niveau 2');
+    await expect(page.locator('#carte-titre')).toContainText('Temps · Épeler');
+    await expect(page.locator('#carte-titre')).not.toContainText('niveau');
     await expect(page.locator('#carte-consigne')).toHaveText('Épelle le mot :');
     // Le mot est caché…
     await expect(page.locator('#carte-mot')).toHaveClass(/cache/);
@@ -122,7 +125,7 @@ test('la carte piochée vient des packs et du niveau du joueur ; mot caché puis
     // …jusqu'à « Voir la réponse ».
     await page.getByRole('button', { name: 'Voir la réponse' }).click();
     const mot = (await page.locator('#carte-mot').innerText()).trim();
-    expect(temps2).toContain(mot);
+    expect(temps).toContain(mot);
     await expect(page.locator('#carte-reponse')).toHaveText('Réponse : ' + [...mot].filter((c) => /\p{L}/u.test(c)).join(' - '));
     await page.getByRole('button', { name: 'Bonne réponse' }).click();
     await lancerLeDe(page);
@@ -130,20 +133,21 @@ test('la carte piochée vient des packs et du niveau du joueur ; mot caché puis
   }
 });
 
-test('lettres : la lettre est affichée et la consigne demande son nom', async ({ page }) => {
+test('pack « Lettres » plus proposé : aucune carte lettre n\'est piochée, même avec tous les packs', async ({ page }) => {
   await preparer(page, 1);
-  for (const nom of ['Mots simples', 'Mots compliqués', 'Temps', 'Numérique']) await page.getByRole('checkbox', { name: nom, exact: true }).uncheck();
   await lancer(page);
+  // Toutes les cartes que le joueur peut piocher : 4 packs × 3 niveaux, aucune du pack Lettres.
+  const packs = await page.evaluate(() => [...new Set(window.Aventura.cartesDuJoueur(0).map((c) => c.pack + ':' + c.niveau))]);
+  expect(packs.filter((p) => p.startsWith('lettres'))).toEqual([]);
+  expect(packs).toHaveLength(12);
   await page.getByRole('button', { name: 'Piocher une carte' }).click();
-  await expect(page.locator('#carte-consigne')).toHaveText('Quelle est cette lettre ?');
-  await expect(page.locator('#carte-mot')).toHaveText(/^[A-Z]$/);
-  await expect(page.getByRole('button', { name: 'Voir la réponse' })).toBeHidden();
+  await expect(page.locator('#carte-consigne')).not.toHaveText('Quelle est cette lettre ?');
 });
 
-test('🔊 Écouter : la voix lit la consigne et le mot (en français), sans dire la lettre', async ({ page }) => {
+test('🔊 Écouter : la voix lit la consigne et le mot (en français)', async ({ page }) => {
   await voixEspion(page);
   await preparer(page, 1);
-  for (const nom of ['Mots simples', 'Mots compliqués', 'Numérique', 'Lettres']) await page.getByRole('checkbox', { name: nom, exact: true }).uncheck();
+  for (const nom of ['Mots simples', 'Mots compliqués', 'Numérique']) await page.getByRole('checkbox', { name: nom, exact: true }).uncheck();
   await seulement(page, ['Épeler']);
   await lancer(page);
   await page.getByRole('button', { name: 'Piocher une carte' }).click();
@@ -153,23 +157,11 @@ test('🔊 Écouter : la voix lit la consigne et le mot (en français), sans dir
   const lu = await page.evaluate(() => window.__lu);
   expect(lu).toEqual([{ text: 'Épelle le mot : ' + mot.toLocaleLowerCase('fr-FR') + '.', lang: 'fr-FR' }]);
 
-  // Carte lettre : seule la question est lue.
-  await page.getByRole('button', { name: 'Bonne réponse' }).click();
-  await lancerLeDe(page);
-  await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
-  await page.getByRole('button', { name: 'Préparation' }).click(); // revient sur l'écran 4 (aventure)
-  await page.getByRole('button', { name: /Retour/ }).click(); // écran 3 : cartes du joueur
-  for (const nom of ['Lettres', 'Temps']) await page.getByRole('checkbox', { name: nom, exact: true }).click(); // Lettres d'abord : on ne peut pas décocher le dernier pack
-  await lancer(page);
-  await page.getByRole('button', { name: 'Piocher une carte' }).click();
-  await page.getByRole('button', { name: 'Écouter' }).click();
-  expect((await page.evaluate(() => window.__lu)).pop().text).toBe('Quelle est cette lettre ?');
 });
 
-test('« Mêmes réglages pour tous » copie niveau, packs et questions, puis passe au choix de l\'aventure', async ({ page }) => {
+test('« Mêmes réglages pour tous » copie packs et questions, puis passe au choix de l\'aventure', async ({ page }) => {
   await preparer(page, 3);
   await page.getByRole('checkbox', { name: 'Temps', exact: true }).uncheck();
-  await page.getByRole('radio', { name: 'Niveau 3' }).check();
   await page.getByRole('checkbox', { name: 'Syllabes', exact: true }).uncheck();
   await page.getByRole('button', { name: 'Mêmes réglages pour tous' }).click();
   await expect(page.getByRole('button', { name: 'Lancer la partie' })).toBeVisible();
@@ -177,7 +169,6 @@ test('« Mêmes réglages pour tous » copie niveau, packs et questions, puis pa
   for (const k of [1, 2]) {
     expect(p.packs[k]).toEqual(p.packs[0]);
     expect(p.packs[k]).not.toContain('temps');
-    expect(p.niveaux[k]).toBe(3);
     expect(p.types[k]).toHaveLength(7);
     expect(p.types[k]).not.toContain('syllabes');
   }
@@ -185,7 +176,6 @@ test('« Mêmes réglages pour tous » copie niveau, packs et questions, puis pa
   await page.getByRole('button', { name: /Retour/ }).click();
   await expect(page.locator('#reglages-titre')).toContainText('(Joueur 3)');
   await expect(page.getByRole('checkbox', { name: 'Temps', exact: true })).not.toBeChecked();
-  await expect(page.getByRole('radio', { name: 'Niveau 3' })).toBeChecked();
 });
 
 test('le bouton « Mêmes réglages » n\'apparaît pas pour un seul joueur', async ({ page }) => {
@@ -195,7 +185,6 @@ test('le bouton « Mêmes réglages » n\'apparaît pas pour un seul joueur', as
 
 test('« Voir le mot » montre le mot seul (aide), « Voir la réponse » montre aussi la solution', async ({ page }) => {
   await preparer(page, 1);
-  await page.getByRole('checkbox', { name: 'Lettres', exact: true }).uncheck();
   await lancer(page);
   await page.getByRole('button', { name: 'Piocher une carte' }).click();
   await expect(page.locator('#carte-mot')).toHaveClass(/cache/);

@@ -44,7 +44,7 @@
   </section>
 
   <!-- ÉCRAN 2 : préparation de la partie, en écrans successifs (un seul visible, sans défiler) :
-       1 nombre de joueurs → 2 aventurier de chaque joueur → 3 niveau, packs et questions de chaque joueur → 4 aventure.
+       1 nombre de joueurs → 2 aventurier de chaque joueur → 3 packs et questions de chaque joueur → 4 aventure.
        Navigation : js/plateau.js (montrerEtape). -->
   <section class="ecran preparation" id="ecran-preparation" aria-labelledby="titre-preparation" hidden>
     <header class="barre">
@@ -82,12 +82,8 @@
 
       <fieldset class="bloc etape" data-etape="3" tabindex="-1" hidden>
         <legend><span class="etape-num">3</span> <span id="reglages-titre"></span></legend>
-        <!-- Cartes du joueur : niveau, packs où il pioche, questions posées (js/cartes.js, js/questions.js). -->
+        <!-- Cartes du joueur : packs où il pioche, questions posées (js/cartes.js, js/questions.js). -->
         <div class="etape-corps reglages-joueur" id="reglages-joueur">
-          <div class="reglage reglage-niveau">
-            <p class="reglage-titre" id="niveau-titre">Niveau</p>
-            <div class="niveaux-cartes" id="niveaux-cartes" role="radiogroup" aria-labelledby="niveau-titre"></div>
-          </div>
           <div class="reglage">
             <p class="reglage-titre" id="packs-titre">Packs où piocher <span>(au moins un)</span></p>
             <div class="packs" id="packs" role="group" aria-labelledby="packs-titre"></div>

@@ -61,7 +61,6 @@ test('le joueur choisit ses questions ; « Lettres muettes » seule → la répo
     await page.getByRole('checkbox', { name: t, exact: true }).uncheck();
   }
   expect(await page.evaluate(() => window.Aventura.partie.types[0])).toEqual(['muettes']);
-  await page.getByRole('checkbox', { name: 'Lettres', exact: true }).uncheck(); // pas de lettres seules
   await lancer(page);
   for (let t = 0; t < 3; t++) {
     await page.getByRole('button', { name: 'Piocher une carte' }).click();
@@ -87,7 +86,6 @@ test('la voix lit la question tirée, puis le mot', async ({ page }) => {
   for (const t of ['Épeler', 'Nombre de lettres', 'Consonnes', 'Voyelles', 'Première lettre', 'Lettres muettes', 'Réécrire le mot']) {
     await page.getByRole('checkbox', { name: t, exact: true }).uncheck();
   }
-  await page.getByRole('checkbox', { name: 'Lettres', exact: true }).uncheck();
   await lancer(page);
   await page.getByRole('button', { name: 'Piocher une carte' }).click();
   await page.getByRole('button', { name: 'Écouter' }).click();

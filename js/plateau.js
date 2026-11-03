@@ -43,7 +43,10 @@
   var A = window.Aventures;
   var P = window.Aventuriers;
   var C = window.Cartes;
-  var TOUS_PACKS = C.PACKS.map(function (p) { return p.id; });
+  // Packs proposés aux joueurs : le pack « Lettres » n'est plus proposé (demande du 03/11/2026) ;
+  // ses cartes restent dans js/cartes.js (généré depuis l'Excel) mais ne sont jamais piochées.
+  var PACKS = C.PACKS.filter(function (p) { return p.id !== 'lettres'; });
+  var TOUS_PACKS = PACKS.map(function (p) { return p.id; });
   var Q = window.Questions;
   var TOUS_TYPES = Q.TYPES.map(function (t) { return t.id; });
 
@@ -51,12 +54,12 @@
   // il survit aux rechargements, aux changements de page et à la mise en veille,
   // et n'est effacé qu'à la fermeture de l'onglet (la partie repart alors de l'accueil).
   // choix[i] = aventurier du joueur i (par défaut : les 4 premiers de la liste) ;
-  // packs[i] / niveaux[i] = packs où le joueur i pioche et son niveau (niveau 1 par défaut).
+  // packs[i] = packs où le joueur i pioche (tous niveaux mêlés : plus de choix du niveau depuis la v4.8).
   // Packs et types de questions sont décochés au départ : c'est au joueur de les cocher (demande du 02/11/2026).
   var partie = {
     nbJoueurs: 2, aventure: A.LISTE[0], joueurs: [], choix: ['lea', 'tom', 'nour', 'malo'], actif: 0, regles: null,
     etapePrepa: 1, // écran de la préparation affiché (1 à 4), voir montrerEtape
-    packs: [[], [], [], []], niveaux: [1, 1, 1, 1], carte: null,
+    packs: [[], [], [], []], carte: null,
     types: [[], [], [], []] // types de questions cochés par chaque joueur
   };
 
@@ -115,21 +118,14 @@
     majAventuriers();
   }
 
-  // Packs (cases à cocher) et niveau (1 à 3) du joueur actif.
+  // Packs (cases à cocher) du joueur actif.
   function construireReglages() {
     var box = $('packs');
-    C.PACKS.forEach(function (p) {
+    PACKS.forEach(function (p) {
       var l = document.createElement('label');
       l.className = 'pack';
       l.innerHTML = '<input type="checkbox" name="pack" value="' + p.id + '"><span>' + p.nom + '</span>';
       box.appendChild(l);
-    });
-    var niv = $('niveaux-cartes');
-    [1, 2, 3].forEach(function (n) {
-      var l = document.createElement('label');
-      l.className = 'niveau-carte';
-      l.innerHTML = '<input type="radio" name="niveau-cartes" value="' + n + '"><span><span class="visually-hidden">Niveau </span>' + n + '</span>';
-      niv.appendChild(l);
     });
     box.addEventListener('change', function () {
       var j = partie.actif;
@@ -138,10 +134,6 @@
       // Au moins un pack est demandé, mais on ne le vérifie qu'au lancement de la partie.
       $('packs-alerte').textContent = '';
       partie.packs[j] = coches;
-      majAventuriers();
-    });
-    niv.addEventListener('change', function (e) {
-      partie.niveaux[partie.actif] = Number(e.target.value);
       majAventuriers();
     });
     // Types de questions (cases à cocher, au moins un).
@@ -159,14 +151,13 @@
       partie.types[partie.actif] = coches;
       majAventuriers();
     });
-    // Copie les packs, le niveau et les questions du joueur affiché vers tous les joueurs,
+    // Copie les packs et les questions du joueur affiché vers tous les joueurs,
     // puis passe directement au choix de l'aventure (tous les joueurs sont réglés).
     $('btn-memes-reglages').addEventListener('click', function () {
       if (!reglagesComplets(partie.actif)) return;
       var a = partie.actif;
       for (var k = 0; k < 4; k++) {
         partie.packs[k] = partie.packs[a].slice();
-        partie.niveaux[k] = partie.niveaux[a];
         partie.types[k] = partie.types[a].slice();
       }
       montrerEtape(4);
@@ -174,12 +165,10 @@
   }
 
   // Ce qui manque au joueur i pour pouvoir jouer (null si tout est coché).
-  // Les cartes « Lettres » n'ont pas de type de question : un joueur qui ne pioche que des lettres n'en a pas besoin.
   function manque(i) {
     var packs = partie.packs[i];
     if (!packs.length) return 'pack';
-    var queLettres = packs.length === 1 && packs[0] === 'lettres';
-    if (!queLettres && !partie.types[i].length) return 'type';
+    if (!partie.types[i].length) return 'type';
     return null;
   }
 
@@ -280,10 +269,9 @@
     var actif = P.trouver(partie.choix[partie.actif]);
     $('reglages-joueur').className = 'etape-corps reglages-joueur joueur-' + couleur;
     $('reglages-titre').innerHTML = '<img src="' + actif.image + '" alt="" width="200" height="220">' +
-      actif.nom + ' (Joueur ' + (partie.actif + 1) + ') : niveau, packs et questions';
+      actif.nom + ' (Joueur ' + (partie.actif + 1) + ') : packs et questions';
     $('reglages-titre').className = 'legende-joueur joueur-' + couleur;
     $('packs').querySelectorAll('input').forEach(function (i) { i.checked = partie.packs[partie.actif].indexOf(i.value) >= 0; });
-    $('niveaux-cartes').querySelectorAll('input').forEach(function (i) { i.checked = Number(i.value) === partie.niveaux[partie.actif]; });
     $('types-questions').querySelectorAll('input').forEach(function (i) { i.checked = partie.types[partie.actif].indexOf(i.value) >= 0; });
     $('btn-memes-reglages').hidden = nb < 2;
     sauver();
@@ -298,14 +286,16 @@
     return t;
   }
 
-  // Toutes les cartes que le joueur i peut piocher : ses packs, à son niveau.
+  // Toutes les cartes que le joueur i peut piocher : ses packs, les 3 niveaux mêlés
+  // (choix de l'utilisateur le 03/11/2026 : plus de choix du niveau).
   function cartesDuJoueur(i) {
-    var niveau = String(partie.niveaux[i]);
     var liste = [];
-    C.PACKS.forEach(function (p) {
+    PACKS.forEach(function (p) {
       if (partie.packs[i].indexOf(p.id) === -1) return;
-      p.niveaux[niveau].forEach(function (mot) {
-        liste.push({ pack: p.id, packNom: p.nom, niveau: Number(niveau), mot: mot, lettre: p.id === 'lettres' && mot.length === 1 });
+      Object.keys(p.niveaux).forEach(function (niveau) {
+        p.niveaux[niveau].forEach(function (mot) {
+          liste.push({ pack: p.id, packNom: p.nom, niveau: Number(niveau), mot: mot, lettre: p.id === 'lettres' && mot.length === 1 });
+        });
       });
     });
     return liste;
@@ -662,7 +652,7 @@
     box.hidden = false;
     box.className = 'carte-piochee joueur-' + j.couleur;
     $('carte-titre').innerHTML = 'Carte n° ' + partie.regles.pioches[j.index] + ' de ' + j.nom +
-      '<small>' + c.packNom + ' · niveau ' + c.niveau + (c.question ? ' · ' + c.question.nom : '') + '</small>';
+      '<small>' + c.packNom + (c.question ? ' · ' + c.question.nom : '') + '</small>';
     $('carte-consigne').textContent = c.lettre ? 'Quelle est cette lettre ?' : c.question.consigne;
     var mot = $('carte-mot');
     var boutons = $('carte-boutons');
@@ -848,7 +838,7 @@
       ecran: partie.ecran || 'ecran-accueil',
       nb: nb ? Number(nb.value) : partie.nbJoueurs,
       aventure: avRadio ? avRadio.value : partie.aventure.id,
-      choix: partie.choix, packs: partie.packs, niveaux: partie.niveaux, types: partie.types, actif: partie.actif,
+      choix: partie.choix, packs: partie.packs, types: partie.types, actif: partie.actif,
       etapePrepa: partie.etapePrepa
     };
     if (partie.regles && partie.joueurs.length) {
@@ -872,7 +862,7 @@
       if (nb) nb.checked = true;
       var av = document.querySelector('input[name="aventure"][value="' + d.aventure + '"]');
       if (av) av.checked = true;
-      partie.choix = d.choix; partie.packs = d.packs; partie.niveaux = d.niveaux; partie.types = d.types; partie.actif = d.actif || 0;
+      partie.choix = d.choix; partie.packs = d.packs.map(function (l) { return l.filter(function (id) { return TOUS_PACKS.indexOf(id) >= 0; }); }); partie.types = d.types; partie.actif = d.actif || 0;
       partie.etapePrepa = d.etapePrepa || 1;
       majDetail();
       majAventuriers();

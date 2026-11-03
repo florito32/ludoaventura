@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '4.7';
+  var VERSION = '4.8';
 
   var HISTORY = [
+    { v: '4.8', date: '2026-11-03', changes: [
+      'Préparation : plus de choix du niveau. Chaque joueur coche ses packs et pioche dans tous leurs mots, niveaux 1, 2 et 3 mélangés.',
+      'Le pack « Lettres » n\u2019est plus proposé.'
+    ] },
     { v: '4.7', date: '2026-11-03', changes: [
       'Choix des aventuriers : le cadre de couleur des personnages choisis (J1, J2…) n\u2019est plus coupé sur les bords de l\u2019écran, il est dessiné à l\u2019intérieur de la carte.'
     ] },
