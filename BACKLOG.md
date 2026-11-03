@@ -56,7 +56,7 @@ Statuts : à faire / en cours / fait à valider / terminé / question en attente
 | 50 | Corriger le problème sur les bords des personnages (cartes J1, J2 du choix des aventuriers) | fait à valider (v4.7) — cause : le cadre de couleur des cartes choisies était une ombre extérieure, coupée par la grille sur les cartes du bord (haut, gauche) ; il est maintenant dessiné à l'intérieur de la carte (bordure de 4 px + cadre intérieur), même chose pour le contour du clavier | ✅ local (4 formats) + CI |
 | 51 | Enlever les niveaux : piocher directement dans les packs sans demander le niveau | fait à valider (v4.8) — choix de l'utilisateur : les niveaux 1, 2 et 3 des packs cochés sont mélangés dans le tas ; le niveau n'apparaît plus sur la carte | ✅ local (4 formats) + CI |
 | 52 | Ne plus proposer le pack « Lettres » | fait à valider (v4.8, livré avec la ligne 51 : sans niveau, les niveaux 2 et 3 du pack Lettres, qui sont des mots, auraient été mélangés aux lettres) — 4 packs proposés ; les cartes Lettres restent dans js/cartes.js (généré depuis l'Excel) mais ne sont plus piochées | ✅ local (4 formats) + CI |
-| 53 | Ne plus proposer la question « Première lettre » | à faire | — |
+| 53 | Ne plus proposer la question « Première lettre » | fait à valider (v4.9) — 7 types de questions proposés ; un choix gardé d'une partie en cours est ignoré | ✅ local (4 formats) + CI |
 | 54 | Cartes : bouton « Voir le mot » juste sous « Écouter », avec une icône d'œil comme « Écouter » a la sienne | à faire | — |
 | 55 | Points du dé en noir, pas de couleur | à faire | — |
 | 56 | Ne plus afficher « Léa gagne 3 points ! Au tour de Tom. » dans l'encadré Tour de jeu (déjà affiché sur le plateau) | à faire | — |

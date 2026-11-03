@@ -28,8 +28,7 @@
     { id: 'voyelles', nom: 'Voyelles', consigne: 'Quelles sont les voyelles du mot :',
       possible: function (mot) { return lettres(mot).some(estVoyelle); },
       reponse: function (mot) { return lettres(mot).filter(estVoyelle).join(', '); } },
-    { id: 'premiere', nom: 'Première lettre', consigne: 'Quelle est la première lettre du mot :',
-      reponse: function (mot) { return lettres(mot)[0]; } },
+    // « Première lettre » n'est plus proposée (demande du 03/11/2026).
     { id: 'muettes', nom: 'Lettres muettes', consigne: 'Quelles sont les lettres muettes du mot :',
       possible: function (mot, info) { return !!(info.muettes && info.muettes.length); },
       reponse: function (mot, info) {
