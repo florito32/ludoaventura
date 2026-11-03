@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.7';
+  var VERSION = '6.8';
 
   var HISTORY = [
+    { v: '6.8', date: '2026-11-03', changes: [
+      "Plateau : la page ne défile plus jamais, sur aucun écran (ordinateur et téléphone en paysage compris). Si le tour de jeu ne tient plus, il passe par-dessus le plateau et ses boutons restent toujours visibles."
+    ] },
     { v: '6.7', date: '2026-11-03', changes: [
       "Préparation, conjugaison : les groupes de verbes et le niveau sont en grands boutons qui prennent toute la place de l\u2019écran."
     ] },
