@@ -88,7 +88,7 @@ test('rafraîchir la préparation garde l\'écran et les choix (joueurs, joueur 
   await page.getByRole('button', { name: /Retour/ }).click();
   await expect(page.getByRole('checkbox', { name: 'Temps', exact: true })).toBeChecked();
   await expect(page.getByRole('checkbox', { name: 'Syllabes', exact: true })).toBeChecked();
-  await expect(page.getByRole('checkbox', { name: 'Lettres', exact: true })).not.toBeChecked();
+  await expect(page.getByRole('checkbox', { name: 'Numérique', exact: true })).not.toBeChecked();
   for (let k = 0; k < 3; k++) { await cocherJoueur(page); await valider(page); }
   await page.getByRole('radio', { name: /^Savane/ }).check();
   await page.reload();
