@@ -4,9 +4,14 @@
 (function () {
   'use strict';
 
-  var VERSION = '5.7';
+  var VERSION = '5.8';
 
   var HISTORY = [
+    { v: '5.8', date: '2026-11-03', changes: [
+      'Français → Conjugaison : chaque joueur choisit les temps (rangés par mode : indicatif, conditionnel, subjonctif, impératif), les groupes de verbes (1er, 2e, 3e) et le niveau (des verbes courants aux plus rares).',
+      'À chaque carte : un pronom, un verbe à l\u2019infinitif et un temps. Le joueur écrit la forme conjuguée et valide ; le jeu dit si c\u2019est juste et montre la bonne réponse.',
+      'Réponse fausse : le bouton « ? » montre le verbe conjugué à ce temps avec tous les pronoms ; « C\u2019est bon » lance le dé.'
+    ] },
     { v: '5.7', date: '2026-11-03', changes: [
       'Préparation, étape 3 : chaque joueur choisit d\u2019abord sa matière, Mathématiques ou Français (puis Orthographe).',
       'Mathématiques : choix des signes (+, −, ×, ÷), des nombres de 1 à 10 et du niveau (Facile = 1 signe, Moyen = 2, Difficile = 3, Expert = 4). À chaque carte, une formule ; le joueur écrit le résultat (entier, ou une décimale avec une division) et le jeu le corrige, puis le dé se lance tout seul.'

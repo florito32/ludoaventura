@@ -33,7 +33,7 @@
   // (en majuscules, certaines voix l'épellent comme un sigle). Les lettres seules ne sont pas dites.
   function texteCarte(carte) {
     if (carte.lettre) return 'Quelle est cette lettre ?';
-    if (carte.type === 'calcul') return carte.oral; // « Combien font 3 plus 4 multiplié par 2 ? »
+    if (carte.type === 'calcul' || carte.type === 'conjugaison') return carte.oral; // « Combien font 3 plus 4… ? », « Conjugue le verbe… »
     var mot = carte.mot.replace(/(\.\.\.|…)/g, ' ').replace(/\s+/g, ' ').trim().toLocaleLowerCase('fr-FR');
     var consigne = carte.question ? carte.question.consigne : 'Épelle le mot :';
     return consigne + ' ' + mot + '.';

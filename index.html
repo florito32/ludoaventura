@@ -85,6 +85,7 @@
         <!-- Cartes du joueur (v5.7) : d'abord la matière (Mathématiques ou Français), puis ses réglages.
              Mathématiques : signes, nombres de 1 à 10, niveau (js/calcul.js).
              Français → Orthographe : packs où il pioche, questions posées (js/cartes.js, js/questions.js).
+             Français → Conjugaison (v5.8) : temps rangés par mode, groupes de verbes, niveau (js/conjugaison.js).
              Les choix sont « entourés » (pas de case à cocher visible, v5.6). -->
         <div class="etape-corps reglages-joueur" id="reglages-joueur">
           <div class="reglage reglage-ligne">
@@ -98,6 +99,7 @@
             <p class="reglage-titre" id="francais-titre">Français</p>
             <div class="packs" id="francais" role="radiogroup" aria-labelledby="francais-titre">
               <label class="pack"><input type="radio" name="francais" value="orthographe"><span>Orthographe</span></label>
+              <label class="pack"><input type="radio" name="francais" value="conjugaison"><span>Conjugaison</span></label>
             </div>
           </div>
 
@@ -113,6 +115,26 @@
             <div class="reglage">
               <p class="reglage-titre" id="niveau-maths-titre">Niveau <span>(1 à 4 signes par calcul)</span></p>
               <div class="packs" id="niveau-maths" role="radiogroup" aria-labelledby="niveau-maths-titre"></div>
+            </div>
+          </div>
+
+          <div class="reglages-matiere" id="reglages-conj" hidden>
+            <!-- Temps rangés par mode : un onglet par mode (le nombre de temps choisis entre parenthèses),
+                 les temps du mode affiché dessous. Tout tient sans défiler, même sur un téléphone carré. -->
+            <div class="reglage">
+              <div class="reglage-ligne">
+                <p class="reglage-titre" id="temps-titre">Temps <span>(au moins un)</span></p>
+                <div class="onglets" id="modes-conj" role="radiogroup" aria-label="Mode"></div>
+              </div>
+              <div class="packs temps-conj" id="temps-conj" role="group" aria-labelledby="temps-titre"></div>
+            </div>
+            <div class="reglage reglage-ligne">
+              <p class="reglage-titre" id="groupes-titre">Groupes</p>
+              <div class="packs" id="groupes" role="group" aria-labelledby="groupes-titre"></div>
+            </div>
+            <div class="reglage reglage-ligne">
+              <p class="reglage-titre" id="niveau-conj-titre">Niveau <span>(verbes plus rares)</span></p>
+              <div class="packs" id="niveau-conj" role="radiogroup" aria-labelledby="niveau-conj-titre"></div>
             </div>
           </div>
 
@@ -218,6 +240,13 @@
               </div>
             </form>
             <p class="carte-reponse" id="carte-reponse" hidden></p>
+            <!-- Conjugaison, réponse fausse (v5.8) : « ? » montre le verbe conjugué à ce temps pour tous les pronoms ;
+                 « C'est bon » : le joueur a compris, le dé se lance tout seul. -->
+            <div class="conj-suite" id="conj-suite" hidden>
+              <button type="button" class="btn-aide" id="btn-conj-aide" aria-controls="conj-tableau" aria-expanded="false" aria-label="Voir toute la conjugaison" title="Voir toute la conjugaison">?</button>
+              <button type="button" class="btn btn-principal" id="btn-conj-ok">C’est bon</button>
+            </div>
+            <ul class="conj-tableau" id="conj-tableau" aria-label="Conjugaison complète" hidden></ul>
             <!-- « Voir la réponse » : le mot et la solution. -->
             <div class="carte-boutons" id="carte-boutons">
               <button type="button" class="btn-voir" id="btn-voir" aria-controls="carte-mot carte-reponse" aria-expanded="false">Voir la réponse</button>
@@ -253,6 +282,7 @@
 <script src="js/cartes.js"></script>
 <script src="js/questions.js"></script>
 <script src="js/calcul.js"></script>
+<script src="js/conjugaison.js"></script>
 <script src="js/voix.js"></script>
 <script src="js/constructions.js"></script>
 <script src="js/regles.js"></script>

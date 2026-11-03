@@ -30,6 +30,20 @@ async function maths(page, { signes = ['plus'], nombres = [2, 3], niveau = 'faci
   await page.locator('#niveau-maths input[value="' + niveau + '"]').check();
 }
 
+// Écran 3 : Français → Conjugaison avec les temps, groupes et niveau donnés (v5.8).
+async function conjugaison(page, { temps = ['ind-present'], groupes = [1], niveau = 'facile' } = {}) {
+  await page.locator('#matieres input[value="francais"]').check();
+  await page.locator('#francais input[value="conjugaison"]').check();
+  // Les temps sont rangés par mode (onglets) : on ouvre l'onglet du mode avant de cocher le temps.
+  const MODES = { ind: 'indicatif', cond: 'conditionnel', subj: 'subjonctif', imp: 'imperatif' };
+  for (const t of temps) {
+    await page.locator('#modes-conj input[value="' + MODES[t.split('-')[0]] + '"]').check();
+    await page.locator('#temps-conj input[value="' + t + '"]').check();
+  }
+  for (const g of groupes) await page.locator('#groupes input[value="' + g + '"]').check();
+  await page.locator('#niveau-conj input[value="' + niveau + '"]').check();
+}
+
 // Écran 3 : packs et questions sont décochés au départ (v3.9) : coche tout pour chaque joueur et valide
 // (on arrive sur l'écran 4, le choix de l'aventure).
 async function cocherTout(page, joueurs) {
@@ -89,4 +103,4 @@ async function attendreJoueur(page, nom) {
   await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
 }
 
-module.exports = { valider, cocherJoueur, orthographe, maths, versReglages, lancer, lancerLeDe, lancerPartie, rapide, attendreJoueur, cocherTout, ouvrirNeuf };
+module.exports = { valider, cocherJoueur, orthographe, maths, conjugaison, versReglages, lancer, lancerLeDe, lancerPartie, rapide, attendreJoueur, cocherTout, ouvrirNeuf };

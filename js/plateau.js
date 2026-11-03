@@ -50,8 +50,11 @@
   var Q = window.Questions;
   var TOUS_TYPES = Q.TYPES.map(function (t) { return t.id; });
   var K = window.Calcul;
-  var MATIERES = ['maths', 'orthographe']; // matières jouables (Français → Orthographe)
+  var V = window.Conjugaison;
+  var MATIERES = ['maths', 'orthographe', 'conjugaison']; // matières jouables (Français → Orthographe ou Conjugaison)
   function mathsVides() { return { signes: [], nombres: [], niveau: 'facile' }; }
+  function conjVides() { return { temps: [], groupes: [], niveau: 'facile' }; }
+  var modeConj = 'indicatif'; // onglet de mode affiché à l'étape 3 (conjugaison)
 
   // État de la partie. Il est sauvegardé dans le stockage de session (sessionStorage) :
   // il survit aux rechargements, aux changements de page et à la mise en veille,
@@ -68,7 +71,9 @@
     // francais[i] = vrai si le joueur a touché « Français » (il choisit alors Orthographe…).
     matiere: [null, null, null, null], francais: [false, false, false, false],
     // Réglages de calcul de chaque joueur : signes, nombres (1 à 10), niveau (rien de choisi au départ, niveau Facile).
-    maths: [mathsVides(), mathsVides(), mathsVides(), mathsVides()]
+    maths: [mathsVides(), mathsVides(), mathsVides(), mathsVides()],
+    // Réglages de conjugaison de chaque joueur (v5.8) : temps, groupes (1, 2, 3), niveau (rien de choisi, niveau Facile).
+    conj: [conjVides(), conjVides(), conjVides(), conjVides()]
   };
 
   function afficher(id) {
@@ -171,6 +176,27 @@
       });
     });
 
+    // Conjugaison : temps rangés par mode (plusieurs), groupes (plusieurs), niveau (un seul).
+    V.MODES.forEach(function (m, k) {
+      choix($('modes-conj'), 'radio', 'mode-conj', m.id, m.nom + '<small class="nb"></small>');
+      m.temps.forEach(function (t) { choix($('temps-conj'), 'checkbox', 'temps', t.id, t.nom, m.nom + ' ' + t.nom.toLowerCase()); });
+    });
+    $('temps-conj').querySelectorAll('.pack').forEach(function (l) { l.dataset.mode = V.temps(l.querySelector('input').value).mode; });
+    // Onglet de mode : n'affiche que les temps de ce mode (ce n'est pas un réglage enregistré).
+    $('modes-conj').addEventListener('change', function (e) { e.stopPropagation(); modeConj = valeursCochees($('modes-conj'))[0]; majAventuriers(); });
+    V.GROUPES.forEach(function (g) { choix($('groupes'), 'checkbox', 'groupe', g.id, g.nom.split(' ')[0], g.nom); }); // « 1er », « 2e », « 3e »
+    V.NIVEAUX.forEach(function (nv) { choix($('niveau-conj'), 'radio', 'niveau-conj', nv.id, nv.nom); });
+    ['temps-conj', 'groupes', 'niveau-conj'].forEach(function (id) {
+      $(id).addEventListener('change', function () {
+        var c = partie.conj[partie.actif];
+        $('packs-alerte').textContent = '';
+        c.temps = valeursCochees($('temps-conj'));
+        c.groupes = valeursCochees($('groupes')).map(Number);
+        c.niveau = valeursCochees($('niveau-conj'))[0] || 'facile';
+        majAventuriers();
+      });
+    });
+
     var box = $('packs');
     PACKS.forEach(function (p) {
       var l = document.createElement('label');
@@ -213,6 +239,7 @@
         partie.matiere[k] = partie.matiere[a];
         partie.francais[k] = partie.francais[a];
         partie.maths[k] = JSON.parse(JSON.stringify(partie.maths[a]));
+        partie.conj[k] = JSON.parse(JSON.stringify(partie.conj[a]));
       }
       montrerEtape(4);
     });
@@ -227,6 +254,11 @@
       if (!partie.maths[i].nombres.length) return 'nombre';
       return null;
     }
+    if (m === 'conjugaison') {
+      if (!partie.conj[i].temps.length) return 'temps';
+      if (!partie.conj[i].groupes.length) return 'groupe';
+      return null;
+    }
     if (!partie.packs[i].length) return 'pack';
     if (!partie.types[i].length) return 'type';
     return null;
@@ -234,7 +266,9 @@
   // Message et endroit où mettre le focus pour chaque chose qui manque.
   var MANQUES = {
     matiere: ['choisir une matière.', 'matieres'],
-    francais: ['choisir Orthographe.', 'francais'],
+    francais: ['choisir Orthographe ou Conjugaison.', 'francais'],
+    temps: ['choisir au moins un temps.', 'temps-conj'],
+    groupe: ['choisir au moins un groupe de verbes.', 'groupes'],
     signe: ['choisir au moins un signe.', 'signes'],
     nombre: ['choisir au moins un nombre.', 'nombres'],
     pack: ['choisir au moins un pack.', 'packs'],
@@ -345,6 +379,17 @@
     $('reglage-francais').hidden = !fr;
     $('reglages-maths').hidden = mat !== 'maths';
     $('reglages-ortho').hidden = mat !== 'orthographe';
+    $('reglages-conj').hidden = mat !== 'conjugaison';
+    var cj = partie.conj[a];
+    $('temps-conj').querySelectorAll('input').forEach(function (i) { i.checked = cj.temps.indexOf(i.value) >= 0; });
+    $('modes-conj').querySelectorAll('input').forEach(function (i) {
+      i.checked = i.value === modeConj;
+      var n = cj.temps.filter(function (id) { return V.temps(id).mode === i.value; }).length;
+      i.nextElementSibling.querySelector('.nb').textContent = n ? ' ' + n : '';
+    });
+    $('temps-conj').querySelectorAll('.pack').forEach(function (l) { l.hidden = l.dataset.mode !== modeConj; });
+    $('groupes').querySelectorAll('input').forEach(function (i) { i.checked = cj.groupes.indexOf(Number(i.value)) >= 0; });
+    $('niveau-conj').querySelectorAll('input').forEach(function (i) { i.checked = i.value === cj.niveau; });
     var mm = partie.maths[a];
     $('signes').querySelectorAll('input').forEach(function (i) { i.checked = mm.signes.indexOf(i.value) >= 0; });
     $('nombres').querySelectorAll('input').forEach(function (i) { i.checked = mm.nombres.indexOf(Number(i.value)) >= 0; });
@@ -389,6 +434,13 @@
       f.type = 'calcul';
       f.packNom = 'Calcul · ' + K.niveau(m.niveau).nom;
       return f;
+    }
+    // Conjugaison : un pronom, un verbe, un temps, tirés selon les réglages du joueur (pas de tas).
+    if (partie.matiere[j.index] === 'conjugaison') {
+      var cr = partie.conj[j.index], v = V.generer(cr);
+      v.type = 'conjugaison';
+      v.packNom = 'Conjugaison · ' + V.niveau(cr.niveau).nom;
+      return v;
     }
     var choisis = partie.types[j.index];
     for (var essai = 0; essai < 400; essai++) {
@@ -649,6 +701,9 @@
       consigne.textContent = 'La réponse de ' + j.nom + ' est-elle bonne ?';
       bouton('Bonne réponse', 'btn-bonne', function () { R.repondre(r, true); reagir(true); rendre(); lancerApresReaction(); });
       bouton('Mauvaise réponse', 'btn-mauvaise', function () { R.repondre(r, false); reagir(false); rendre(); lancerApresReaction(); });
+    } else if (r.etape === 'lancer' && partie.carte && partie.carte.attente) {
+      // Conjugaison fausse : le joueur lit la correction (et le tableau « ? »), puis touche « C'est bon ».
+      annoncer(j.nom + ' lit la correction puis touche « C\u2019est bon ».');
     } else if (r.etape === 'lancer') {
       // Après « Bonne / Mauvaise réponse » : ni commentaire ni bouton (v4.3), le dé se lance tout seul.
       annoncer(j.nom + ' lance le dé ' + r.de.toUpperCase() + '.');
@@ -720,6 +775,7 @@
   function lancerApresReaction() {
     var r = partie.regles;
     if (r.etape !== 'lancer') return;
+    if (partie.carte && partie.carte.attente) return; // conjugaison fausse : on attend « C'est bon »
     var de = r.de;
     clearTimeout(minuteurDe);
     minuteurDe = setTimeout(function () { minuteurDe = null; lancerDe(de); }, DELAI_AUTO_DE);
@@ -738,10 +794,11 @@
   }
 
   // Cartes où le joueur écrit lui-même sa réponse, corrigée par le jeu (calcul, v5.7).
-  function aSaisir(c) { return !!(c && c.type === 'calcul'); }
+  function aSaisir(c) { return !!(c && (c.type === 'calcul' || c.type === 'conjugaison')); }
 
   // Carte de calcul : la formule, la case de réponse ; après validation, la correction.
   function montrerCalcul(c) {
+    if (c.type === 'conjugaison') { montrerConjugaison(c); return; }
     $('carte-consigne').textContent = 'Combien font :';
     var mot = $('carte-mot');
     mot.className = 'carte-mot calcul';
@@ -765,6 +822,62 @@
     } else { rep.hidden = true; rep.className = 'carte-reponse'; }
   }
 
+  // Carte de conjugaison (v5.8) : le temps, le pronom et le verbe à l'infinitif ; la case de réponse ;
+  // après validation, la correction. Réponse fausse : « ? » (tableau complet) et « C'est bon » (lance le dé).
+  function montrerConjugaison(c) {
+    var t = V.temps(c.temps);
+    $('carte-consigne').innerHTML = 'Conjugue à ce temps : <strong class="conj-temps">' + c.tempsNom + '</strong>';
+    var mot = $('carte-mot');
+    mot.className = 'carte-mot conjugaison';
+    var sujet = t.mode === 'imperatif' ? '(' + c.pronom + ')' : (t.mode === 'subjonctif' ? 'que ' : '') + c.pronom;
+    mot.innerHTML = '<span class="conj-pronom">' + sujet + '</span> <span class="conj-verbe">' + c.verbe + '</span>';
+    $('btn-voir-mot').hidden = true;
+    $('carte-boutons').hidden = true;
+    var saisie = $('carte-saisie'), champ = $('reponse-joueur');
+    saisie.hidden = false;
+    champ.setAttribute('inputmode', 'text');
+    var corrigee = c.reponseDonnee != null;
+    champ.value = corrigee ? c.reponseDonnee : '';
+    champ.disabled = corrigee;
+    $('btn-valider-reponse').disabled = corrigee;
+    champ.removeAttribute('aria-invalid');
+    var rep = $('carte-reponse');
+    if (corrigee) {
+      rep.hidden = false;
+      rep.className = 'carte-reponse ' + (c.juste ? 'juste' : 'fausse');
+      rep.textContent = c.juste ? 'Bonne réponse ! ' + c.solution : 'Ce n\u2019est pas ça. La bonne réponse est : ' + c.solution + '.';
+    } else { rep.hidden = true; rep.className = 'carte-reponse'; }
+    // Réponse fausse, en attente du « C'est bon » du joueur.
+    $('conj-suite').hidden = !c.attente;
+    montrerTableau(!!(c.attente && c.tableauOuvert));
+  }
+
+  // Tableau du verbe à ce temps, pour tous les pronoms (aide « ? »).
+  function montrerTableau(ouvert) {
+    var c = partie.carte, ul = $('conj-tableau');
+    if (c) c.tableauOuvert = ouvert;
+    $('btn-conj-aide').setAttribute('aria-expanded', String(ouvert));
+    ul.hidden = !ouvert;
+    ul.innerHTML = '';
+    if (ouvert) V.tableau(c.verbe, c.temps).forEach(function (l) {
+      var li = document.createElement('li');
+      li.textContent = l;
+      ul.appendChild(li);
+    });
+  }
+
+  // « C'est bon » : le joueur a vu la correction ; le dé (FAIBLE) se lance tout seul.
+  function conjugaisonVue() {
+    var c = partie.carte;
+    if (!c || !c.attente) return;
+    c.attente = false;
+    c.tableauOuvert = false;
+    $('conj-suite').hidden = true;
+    $('conj-tableau').hidden = true;
+    sauver();
+    lancerApresReaction();
+  }
+
   // « Valider » la réponse écrite : le jeu la corrige, puis le bon dé se lance tout seul.
   function validerSaisie(e) {
     e.preventDefault();
@@ -772,7 +885,8 @@
     if (!r || r.etape !== 'repondre' || !aSaisir(c)) return;
     var champ = $('reponse-joueur'), texte = champ.value.trim();
     var rep = $('carte-reponse');
-    if (!texte || isNaN(K.lire(texte))) {
+    var conj = c.type === 'conjugaison';
+    if (!texte || (!conj && isNaN(K.lire(texte)))) {
       rep.hidden = false;
       rep.className = 'carte-reponse alerte';
       rep.textContent = texte ? 'Écris un nombre, par exemple 12 ou 3,5.' : 'Écris ta réponse dans la case.';
@@ -781,12 +895,15 @@
       return;
     }
     c.reponseDonnee = texte;
-    c.juste = K.juste(texte, c.resultat);
+    c.juste = conj ? V.juste(texte, c) : K.juste(texte, c.resultat);
+    // Conjugaison fausse : le dé attend le « C'est bon » du joueur (il peut d'abord ouvrir le tableau « ? »).
+    c.attente = conj && !c.juste;
     montrerCalcul(c);
     R.repondre(r, c.juste);
     reagir(c.juste);
     rendre();
-    lancerApresReaction();
+    if (c.attente) $('btn-conj-ok').focus({ preventScroll: true });
+    else lancerApresReaction();
   }
 
   // Affiche la carte piochée : la question tirée et le mot caché (ou la lettre affichée), avec la lecture vocale.
@@ -796,6 +913,8 @@
     box.hidden = false;
     box.className = 'carte-piochee joueur-' + j.couleur;
     $('carte-saisie').hidden = true;
+    $('conj-suite').hidden = true;
+    $('conj-tableau').hidden = true;
     if (aSaisir(c)) {
       $('carte-titre').innerHTML = 'Carte n° ' + partie.regles.pioches[j.index] + ' de ' + j.nom + '<small>' + c.packNom + '</small>';
       montrerCalcul(c);
@@ -866,6 +985,8 @@
 
   function brancherCarte() {
     $('carte-saisie').addEventListener('submit', validerSaisie);
+    $('btn-conj-aide').addEventListener('click', function () { montrerTableau($('conj-tableau').hidden); sauver(); });
+    $('btn-conj-ok').addEventListener('click', conjugaisonVue);
     $('btn-voir-mot').addEventListener('click', function () { if (partie.vue === 'mot') cacherMot(); else montrerMotSeul(); });
     $('btn-voir').addEventListener('click', function () { if (partie.vue === 'reponse') cacherMot(); else montrerReponse(); });
     var ecouter = $('btn-ecouter');
@@ -991,7 +1112,7 @@
       nb: nb ? Number(nb.value) : partie.nbJoueurs,
       aventure: avRadio ? avRadio.value : partie.aventure.id,
       choix: partie.choix, packs: partie.packs, types: partie.types, actif: partie.actif,
-      matiere: partie.matiere, francais: partie.francais, maths: partie.maths,
+      matiere: partie.matiere, francais: partie.francais, maths: partie.maths, conj: partie.conj,
       etapePrepa: partie.etapePrepa
     };
     if (partie.regles && partie.joueurs.length) {
@@ -1021,6 +1142,7 @@
         partie.matiere = d.matiere.map(function (m) { return MATIERES.indexOf(m) >= 0 ? m : null; });
         partie.francais = d.francais || partie.francais;
         partie.maths = d.maths || partie.maths;
+        partie.conj = d.conj || partie.conj;
       } else {
         // Sauvegarde d'avant la v5.7 : un joueur qui avait des packs jouait en orthographe.
         partie.matiere = partie.packs.map(function (l) { return l.length ? 'orthographe' : null; });

@@ -91,7 +91,7 @@ test('packs et questions décochés au départ ; « Valider » demande au moins 
   await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir une matière.');
   await page.locator('#matieres input[value="francais"]').check();
   await valider(page);
-  await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir Orthographe.');
+  await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir Orthographe ou Conjugaison.');
   await page.locator('#francais input[value="orthographe"]').check();
   for (const c of await page.locator('#packs input, #types-questions input').all()) await expect(c).not.toBeChecked();
   // Rien de coché : on reste sur le joueur 1 avec un message.
