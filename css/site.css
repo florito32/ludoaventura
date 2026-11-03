@@ -822,13 +822,51 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
    La page a la hauteur de l'écran ; le plateau prend la largeur qu'il peut en laissant au moins
    --tour-min de hauteur au tour de jeu. Quand le contenu du tour ne tient plus (correction, tableau « ? »),
    l'encadré « remonte » sur le plateau (classe .tour-monte posée par js/plateau.js → ajusterTour). */
+/* Tous les écrans (v6.8) : la page du plateau a la hauteur de l'écran et ne défile jamais. */
+body:has(#ecran-plateau:not([hidden])) { height: 100vh; height: 100dvh; overflow: hidden; }
+body:has(#ecran-plateau:not([hidden])) main { min-height: 0; }
+body:has(#ecran-plateau:not([hidden])) .pied { padding-block: 2px calc(2px + env(safe-area-inset-bottom)); font-size: .8rem; }
+.plateau-ecran:not([hidden]) { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 6px 10px 4px; }
+.plateau-ecran .barre { margin-bottom: 6px; }
+.plateau-ecran .btn-retour { min-height: 38px; padding: 2px 12px; }
+/* Écrans larges (ordinateur, tablette et téléphone en paysage) : plateau à gauche, aussi grand que la hauteur
+   le permet, tour de jeu à droite sur toute la hauteur. Si le contenu du tour ne tient plus (correction,
+   tableau « ? »), l'encadré s'élargit vers la gauche, par-dessus le plateau (.tour-monte, js/plateau.js). */
+@media (min-width: 900px) {
+  .table { flex: 1; min-height: 0; position: relative; container-type: size; align-items: center; }
+  .table .plateau { justify-self: center; width: min(100%, 100cqh * 1.494); }
+  .panneau { align-self: stretch; min-height: 0; display: flex; flex-direction: column; justify-content: center; }
+  .panneau .tour { flex: 0 1 auto; min-height: 0; overflow: auto; position: relative; }
+  .table.tour-monte .panneau { position: absolute; top: 0; right: 0; bottom: 0; width: min(100%, 560px); z-index: 6; }
+  .table.tour-monte .tour { box-shadow: -6px 0 18px rgb(0 0 0 / .35); }
+}
+/* Écrans larges mais bas (téléphone en paysage) : tour de jeu plus serré. */
+@media (min-width: 900px) and (max-height: 560px) {
+  .panneau .tour { padding: 8px 10px; }
+  .tour h3 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .tour-joueur img { width: 40px; height: 44px; border-width: 2px; }
+  .tour .carte-piochee { margin-top: 6px; padding: 8px 10px; }
+  .tour .tour-actions .btn { min-height: 40px; padding: 4px 12px; }
+  .table.tour-monte .tour-joueur { display: none; }
+  .plateau-ecran .barre { margin-bottom: 4px; }
+  .plateau-ecran .barre h2 { font-size: 1.15rem; }
+  .plateau-ecran .btn-retour { min-height: 32px; }
+  .table.tour-monte .panneau { width: min(100%, 640px); }
+  .tour .carte-outils { flex-direction: row; } /* « Écouter » et « Voir le mot » côte à côte */
+  .tour .carte-outils .btn-ecouter { min-height: 36px; padding: 2px 10px; }
+  .tour .carte-mot { margin: 2px 0 !important; font-size: clamp(1.4rem, 7vh, 2rem); }
+  .tour .carte-consigne { margin-top: 2px !important; }
+  .tour .tour-consigne { margin-top: 2px; min-height: 0; }
+  .tour .tour-actions { margin-top: 4px; }
+  .tour .carte-tableau { font-size: .85rem; line-height: 1.25; padding: 4px 10px; margin-top: 4px; }
+  .tour .carte-reponse { margin-bottom: 4px !important; line-height: 1.25; }
+  body:has(#ecran-plateau:not([hidden])) .pied { padding-block: 0 env(safe-area-inset-bottom); font-size: .72rem; }
+  body:has(#ecran-plateau:not([hidden])) .version-badge { min-height: 24px; padding: 0 8px; }
+}
+/* Dans tous les cas, les boutons d'action restent visibles en bas de l'encadré (v6.8) :
+   si le contenu ne tenait pas, c'est lui qui passe dessous, jamais les boutons. */
+.tour .tour-actions:not(:empty) { position: sticky; bottom: -1px; z-index: 2; background: var(--parchemin); padding-block: 4px; }
 @media (max-width: 899px) {
-  body:has(#ecran-plateau:not([hidden])) { height: 100vh; height: 100dvh; overflow: hidden; }
-  body:has(#ecran-plateau:not([hidden])) main { min-height: 0; }
-  body:has(#ecran-plateau:not([hidden])) .pied { padding-block: 2px calc(2px + env(safe-area-inset-bottom)); font-size: .8rem; }
-  .plateau-ecran:not([hidden]) { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 6px 10px 4px; }
-  .plateau-ecran .barre { margin-bottom: 6px; }
-  .plateau-ecran .btn-retour { min-height: 38px; padding: 2px 12px; }
   .table { --tour-min: 132px; flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: stretch; gap: 8px; position: relative; container-type: size; }
   .table .plateau { flex: none; align-self: center; width: min(100cqw, (100cqh - var(--tour-min) - 8px) * 1.494); }
   .panneau { flex: 1; min-height: 0; display: flex; flex-direction: column; }

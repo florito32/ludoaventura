@@ -1,5 +1,7 @@
 // v6.2 : sur téléphone et tablette en hauteur, le tour de jeu tient dans l'écran, sans jamais faire défiler ;
 // quand la correction ou le tableau « ? » ne tiennent plus sous le plateau, l'encadré remonte sur le plateau.
+// v6.8 (ligne 86 du backlog) : sur TOUS les écrans (ordinateur, paysage compris), jamais de défilement,
+// et chaque bouton du tour de jeu est entièrement à l'écran.
 const { test, expect } = require('@playwright/test');
 const { rapide, versReglages, valider, maths, conjugaison, cocherJoueur, lancer } = require('./aide');
 
@@ -11,6 +13,12 @@ async function tient(page, quand) {
   });
   expect(r.page, quand + ' : la page défile').toBeLessThanOrEqual(1);
   expect(r.tour, quand + ' : le tour de jeu dépasse').toBeLessThanOrEqual(1);
+  // Chaque bouton visible du tour de jeu est entièrement dans l'écran.
+  const dehors = await page.evaluate(() => [...document.querySelectorAll('#tour button, #tour input')]
+    .filter((b) => b.offsetParent && !b.closest('[hidden]'))
+    .filter((b) => { const r = b.getBoundingClientRect(); return r.top < -1 || r.left < -1 || r.bottom > innerHeight + 1 || r.right > innerWidth + 1; })
+    .map((b) => b.textContent.trim() || b.id));
+  expect(dehors, quand + ' : boutons hors de l\'écran').toEqual([]);
 }
 
 async function partie(page, reglage) {
@@ -23,7 +31,6 @@ async function partie(page, reglage) {
   await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
 }
 
-test.beforeEach(() => test.skip(test.info().project.name === 'ordinateur', 'sur ordinateur, le tour de jeu est à côté du plateau'));
 
 test('conjugaison fausse puis « ? » : tout reste à l\'écran, l\'encadré remonte puis redescend après « J\'ai compris »', async ({ page }) => {
   await partie(page, (p) => conjugaison(p, { temps: ['subjonctif.plus-que-parfait'], groupes: [3], niveau: 'expert' }));
