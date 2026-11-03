@@ -199,3 +199,19 @@ test('« Voir le mot » montre le mot seul (aide), « Voir la réponse » montre
   await expect(page.locator('#carte-mot')).toHaveClass(/cache/);
   await expect(page.locator('#carte-reponse')).toBeHidden();
 });
+
+// v5.0 : « Voir le mot » juste sous « Écouter », même style, avec son icône d'œil (gardée en « Cacher le mot »).
+test('« Voir le mot » est juste sous « Écouter », avec une icône d\'œil', async ({ page }) => {
+  await preparer(page, 1);
+  await lancer(page);
+  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  const ecouter = page.getByRole('button', { name: 'Écouter' });
+  const voir = page.getByRole('button', { name: 'Voir le mot' });
+  await expect(voir.locator('[aria-hidden="true"]')).toHaveText('👁️');
+  const a = await ecouter.boundingBox(), b = await voir.boundingBox();
+  expect(b.y).toBeGreaterThan(a.y + a.height - 1);       // dessous…
+  expect(b.y - (a.y + a.height)).toBeLessThan(16);        // …juste dessous
+  expect(Math.abs(b.x + b.width / 2 - (a.x + a.width / 2))).toBeLessThan(2); // aligné
+  await voir.click();
+  await expect(page.getByRole('button', { name: 'Cacher le mot' }).locator('[aria-hidden="true"]')).toHaveText('👁️');
+});

@@ -167,14 +167,17 @@
           <div class="carte-piochee" id="carte-piochee" hidden>
             <div class="carte-entete">
               <p class="carte-titre" id="carte-titre"></p>
-              <button type="button" class="btn-ecouter" id="btn-ecouter"><span aria-hidden="true">🔊</span> Écouter</button>
+              <!-- « Écouter » puis, juste dessous, « Voir le mot » (une aide : le mot seul), chacun avec son icône (v5.0). -->
+              <div class="carte-outils">
+                <button type="button" class="btn-ecouter" id="btn-ecouter"><span aria-hidden="true">🔊</span> Écouter</button>
+                <button type="button" class="btn-ecouter" id="btn-voir-mot" aria-controls="carte-mot" aria-expanded="false"><span aria-hidden="true">👁️</span> <span class="btn-libelle">Voir le mot</span></button>
+              </div>
             </div>
             <p class="carte-consigne" id="carte-consigne"></p>
             <p class="carte-mot" id="carte-mot"></p>
             <p class="carte-reponse" id="carte-reponse" hidden></p>
-            <!-- « Voir le mot » : une aide (le mot seul) ; « Voir la réponse » : le mot et la solution. -->
+            <!-- « Voir la réponse » : le mot et la solution. -->
             <div class="carte-boutons" id="carte-boutons">
-              <button type="button" class="btn-voir" id="btn-voir-mot" aria-controls="carte-mot" aria-expanded="false">Voir le mot</button>
               <button type="button" class="btn-voir" id="btn-voir" aria-controls="carte-mot carte-reponse" aria-expanded="false">Voir la réponse</button>
             </div>
           </div>
