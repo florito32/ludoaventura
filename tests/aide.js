@@ -13,18 +13,25 @@ async function valider(page) {
   await page.getByRole('button', { name: 'Valider', exact: true }).click();
 }
 
-// Écran 3 (v5.7) : choisit Français → Orthographe, puis coche tous les packs et toutes les questions du joueur affiché.
-async function orthographe(page) {
-  await page.locator('#matieres input[value="francais"]').check();
-  await page.locator('#francais input[value="orthographe"]').check();
+// Écran 3 (v5.7, deux écrans depuis v5.8) : choisit la matière, valide, et arrive sur ses réglages.
+async function matiere(page, valeur) {
+  if (valeur === 'maths') await page.locator('#matieres input[value="maths"]').check();
+  else {
+    await page.locator('#matieres input[value="francais"]').check();
+    await page.locator('#francais input[value="' + valeur + '"]').check();
+  }
+  await valider(page);
+  await page.locator(valeur === 'maths' ? '#reglages-maths' : valeur === 'orthographe' ? '#reglages-ortho' : '#reglages-conj').waitFor();
 }
+// Français → Orthographe, puis coche tous les packs et toutes les questions du joueur affiché.
+async function orthographe(page) { await matiere(page, 'orthographe'); }
 async function cocherJoueur(page) {
   await orthographe(page);
   for (const c of await page.locator('#packs input, #types-questions input').all()) await c.check();
 }
 // Écran 3 : Mathématiques avec les signes, nombres et niveau donnés.
 async function maths(page, { signes = ['plus'], nombres = [2, 3], niveau = 'facile' } = {}) {
-  await page.locator('#matieres input[value="maths"]').check();
+  await matiere(page, 'maths');
   for (const s of signes) await page.locator('#signes input[value="' + s + '"]').check();
   for (const n of nombres) await page.locator('#nombres input[value="' + n + '"]').check();
   await page.locator('#niveau-maths input[value="' + niveau + '"]').check();
@@ -89,4 +96,12 @@ async function attendreJoueur(page, nom) {
   await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
 }
 
-module.exports = { valider, cocherJoueur, orthographe, maths, versReglages, lancer, lancerLeDe, lancerPartie, rapide, attendreJoueur, cocherTout, ouvrirNeuf };
+// Écran 3 : Français → Conjugaison avec les temps, groupes et niveau donnés.
+async function conjugaison(page, { temps = ['indicatif.present'], groupes = [1], niveau = 'facile' } = {}) {
+  await matiere(page, 'conjugaison');
+  for (const t of temps) await page.locator('#temps-conj input[value="' + t + '"]').check();
+  for (const g of groupes) await page.locator('#groupes input[value="' + g + '"]').check();
+  await page.locator('#niveau-conj input[value="' + niveau + '"]').check();
+}
+
+module.exports = { valider, cocherJoueur, orthographe, maths, conjugaison, matiere, versReglages, lancer, lancerLeDe, lancerPartie, rapide, attendreJoueur, cocherTout, ouvrirNeuf };

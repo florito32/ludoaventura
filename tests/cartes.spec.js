@@ -61,24 +61,28 @@ test.describe('données des cartes', () => {
 
 test('préparation : chaque joueur choisit ses packs, sur son propre écran, sans choix du niveau', async ({ page }) => {
   await preparer(page, 2);
-  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : ses cartes');
+  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Orthographe');
   // Plus de choix du niveau (v4.8).
   await expect(page.locator('input[name="niveau-cartes"]')).toHaveCount(0);
-  await expect(page.getByText('Niveau', { exact: true })).toHaveCount(0);
+  await expect(page.locator('#reglages-ortho').getByText('Niveau')).toHaveCount(0);
   // Le pack « Lettres » n'est plus proposé (v4.8).
   await expect(page.locator('#packs input')).toHaveCount(4);
   await expect(page.getByRole('checkbox', { name: 'Lettres', exact: true })).toHaveCount(0);
   await page.getByRole('checkbox', { name: 'Mots simples', exact: true }).uncheck();
   await valider(page);
-  await expect(page.locator('#reglages-titre')).toHaveText('Tom (Joueur 2) : ses cartes');
+  // Joueur 2 : il commence par l'écran de la matière (v5.8), rien de choisi.
+  await expect(page.locator('#reglages-titre')).toHaveText('Tom (Joueur 2) : quelle matière ?');
   await expect(page.locator('#prepa-progres')).toHaveText('Étape 3 sur 4 · Joueur 2 sur 2');
-  // Le joueur 2 a ses propres réglages : pas de matière choisie, packs cachés ; en orthographe, rien de coché.
   await expect(page.locator('#reglages-ortho')).toBeHidden();
+  for (const c of await page.locator('#matieres input').all()) await expect(c).not.toBeChecked();
   await orthographe(page);
+  await expect(page.locator('#reglages-titre')).toHaveText('Tom (Joueur 2) : Orthographe');
   await expect(page.getByRole('checkbox', { name: 'Mots simples', exact: true })).not.toBeChecked();
-  // Retour au joueur 1 : ses choix sont gardés.
+  // Retour : la matière du joueur 2, puis les réglages du joueur 1, gardés.
   await page.getByRole('button', { name: /Retour/ }).click();
-  await expect(page.locator('#reglages-titre')).toContainText('Léa (Joueur 1)');
+  await expect(page.locator('#reglages-titre')).toHaveText('Tom (Joueur 2) : quelle matière ?');
+  await page.getByRole('button', { name: /Retour/ }).click();
+  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Orthographe');
   await expect(page.getByRole('checkbox', { name: 'Mots simples', exact: true })).not.toBeChecked();
 });
 
@@ -91,8 +95,9 @@ test('packs et questions décochés au départ ; « Valider » demande au moins 
   await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir une matière.');
   await page.locator('#matieres input[value="francais"]').check();
   await valider(page);
-  await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir Orthographe.');
+  await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir Orthographe ou Conjugaison.');
   await page.locator('#francais input[value="orthographe"]').check();
+  await valider(page); // écran des réglages de l'orthographe
   for (const c of await page.locator('#packs input, #types-questions input').all()) await expect(c).not.toBeChecked();
   // Rien de coché : on reste sur le joueur 1 avec un message.
   await valider(page);

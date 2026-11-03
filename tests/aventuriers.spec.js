@@ -90,8 +90,8 @@ test('v4.6 : chaque écran de la préparation tient sans défiler', async ({ pag
   await cocherTout(page, 4);
   await page.getByRole('radio', { name: /^Savane/ }).check(); // histoire la plus longue
   await tient('aventure');
-  // « Retour » remonte joueur par joueur et écran par écran : 4 → 3 (×4) → 2 (×4) → 1.
-  for (let k = 0; k < 9; k++) await page.getByRole('button', { name: /Retour/ }).click();
+  // « Retour » remonte joueur par joueur et écran par écran : 4 → 3 (réglages puis matière, ×4) → 2 (×4) → 1.
+  for (let k = 0; k < 13; k++) await page.getByRole('button', { name: /Retour/ }).click();
   await expect(page.locator('#prepa-progres')).toHaveText('Étape 1 sur 4');
   await tient('nombre de joueurs');
 });
