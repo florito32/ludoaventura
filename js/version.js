@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '4.6';
+  var VERSION = '4.7';
 
   var HISTORY = [
+    { v: '4.7', date: '2026-11-03', changes: [
+      'Choix des aventuriers : le cadre de couleur des personnages choisis (J1, J2…) n\u2019est plus coupé sur les bords de l\u2019écran, il est dessiné à l\u2019intérieur de la carte.'
+    ] },
     { v: '4.6', date: '2026-11-02', changes: [
       'Préparation en écrans successifs, sans défiler : 1) nombre de joueurs, 2) chaque joueur choisit son aventurier, 3) chaque joueur choisit son niveau, ses packs et ses questions, 4) l\u2019aventure, puis « Lancer la partie ». Chaque écran a son bouton « Valider » ; « Retour » revient au joueur ou à l\u2019écran précédent.'
     ] },

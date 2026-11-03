@@ -108,3 +108,19 @@ test('chaque portrait est un SVG valide (un attribut en double l\'empêchait de 
     expect(erreur, a.image).toBe('');
   }
 });
+
+// Bug v4.6 : le cadre de couleur des cartes choisies (J1, J2…) était dessiné à l'extérieur
+// de la carte et rogné par la grille sur les cartes du bord. Il doit rester à l'intérieur.
+test('cadres des aventuriers choisis entiers : rien ne dépasse de la carte', async ({ page }) => {
+  await preparation(page, 2);
+  await valider(page); // joueur 1 garde son aventurier → écran du joueur 2
+  const ombres = await page.locator('.aventurier.pris, .aventurier[aria-pressed="true"]')
+    .evaluateAll(els => els.map(e => getComputedStyle(e).boxShadow));
+  expect(ombres.length).toBeGreaterThanOrEqual(2);
+  for (const o of ombres) expect(o === 'none' || /inset/.test(o), o).toBe(true);
+  // Et la carte elle-même tient dans la grille (pas coupée).
+  const grille = await page.locator('.aventuriers').boundingBox();
+  const carte = await page.locator('.aventurier').first().boundingBox();
+  expect(carte.x).toBeGreaterThanOrEqual(grille.x - 0.5);
+  expect(carte.y).toBeGreaterThanOrEqual(grille.y - 0.5);
+});
