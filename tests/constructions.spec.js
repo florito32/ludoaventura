@@ -62,3 +62,13 @@ test('la construction suit les points gagnés pendant la partie', async ({ page 
   const pts = Number(await page.locator('#points').textContent());
   await expect(page.locator('#construction .etape.vue')).toHaveCount(K.etapesVisibles('viking', pts, 15));
 });
+
+// v5.5 : graphisme redessiné, progression inchangée (nombre d'étapes figé) et décor propre à chaque histoire.
+test('v5.5 : mêmes étapes qu\'avant et un décor (ciel) propre à chaque aventure', () => {
+  test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit');
+  const attendu = { viking: 13, chevalier: 10, prehistoire: 7, mayas: 7, savane: 10, egypte: 7, chine: 8, 'far-west': 9, druides: 9, incas: 7 };
+  for (const [id, n] of Object.entries(attendu)) {
+    expect(K.CONSTRUCTIONS[id].etapes.length, id).toBe(n);
+    expect(K.CONSTRUCTIONS[id].decor, id).toContain('id="ciel-' + id + '"');
+  }
+});
