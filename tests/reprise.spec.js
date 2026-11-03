@@ -1,7 +1,7 @@
 // La partie continue après un rafraîchissement, un changement de page ou une mise en veille ;
 // elle ne repart de l'accueil que si l'onglet est fermé (stockage de session, demande du 02/11/2026).
 const { test, expect } = require('@playwright/test');
-const { lancerPartie, attendreJoueur, rapide, lancerLeDe, versReglages, cocherJoueur, valider } = require('./aide');
+const { lancerPartie, attendreJoueur, rapide, lancerLeDe, versReglages, cocherJoueur, valider, orthographe } = require('./aide');
 
 async function unTour(page) {
   await page.getByRole('button', { name: 'Piocher une carte' }).click();
@@ -79,6 +79,7 @@ test('rafraîchir la préparation garde l\'écran et les choix (joueurs, joueur 
   await rapide(page);
   await page.goto('./');
   await versReglages(page, 3);
+  await orthographe(page);
   await page.getByRole('checkbox', { name: 'Temps', exact: true }).check();
   await page.getByRole('checkbox', { name: 'Syllabes', exact: true }).check();
   await valider(page); // joueur 2

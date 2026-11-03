@@ -1,7 +1,7 @@
 // Cartes JEU : 5 packs × 3 niveaux depuis l'Excel, choix par joueur, dictée, lecture vocale.
 const { test, expect } = require('@playwright/test');
 const C = require('../js/cartes.js');
-const { rapide, lancerLeDe, versReglages, cocherJoueur, valider, lancer } = require('./aide');
+const { rapide, lancerLeDe, versReglages, cocherJoueur, orthographe, valider, lancer } = require('./aide');
 
 // Remplace la synthèse vocale du navigateur par un enregistreur (les phrases « lues » sont gardées).
 async function voixEspion(page) {
@@ -61,7 +61,7 @@ test.describe('données des cartes', () => {
 
 test('préparation : chaque joueur choisit ses packs, sur son propre écran, sans choix du niveau', async ({ page }) => {
   await preparer(page, 2);
-  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : packs et questions');
+  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : ses cartes');
   // Plus de choix du niveau (v4.8).
   await expect(page.locator('input[name="niveau-cartes"]')).toHaveCount(0);
   await expect(page.getByText('Niveau', { exact: true })).toHaveCount(0);
@@ -70,9 +70,11 @@ test('préparation : chaque joueur choisit ses packs, sur son propre écran, san
   await expect(page.getByRole('checkbox', { name: 'Lettres', exact: true })).toHaveCount(0);
   await page.getByRole('checkbox', { name: 'Mots simples', exact: true }).uncheck();
   await valider(page);
-  await expect(page.locator('#reglages-titre')).toHaveText('Tom (Joueur 2) : packs et questions');
+  await expect(page.locator('#reglages-titre')).toHaveText('Tom (Joueur 2) : ses cartes');
   await expect(page.locator('#prepa-progres')).toHaveText('Étape 3 sur 4 · Joueur 2 sur 2');
-  // Le joueur 2 a ses propres réglages (rien de coché).
+  // Le joueur 2 a ses propres réglages : pas de matière choisie, packs cachés ; en orthographe, rien de coché.
+  await expect(page.locator('#reglages-ortho')).toBeHidden();
+  await orthographe(page);
   await expect(page.getByRole('checkbox', { name: 'Mots simples', exact: true })).not.toBeChecked();
   // Retour au joueur 1 : ses choix sont gardés.
   await page.getByRole('button', { name: /Retour/ }).click();
@@ -84,6 +86,13 @@ test('packs et questions décochés au départ ; « Valider » demande au moins 
   if (!page.__rapide) { await rapide(page); page.__rapide = true; }
   await page.goto('./');
   await versReglages(page, 2);
+  // Aucune matière choisie au départ (v5.7) : message, puis Français demande Orthographe.
+  await valider(page);
+  await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir une matière.');
+  await page.locator('#matieres input[value="francais"]').check();
+  await valider(page);
+  await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir Orthographe.');
+  await page.locator('#francais input[value="orthographe"]').check();
   for (const c of await page.locator('#packs input, #types-questions input').all()) await expect(c).not.toBeChecked();
   // Rien de coché : on reste sur le joueur 1 avec un message.
   await valider(page);
@@ -97,6 +106,7 @@ test('packs et questions décochés au départ ; « Valider » demande au moins 
   await page.getByRole('checkbox', { name: 'Épeler', exact: true }).check();
   await valider(page);
   // Joueur 2 : il faut aussi au moins un pack.
+  await orthographe(page);
   for (const c of await page.locator('#packs input, #types-questions input').all()) await expect(c).not.toBeChecked();
   await valider(page);
   await expect(page.locator('#packs-alerte')).toHaveText('Tom (Joueur 2) doit choisir au moins un pack.');
@@ -222,6 +232,7 @@ test('étape 3 : choix entourés sans case à cocher, colorés quand ils sont ch
   if (!page.__rapide) { await rapide(page); page.__rapide = true; }
   await page.goto('./');
   await versReglages(page, 1);
+  await orthographe(page);
   const pastille = page.locator('#packs .pack').first().locator('span').first();
   const style = (el) => el.evaluate((s) => {
     const c = getComputedStyle(s), b = getComputedStyle(s, '::before');
