@@ -1,5 +1,5 @@
 // Conjugaison (v5.8) : Français → Conjugaison, temps rangés par mode, groupes, niveau ;
-// carte = pronom + verbe + temps, réponse écrite et corrigée ; si faux : « ? » (tableau) et « C'est bon pour moi ».
+// carte = pronom + verbe + temps, réponse écrite et corrigée ; si faux : « ? » (tableau) et « J'ai compris ».
 const { test, expect } = require('@playwright/test');
 const V = require('../js/conjugaison.js');
 const { rapide, versReglages, valider, conjugaison, matiere, lancer, lancerLeDe } = require('./aide');
@@ -172,7 +172,7 @@ test('partie en conjugaison : bonne réponse → dé FORT tout seul @smoke', asy
   await expect.poll(async () => Number(await page.locator('#points').textContent())).toBeGreaterThanOrEqual(4);
 });
 
-test('conjugaison fausse : bonne réponse affichée, « ? » montre tout le verbe, le dé attend « C\'est bon pour moi »', async ({ page }) => {
+test('conjugaison fausse : bonne réponse affichée, « ? » montre tout le verbe, le dé attend « J\'ai compris »', async ({ page }) => {
   await rapide(page, { autoDe: 50 });
   page.__rapide = true;
   await preparer(page);
@@ -200,7 +200,7 @@ test('conjugaison fausse : bonne réponse affichée, « ? » montre tout le verb
   await expect(page.locator('#carte-reponse')).toContainText(c.bonne);
   await page.waitForTimeout(300);
   expect(Number(await page.locator('#points').textContent())).toBe(0);
-  await page.getByRole('button', { name: 'C’est bon pour moi' }).click();
+  await page.getByRole('button', { name: 'J’ai compris' }).click();
   await expect.poll(async () => Number(await page.locator('#points').textContent())).toBeGreaterThanOrEqual(1);
   expect(Number(await page.locator('#points').textContent())).toBeLessThanOrEqual(3);
 });

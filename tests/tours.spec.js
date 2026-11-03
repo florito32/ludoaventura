@@ -125,7 +125,7 @@ test('animation de réponse : « Bravo ! » et confettis si bonne, « Oups ! » 
   await expect(page.locator('.pion').nth(1)).toHaveClass(/secoue/);
 });
 
-test('après l\u2019animation de réponse, le bon dé se lance tout seul (FORT si bonne, FAIBLE si mauvaise)', async ({ page }) => {
+test('après l\u2019animation de réponse, le bon dé se lance tout seul (FORT si bonne) ; FAIBLE après « J’ai compris » (v6.1)', async ({ page }) => {
   await rapide(page, { autoDe: 300 });
   page.__rapide = true;
   await lancerPartie(page, { joueurs: 2 });
@@ -133,8 +133,10 @@ test('après l\u2019animation de réponse, le bon dé se lance tout seul (FORT s
     const avant = Number(await page.locator('#points').textContent());
     await page.getByRole('button', { name: 'Piocher une carte' }).click();
     await page.getByRole('button', { name: reponse }).click();
-    // v4.3 : ni commentaire visible ni bouton « Lancer le dé » dans le tour de jeu.
-    await expect(page.locator('#tour-actions')).toBeEmpty();
+    // v4.3 : ni commentaire visible ni bouton « Lancer le dé » dans le tour de jeu ;
+    // v6.1 : après une mauvaise réponse, seul le bouton « J'ai compris ».
+    if (reponse === 'Bonne réponse') await expect(page.locator('#tour-actions')).toBeEmpty();
+    else await page.getByRole('button', { name: 'J’ai compris' }).click();
     await expect(page.locator('#tour-consigne .visually-hidden')).toHaveCount(1);
     await expect(page.locator('#tour-consigne')).not.toContainText('Bravo');
     // Le dé roule seul, les points arrivent et le tour passe.
@@ -186,8 +188,31 @@ test('v4.5 : à la fin de « Bravo ! » / « Oups ! », le personnage reste sur 
     await page.getByRole('button', { name: reponse }).click();
     await page.locator('#reaction:not([hidden])').waitFor({ state: 'attached' });
     await page.locator('#reaction[hidden]').waitFor({ state: 'attached', timeout: 5000 }); // fin de l'animation de réponse
+    if (reponse === 'Mauvaise réponse') await page.getByRole('button', { name: 'J’ai compris' }).click(); // v6.1
     await expect(page.locator('#de-plateau')).toHaveClass(/pose/);
     expect(await page.evaluate(() => window.__arrivees)).toBe(0);
     await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
   }
+});
+
+// v6.1 : après une erreur, le joueur a le temps de comprendre : la réponse s'affiche et le dé attend « J'ai compris ».
+test('orthographe, « Mauvaise réponse » : la réponse s\'affiche, le dé FAIBLE attend « J\'ai compris »', async ({ page }) => {
+  await rapide(page, { autoDe: 50 });
+  await lancerPartie(page, { joueurs: 2 });
+  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await page.getByRole('button', { name: 'Mauvaise réponse' }).click();
+  await expect(page.locator('#carte-reponse')).toBeVisible();
+  await expect(page.locator('#carte-mot')).not.toHaveClass(/cache/);
+  await page.waitForTimeout(400);
+  expect(await page.evaluate(() => window.Aventura.partie.regles.etape)).toBe('lancer');
+  expect(Number(await page.locator('#points').textContent())).toBe(0);
+  await page.getByRole('button', { name: 'J’ai compris' }).click();
+  await expect.poll(async () => Number(await page.locator('#points').textContent())).toBeGreaterThanOrEqual(1);
+  expect(Number(await page.locator('#points').textContent())).toBeLessThanOrEqual(3);
+  // Une bonne réponse, elle, lance le dé FORT tout seul.
+  await attendreJoueur(page, 'Tom');
+  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await page.getByRole('button', { name: 'Bonne réponse' }).click();
+  await expect(page.getByRole('button', { name: 'J’ai compris' })).toHaveCount(0);
+  await expect.poll(async () => Number(await page.locator('#points').textContent())).toBeGreaterThanOrEqual(5);
 });

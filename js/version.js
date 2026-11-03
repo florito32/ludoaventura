@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.0';
+  var VERSION = '6.1';
 
   var HISTORY = [
+    { v: '6.1', date: '2026-11-03', changes: [
+      'Après une erreur (mathématiques, orthographe ou conjugaison), la bonne réponse reste affichée et le dé attend que le joueur touche « J\u2019ai compris » (ce bouton s\u2019appelait « C\u2019est bon pour moi »). Une bonne réponse lance toujours le dé tout seul.'
+    ] },
     { v: '6.0', date: '2026-11-03', changes: [
       'Conjugaison en trois petits écrans : la matière (Français → Conjugaison), puis les modes (indicatif, conditionnel, subjonctif, impératif) avec seulement les temps de ces modes, puis les groupes de verbes et le niveau.'
     ] },

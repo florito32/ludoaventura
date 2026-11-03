@@ -224,3 +224,20 @@ test('formule Expert : la page ne défile jamais de côté', async ({ page }) =>
   await page.getByRole('button', { name: 'Valider' }).click();
   expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
 });
+
+// v6.1 : un calcul faux attend « J'ai compris » avant le dé FAIBLE.
+test('calcul faux : la correction reste à l\'écran jusqu\'à « J\'ai compris »', async ({ page }) => {
+  await rapide(page, { autoDe: 50 });
+  page.__rapide = true;
+  await versMaths(page);
+  await maths(page, { signes: ['fois'], nombres: [3] });
+  await lancer(page);
+  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await page.getByLabel('Ta réponse').fill('1000');
+  await page.getByRole('button', { name: 'Valider' }).click();
+  await expect(page.locator('#carte-reponse')).toContainText('La bonne réponse est');
+  await page.waitForTimeout(400);
+  expect(Number(await page.locator('#points').textContent())).toBe(0);
+  await page.getByRole('button', { name: 'J’ai compris' }).click();
+  await expect.poll(async () => Number(await page.locator('#points').textContent())).toBeGreaterThanOrEqual(1);
+});
