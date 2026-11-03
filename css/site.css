@@ -167,14 +167,18 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 .aventurier {
   position: relative; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 1px;
   padding: 4px 4px 6px; font: inherit; color: var(--encre); cursor: pointer; text-align: center; line-height: 1.1;
-  background: #fff; border: 3px solid var(--parchemin-bord); border-radius: 12px;
+  background: #fff; border: 4px solid var(--parchemin-bord); border-radius: 12px;
 }
 .aventurier img { flex: 1 1 0; min-height: 0; width: 100%; object-fit: contain; border-radius: 10px; margin-bottom: 2px; }
 .aventurier-nom { font: 700 clamp(.78rem, 2.2vmin, .98rem)/1.1 "Rockwell", "Roboto Slab", Georgia, serif; }
 .aventurier-titre { font-size: clamp(.62rem, 1.6vmin, .72rem); color: var(--encre-douce); }
 @media (max-height: 620px) { .aventurier-titre { display: none; } }
-.aventurier.pris { border-color: var(--c); box-shadow: 0 0 0 2px var(--c); }
-.aventurier[aria-pressed="true"] { border-color: var(--encre); box-shadow: 0 0 0 4px var(--c); }
+/* Cadres de couleur dessinés À L'INTÉRIEUR de la carte (bordure + ombre « inset ») :
+   la grille coupe ce qui dépasse (overflow: hidden), un cadre extérieur était rogné
+   sur les cartes du bord (v4.7). */
+.aventurier.pris { border-color: var(--c); }
+.aventurier[aria-pressed="true"] { border-color: var(--encre); box-shadow: inset 0 0 0 4px var(--c); }
+.aventurier:focus-visible { outline-offset: -8px; box-shadow: inset 0 0 0 4px var(--c, var(--encre)); }
 .aventurier:disabled { cursor: not-allowed; opacity: .55; }
 .aventurier-pris:not(:empty) {
   position: absolute; top: 2px; right: 2px; min-width: 28px; padding: 1px 5px; border-radius: 99px;
@@ -237,7 +241,7 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 .etape-aventure .aventures { flex: 1; min-height: 0; height: auto; }
 .aventure {
   position: relative; min-height: 0; display: flex; flex-direction: column; cursor: pointer; overflow: hidden;
-  background: #fff; border: 3px solid var(--parchemin-bord); border-radius: 12px;
+  background: #fff; border: 4px solid var(--parchemin-bord); border-radius: 12px;
 }
 .aventure img { flex: 1 1 0; min-height: 0; width: 100%; object-fit: cover; display: block; }
 .aventure-nom { font: 700 clamp(.72rem, 2vmin, 1rem)/1.15 "Rockwell", "Roboto Slab", Georgia, serif; padding: 3px 6px 0; }
