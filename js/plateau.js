@@ -52,6 +52,10 @@
   var K = window.Calcul;
   var V = window.Conjugaison;
   var MATIERES = ['maths', 'orthographe', 'conjugaison']; // matières jouables (Français → Orthographe ou Conjugaison)
+  var AIDES_NIVEAU = {
+    facile: 'Facile : les tables (table de 2 → 2 × 8, 2 + 8, 16 ÷ 2…).',
+    moyen: 'Moyen : 2 signes par calcul.', difficile: 'Difficile : 3 signes par calcul.', expert: 'Expert : 4 signes par calcul.'
+  };
   function mathsVides() { return { signes: [], nombres: [], niveau: 'facile' }; }
   function conjVide() { return { temps: [], groupes: [], niveau: 'facile' }; }
 
@@ -258,7 +262,7 @@
     if (!m) return partie.francais[i] ? 'francais' : 'matiere';
     if (m === 'maths') {
       if (!partie.maths[i].signes.length) return 'signe';
-      if (!partie.maths[i].nombres.length) return 'nombre';
+      if (!partie.maths[i].nombres.length) return partie.maths[i].niveau === 'facile' ? 'table' : 'nombre';
       return null;
     }
     if (m === 'conjugaison') {
@@ -278,6 +282,7 @@
     groupe: ['choisir au moins un groupe de verbes.', 'groupes'],
     signe: ['choisir au moins un signe.', 'signes'],
     nombre: ['choisir au moins un nombre.', 'nombres'],
+    table: ['choisir au moins une table.', 'nombres'],
     pack: ['choisir au moins un pack.', 'packs'],
     type: ['choisir au moins un type de question.', 'types-questions']
   };
@@ -398,6 +403,11 @@
     $('francais').querySelectorAll('input').forEach(function (i) { i.checked = i.value === mat; });
     $('reglage-francais').hidden = !fr;
     $('reglages-maths').hidden = mat !== 'maths';
+    $('reglage-niveau-maths').hidden = mat !== 'maths';
+    // Niveau de calcul : une phrase d'aide sous les choix ; au niveau Facile, les nombres deviennent des tables.
+    var nvm = partie.maths[a].niveau;
+    $('niveau-maths-aide').textContent = AIDES_NIVEAU[nvm];
+    $('nombres-titre').innerHTML = nvm === 'facile' ? 'Tables <span>(au moins une : table de 2 → 2 × 8, 2 + 8…)</span>' : 'Nombres <span>(au moins un)</span>';
     $('reglages-ortho').hidden = mat !== 'orthographe';
     $('reglages-conj').hidden = mat !== 'conjugaison';
     var cc = partie.conj[a];
@@ -453,7 +463,7 @@
     if (partie.matiere[j.index] === 'maths') {
       var m = partie.maths[j.index], f = K.generer(m);
       f.type = 'calcul';
-      f.packNom = 'Calcul · ' + K.niveau(m.niveau).nom;
+      f.packNom = 'Calcul · ' + K.niveau(m.niveau).nom + (f.table ? ' · table de ' + f.table : '');
       return f;
     }
     // Conjugaison : un verbe, un temps et un pronom tirés selon les réglages du joueur.

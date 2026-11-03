@@ -103,6 +103,12 @@
               <label class="pack"><input type="radio" name="francais" value="conjugaison"><span>Conjugaison</span></label>
             </div>
           </div>
+          <!-- Mathématiques : le niveau se choisit tout de suite, sur cet écran (v5.9). Facile = les tables. -->
+          <div class="reglage-ligne" id="reglage-niveau-maths" hidden>
+            <p class="reglage-titre" id="niveau-maths-titre">Niveau</p>
+            <div class="packs" id="niveau-maths" role="radiogroup" aria-labelledby="niveau-maths-titre" aria-describedby="niveau-maths-aide"></div>
+            <p class="reglage-aide" id="niveau-maths-aide"></p>
+          </div>
           </div>
 
           <div class="reglages-matiere" id="reglages-maths" hidden>
@@ -111,12 +117,9 @@
               <div class="packs" id="signes" role="group" aria-labelledby="signes-titre"></div>
             </div>
             <div class="reglage">
+              <!-- « Tables » au niveau Facile (table de 2 → 2 × 8…), « Nombres » aux autres niveaux. -->
               <p class="reglage-titre" id="nombres-titre">Nombres <span>(au moins un)</span></p>
               <div class="packs nombres" id="nombres" role="group" aria-labelledby="nombres-titre"></div>
-            </div>
-            <div class="reglage">
-              <p class="reglage-titre" id="niveau-maths-titre">Niveau <span>(1 à 4 signes par calcul)</span></p>
-              <div class="packs" id="niveau-maths" role="radiogroup" aria-labelledby="niveau-maths-titre"></div>
             </div>
           </div>
 

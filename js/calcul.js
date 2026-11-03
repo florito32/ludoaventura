@@ -3,6 +3,8 @@
 //  - les signes (additionner, soustraire, multiplier, diviser), au moins un ;
 //  - les nombres de 1 à 10 utilisés dans les calculs, au moins un ;
 //  - le niveau : Facile = 1 signe, Moyen = 2, Difficile = 3, Expert = 4 (choix de l'utilisateur).
+// Au niveau Facile, les nombres choisis sont des TABLES (demande du 03/11/2026) : table de 2 →
+//  2 × 1 … 2 × 10, 2 + 1 … 2 + 10, (2 + k) − 2, (2 × k) ÷ 2, selon les signes choisis (résultat entier).
 // Ordre de calcul : priorités habituelles, × et ÷ avant + et − (choix de l'utilisateur).
 // Le résultat est un nombre entier, ou un nombre à une décimale s'il y a une division ;
 // il n'est jamais négatif, et chaque étape du calcul garde au plus une décimale.
@@ -74,6 +76,7 @@
     var signes = reglages.signes && reglages.signes.length ? reglages.signes : ['plus'];
     var nombres = reglages.nombres && reglages.nombres.length ? reglages.nombres : NOMBRES;
     function tirer(t) { return t[Math.floor(hasard() * t.length)]; }
+    if (niveau(reglages.niveau).id === 'facile') return table(tirer(nombres), tirer(signes), tirer(NOMBRES));
     for (var n = niveau(reglages.niveau).signes; n >= 1; n--) {
       for (var essai = 0; essai < 3000; essai++) {
         var nb = [], ops = [];
@@ -88,13 +91,21 @@
     return carte([a, a], ['plus'], a + a);
   }
 
-  function carte(nb, ops, resultat) {
+  // Une question de la table de n (k de 1 à 10), selon le signe.
+  function table(n, op, k) {
+    if (op === 'plus') return carte([n, k], ['plus'], n + k, n);
+    if (op === 'moins') return carte([n + k, n], ['moins'], k, n);
+    if (op === 'fois') return carte([n, k], ['fois'], n * k, n);
+    return carte([n * k, n], ['divise'], k, n);
+  }
+
+  function carte(nb, ops, resultat, tableDe) {
     var texte = String(nb[0]), oral = String(nb[0]);
     for (var i = 0; i < ops.length; i++) {
       texte += ' ' + signe(ops[i]).symbole + ' ' + nb[i + 1];
       oral += ' ' + signe(ops[i]).oral + ' ' + nb[i + 1];
     }
-    return { nombres: nb, operations: ops, formule: texte, oral: 'Combien font ' + oral + ' ?', resultat: resultat, resultatTexte: ecrire(resultat) };
+    return { nombres: nb, operations: ops, table: tableDe || null, formule: texte, oral: 'Combien font ' + oral + ' ?', resultat: resultat, resultatTexte: ecrire(resultat) };
   }
 
   // Lit la réponse tapée : « 3,5 », « 3.5 », « 12 », espaces tolérés. NaN si ce n'est pas un nombre.
@@ -111,7 +122,7 @@
 
   var api = { SIGNES: SIGNES, NOMBRES: NOMBRES, NIVEAUX: NIVEAUX, signe: signe, niveau: niveau,
     evaluer: function (nb, ops) { var r = evaluer(nb, ops); return r ? versNombre(r) : null; },
-    generer: generer, lire: lire, juste: juste, ecrire: ecrire };
+    generer: generer, table: table, lire: lire, juste: juste, ecrire: ecrire };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else racine.Calcul = api;
 })(this);
