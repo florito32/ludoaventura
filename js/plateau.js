@@ -86,7 +86,7 @@
       label.className = 'aventure';
       label.innerHTML =
         '<input type="radio" name="aventure" value="' + av.id + '"' + (i === 0 ? ' checked' : '') + '>' +
-        '<img src="' + av.image + '" alt="" width="640" height="400" loading="lazy">' +
+        '<img src="' + av.image + '" alt="" width="233" height="274" loading="lazy">' +
         '<span class="aventure-nom">' + av.nom + '</span>' +
         '<span class="aventure-diff diff-' + av.difficulte + '">' + DIFF[av.difficulte] + '</span>';
       box.appendChild(label);

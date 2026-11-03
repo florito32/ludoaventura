@@ -11,23 +11,21 @@ test.describe('données des aventures', () => {
     expect(new Set(A.LISTE.map((a) => a.id)).size).toBe(10);
     for (const a of A.LISTE) {
       expect(a.nom).toBeTruthy();
-      expect(a.image).toMatch(/^img\/aventures\/[a-z-]+\.svg$/);
+      expect(a.image).toMatch(/^img\/aventures\/[a-z-]+\.webp$/);
       expect(['facile', 'moyen', 'difficile']).toContain(a.difficulte);
     }
   });
 
-  test('chaque illustration d\'aventure est un SVG valide', () => {
+  test('chaque illustration d\'aventure est une image WebP (planche « histoires », v5.4)', () => {
     const fs = require('fs');
     for (const a of A.LISTE) {
-      const svg = fs.readFileSync(a.image, 'utf8');
-      expect(svg, a.image).toMatch(/^<svg[\s\S]*<\/svg>\s*$/);
-      // Un attribut répété dans une balise rend le SVG invalide (bug déjà rencontré sur les portraits).
-      for (const balise of svg.match(/<[a-zA-Z][^>]*>/g)) {
-        const noms = (balise.match(/\s([a-zA-Z:-]+)=/g) || []).map((n) => n.trim());
-        expect(new Set(noms).size, a.image + ' : ' + balise).toBe(noms.length);
-      }
+      const b = fs.readFileSync(a.image);
+      expect(b.subarray(0, 4).toString(), a.image).toBe('RIFF');
+      expect(b.subarray(8, 12).toString(), a.image).toBe('WEBP');
+      expect(b.length, a.image).toBeGreaterThan(5000);
     }
   });
+
 
   test('objectif = 15 / 18 / 21 points par joueur × nombre de joueurs', () => {
     expect(A.objectif(A.trouver('viking'), 1)).toBe(15);

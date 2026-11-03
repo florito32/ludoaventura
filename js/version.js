@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '5.3';
+  var VERSION = '5.4';
 
   var HISTORY = [
+    { v: '5.4', date: '2026-11-03', changes: [
+      'Nouvelles images des 10 aventures (illustrations de la planche « histoires ») sur le choix de l\u2019aventure et sur le rouleau du plateau.'
+    ] },
     { v: '5.3', date: '2026-11-03', changes: [
       'Choix de l\u2019aventure : le cadre rouge de l\u2019aventure choisie n\u2019est plus coupé sur les bords, il est dessiné à l\u2019intérieur de la carte.'
     ] },
