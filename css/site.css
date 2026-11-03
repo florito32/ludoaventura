@@ -368,10 +368,7 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
   backface-visibility: hidden; -webkit-backface-visibility: hidden;
 }
 .de3d-fort .face { background: #fff3c4; }
-.de3d .face i { width: 70%; aspect-ratio: 1; border-radius: 50%; place-self: center; background: var(--encre); }
-.de3d .face i:nth-of-type(3n+1) { background: var(--rouge); }
-.de3d .face i:nth-of-type(3n+2) { background: var(--bleu); }
-.de3d .face i:nth-of-type(3n) { background: #c99a00; }
+.de3d .face i { width: 70%; aspect-ratio: 1; border-radius: 50%; place-self: center; background: #000; } /* points noirs (v5.1) */
 .face-avant { transform: translateZ(calc(clamp(48px, 9cqw, 96px) / 2)); }
 .face-arriere { transform: rotateY(180deg) translateZ(calc(clamp(48px, 9cqw, 96px) / 2)); }
 .face-droite { transform: rotateY(90deg) translateZ(calc(clamp(48px, 9cqw, 96px) / 2)); }

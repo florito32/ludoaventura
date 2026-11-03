@@ -82,3 +82,15 @@ test('v4.4 : les coins du dé restent arrondis (les faces de derrière ne dépas
     await expect.poll(() => f.evaluate((el) => parseFloat(getComputedStyle(el).borderTopLeftRadius))).toBeGreaterThan(0);
   }
 });
+
+test('v5.1 : les points du dé sont noirs, sur le dé FORT comme sur le dé FAIBLE', async ({ page }) => {
+  await lancerPartie(page);
+  for (const reponse of ['Bonne réponse', 'Mauvaise réponse']) {
+    await page.getByRole('button', { name: 'Piocher une carte' }).click();
+    await page.getByRole('button', { name: reponse }).click();
+    await lancerLeDe(page);
+    const couleurs = await page.locator('#de3d .face i').evaluateAll((p) => [...new Set(p.map((x) => getComputedStyle(x).backgroundColor))]);
+    expect(couleurs).toEqual(['rgb(0, 0, 0)']);
+    await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
+  }
+});

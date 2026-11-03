@@ -58,5 +58,5 @@ Statuts : à faire / en cours / fait à valider / terminé / question en attente
 | 52 | Ne plus proposer le pack « Lettres » | fait à valider (v4.8, livré avec la ligne 51 : sans niveau, les niveaux 2 et 3 du pack Lettres, qui sont des mots, auraient été mélangés aux lettres) — 4 packs proposés ; les cartes Lettres restent dans js/cartes.js (généré depuis l'Excel) mais ne sont plus piochées | ✅ local (4 formats) + CI |
 | 53 | Ne plus proposer la question « Première lettre » | fait à valider (v4.9) — 7 types de questions proposés ; un choix gardé d'une partie en cours est ignoré | ✅ local (4 formats) + CI |
 | 54 | Cartes : bouton « Voir le mot » juste sous « Écouter », avec une icône d'œil comme « Écouter » a la sienne | fait à valider (v5.0) — même style que « Écouter » (bouton foncé), icône 👁️ gardée en « Cacher le mot » ; « Voir la réponse » reste sous le mot | ✅ local (4 formats) + CI |
-| 55 | Points du dé en noir, pas de couleur | à faire | — |
+| 55 | Points du dé en noir, pas de couleur | fait à valider (v5.1) — tous les points du dé qui roule sont noirs, sur les deux dés (FAIBLE et FORT) | ✅ local (4 formats) + CI |
 | 56 | Ne plus afficher « Léa gagne 3 points ! Au tour de Tom. » dans l'encadré Tour de jeu (déjà affiché sur le plateau) | à faire | — |
