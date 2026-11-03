@@ -764,11 +764,18 @@
     } else if (r.etape === 'repondre') {
       consigne.textContent = 'La réponse de ' + j.nom + ' est-elle bonne ?';
       bouton('Bonne réponse', 'btn-bonne', function () { R.repondre(r, true); reagir(true); rendre(); lancerApresReaction(); });
-      bouton('Mauvaise réponse', 'btn-mauvaise', function () { R.repondre(r, false); reagir(false); rendre(); lancerApresReaction(); });
+      // Mauvaise réponse en orthographe : la réponse s'affiche et le dé attend « J'ai compris » (v6.1).
+      bouton('Mauvaise réponse', 'btn-mauvaise', function () {
+        R.repondre(r, false);
+        partie.carte.attente = true;
+        montrerReponse();
+        reagir(false);
+        rendre();
+      });
     } else if (r.etape === 'lancer' && partie.carte && partie.carte.attente) {
-      // Conjugaison fausse : le joueur regarde la correction (et le « ? »), puis dit que c'est bon pour lui.
-      annoncer(j.nom + ' lit la correction, puis touche « C\u2019est bon pour moi ».');
-      bouton('C\u2019est bon pour moi', 'btn-principal', function () {
+      // Réponse fausse : le joueur lit la correction (et le « ? » en conjugaison), puis « J'ai compris » lance le dé.
+      annoncer(j.nom + ' lit la correction, puis touche « J\u2019ai compris ».');
+      bouton('J\u2019ai compris', 'btn-principal', function () {
         partie.carte.attente = false;
         rendre();
         lancerDe(r.de);
@@ -844,7 +851,7 @@
   function lancerApresReaction() {
     var r = partie.regles;
     if (r.etape !== 'lancer') return;
-    if (partie.carte && partie.carte.attente) return; // le joueur n'a pas encore dit « C'est bon pour moi »
+    if (partie.carte && partie.carte.attente) return; // le joueur n'a pas encore touché « J'ai compris »
     var de = r.de;
     clearTimeout(minuteurDe);
     minuteurDe = setTimeout(function () { minuteurDe = null; lancerDe(de); }, DELAI_AUTO_DE);
@@ -940,8 +947,8 @@
     }
     c.reponseDonnee = texte;
     c.juste = conj ? V.juste(texte, c.verbe, c.temps, c.personne) : K.juste(texte, c.resultat);
-    // Conjugaison fausse : on attend que le joueur dise « C'est bon pour moi » avant de lancer le dé.
-    c.attente = conj && !c.juste;
+    // Réponse fausse (calcul ou conjugaison) : on attend « J'ai compris » avant de lancer le dé (v6.1).
+    c.attente = !c.juste;
     montrerCalcul(c);
     R.repondre(r, c.juste);
     reagir(c.juste);
