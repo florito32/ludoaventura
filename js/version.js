@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '5.4';
+  var VERSION = '5.5';
 
   var HISTORY = [
+    { v: '5.5', date: '2026-11-03', changes: [
+      'Encadré des points : les constructions (drakkar, épées, feu, pyramides, gazelles, muraille, voie ferrée, pierres levées, temple inca) sont redessinées dans le style des nouvelles images d\u2019aventure, avec le même décor que chaque histoire. La progression ne change pas.'
+    ] },
     { v: '5.4', date: '2026-11-03', changes: [
       'Nouvelles images des 10 aventures (illustrations de la planche « histoires ») sur le choix de l\u2019aventure et sur le rouleau du plateau.'
     ] },
