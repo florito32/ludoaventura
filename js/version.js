@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.7';
+  var VERSION = '6.8';
 
   var HISTORY = [
+    { v: '6.8', date: '2026-11-03', changes: [
+      "Plateau : la page ne défile plus jamais, sur tous les écrans (ordinateur et téléphone en paysage compris). Sur un écran large, le plateau prend toute la hauteur et le tour de jeu est à droite ; s\u2019il manque de place (correction, tableau « ? »), l\u2019encadré s\u2019élargit par-dessus le plateau. Les boutons restent toujours à l\u2019écran.",
+      "Correction : au tout début de la partie, toucher « Piocher une carte » au mauvais moment pouvait ne rien faire."
+    ] },
     { v: '6.7', date: '2026-11-03', changes: [
       "Préparation, conjugaison : les groupes de verbes et le niveau sont en grands boutons qui prennent toute la place de l\u2019écran."
     ] },
