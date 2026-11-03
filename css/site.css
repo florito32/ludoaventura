@@ -461,6 +461,10 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
   background: var(--encre); color: #fff; border: 2px solid var(--encre); border-radius: 99px;
 }
 .btn-ecouter:disabled { opacity: .5; cursor: not-allowed; }
+/* « Écouter » et « Voir le mot » l'un sous l'autre, même largeur. */
+.carte-outils { flex: none; display: flex; flex-direction: column; gap: 6px; }
+.carte-outils .btn-ecouter { white-space: nowrap; }
+.carte-outils [hidden] { display: none; }
 .carte-consigne { margin-top: 8px !important; font-weight: 600; }
 .carte-mot {
   margin: 6px 0 !important; text-align: center; font: 800 clamp(1.5rem, 6vw, 2.1rem)/1.2 "Rockwell", "Roboto Slab", Georgia, serif;

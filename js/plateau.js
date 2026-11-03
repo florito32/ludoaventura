@@ -655,15 +655,15 @@
       '<small>' + c.packNom + (c.question ? ' · ' + c.question.nom : '') + '</small>';
     $('carte-consigne').textContent = c.lettre ? 'Quelle est cette lettre ?' : c.question.consigne;
     var mot = $('carte-mot');
-    var boutons = $('carte-boutons');
+    var boutons = $('carte-boutons'), voirMot = $('btn-voir-mot');
     $('carte-reponse').hidden = true;
     if (c.lettre) {
       mot.textContent = c.mot;
       mot.className = 'carte-mot lettre';
-      boutons.hidden = true;
+      boutons.hidden = true; voirMot.hidden = true;
     } else {
       cacherMot();
-      boutons.hidden = false;
+      boutons.hidden = false; voirMot.hidden = false;
     }
   }
 
@@ -679,7 +679,7 @@
   // Textes des deux boutons selon ce qui est affiché : rien, le mot seul (aide) ou la réponse.
   function majBoutonsCarte() {
     var mot = $('btn-voir-mot'), rep = $('btn-voir');
-    mot.textContent = partie.vue === 'mot' ? 'Cacher le mot' : 'Voir le mot';
+    mot.querySelector('.btn-libelle').textContent = partie.vue === 'mot' ? 'Cacher le mot' : 'Voir le mot'; // garde l'icône d'œil
     mot.setAttribute('aria-expanded', String(partie.vue === 'mot'));
     rep.textContent = partie.vue === 'reponse' ? 'Cacher la réponse' : 'Voir la réponse';
     rep.setAttribute('aria-expanded', String(partie.vue === 'reponse'));
