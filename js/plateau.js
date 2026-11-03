@@ -61,7 +61,7 @@
   // Écran de l'étape 3 où se règle chaque chose qui manque.
   function ecranDe(m) {
     if (m === 'matiere' || m === 'francais') return 'matiere';
-    if (m === 'mode' || m === 'temps') return 'modes';
+    if (m === 'mode' || m === 'temps' || m === 'tempsMode') return 'modes';
     return 'reglages';
   }
 
@@ -280,12 +280,23 @@
     if (m === 'conjugaison') {
       if (!partie.conj[i].modes.length) return 'mode';
       if (!partie.conj[i].temps.length) return 'temps';
+      // Chaque mode choisi doit avoir au moins un de ses temps (v6.3 : Indicatif + Conditionnel
+      // avec seulement « Futur simple » ne bloquait pas).
+      if (modeSansTemps(i)) return 'tempsMode';
       if (!partie.conj[i].groupes.length) return 'groupe';
       return null;
     }
     if (!partie.packs[i].length) return 'pack';
     if (!partie.types[i].length) return 'type';
     return null;
+  }
+  // Premier mode choisi par le joueur i sans aucun de ses temps (ou null).
+  function modeSansTemps(i) {
+    var c = partie.conj[i];
+    var id = c.modes.filter(function (m) {
+      return !c.temps.some(function (t) { return t.split('.')[0] === m; });
+    })[0];
+    return id ? V.MODES.filter(function (m) { return m.id === id; })[0] : null;
   }
   // Message et endroit où mettre le focus pour chaque chose qui manque.
   var MANQUES = {
@@ -308,6 +319,13 @@
     var nom = P.trouver(partie.choix[i]).nom;
     var alerte = $('packs-alerte');
     alerte.className = 'reglage-alerte';
+    if (m === 'tempsMode') {
+      // Un mode choisi sans temps : on le nomme et on va sur ses temps.
+      var md = modeSansTemps(i);
+      alerte.textContent = nom + ' (Joueur ' + (i + 1) + ') doit choisir au moins un temps ' + md.oral + '.';
+      $('temps-conj').querySelector('[data-mode="' + md.id + '"] input').focus({ preventScroll: true });
+      return false;
+    }
     alerte.textContent = nom + ' (Joueur ' + (i + 1) + ') doit ' + MANQUES[m][0];
     $(MANQUES[m][1]).querySelector('input').focus({ preventScroll: true });
     return false;

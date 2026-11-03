@@ -125,6 +125,8 @@ test('conjugaison en 3 écrans : matière → modes et leurs temps seulement →
   await page.locator('#modes-conj label', { hasText: 'Conditionnel' }).click();
   expect(await page.evaluate(() => window.Aventura.partie.conj[0].temps)).toEqual([]);
   await page.getByRole('checkbox', { name: 'Indicatif futur simple' }).check();
+  // Un mode choisi sans temps bloque (v6.3) : on retire Subjonctif et Impératif.
+  for (const m of ['Subjonctif', 'Impératif']) await page.locator('#modes-conj label', { hasText: m }).click();
   await valider(page);
   // Écran 3 : groupes et niveau.
   await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Conjugaison, les verbes');
@@ -145,6 +147,22 @@ test('conjugaison en 3 écrans : matière → modes et leurs temps seulement →
   await page.locator('#groupes input[value="2"]').check();
   await valider(page);
   await expect(page.getByRole('button', { name: 'Lancer la partie' })).toBeVisible();
+});
+
+// Bug v6.2 (ligne 84 du backlog) : Indicatif + Conditionnel choisis, un temps de l'indicatif seulement → ça passait.
+test('chaque mode choisi doit avoir au moins un temps', async ({ page }) => {
+  await preparer(page);
+  await matiere(page, 'conjugaison');
+  await page.locator('#modes-conj label', { hasText: 'Indicatif' }).click();
+  await page.locator('#modes-conj label', { hasText: 'Conditionnel' }).click();
+  await page.getByRole('checkbox', { name: 'Indicatif futur simple' }).check();
+  await valider(page);
+  await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir au moins un temps du conditionnel.');
+  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Conjugaison, les temps');
+  await expect(page.getByRole('checkbox', { name: 'Conditionnel présent' })).toBeFocused();
+  await page.getByRole('checkbox', { name: 'Conditionnel passé' }).check();
+  await valider(page);
+  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Conjugaison, les verbes');
 });
 
 // Joue la carte affichée : bonne réponse ou réponse fausse.
