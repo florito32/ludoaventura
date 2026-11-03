@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '5.2';
+  var VERSION = '5.3';
 
   var HISTORY = [
+    { v: '5.3', date: '2026-11-03', changes: [
+      'Choix de l\u2019aventure : le cadre rouge de l\u2019aventure choisie n\u2019est plus coupé sur les bords, il est dessiné à l\u2019intérieur de la carte.'
+    ] },
     { v: '5.2', date: '2026-11-03', changes: [
       'Tour de jeu : « Léa gagne 3 points ! Au tour de Tom. » n\u2019est plus écrit dans l\u2019encadré, seulement sur le plateau.'
     ] },

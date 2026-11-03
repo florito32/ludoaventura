@@ -150,7 +150,8 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
   background: #fff; border: 3px solid var(--parchemin-bord); font: 800 clamp(1.6rem, 6vw, 2.4rem)/1 system-ui, sans-serif;
 }
 .nb-joueurs input:checked + span { background: var(--encre); color: #fff; border-color: var(--encre); }
-.nb-joueurs input:focus-visible + span, .aventure:has(input:focus-visible) { outline: 3px solid var(--rouge); outline-offset: 3px; }
+.nb-joueurs input:focus-visible + span { outline: 3px solid var(--rouge); outline-offset: 3px; }
+.aventure:has(input:focus-visible)::after { outline: 3px solid var(--encre); outline-offset: -10px; border-radius: 8px; }
 
 /* 2. Aventuriers et 4. aventures : grilles qui remplissent la place libre (lignes de hauteur égale).
    Écran haut (portrait) : 3 colonnes ; sinon (paysage, carré) : 5 colonnes. */
@@ -240,7 +241,13 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 .diff-facile::before { color: #2f8a4e; }
 .diff-moyen::before { color: #c98a00; }
 .diff-difficile::before { color: var(--rouge); }
-.aventure:has(input:checked) { border-color: var(--encre); box-shadow: 0 0 0 3px var(--rouge); }
+/* Aventure choisie : cadre dessiné À L'INTÉRIEUR de la carte (pseudo-élément au-dessus de l'image),
+   car la grille coupe ce qui dépasse (v5.3, même correction que pour les aventuriers en v4.7). */
+.aventure::after {
+  content: ""; position: absolute; inset: 0; border-radius: 8px; pointer-events: none; z-index: 1;
+}
+.aventure:has(input:checked) { border-color: var(--encre); }
+.aventure:has(input:checked)::after { box-shadow: inset 0 0 0 4px var(--rouge); }
 .aventure-detail { flex: none; padding-top: 6px; border-top: 2px dashed var(--parchemin-bord); }
 .aventure-detail h3 { font-size: 1.05rem; margin-bottom: 2px; }
 .aventure-detail p { margin: 0 0 4px; max-width: 60em; font-size: .92rem; line-height: 1.3; }
