@@ -330,6 +330,66 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
   #reglages-ortho .packs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
+/* Conjugaison, écran des temps (v6.6) : chaque mode choisi est un cadre qui entoure SES temps,
+   rangés en colonne (un temps sous l'autre), pour ne pas confondre les temps de deux modes.
+   Écran plus large que haut : les cadres côte à côte ; sinon 2 colonnes, l'indicatif (8 temps) à gauche,
+   les autres modes empilés à droite. Les boutons grandissent avec la place libre. */
+#conj-temps { height: 100%; display: flex; flex-direction: column; gap: clamp(4px, 1.6cqh, 14px); }
+#conj-temps .reglage { margin: 0; }
+#conj-temps .reglage-ligne { justify-content: center; }
+/* Écran étroit : sans le mot « Modes » (les cadres le disent) ; très étroit : les 4 modes en 2 × 2. */
+@container (max-width: 520px) {
+  #conj-temps .reglage-ligne > .reglage-titre { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+}
+@container (max-width: 400px) {
+  #modes-conj { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 6px; width: 100%; }
+  #modes-conj .pack span { width: 100%; justify-content: center; min-height: 30px; }
+}
+#conj-temps > .reglage:last-child { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+#temps-conj {
+  --ht: clamp(24px, calc((100cqh - 7rem) / 8 - 1cqh), 64px);
+  flex: 1; min-height: 0; display: grid; gap: clamp(6px, 1.6cqi, 16px); align-content: safe center;
+  grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); grid-template-rows: auto;
+}
+#temps-conj .mode-ligne {
+  display: flex; flex-direction: column; align-items: stretch; gap: clamp(2px, .8cqh, 8px); align-self: start;
+  border: 3px solid var(--encre); border-radius: 16px; padding: clamp(4px, 1cqh, 10px) clamp(4px, 1cqi, 10px);
+  background: rgb(255 255 255 / .55);
+}
+#temps-conj .mode-ligne[hidden] { display: none; }
+#temps-conj .mode-nom { width: auto; text-align: center; color: var(--encre); font-size: clamp(.78rem, calc(var(--ht) * .42), 1.3rem); }
+#temps-conj .mode-nom .long { display: inline; }
+#temps-conj .mode-nom .court { display: none; }
+#temps-conj .packs { display: grid; grid-template-columns: 1fr; gap: clamp(2px, .7cqh, 8px); }
+#temps-conj .pack span {
+  width: 100%; height: var(--ht); min-height: 0; padding: 0 6px; justify-content: center; text-align: center; line-height: 1.05;
+  border-radius: 12px; font-size: clamp(.74rem, min(calc(var(--ht) * .4), 3.2cqi), 1.25rem);
+}
+@container (max-aspect-ratio: 1/1) {
+  #temps-conj { --ht: clamp(24px, calc((100cqh - 16rem) / 8 - 1cqh), 64px); grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-columns: auto; }
+  #temps-conj .mode-ligne[data-mode="indicatif"] { grid-column: 1; grid-row: 1 / span 3; }
+  #temps-conj .pack span { font-size: clamp(.78rem, min(calc(var(--ht) * .42), 5cqi), 1.25rem); }
+}
+/* Écran très bas (téléphone en paysage, format carré) : dans leur cadre, les 8 temps de l'indicatif
+   et les 4 du subjonctif passent sur deux colonnes (4 lignes au plus). */
+@container (max-height: 380px) and (min-aspect-ratio: 1/1) {
+  #temps-conj { --ht: clamp(24px, calc((100cqh - 9rem) / 4 - 1cqh), 48px); }
+  #temps-conj .mode-ligne { grid-column: auto; }
+  #temps-conj [data-mode="indicatif"] .packs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* Indicatif | Subjonctif | Conditionnel au-dessus de l'Impératif. */
+  #temps-conj { grid-template-columns: 2fr 1fr 1fr; grid-auto-flow: row; }
+  #temps-conj [data-mode="indicatif"] { grid-column: 1; grid-row: 1 / span 2; }
+  #temps-conj [data-mode="subjonctif"] { grid-column: 2; grid-row: 1 / span 2; }
+  #temps-conj [data-mode="conditionnel"] { grid-column: 3; grid-row: 1; }
+  #temps-conj [data-mode="imperatif"] { grid-column: 3; grid-row: 2; }
+}
+/* … et assez large (téléphone en paysage) : les 4 cadres sur une ligne, le subjonctif aussi sur 2 colonnes. */
+@container (max-height: 380px) and (min-width: 600px) {
+  #temps-conj { grid-template-columns: 2fr 1fr 2fr 1fr; } /* ordre du HTML : indicatif, conditionnel, subjonctif, impératif */
+  #temps-conj .mode-ligne { grid-row: 1 !important; grid-column: auto !important; }
+  #temps-conj [data-mode="subjonctif"] .packs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 /* 4. Aventures : la grille au-dessus, le résumé de l'aventure choisie en dessous. */
 .etape-aventure { display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
 .etape-aventure .aventures { flex: 1; min-height: 0; height: auto; }
