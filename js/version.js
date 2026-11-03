@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '5.0';
+  var VERSION = '5.1';
 
   var HISTORY = [
+    { v: '5.1', date: '2026-11-03', changes: [
+      'Dé : les points sont noirs (plus de couleurs).'
+    ] },
     { v: '5.0', date: '2026-11-03', changes: [
       'Cartes : le bouton « Voir le mot » est juste sous « Écouter », dans le même style, avec une icône d\u2019œil.'
     ] },
