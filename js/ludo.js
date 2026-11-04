@@ -259,13 +259,27 @@
     var accueil = ecranVisible() === 'ecran-accueil';
     var candidats = [];
     if (accueil) {
-      // Accueil : la bulle part de la tête du grand Ludo (haut de l'illustration), vers la droite.
+      // Accueil (v6.10, demande de l'utilisateur) : la bulle ne cache ni la tête de Ludo ni l'arche ;
+      // elle se place le plus haut possible, dans le ciel. On essaie des places de haut en bas
+      // (à gauche, au centre, à droite) et on garde celle qui cache le moins.
       var perso = document.querySelector('.calque.perso').getBoundingClientRect();
-      var bouche = { x: perso.left + perso.width * 0.62, y: perso.top + perso.height * 0.14 };
-      candidats.push({ left: bouche.x + 14, top: bouche.y - h * 0.6, queue: 'gauche' });
-      candidats.push({ left: bouche.x - largeur / 2, top: bouche.y - h - 26, queue: 'bas' });
-      candidats.push({ left: 8, top: 8, queue: null });
-    } else {
+      var arche = document.querySelector('.calque.arche').getBoundingClientRect();
+      var accroche = document.querySelector('.accroche').getBoundingClientRect();
+      // Tête de Ludo sur l'illustration (img/perso.webp) : de 20 % à 72 % de la largeur, 27 % du haut.
+      var tete = { left: perso.left + perso.width * 0.2, right: perso.left + perso.width * 0.72,
+        top: perso.top, bottom: perso.top + perso.height * 0.27 };
+      zones.push({ r: tete, poids: 300 }, { r: arche, poids: 200 }, { r: accroche, poids: 100 });
+      // Petits écrans : si le ciel manque, une bulle plus étroite peut se poser ailleurs (dans l'herbe, à côté de Ludo).
+      [largeur, Math.min(250, largeur)].forEach(function (l, n) {
+        if (n && l === largeur) return;
+        bulle.style.width = l + 'px';
+        var hb = bulle.offsetHeight;
+        for (var y = 8; y <= vh - hb - 8; y += 16) {
+          [8, (vw - l) / 2, vw - l - 8].forEach(function (x) { candidats.push({ left: x, top: y, largeur: l, h: hb, queue: null }); });
+        }
+      });
+      bulle.style.width = largeur + 'px';
+        } else {
       // Ailleurs : au-dessus du petit Ludo du pied de page de préférence, sinon ailleurs sur l'écran.
       var b = bouton.getBoundingClientRect();
       var bas = b.top - h - 14, milieu = (vh - h) / 2;
@@ -276,13 +290,15 @@
     }
     var choix = null, meilleur = Infinity;
     candidats.forEach(function (k) {
-      k.left = Math.min(Math.max(k.left, 8), vw - largeur - 8);
-      k.top = Math.min(Math.max(k.top, 8), vh - h - 8);
-      var boite = { left: k.left, right: k.left + largeur, top: k.top, bottom: k.top + h };
+      var l = k.largeur || largeur, hk = k.h || h;
+      k.left = Math.min(Math.max(k.left, 8), vw - l - 8);
+      k.top = Math.min(Math.max(k.top, 8), vh - hk - 8);
+      var boite = { left: k.left, right: k.left + l, top: k.top, bottom: k.top + hk };
       var cout = 0;
       zones.forEach(function (z) { cout += commun(boite, z.r) * z.poids; });
       if (cout < meilleur - 1) { meilleur = cout; choix = k; } // à égalité, l'ordre de préférence l'emporte
     });
+    bulle.style.width = (choix.largeur || largeur) + 'px';
     bulle.style.left = choix.left + 'px';
     bulle.style.top = choix.top + 'px';
     bulle.dataset.queue = choix.queue || '';
