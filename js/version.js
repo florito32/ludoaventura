@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.23';
+  var VERSION = '6.24';
 
   var HISTORY = [
+    { v: '6.24', date: '2026-11-04', changes: [
+      "Accueil, sur téléphone et tablette : un bouton « Installer l'application » pour mettre l'icône d'Aventura sur l'écran d'accueil. Il n'apparaît pas quand le jeu est déjà ouvert comme application."
+    ] },
     { v: '6.23', date: '2026-11-04', changes: [
       "Touche « précédent » du téléphone ou de la tablette : pendant la préparation, elle revient à l'étape précédente ; sur le plateau, elle ouvre le menu. Elle ne ferme plus l'application (sauf depuis l'accueil)."
     ] },
