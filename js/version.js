@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.10';
+  var VERSION = '6.11';
 
   var HISTORY = [
+    { v: '6.11', date: '2026-11-04', changes: [
+      "Ouverture de l\u2019application installée : sur iPhone, l\u2019écran de lancement est l\u2019image de l\u2019accueil en plein écran (aventurier, arche et boutons), sans saut à l\u2019arrivée sur l\u2019accueil.",
+      "Sur Android, le téléphone fabrique lui-même cet écran (petite icône au centre) : son fond passe du vert au bleu du ciel de l\u2019accueil pour s\u2019y fondre. Le changement arrive sur le téléphone en général sous un ou deux jours, ou tout de suite en réinstallant l\u2019application."
+    ] },
     { v: '6.10', date: '2026-11-04', changes: [
       "Accueil : la bulle de Ludo se place en haut, dans le ciel, et ne cache plus sa tête ni l\u2019arche « Aventura ». Sur les petits écrans sans assez de ciel, elle se fait plus étroite et se pose à côté de Ludo, dans l\u2019herbe."
     ] },
