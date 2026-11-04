@@ -55,6 +55,9 @@
         <button type="button" class="btn btn-principal" id="btn-commencer">Commencer l'aventure</button>
         <!-- Didacticiel : Ludo (l'aventurier de l'accueil) guide la préparation et le premier tour (js/ludo.js). -->
         <button type="button" class="btn btn-secondaire" id="btn-didacticiel">Didacticiel avec Ludo</button>
+        <!-- Installer l'application (v6.24, js/pwa.js) : téléphone et tablette seulement, et seulement dans un navigateur
+             (caché quand le jeu est déjà ouvert comme application installée). -->
+        <button type="button" class="btn-installer" id="btn-installer" hidden><span aria-hidden="true">📲</span> Installer l’application</button>
       </div>
     </div>
   </section>
@@ -339,6 +342,16 @@
     <button type="button" class="btn btn-secondaire" id="btn-redemarrer">Redémarrer partie</button>
     <button type="button" class="btn btn-secondaire" id="btn-modifier">Modifier les choix</button>
     <button type="button" class="btn btn-secondaire" id="btn-accueil">Retour à l’accueil</button>
+  </div>
+</dialog>
+
+<!-- Installer l'application quand le navigateur ne propose pas sa propre fenêtre (iPhone, iPad, Firefox…). -->
+<dialog class="fin installer" id="installer" aria-labelledby="installer-titre">
+  <p class="fin-icone" aria-hidden="true">📲</p>
+  <h2 id="installer-titre">Installer Aventura</h2>
+  <p id="installer-texte"></p>
+  <div class="fin-actions">
+    <button type="button" class="btn btn-principal" id="btn-installer-ok">J’ai compris</button>
   </div>
 </dialog>
 
