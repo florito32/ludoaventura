@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.24';
+  var VERSION = '6.25';
 
   var HISTORY = [
+    { v: '6.25', date: '2026-11-04', changes: [
+      "Menu : « Redémarrer partie » et « Retour à l'accueil » demandent une confirmation avant d'effacer la partie en cours."
+    ] },
     { v: '6.24', date: '2026-11-04', changes: [
       "Accueil, sur téléphone et tablette : un bouton « Installer l'application » pour mettre l'icône d'Aventura sur l'écran d'accueil. Il n'apparaît pas quand le jeu est déjà ouvert comme application."
     ] },

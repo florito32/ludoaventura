@@ -880,6 +880,8 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 .menu-partie h2 { margin: 0 0 14px; }
 .menu-actions { display: flex; flex-direction: column; gap: 10px; }
 .menu-actions .btn { width: 100%; }
+.menu-actions[hidden], .menu-confirmer[hidden] { display: none; }
+.menu-confirmer p { margin: 0 0 14px; font-weight: 700; line-height: 1.4; }
 .menu-fermer {
   position: absolute; top: 6px; right: 6px; width: 44px; height: 44px; border: 0; border-radius: 50%;
   background: transparent; color: var(--encre); font: inherit; font-size: 1.3rem; cursor: pointer;

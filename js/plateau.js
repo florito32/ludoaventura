@@ -1511,7 +1511,24 @@
   // « Modifier les choix » : retour à la préparation (tous les choix gardés), puis « Reprendre la partie »
   //   la continue là où elle en était, avec les nouveaux réglages.
   // « Retour à l'accueil » : la partie est arrêtée et tout repart de zéro.
-  function ouvrirMenu() { if (!$('menu-partie').open) $('menu-partie').showModal(); }
+  function ouvrirMenu() { if (!$('menu-partie').open) { montrerChoix(); $('menu-partie').showModal(); } }
+  // Le menu montre ses 3 choix, ou la question de confirmation (v6.25, choix de l'utilisateur).
+  var aConfirmer = null;
+  function montrerChoix() {
+    aConfirmer = null;
+    $('menu-confirmer').hidden = true;
+    $('menu-partie').querySelector('.menu-actions').hidden = false;
+    $('menu-titre').textContent = 'Menu';
+  }
+  function demanderConfirmation(titre, texte, oui, action) {
+    aConfirmer = action;
+    $('menu-titre').textContent = titre;
+    $('menu-confirmer-texte').textContent = texte;
+    $('btn-confirmer-oui').textContent = oui;
+    $('menu-partie').querySelector('.menu-actions').hidden = true;
+    $('menu-confirmer').hidden = false;
+    $('btn-confirmer-non').focus();
+  }
   function fermerMenu() { if ($('menu-partie').open) $('menu-partie').close(); }
 
   // Reprend la partie après « Modifier les choix ». Hypothèses (à valider, voir BACKLOG) :
@@ -1559,7 +1576,12 @@
   $('btn-menu-fermer').addEventListener('click', fermerMenu);
   // Un toucher à côté de la boîte (sur le fond sombre) referme aussi le menu.
   $('menu-partie').addEventListener('click', function (e) { if (e.target === $('menu-partie')) fermerMenu(); });
-  $('btn-redemarrer').addEventListener('click', function () { fermerMenu(); lancerPartie(); });
+  $('btn-redemarrer').addEventListener('click', function () {
+    demanderConfirmation('Redémarrer ?', 'La partie en cours sera perdue : on recommence avec les mêmes joueurs et la même aventure.',
+      'Oui, redémarrer', function () { fermerMenu(); lancerPartie(); });
+  });
+  $('btn-confirmer-oui').addEventListener('click', function () { var a = aConfirmer; montrerChoix(); if (a) a(); });
+  $('btn-confirmer-non').addEventListener('click', montrerChoix);
   $('btn-modifier').addEventListener('click', function () {
     fermerMenu();
     annulerMinuteurs();
@@ -1567,13 +1589,16 @@
     preparer(1);
   });
   $('btn-accueil').addEventListener('click', function () {
+    demanderConfirmation('Retour à l’accueil ?', 'La partie en cours sera arrêtée et tous les choix effacés.', 'Oui, arrêter la partie', retourAccueil);
+  });
+  function retourAccueil() {
     fermerMenu();
     annulerMinuteurs();
     // Tout repart de zéro : on efface la partie gardée dans l'onglet et on recharge la page sur l'accueil.
     pretASauver = false;
     try { sessionStorage.removeItem(CLE); } catch (e) { /* rien */ }
     window.location.reload();
-  });
+  }
 
   // Sauvegarde aussi au moment où la page est quittée ou masquée (veille, autre application).
   window.addEventListener('pagehide', sauver);

@@ -14,7 +14,7 @@ test('le menu s\'ouvre au milieu de l\'écran avec les 3 choix, et se referme sa
   await lancerPartie(page, { joueurs: 2 });
   await page.getByRole('button', { name: 'Menu' }).click();
   await expect(menu(page)).toBeVisible();
-  const boutons = menu(page).locator('.menu-actions button');
+  const boutons = menu(page).locator('.menu-actions button:visible');
   await expect(boutons).toHaveText(['Redémarrer partie', 'Modifier les choix', 'Retour à l’accueil']);
   // Au milieu de l'écran, entier, sur tous les formats.
   const b = await menu(page).boundingBox(), v = page.viewportSize();
@@ -35,6 +35,13 @@ test('« Redémarrer partie » : la partie recommence à zéro, sans repasser pa
   expect(Number(await page.locator('#points').textContent())).toBeGreaterThan(0);
   await page.getByRole('button', { name: 'Menu' }).click();
   await page.getByRole('button', { name: 'Redémarrer partie' }).click();
+  // v6.25 : confirmation d'abord ; « Non » revient aux choix sans rien changer.
+  await expect(menu(page)).toContainText('La partie en cours sera perdue');
+  await page.getByRole('button', { name: 'Non, continuer la partie' }).click();
+  await expect(page.getByRole('button', { name: 'Redémarrer partie' })).toBeVisible();
+  expect(Number(await page.locator('#points').textContent())).toBeGreaterThan(0);
+  await page.getByRole('button', { name: 'Redémarrer partie' }).click();
+  await page.getByRole('button', { name: 'Oui, redémarrer' }).click();
   await expect(menu(page)).toBeHidden();
   await expect(page.getByRole('heading', { name: 'Le plateau' })).toBeVisible();
   await expect(page.locator('#points')).toHaveText('0');
@@ -108,10 +115,25 @@ test('« Retour à l\'accueil » : la partie est arrêtée et tout repart de zé
   await jouerUnTour(page);
   await page.getByRole('button', { name: 'Menu' }).click();
   await page.getByRole('button', { name: 'Retour à l’accueil' }).click();
+  await expect(menu(page)).toContainText('tous les choix effacés');
+  for (const x of await menu(page).locator('#menu-confirmer button').all()) await expect(x).toBeInViewport({ ratio: 1 });
+  await page.getByRole('button', { name: 'Oui, arrêter la partie' }).click();
   await expect(page.getByRole('button', { name: 'Commencer l\'aventure' })).toBeVisible();
   // Un rechargement ne ramène pas la partie arrêtée.
   await page.reload();
   await expect(page.getByRole('button', { name: 'Commencer l\'aventure' })).toBeVisible();
   await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
   await expect(page.locator('input[name="nb"]:checked')).toHaveValue('1');
+});
+
+test('v6.25 : refermer le menu pendant la confirmation, puis le rouvrir, montre de nouveau les 3 choix', async ({ page }) => {
+  test.skip(test.info().project.name !== 'ordinateur', 'logique : un format suffit');
+  await lancerPartie(page, { joueurs: 1 });
+  await page.getByRole('button', { name: 'Menu' }).click();
+  await page.getByRole('button', { name: 'Retour à l’accueil' }).click();
+  await page.keyboard.press('Escape');
+  await expect(menu(page)).toBeHidden();
+  await page.getByRole('button', { name: 'Menu' }).click();
+  await expect(menu(page).locator('.menu-actions').first()).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Menu' })).toBeVisible();
 });
