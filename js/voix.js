@@ -35,7 +35,10 @@
     if (carte.lettre) return 'Quelle est cette lettre ?';
     if (carte.type === 'calcul' || carte.type === 'conjugaison') return carte.oral; // « Combien font 3 plus 4 multiplié par 2 ? »
     var mot = carte.mot.replace(/(\.\.\.|…)/g, ' ').replace(/\s+/g, ' ').trim().toLocaleLowerCase('fr-FR');
-    var consigne = carte.question ? carte.question.consigne : 'Épelle le mot :';
+    var q = carte.question, Q = racine.Questions;
+    var consigne = q ? (Q ? Q.consigne(q, carte.mot, null, carte.params) : q.consigne) : 'Épelle le mot :';
+    // Mot mélangé (v6.17) : dire le mot donnerait la réponse, on ne lit que la consigne.
+    if (q && q.voixSansMot) return consigne;
     return consigne + ' ' + mot + '.';
   }
 

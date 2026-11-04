@@ -43,8 +43,72 @@
         return info.muettes.map(function (i) { return mot[i]; }).join(', ');
       } },
     { id: 'ecrire', nom: 'Réécrire le mot', consigne: 'Écris le mot :',
-      reponse: function (mot) { return mot; } }
+      reponse: function (mot) { return mot; } },
+    // ---------- v6.17 : questions acceptées par l'utilisateur le 04/11/2026 ----------
+    // Certaines questions ont des réglages tirés pour chaque carte (preparer → c.params) :
+    // la lettre cachée, l'ordre des lettres mélangées, la lettre à compter.
+    // « montrer » : texte affiché à la place du mot caché (le joueur doit le voir pour répondre).
+    // Lettre manquante : une lettre sans accent remplacée par « _ » (une seule réponse possible).
+    { id: 'manquante', nom: 'Lettre manquante', consigne: 'Quelle lettre manque dans le mot :', saisie: 'lettres',
+      possible: function (mot) { return positionsSimples(mot).length > 0 && lettres(mot).length >= 3; },
+      preparer: function (mot) { var p = positionsSimples(mot); return { pos: p[Math.floor(Math.random() * p.length)] }; },
+      montrer: function (mot, info, p) { return mot.slice(0, p.pos) + '_' + mot.slice(p.pos + 1); },
+      attendu: function (mot, info, p) { return [mot[p.pos]]; },
+      reponse: function (mot, info, p) { return mot[p.pos] + ' (' + mot + ')'; } },
+    // Mot mélangé : les lettres en désordre ; le joueur écrit le mot (mots d'un seul morceau, 4 lettres ou plus).
+    // La voix ne lit que la consigne : dire le mot donnerait la réponse.
+    { id: 'melange', nom: 'Mot mélangé', consigne: 'Remets les lettres dans l\u2019ordre :', saisie: 'mot', voixSansMot: true,
+      possible: function (mot) { return /^\p{L}+$/u.test(mot) && lettres(mot).length >= 4 && new Set(mot.split('')).size > 1; },
+      preparer: function (mot) {
+        var l = mot.split(''), m, essai = 0;
+        do { m = melanger(l.slice()).join(''); } while (m === mot && ++essai < 20);
+        return { melange: m.split('').join(' ') };
+      },
+      montrer: function (mot, info, p) { return p.melange; },
+      attendu: function (mot) { return mot; },
+      reponse: function (mot) { return mot; } },
+    // Nombre de voyelles / de consonnes : deux questions séparées, comme « Nombre de lettres ».
+    { id: 'nb-voyelles', nom: 'Nombre de voyelles', consigne: 'Combien de voyelles y a-t-il dans le mot :', saisie: 'nombre',
+      possible: function (mot) { return lettres(mot).some(estVoyelle) && !/Œ/.test(mot); },
+      attendu: function (mot) { return lettres(mot).filter(estVoyelle).length; },
+      reponse: function (mot) { var l = lettres(mot).filter(estVoyelle); return pluriel(l.length, 'voyelle') + ' (' + l.join(', ') + ')'; } },
+    { id: 'nb-consonnes', nom: 'Nombre de consonnes', consigne: 'Combien de consonnes y a-t-il dans le mot :', saisie: 'nombre',
+      possible: function (mot) { return lettres(mot).some(function (c) { return !estVoyelle(c); }) && !/Œ/.test(mot); },
+      attendu: function (mot) { return lettres(mot).filter(function (c) { return !estVoyelle(c); }).length; },
+      reponse: function (mot) {
+        var l = lettres(mot).filter(function (c) { return !estVoyelle(c); });
+        return pluriel(l.length, 'consonne') + ' (' + l.join(', ') + ')';
+      } },
+    // Combien de fois une lettre : de préférence une lettre présente plusieurs fois (3 fois sur 4).
+    { id: 'combien-lettre', nom: 'Combien de fois cette lettre ?', court: 'Combien de fois ?', saisie: 'nombre',
+      possible: function (mot) { return lettres(mot).length >= 3 && !/Œ/.test(mot); },
+      preparer: function (mot) {
+        var n = {};
+        lettres(mot).forEach(function (c) { var k = normaliser(c); n[k] = (n[k] || 0) + 1; });
+        var cles = Object.keys(n), doubles = cles.filter(function (k) { return n[k] > 1; });
+        var liste = doubles.length && Math.random() < 0.75 ? doubles : cles;
+        return { lettre: liste[Math.floor(Math.random() * liste.length)] };
+      },
+      consigneDe: function (mot, info, p) { return 'Combien de fois vois-tu la lettre ' + p.lettre + ' dans le mot :'; },
+      attendu: function (mot, info, p) { return lettres(mot).filter(function (c) { return normaliser(c) === p.lettre; }).length; },
+      reponse: function (mot, info, p) {
+        var n = lettres(mot).filter(function (c) { return normaliser(c) === p.lettre; }).length;
+        return n + ' fois';
+      } }
   ];
+
+  // Positions des lettres sans accent (A à Z) : seules celles-là peuvent être cachées.
+  function positionsSimples(mot) {
+    var p = [];
+    for (var i = 0; i < mot.length; i++) if (/[A-Z]/.test(mot[i])) p.push(i);
+    return p;
+  }
+  function melanger(t) {
+    for (var i = t.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), x = t[i]; t[i] = t[j]; t[j] = x; }
+    return t;
+  }
+  // Consigne de la carte (certaines dépendent de ses réglages, ex. la lettre à compter).
+  function consigne(type, mot, info, p) { return type.consigneDe ? type.consigneDe(mot, info, p || {}) : type.consigne; }
 
   function morceaux(info) { return info.syllabes.split(/[\s-]+/).filter(function (m) { return /\p{L}/u.test(m); }); }
 
@@ -74,11 +138,14 @@
   function lisible(type, texte) {
     return type.saisie === 'nombre' ? !isNaN(nombreEcrit(texte)) : lettresEcrites(texte).length > 0;
   }
+  // Mot écrit : comparé sans accents ni majuscules, espaces et tirets ignorés (« avion » = AVION).
+  function motEcrit(t) { return normaliser(t).replace(/[^A-Z]/g, ''); }
   // Juste : le bon nombre ; ou exactement les bonnes lettres, dans n'importe quel ordre,
   // une lettre répétée pouvant être écrite une fois ou plusieurs fois (« voyelles de PAPA » : « a » ou « a a »).
-  function juste(type, texte, mot, info) {
-    var att = type.attendu(mot, info);
+  function juste(type, texte, mot, info, p) {
+    var att = type.attendu(mot, info, p || {});
     if (type.saisie === 'nombre') return nombreEcrit(texte) === att;
+    if (type.saisie === 'mot') return motEcrit(texte) === motEcrit(att);
     var ensemble = function (l) { var o = {}; l.forEach(function (c) { normaliser(c).split('').forEach(function (x) { o[x] = 1; }); }); return Object.keys(o).sort().join(''); };
     return ensemble(lettresEcrites(texte)) === ensemble(att);
   }
@@ -90,7 +157,7 @@
     return TYPES.filter(function (t) { return choisis.indexOf(t.id) >= 0 && (!t.possible || t.possible(mot, info)); });
   }
 
-  var api = { TYPES: TYPES, trouver: trouver, juste: juste, lisible: lisible, lettresEcrites: lettresEcrites, nombreEcrit: nombreEcrit, possibles: possibles, lettres: lettres, estVoyelle: estVoyelle };
+  var api = { TYPES: TYPES, trouver: trouver, juste: juste, consigne: consigne, lisible: lisible, lettresEcrites: lettresEcrites, nombreEcrit: nombreEcrit, possibles: possibles, lettres: lettres, estVoyelle: estVoyelle };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else racine.Questions = api;
 })(this);
