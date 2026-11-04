@@ -31,13 +31,15 @@ async function cocherJoueur(page) {
 }
 // Écran 3 : Mathématiques avec les signes, nombres et niveau donnés.
 // Depuis v5.9, le niveau se choisit sur l'écran de la matière ; au niveau Facile, les nombres sont des tables.
-async function maths(page, { signes = ['plus'], nombres = [2, 3], niveau = 'facile' } = {}) {
+async function maths(page, { signes = ['plus'], nombres = [2, 3], dizaines = [], centaines = [], niveau = 'facile' } = {}) {
   await page.locator('#matieres input[value="maths"]').check();
   await page.locator('#niveau-maths input[value="' + niveau + '"]').check();
   await valider(page);
   await page.locator('#reglages-maths').waitFor();
   for (const s of signes) await page.locator('#signes input[value="' + s + '"]').check();
   for (const n of nombres) await page.locator('#nombres input[value="' + n + '"]').check();
+  for (const n of dizaines) await page.locator('#dizaines input[value="' + n + '"]').check();
+  for (const n of centaines) await page.locator('#centaines input[value="' + n + '"]').check();
 }
 
 // Écran 3 : packs et questions sont décochés au départ (v3.9) : coche tout pour chaque joueur et valide

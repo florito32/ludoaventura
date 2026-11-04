@@ -99,7 +99,7 @@
       <fieldset class="bloc etape" data-etape="3" tabindex="-1" hidden>
         <legend><span class="etape-num">3</span> <span id="reglages-titre"></span></legend>
         <!-- Cartes du joueur (v5.7) : d'abord la matière (Mathématiques ou Français), puis ses réglages.
-             Mathématiques : signes, nombres de 1 à 10, niveau (js/calcul.js).
+             Mathématiques : signes, nombres de 1 à 10, dizaines, centaines, niveau (js/calcul.js).
              Français → Orthographe : packs où il pioche, questions posées (js/cartes.js, js/questions.js).
              Les choix sont « entourés » (pas de case à cocher visible, v5.6). -->
         <div class="etape-corps reglages-joueur" id="reglages-joueur">
@@ -127,15 +127,34 @@
           </div>
           </div>
 
+          <!-- Réglages de calcul (v7.0) : les signes seuls sur une ligne, puis unités, dizaines et centaines,
+               chacun avec un bouton « Tout sélectionner / Tout désélectionner ». -->
           <div class="reglages-matiere reglages-remplir" id="reglages-maths" hidden>
             <div class="reglage">
               <p class="reglage-titre" id="signes-titre">Signes <span>(au moins un)</span></p>
               <div class="packs" id="signes" role="group" aria-labelledby="signes-titre"></div>
             </div>
             <div class="reglage">
-              <!-- « Tables » au niveau Facile (table de 2 → 2 × 8…), « Nombres » aux autres niveaux. -->
-              <p class="reglage-titre" id="nombres-titre">Nombres <span>(au moins un)</span></p>
+              <div class="reglage-tete">
+                <!-- « Tables » au niveau Facile (table de 2 → 2 × 8…), « Unités » aux autres niveaux. -->
+                <p class="reglage-titre" id="nombres-titre">Unités</p>
+                <button type="button" class="btn-tout" data-groupe="nombres"></button>
+              </div>
               <div class="packs nombres" id="nombres" role="group" aria-labelledby="nombres-titre"></div>
+            </div>
+            <div class="reglage">
+              <div class="reglage-tete">
+                <p class="reglage-titre" id="dizaines-titre">Dizaines <em>(30 = de 30 à 39)</em></p>
+                <button type="button" class="btn-tout" data-groupe="dizaines"></button>
+              </div>
+              <div class="packs nombres" id="dizaines" role="group" aria-labelledby="dizaines-titre"></div>
+            </div>
+            <div class="reglage">
+              <div class="reglage-tete">
+                <p class="reglage-titre" id="centaines-titre">Centaines <em>(300 = de 300 à 399)</em></p>
+                <button type="button" class="btn-tout" data-groupe="centaines"></button>
+              </div>
+              <div class="packs nombres" id="centaines" role="group" aria-labelledby="centaines-titre"></div>
             </div>
           </div>
 

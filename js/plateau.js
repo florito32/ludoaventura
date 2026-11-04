@@ -54,9 +54,10 @@
   var MATIERES = ['maths', 'orthographe', 'conjugaison']; // matières jouables (Français → Orthographe ou Conjugaison)
   var AIDES_NIVEAU = {
     facile: 'Facile : les tables (table de 2 → 2 × 8, 2 + 8, 16 ÷ 2…).',
-    moyen: 'Moyen : 2 signes par calcul.', difficile: 'Difficile : 3 signes par calcul.', expert: 'Expert : 4 signes par calcul.'
+    moyen: 'Moyen : 2 signes par calcul, au moins 4 nombres.', difficile: 'Difficile : 3 signes par calcul, au moins 4 nombres.',
+    expert: 'Expert : 4 signes par calcul, au moins 4 nombres.'
   };
-  function mathsVides() { return { signes: [], nombres: [], niveau: 'facile' }; }
+  function mathsVides() { return { signes: [], nombres: [], dizaines: [], centaines: [], niveau: 'facile' }; }
   function conjVide() { return { modes: [], temps: [], groupes: [], niveau: 'facile' }; }
   // Écran de l'étape 3 où se règle chaque chose qui manque.
   function ecranDe(m) {
@@ -171,11 +172,24 @@
       partie.matiere[partie.actif] = valeursCochees($('francais'))[0] || null;
       majAventuriers();
     });
-    // Mathématiques : signes (plusieurs), nombres de 1 à 10 (plusieurs), niveau (un seul).
+    // Mathématiques : signes (plusieurs), unités 1 à 10, dizaines, centaines (plusieurs), niveau (un seul).
+    // v7.0 : le signe seul dans un rond (le mot « Additionner » ne tenait pas), le nom reste lu par les lecteurs d'écran.
     K.SIGNES.forEach(function (sg) {
-      choix($('signes'), 'checkbox', 'signe', sg.id, '<b aria-hidden="true">' + sg.symbole + '</b> ' + sg.nom);
+      choix($('signes'), 'checkbox', 'signe', sg.id, '<b aria-hidden="true">' + sg.symbole + '</b>', sg.nom);
     });
     K.NOMBRES.forEach(function (n) { choix($('nombres'), 'checkbox', 'nombre', n, String(n), 'Nombre ' + n); });
+    K.DIZAINES.forEach(function (n) { choix($('dizaines'), 'checkbox', 'dizaine', n, String(n), 'Dizaine ' + n + ' : nombres de ' + n + ' à ' + (n + 9)); });
+    K.CENTAINES.forEach(function (n) { choix($('centaines'), 'checkbox', 'centaine', n, String(n), 'Centaine ' + n + ' : nombres de ' + n + ' à ' + (n + 99)); });
+    // « Tout sélectionner » / « Tout désélectionner » pour chaque groupe de nombres.
+    document.querySelectorAll('#reglages-maths .btn-tout').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var m = partie.maths[partie.actif], g = b.dataset.groupe, tous = $(g).querySelectorAll('input');
+        var plein = (m[g] || []).length === tous.length;
+        m[g] = plein ? [] : Array.prototype.map.call(tous, function (i) { return Number(i.value); });
+        $('packs-alerte').textContent = '';
+        majAventuriers();
+      });
+    });
     K.NIVEAUX.forEach(function (nv) { choix($('niveau-maths'), 'radio', 'niveau-maths', nv.id, nv.nom); });
     // Conjugaison : temps rangés par mode (une ligne par mode), groupes de verbes, niveau.
     // Les modes d'abord : seuls les temps des modes choisis apparaissent dessous.
@@ -209,12 +223,14 @@
         majAventuriers();
       });
     });
-    ['signes', 'nombres', 'niveau-maths'].forEach(function (id) {
+    ['signes', 'nombres', 'dizaines', 'centaines', 'niveau-maths'].forEach(function (id) {
       $(id).addEventListener('change', function () {
         var m = partie.maths[partie.actif];
         $('packs-alerte').textContent = '';
         m.signes = valeursCochees($('signes'));
         m.nombres = valeursCochees($('nombres')).map(Number);
+        m.dizaines = valeursCochees($('dizaines')).map(Number);
+        m.centaines = valeursCochees($('centaines')).map(Number);
         m.niveau = valeursCochees($('niveau-maths'))[0] || 'facile';
         majAventuriers();
       });
@@ -274,7 +290,9 @@
     if (!m) return partie.francais[i] ? 'francais' : 'matiere';
     if (m === 'maths') {
       if (!partie.maths[i].signes.length) return 'signe';
-      if (!partie.maths[i].nombres.length) return partie.maths[i].niveau === 'facile' ? 'table' : 'nombre';
+      // Au moins une table au niveau Facile ; au moins 4 nombres (unités + dizaines + centaines) aux autres niveaux.
+      var mi = partie.maths[i];
+      if (K.compter(mi) < K.minimum(mi.niveau)) return mi.niveau === 'facile' ? 'table' : 'nombre';
       return null;
     }
     if (m === 'conjugaison') {
@@ -306,7 +324,7 @@
     temps: ['choisir au moins un temps.', 'temps-conj'],
     groupe: ['choisir au moins un groupe de verbes.', 'groupes'],
     signe: ['choisir au moins un signe.', 'signes'],
-    nombre: ['choisir au moins un nombre.', 'nombres'],
+    nombre: ['choisir au moins 4 nombres (unités, dizaines ou centaines).', 'nombres'],
     table: ['choisir au moins une table.', 'nombres'],
     pack: ['choisir au moins un pack.', 'packs'],
     type: ['choisir au moins un type de question.', 'types-questions']
@@ -451,7 +469,10 @@
     // Niveau de calcul : une phrase d'aide sous les choix ; au niveau Facile, les nombres deviennent des tables.
     var nvm = partie.maths[a].niveau;
     $('niveau-maths-aide').textContent = AIDES_NIVEAU[nvm];
-    $('nombres-titre').innerHTML = nvm === 'facile' ? 'Tables <span>(au moins une : table de 2 → 2 × 8, 2 + 8…)</span>' : 'Nombres <span>(au moins un)</span>';
+    // v7.0 : au Facile, les dizaines et centaines sont aussi des tables (30 → tables de 30 à 39).
+    $('nombres-titre').innerHTML = nvm === 'facile' ? 'Tables <em>(2 → 2 × 8, 2 + 8…)</em>' : 'Unités <span>(au moins 4 nombres en tout)</span>';
+    $('dizaines-titre').innerHTML = nvm === 'facile' ? 'Tables des dizaines <em>(30 = de 30 à 39)</em>' : 'Dizaines <em>(30 = de 30 à 39)</em>';
+    $('centaines-titre').innerHTML = nvm === 'facile' ? 'Tables des centaines <em>(300 = de 300 à 399)</em>' : 'Centaines <em>(300 = de 300 à 399)</em>';
     $('reglages-ortho').hidden = mat !== 'orthographe';
     $('reglages-conj').hidden = mat !== 'conjugaison';
     var cc = partie.conj[a];
@@ -463,7 +484,16 @@
     $('niveau-conj').querySelectorAll('input').forEach(function (i) { i.checked = i.value === cc.niveau; });
     var mm = partie.maths[a];
     $('signes').querySelectorAll('input').forEach(function (i) { i.checked = mm.signes.indexOf(i.value) >= 0; });
-    $('nombres').querySelectorAll('input').forEach(function (i) { i.checked = mm.nombres.indexOf(Number(i.value)) >= 0; });
+    ['nombres', 'dizaines', 'centaines'].forEach(function (g) {
+      mm[g] = mm[g] || []; // parties sauvegardées avant la v7.0
+      var tous = $(g).querySelectorAll('input');
+      tous.forEach(function (i) { i.checked = mm[g].indexOf(Number(i.value)) >= 0; });
+      var plein = mm[g].length === tous.length, b = document.querySelector('.btn-tout[data-groupe="' + g + '"]');
+      // Texte court sur téléphone (« Tout » / « Aucun »), nom complet pour les lecteurs d'écran.
+      b.innerHTML = plein ? '<span class="long">Tout désélectionner</span><span class="court">Aucun</span>'
+        : '<span class="long">Tout sélectionner</span><span class="court">Tout</span>';
+      b.setAttribute('aria-label', (plein ? 'Tout désélectionner : ' : 'Tout sélectionner : ') + { nombres: 'unités', dizaines: 'dizaines', centaines: 'centaines' }[g]);
+    });
     $('niveau-maths').querySelectorAll('input').forEach(function (i) { i.checked = i.value === mm.niveau; });
     $('packs').querySelectorAll('input').forEach(function (i) { i.checked = partie.packs[partie.actif].indexOf(i.value) >= 0; });
     $('types-questions').querySelectorAll('input').forEach(function (i) { i.checked = partie.types[partie.actif].indexOf(i.value) >= 0; });

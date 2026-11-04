@@ -315,11 +315,49 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
   width: 100%; height: var(--h); min-height: 0; justify-content: center; text-align: center; line-height: 1.1;
   padding: 2px 8px; font-size: clamp(.85rem, min(calc(var(--h) * .36), calc(var(--larg) / var(--cols) / 6.5)), 1.9rem);
 }
-/* Mathématiques : + et − sur une ligne, × et ÷ sur la suivante ; nombres 1 à 5 puis 6 à 10. */
-#signes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-#nombres { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-.reglages-joueur #nombres .pack span { font-size: clamp(1rem, min(calc(var(--h) * .45), 7cqi), 2.4rem); font-weight: 800; }
-.reglages-joueur #signes .pack span b { font-size: 1.3em; }
+/* Mathématiques (v7.0) : les 4 signes seuls dans des ronds sur une ligne, puis unités (1 à 5 / 6 à 10),
+   dizaines (10 à 50 / 60 à 90) et centaines (100 à 500 / 600 à 900), 5 par ligne : 7 lignes de boutons
+   et 4 titres (d'où les 9 rem retirés de la hauteur). */
+#reglages-maths {
+  --rangs: 7; --cols: 5; --larg: min(100cqi, 640px);
+  --h: clamp(28px, calc((100cqh - 9rem) / var(--rangs) - 1.2cqh), 110px);
+  gap: clamp(4px, 1.4cqh, 18px);
+}
+#reglages-maths .packs { gap: clamp(4px, 1cqh, 10px) clamp(5px, 1.4cqi, 12px); }
+#signes { grid-template-columns: repeat(4, minmax(0, 1fr)); justify-items: center; }
+#signes .pack { width: 100%; display: flex; justify-content: center; }
+.reglages-joueur #reglages-maths #signes .pack span {
+  width: min(var(--h), 100%); height: auto; aspect-ratio: 1; padding: 0; border-radius: 50%;
+}
+.reglages-joueur #signes .pack span b { margin: 0; font-size: clamp(1.2rem, calc(var(--h) * .6), 3rem); line-height: 1; }
+#reglages-maths .nombres { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.reglages-joueur #reglages-maths .nombres .pack span { font-size: clamp(.95rem, min(calc(var(--h) * .45), 5.5cqi), 2.2rem); font-weight: 800; min-width: 0; padding: 0 2px; }
+/* Titre du groupe et son bouton « Tout sélectionner » sur une même ligne. */
+.reglage-tete { display: flex; align-items: center; justify-content: center; gap: 6px 12px; margin-bottom: clamp(2px, .8cqh, 8px); }
+.reglages-remplir .reglage-tete .reglage-titre { margin: 0; }
+.reglage-titre em { font-style: normal; font-weight: 400; color: var(--encre-douce); font-size: .85em; }
+.btn-tout {
+  flex: none; min-height: 28px; padding: 2px 12px; border-radius: 99px; cursor: pointer;
+  border: 2px solid var(--encre-douce); background: #fff; color: var(--encre); font: inherit; font-size: .85rem; font-weight: 700;
+}
+.btn-tout:hover { border-color: var(--encre); }
+.btn-tout:focus-visible { outline: 3px solid var(--rouge); outline-offset: 2px; }
+.btn-tout .court { display: none; }
+/* Écrans peu hauts (téléphone carré ou en paysage) : chaque groupe de nombres sur une seule ligne
+   (4 lignes de boutons au lieu de 7), pour tout voir sans défiler. */
+@container (max-height: 460px) {
+  #reglages-maths { --rangs: 4; --h: clamp(26px, calc((100cqh - 6.4rem) / var(--rangs) - 1cqh), 70px); gap: 3px; }
+  #reglages-maths .nombres { grid-template-columns: repeat(10, minmax(0, 1fr)); }
+  .reglages-joueur #reglages-maths .nombres .pack span { font-size: clamp(.8rem, min(calc(var(--h) * .42), 3.2cqi), 1.6rem); }
+  #reglages-maths .reglage-tete { margin-bottom: 2px; }
+  #reglages-maths .reglage-titre { font-size: .9rem; }
+  #reglages-maths .btn-tout { min-height: 24px; padding: 0 10px; }
+}
+@container (max-width: 520px) {
+  .btn-tout .long { display: none; }
+  .btn-tout .court { display: inline; }
+  .reglages-remplir .reglage-titre { font-size: .95rem; }
+}
 
 /* Orthographe : 4 packs et 7 questions ; en largeur, 4 par ligne (3 lignes), en hauteur 2 par ligne (6 lignes). */
 #reglages-ortho { --rangs: 3; --cols: 4; --larg: min(100cqi, 1000px); }

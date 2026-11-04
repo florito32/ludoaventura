@@ -1,7 +1,8 @@
 // Cartes de calcul (Mathématiques), demande de l'utilisateur du 03/11/2026.
 // Le joueur choisit à la préparation :
 //  - les signes (additionner, soustraire, multiplier, diviser), au moins un ;
-//  - les nombres de 1 à 10 utilisés dans les calculs, au moins un ;
+//  - les nombres de 1 à 10, les dizaines (30 = 30 à 39) et les centaines (300 = 300 à 399) ;
+//    au moins un au niveau Facile, au moins 4 aux autres niveaux (v7.0) ;
 //  - le niveau : Facile = 1 signe, Moyen = 2, Difficile = 3, Expert = 4 (choix de l'utilisateur).
 // Au niveau Facile, les nombres choisis sont des TABLES (demande du 03/11/2026) : table de 2 →
 //  2 × 1 … 2 × 10, 2 + 1 … 2 + 10, (2 + k) − 2, (2 × k) ÷ 2, selon les signes choisis (résultat entier).
@@ -20,6 +21,13 @@
     { id: 'divise', nom: 'Diviser', symbole: '÷', oral: 'divisé par' }
   ];
   var NOMBRES = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  // Dizaines et centaines (v7.0, demande du 04/11/2026) : choisir 30 = les nombres de 30 à 39 ;
+  // choisir 300 = les nombres de 300 à 399.
+  var DIZAINES = [10, 20, 30, 40, 50, 60, 70, 80, 90];
+  var CENTAINES = [100, 200, 300, 400, 500, 600, 700, 800, 900];
+  // Aux niveaux Moyen, Difficile et Expert, il faut au moins 4 choix de nombres (unités, dizaines
+  // et centaines comptées ensemble, choix de l'utilisateur du 04/11/2026).
+  var MINIMUM_NOMBRES = 4;
   var NIVEAUX = [
     { id: 'facile', nom: 'Facile', signes: 1 },
     { id: 'moyen', nom: 'Moyen', signes: 2 },
@@ -68,26 +76,44 @@
   // Écriture française : virgule décimale (3,5).
   function ecrire(x) { return String(Math.round(x * 10) / 10).replace('.', ','); }
 
-  // Tire une formule au hasard. reglages = { signes: [...], nombres: [...], niveau: 'facile' }.
+  // Les « tranches » choisies : une unité seule (5 → 5), une dizaine (30 → 30 à 39), une centaine (300 → 300 à 399).
+  function tranches(reglages) {
+    var t = [];
+    (reglages.nombres || []).forEach(function (n) { t.push([n, n]); });
+    (reglages.dizaines || []).forEach(function (d) { t.push([d, d + 9]); });
+    (reglages.centaines || []).forEach(function (c) { t.push([c, c + 99]); });
+    return t.length ? t : NOMBRES.map(function (n) { return [n, n]; });
+  }
+  // Nombre de choix de nombres (unités + dizaines + centaines).
+  function compter(reglages) {
+    return (reglages.nombres || []).length + (reglages.dizaines || []).length + (reglages.centaines || []).length;
+  }
+  // Ce niveau demande-t-il au moins 4 choix de nombres ?
+  function minimum(niveauId) { return niveau(niveauId).id === 'facile' ? 1 : MINIMUM_NOMBRES; }
+
+  // Tire une formule au hasard. reglages = { signes: [...], nombres: [...], dizaines: [...], centaines: [...], niveau: 'facile' }.
+  // Chaque nombre : on tire d'abord un des choix (chaque bouton a la même chance), puis un nombre de sa tranche
+  // (sinon les centaines, 100 nombres chacune, prendraient presque toute la place).
   // Si aucune formule possible n'est trouvée avec autant de signes (ex. seulement « ÷ » et le nombre 3
   // au niveau Expert), on retire un signe.
   function generer(reglages, hasard) {
     hasard = hasard || Math.random;
     var signes = reglages.signes && reglages.signes.length ? reglages.signes : ['plus'];
-    var nombres = reglages.nombres && reglages.nombres.length ? reglages.nombres : NOMBRES;
+    var tr = tranches(reglages);
     function tirer(t) { return t[Math.floor(hasard() * t.length)]; }
-    if (niveau(reglages.niveau).id === 'facile') return table(tirer(nombres), tirer(signes), tirer(NOMBRES));
+    function nombre() { var x = tirer(tr); return x[0] + Math.floor(hasard() * (x[1] - x[0] + 1)); }
+    if (niveau(reglages.niveau).id === 'facile') return table(nombre(), tirer(signes), tirer(NOMBRES));
     for (var n = niveau(reglages.niveau).signes; n >= 1; n--) {
       for (var essai = 0; essai < 3000; essai++) {
         var nb = [], ops = [];
-        for (var i = 0; i <= n; i++) nb.push(tirer(nombres));
+        for (var i = 0; i <= n; i++) nb.push(nombre());
         for (var k = 0; k < n; k++) ops.push(tirer(signes));
         var res = evaluer(nb, ops);
         if (res) return carte(nb, ops, versNombre(res));
       }
     }
     // Filet de sécurité (ne devrait pas servir) : a + a.
-    var a = nombres[0];
+    var a = tr[0][0];
     return carte([a, a], ['plus'], a + a);
   }
 
@@ -120,7 +146,8 @@
     return !isNaN(x) && Math.abs(x - resultat) < 1e-9;
   }
 
-  var api = { SIGNES: SIGNES, NOMBRES: NOMBRES, NIVEAUX: NIVEAUX, signe: signe, niveau: niveau,
+  var api = { SIGNES: SIGNES, NOMBRES: NOMBRES, DIZAINES: DIZAINES, CENTAINES: CENTAINES, NIVEAUX: NIVEAUX,
+    MINIMUM_NOMBRES: MINIMUM_NOMBRES, tranches: tranches, compter: compter, minimum: minimum, signe: signe, niveau: niveau,
     evaluer: function (nb, ops) { var r = evaluer(nb, ops); return r ? versNombre(r) : null; },
     generer: generer, table: table, lire: lire, juste: juste, ecrire: ecrire };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

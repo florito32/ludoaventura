@@ -80,7 +80,7 @@ test('étape 3 : Mathématiques et son niveau sur le même écran, puis signes e
   await expect(page.locator('#niveau-maths input[value="facile"]')).toBeChecked();
   await expect(page.locator('#niveau-maths-aide')).toContainText('les tables');
   await page.locator('#niveau-maths label', { hasText: 'Moyen' }).click();
-  await expect(page.locator('#niveau-maths-aide')).toHaveText('Moyen : 2 signes par calcul.');
+  await expect(page.locator('#niveau-maths-aide')).toHaveText('Moyen : 2 signes par calcul, au moins 4 nombres.');
   await page.locator('#niveau-maths label', { hasText: 'Facile' }).click();
   await valider(page); // deuxième écran : signes et tables
   await expect(page.locator('#reglages-maths')).toBeVisible();
@@ -96,7 +96,7 @@ test('étape 3 : Mathématiques et son niveau sur le même écran, puis signes e
   expect(corps).toBe(false);
   await valider(page);
   await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir au moins un signe.');
-  await page.locator('#signes label', { hasText: 'Additionner' }).click();
+  await page.getByRole('checkbox', { name: 'Additionner' }).click({ force: true });
   await valider(page);
   await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir au moins une table.');
   await page.locator('#nombres label', { hasText: /^\s*4\s*$/ }).click();
@@ -107,7 +107,60 @@ test('étape 3 : Mathématiques et son niveau sur le même écran, puis signes e
   await page.getByRole('button', { name: /Retour/ }).click();
   await page.locator('#niveau-maths label', { hasText: 'Expert' }).click();
   await valider(page);
-  await expect(page.locator('#nombres-titre')).toContainText('Nombres');
+  await expect(page.locator('#nombres-titre')).toContainText('Unités');
+});
+
+// v7.0 (04/11/2026) : signes seuls dans des ronds sur une ligne, dizaines et centaines, « Tout sélectionner »,
+// au moins 4 nombres aux niveaux Moyen, Difficile et Expert.
+test('signes seuls, dizaines et centaines, « Tout sélectionner », minimum de 4 nombres hors Facile', async ({ page }) => {
+  await versMaths(page);
+  await maths(page, { signes: [], nombres: [], niveau: 'moyen' });
+  // Les signes : le symbole seul, sans le mot, lu quand même par les lecteurs d'écran.
+  await expect(page.locator('#signes .pack span')).toHaveText(['+', '−', '×', '÷']);
+  await expect(page.getByRole('checkbox', { name: 'Diviser' })).toHaveCount(1);
+  const ronds = await page.locator('#signes .pack span').evaluateAll((l) => l.map((e) => { const r = e.getBoundingClientRect(); return [r.y, r.width, r.height]; }));
+  for (const r of ronds) { expect(r[0]).toBe(ronds[0][0]); expect(Math.abs(r[1] - r[2])).toBeLessThanOrEqual(1); } // une ligne, des ronds
+  // Dizaines et centaines, expliquées au joueur.
+  await expect(page.locator('#dizaines input')).toHaveCount(9);
+  await expect(page.locator('#centaines input')).toHaveCount(9);
+  await expect(page.locator('#dizaines-titre')).toContainText('30 = de 30 à 39');
+  await expect(page.locator('#centaines-titre')).toContainText('300 = de 300 à 399');
+  await expect(page.getByRole('checkbox', { name: 'Dizaine 30 : nombres de 30 à 39' })).toHaveCount(1);
+  // Minimum : 3 nombres ne suffisent pas au niveau Moyen.
+  await page.locator('#signes input[value="plus"]').check();
+  for (const n of [2, 5]) await page.locator('#nombres input[value="' + n + '"]').check();
+  await page.locator('#dizaines input[value="30"]').check();
+  await valider(page);
+  await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir au moins 4 nombres (unités, dizaines ou centaines).');
+  await page.locator('#centaines input[value="300"]').check();
+  expect(await page.evaluate(() => window.Aventura.partie.maths[0])).toMatchObject({ nombres: [2, 5], dizaines: [30], centaines: [300] });
+  // « Tout sélectionner » puis « Tout désélectionner » pour chaque groupe.
+  for (const [g, nb] of [['nombres', 10], ['dizaines', 9], ['centaines', 9]]) {
+    const b = page.getByRole('button', { name: new RegExp('^Tout sélectionner : ' + { nombres: 'unités', dizaines: 'dizaines', centaines: 'centaines' }[g]) });
+    await b.click();
+    await expect(page.locator('#' + g + ' input:checked')).toHaveCount(nb);
+    await page.getByRole('button', { name: new RegExp('^Tout désélectionner : ' + { nombres: 'unités', dizaines: 'dizaines', centaines: 'centaines' }[g]) }).click();
+    await expect(page.locator('#' + g + ' input:checked')).toHaveCount(0);
+  }
+  await page.getByRole('button', { name: /^Tout sélectionner : dizaines/ }).click();
+  await valider(page); // 9 dizaines : assez de nombres
+  await expect(page.getByRole('button', { name: 'Lancer la partie' })).toBeVisible();
+});
+
+test('logique : dizaines et centaines donnent des nombres de leur tranche ; Facile = tables des dizaines', () => {
+  test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit');
+  const vus = new Set();
+  for (let i = 0; i < 500; i++) {
+    const c = K.generer({ signes: ['plus'], nombres: [], dizaines: [30], centaines: [300], niveau: 'moyen' });
+    for (const x of c.nombres) { expect((x >= 30 && x <= 39) || (x >= 300 && x <= 399)).toBe(true); vus.add(x >= 300 ? 'c' : 'd'); }
+    const t = K.generer({ signes: ['fois'], nombres: [], dizaines: [30], niveau: 'facile' });
+    expect(t.table).toBeGreaterThanOrEqual(30); expect(t.table).toBeLessThanOrEqual(39);
+    expect(t.resultat).toBe(t.table * t.nombres[1]);
+  }
+  expect(vus.size).toBe(2);
+  expect(K.compter({ nombres: [1, 2], dizaines: [10], centaines: [100] })).toBe(4);
+  expect(K.minimum('facile')).toBe(1);
+  for (const n of ['moyen', 'difficile', 'expert']) expect(K.minimum(n)).toBe(4);
 });
 
 test('niveau Facile : la carte est une question de la table choisie', async ({ page }) => {
@@ -121,7 +174,7 @@ test('niveau Facile : la carte est une question de la table choisie', async ({ p
 
 test('partie en mathématiques : bonne réponse → dé FORT, mauvaise → correction et dé FAIBLE @smoke', async ({ page }) => {
   await versMaths(page);
-  await maths(page, { signes: ['plus', 'fois'], nombres: [2, 3], niveau: 'moyen' });
+  await maths(page, { signes: ['plus', 'fois'], nombres: [2, 3, 4, 5], niveau: 'moyen' });
   await lancer(page);
   for (const [bonne, min, max] of [[true, 4, 6], [false, 1, 3]]) {
     await page.getByRole('button', { name: 'Piocher une carte' }).click();
@@ -186,26 +239,27 @@ test('un joueur en mathématiques, l\'autre en orthographe ; « Mêmes réglages
   // Mêmes réglages : la matière et les réglages de calcul sont copiés (nouvelle partie dans l'onglet).
   await ouvrirNeuf(page);
   await versReglages(page, 3);
-  await maths(page, { signes: ['plus'], nombres: [1] , niveau: 'expert' });
+  await maths(page, { signes: ['plus'], nombres: [1, 2, 3, 4], niveau: 'expert' });
   await page.getByRole('button', { name: 'Mêmes réglages pour tous' }).click();
   const p = await page.evaluate(() => window.Aventura.partie);
   for (let k = 1; k < 3; k++) {
     expect(p.matiere[k]).toBe('maths');
-    expect(p.maths[k]).toEqual({ signes: ['plus'], nombres: [1], niveau: 'expert' });
+    expect(p.maths[k]).toEqual({ signes: ['plus'], nombres: [1, 2, 3, 4], dizaines: [], centaines: [], niveau: 'expert' });
   }
 });
 
 test('rafraîchir après la réponse : la correction reste et les points ne comptent qu\'une fois', async ({ page }) => {
   await versMaths(page);
-  await maths(page, { signes: ['plus'], nombres: [3], niveau: 'moyen' });
+  await maths(page, { signes: ['plus'], nombres: [3], niveau: 'facile' });
   await lancer(page);
   await page.getByRole('button', { name: 'Piocher une carte' }).click();
-  await page.getByLabel('Ta réponse').fill('9');
+  const c = await page.evaluate(() => window.Aventura.partie.carte);
+  await page.getByLabel('Ta réponse').fill(c.resultatTexte);
   await page.getByRole('button', { name: 'Valider' }).click();
   await expect(page.locator('#carte-reponse')).toContainText('Bonne réponse !');
   await page.reload();
-  await expect(page.locator('#carte-reponse')).toContainText('Bonne réponse ! 3 + 3 + 3 = 9');
-  await expect(page.getByLabel('Ta réponse')).toHaveValue('9');
+  await expect(page.locator('#carte-reponse')).toContainText('Bonne réponse ! ' + c.formule + ' = ' + c.resultatTexte);
+  await expect(page.getByLabel('Ta réponse')).toHaveValue(c.resultatTexte);
   await lancerLeDe(page);
   await expect.poll(async () => Number(await page.locator('#points').textContent())).toBeGreaterThanOrEqual(4);
   expect(Number(await page.locator('#points').textContent())).toBeLessThanOrEqual(6);
@@ -215,10 +269,11 @@ test('rafraîchir après la réponse : la correction reste et les points ne comp
 // et la page défilait de côté sur ordinateur.
 test('formule Expert : la page ne défile jamais de côté', async ({ page }) => {
   await versMaths(page);
-  await maths(page, { signes: ['plus', 'moins', 'fois', 'divise'], nombres: [10], niveau: 'expert' });
+  // v7.0 : au moins 4 nombres ; les centaines donnent les formules les plus longues.
+  await maths(page, { signes: ['plus', 'moins', 'fois', 'divise'], nombres: [], centaines: [600, 700, 800, 900], niveau: 'expert' });
   await lancer(page);
   await page.getByRole('button', { name: 'Piocher une carte' }).click();
-  await expect(page.locator('#carte-mot')).toHaveText(/^10(\s[+−×÷]\s10){4}\s=\s\?$/);
+  await expect(page.locator('#carte-mot')).toHaveText(/^\d+(\s[+−×÷]\s\d+){1,4}\s=\s\?$/);
   expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
   await page.getByLabel('Ta réponse').fill('12345678901234567890');
   await page.getByRole('button', { name: 'Valider' }).click();

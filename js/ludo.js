@@ -114,8 +114,11 @@
     var fin = ' Puis « Valider ». « Mêmes réglages pour tous » donne tes choix aux autres joueurs.';
     if (mat === 'maths') {
       if (vide('signes')) return { cle: cle + '-a', cible: $('signes'), texte: 'Choisis les signes de tes calculs : +, −, × ou ÷.' };
-      if (vide('nombres')) return { cle: cle + '-b', cible: $('nombres'),
-        texte: p.maths[p.actif].niveau === 'facile' ? 'Choisis les tables que tu veux réviser.' : 'Choisis les nombres de tes calculs.' };
+      // v7.0 : au moins une table au niveau Facile, au moins 4 nombres (unités, dizaines, centaines) sinon.
+      var mm = p.maths[p.actif];
+      if (window.Calcul.compter(mm) < window.Calcul.minimum(mm.niveau)) return { cle: cle + '-b', cible: $('nombres'),
+        texte: mm.niveau === 'facile' ? 'Choisis les tables que tu veux réviser. « Tout » les choisit toutes d’un coup.'
+          : 'Choisis au moins 4 nombres : des unités, des dizaines (30 = de 30 à 39) ou des centaines. « Tout » les choisit d’un coup.' };
       return { cle: cle + '-c', cible: valider, texte: 'Parfait !' + fin };
     }
     if (mat === 'conjugaison') {
