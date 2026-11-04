@@ -232,7 +232,8 @@
   <!-- ÉCRAN 3 : le plateau de jeu -->
   <section class="ecran plateau-ecran" id="ecran-plateau" aria-labelledby="titre-plateau" hidden>
     <header class="barre">
-      <button type="button" class="btn-retour" data-vers="ecran-preparation"><span aria-hidden="true">←</span> Préparation</button>
+      <!-- Menu de la partie (v6.22) : ouvre au milieu de l'écran « Redémarrer partie », « Modifier les choix », « Retour à l'accueil ». -->
+      <button type="button" class="btn-retour btn-menu" id="btn-menu" aria-haspopup="dialog" aria-controls="menu-partie"><span class="menu-icone" aria-hidden="true">☰</span> Menu</button>
       <h2 id="titre-plateau">Le plateau</h2>
       <span class="barre-vide" aria-hidden="true"></span>
     </header>
@@ -327,6 +328,17 @@
   <div class="fin-actions">
     <button type="button" class="btn btn-principal" id="btn-rejouer">Rejouer cette aventure</button>
     <button type="button" class="btn btn-secondaire" id="btn-nouvelle">Nouvelle partie</button>
+  </div>
+</dialog>
+
+<!-- Menu de la partie (v6.22, js/plateau.js). Échap, la croix ou un toucher à côté le referment : la partie continue. -->
+<dialog class="fin menu-partie" id="menu-partie" aria-labelledby="menu-titre">
+  <button type="button" class="menu-fermer" id="btn-menu-fermer" aria-label="Fermer le menu et continuer la partie"><span aria-hidden="true">✕</span></button>
+  <h2 id="menu-titre">Menu</h2>
+  <div class="menu-actions">
+    <button type="button" class="btn btn-secondaire" id="btn-redemarrer">Redémarrer partie</button>
+    <button type="button" class="btn btn-secondaire" id="btn-modifier">Modifier les choix</button>
+    <button type="button" class="btn btn-secondaire" id="btn-accueil">Retour à l’accueil</button>
   </div>
 </dialog>
 
