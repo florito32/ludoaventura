@@ -930,6 +930,31 @@ body:has(#ecran-plateau:not([hidden])) .pied { padding-block: 2px calc(2px + env
   .tour .carte-entete .btn-ecouter { min-height: 40px; padding: 4px 10px; }
 }
 
+/* ---------- Saisie au clavier sur écran tactile (v6.13, js/plateau.js → majSaisie) ----------
+   Pendant que le joueur écrit sa réponse, la carte se pose par-dessus le plateau et occupe exactement
+   la partie de l'écran visible au-dessus du clavier (--vv-haut, --vv-h, lus par l'API Visual Viewport).
+   La question est au centre, la case de réponse et « Valider » juste au-dessus du clavier. */
+body.saisie-clavier .panneau {
+  position: fixed; z-index: 40; left: 0; right: 0; top: var(--vv-haut, 0px); height: var(--vv-h, 100dvh);
+  width: auto; max-height: none; margin: 0; display: flex; flex-direction: column;
+  padding: max(6px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) 6px max(8px, env(safe-area-inset-left));
+  background: var(--vert);
+}
+body.saisie-clavier .panneau .tour { flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; box-shadow: none; padding: 6px; }
+body.saisie-clavier .tour-joueur, body.saisie-clavier .tour-consigne, body.saisie-clavier .tour-actions:empty { display: none; }
+body.saisie-clavier .tour .carte-piochee { flex: 1 0 auto; margin: 0; display: flex; flex-direction: column; }
+/* La question occupe l'espace libre, centrée, en grand. */
+body.saisie-clavier .tour .carte-mot { flex: 1 0 auto; display: flex; align-items: center; justify-content: center; margin: 4px 0 !important; font-size: clamp(1.6rem, 9vw, 2.6rem); }
+body.saisie-clavier .carte-saisie { margin: 4px 0 0; }
+body.saisie-clavier .carte-correction:has(.carte-reponse:not([hidden])) { margin: 4px 0 0; }
+/* Très peu de hauteur (téléphone en paysage) : on resserre tout, la case de réponse reste visible. */
+body.saisie-basse .tour .carte-piochee { padding: 4px 8px; }
+body.saisie-basse .tour .carte-entete .btn-ecouter { min-height: 34px; padding: 0 10px; }
+body.saisie-basse .tour .carte-consigne { margin-top: 0 !important; }
+body.saisie-basse .tour .carte-mot { font-size: 1.5rem; margin: 0 !important; }
+body.saisie-basse .carte-saisie label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+body.saisie-basse .saisie-ligne input, body.saisie-basse .saisie-ligne .btn { min-height: 44px; }
+
 /* ---------- Ludo, le guide (v6.9, js/ludo.js) ----------
    Le petit Ludo (portrait rond) est posé à gauche du pied de page : il ne recouvre jamais le jeu.
    Sur l'accueil, il est caché : le grand Ludo de l'illustration le remplace (il se touche aussi). */

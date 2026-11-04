@@ -1003,6 +1003,7 @@
       return;
     }
     c.reponseDonnee = texte;
+    champ.blur(); // le clavier se referme : la carte rend la place au plateau et au dé (v6.13)
     c.juste = conj ? V.juste(texte, c.verbe, c.temps, c.personne) : K.juste(texte, c.resultat);
     // Réponse fausse (calcul ou conjugaison) : on attend « J'ai compris » avant de lancer le dé (v6.1).
     c.attente = !c.juste;
@@ -1115,9 +1116,79 @@
     var deEnCours = r && (r.etape === 'lancer' && !(partie.carte && partie.carte.attente) || r.etape === 'suivant' || r.etape === 'fin');
     table.classList.remove('tour-monte');
     if (deEnCours || $('ecran-plateau').hidden) return; // tous les écrans depuis la v6.8
+    if (document.body.classList.contains('saisie-clavier')) return; // la carte occupe déjà tout l'écran visible (v6.13)
     if (tour.scrollHeight > tour.clientHeight + 1) table.classList.add('tour-monte');
   }
   window.addEventListener('resize', ajusterTour);
+
+  // ---------- Saisie au clavier sur écran tactile (v6.13, lignes 106-107 du backlog) ----------
+  // Quand le joueur écrit sa réponse, le clavier du téléphone couvre une bonne partie de l'écran.
+  // La carte se pose alors par-dessus le plateau et occupe exactement la partie visible au-dessus
+  // du clavier (API Visual Viewport) : rien n'est coupé en haut, rien n'est caché par le clavier,
+  // la case de réponse est juste au-dessus du clavier. Le clavier refermé, tout revient en place.
+  var tactile = window.matchMedia('(pointer: coarse)');
+  var vv = window.visualViewport;
+  // suivi : le curseur est dans la case ; clavierVu : le clavier est ouvert (zone visible réduite).
+  // La carte ne passe en grand que si les deux sont vrais : un clavier physique (tablette) ne change rien.
+  var saisie = { suivi: false, hauteurSansClavier: 0, clavierVu: false, minuteur: 0 };
+
+  function hauteurVisible() { return vv ? vv.height : window.innerHeight; }
+
+  // Zone visible de l'écran (au-dessus du clavier), reportée dans des variables CSS.
+  function placerSaisie() {
+    var h = hauteurVisible();
+    var s = document.body.style;
+    s.setProperty('--vv-haut', (vv ? vv.offsetTop : 0) + 'px');
+    s.setProperty('--vv-h', h + 'px');
+    // Très peu de hauteur (téléphone en paysage, clavier ouvert) : carte resserrée.
+    document.body.classList.toggle('saisie-basse', h < 340);
+  }
+
+  // Met la carte en grand (ou la range) selon l'état du curseur et du clavier.
+  function afficherSaisie() {
+    var oui = saisie.suivi && saisie.clavierVu;
+    var avant = document.body.classList.contains('saisie-clavier');
+    if (oui) { document.querySelector('.table').classList.remove('tour-monte'); placerSaisie(); }
+    if (oui === avant) return;
+    document.body.classList.toggle('saisie-clavier', oui);
+    if (!oui) { document.body.classList.remove('saisie-basse'); ajusterTour(); }
+  }
+
+  function doitSuivre() {
+    var champ = $('reponse-joueur');
+    return tactile.matches && document.activeElement === champ && !champ.disabled && !$('ecran-plateau').hidden;
+  }
+
+  function majSaisie() {
+    clearTimeout(saisie.minuteur);
+    var oui = doitSuivre();
+    if (oui && !saisie.suivi) {
+      saisie.hauteurSansClavier = window.innerHeight;
+      saisie.clavierVu = hauteurVisible() < saisie.hauteurSansClavier * 0.85; // clavier déjà ouvert
+    }
+    saisie.suivi = oui;
+    if (!oui) saisie.clavierVu = false;
+    afficherSaisie();
+  }
+
+  // Le clavier s'ouvre ou se ferme : la zone visible change de taille.
+  function clavierBouge() {
+    if (!saisie.suivi) return;
+    var ouvert = hauteurVisible() < saisie.hauteurSansClavier * 0.85;
+    // Clavier refermé par le joueur (touche « retour » d'Android) : on rend le plateau.
+    if (!ouvert && saisie.clavierVu) { saisie.clavierVu = false; $('reponse-joueur').blur(); afficherSaisie(); return; }
+    saisie.clavierVu = ouvert;
+    afficherSaisie();
+  }
+
+  // Entrée immédiate (le curseur arrive dans la case). Sortie différée : un toucher sur « Valider »
+  // ou « Écouter » déplace le focus, et le clic doit tomber sur le bouton visé, pas sur ce qui
+  // apparaîtrait dessous si la carte se rangeait au même instant.
+  function majSaisieBientot() { clearTimeout(saisie.minuteur); saisie.minuteur = setTimeout(majSaisie, 300); }
+  document.addEventListener('focusin', function (e) { if (e.target === $('reponse-joueur')) majSaisie(); else majSaisieBientot(); });
+  document.addEventListener('focusout', majSaisieBientot);
+  if (vv) { vv.addEventListener('resize', clavierBouge); vv.addEventListener('scroll', clavierBouge); }
+  else window.addEventListener('resize', clavierBouge);
 
   // ---------- Dés ----------
   // Durée du roulé du dé (ms). Les tests la raccourcissent avec window.AVENTURA_DUREE_DE.

@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.12';
+  var VERSION = '6.13';
 
   var HISTORY = [
+    { v: '6.13', date: '2026-11-04', changes: [
+      "Téléphone et tablette : quand tu écris ta réponse, la carte se pose par-dessus le plateau et prend toute la place au-dessus du clavier. Rien n\u2019est caché par le clavier ni coupé en haut ; la case de réponse est juste au-dessus du clavier.",
+      "Après « Valider », ou si tu refermes le clavier, le plateau revient tout seul."
+    ] },
     { v: '6.12', date: '2026-11-04', changes: [
       "Mathématiques : les signes +, −, × et ÷ sont seuls dans des ronds, sur une seule ligne (le mot « Additionner » ne tenait pas dans sa case).",
       "Nouveaux choix : les dizaines (30 = les nombres de 30 à 39) et les centaines (300 = les nombres de 300 à 399), en plus des unités de 1 à 10. Au niveau Facile, ce sont des tables (30 → tables de 30 à 39).",
