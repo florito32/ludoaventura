@@ -319,10 +319,18 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
    dizaines (10 à 50 / 60 à 90) et centaines (100 à 500 / 600 à 900), 5 par ligne : 7 lignes de boutons
    et 4 titres (d'où les 9 rem retirés de la hauteur). */
 #reglages-maths {
-  --rangs: 7; --cols: 5; --larg: min(100cqi, 640px);
-  --h: clamp(28px, calc((100cqh - 9rem) / var(--rangs) - 1.2cqh), 110px);
+  --rangs: 7; --titres: 9rem; --cols: 5; --larg: min(100cqi, 640px);
+  --h: clamp(28px, calc((100cqh - var(--titres)) / var(--rangs) - 1.2cqh), 110px);
   gap: clamp(4px, 1.4cqh, 18px);
 }
+/* v6.14 : les groupes de nombres dépendent du niveau (Facile : unités ; Moyen : + dizaines ;
+   Difficile : + centaines ; Expert : + « 1000+ »), d'où un nombre de lignes et de titres différent. */
+#reglages-maths[data-niveau="facile"] { --rangs: 3; --titres: 4.5rem; }
+#reglages-maths[data-niveau="moyen"] { --rangs: 5; --titres: 7rem; }
+#reglages-maths[data-niveau="expert"] { --rangs: 8; --titres: 12.5rem; }
+#reglages-maths #milliers { display: flex; justify-content: center; }
+#reglages-maths #milliers .pack { width: min(40%, 220px); }
+.pack[hidden] { display: none; }
 #reglages-maths .packs { gap: clamp(4px, 1cqh, 10px) clamp(5px, 1.4cqi, 12px); }
 #signes { grid-template-columns: repeat(4, minmax(0, 1fr)); justify-items: center; }
 #signes .pack { width: 100%; display: flex; justify-content: center; }
@@ -346,7 +354,11 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 /* Écrans peu hauts (téléphone carré ou en paysage) : chaque groupe de nombres sur une seule ligne
    (4 lignes de boutons au lieu de 7), pour tout voir sans défiler. */
 @container (max-height: 460px) {
-  #reglages-maths { --rangs: 4; --h: clamp(26px, calc((100cqh - 6.4rem) / var(--rangs) - 1cqh), 70px); gap: 3px; }
+  #reglages-maths { --rangs: 4; --titres: 6.4rem; --h: clamp(26px, calc((100cqh - var(--titres)) / var(--rangs) - 1cqh), 70px); gap: 3px; }
+  #reglages-maths[data-niveau="facile"] { --rangs: 2; --titres: 3.4rem; }
+  #reglages-maths[data-niveau="moyen"] { --rangs: 3; --titres: 5rem; }
+  #reglages-maths[data-niveau="expert"] { --rangs: 5; --titres: 8rem; }
+  #milliers-titre { display: none; } /* « 1000+ » se suffit à lui-même : une ligne de gagnée */
   #reglages-maths .nombres { grid-template-columns: repeat(10, minmax(0, 1fr)); }
   .reglages-joueur #reglages-maths .nombres .pack span { font-size: clamp(.8rem, min(calc(var(--h) * .42), 3.2cqi), 1.6rem); }
   #reglages-maths .reglage-tete { margin-bottom: 2px; }

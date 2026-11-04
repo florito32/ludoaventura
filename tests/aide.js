@@ -34,15 +34,21 @@ async function cocherJoueur(page, { types = ['epeler', 'ecrire'] } = {}) {
 }
 // Écran 3 : Mathématiques avec les signes, nombres et niveau donnés.
 // Depuis v5.9, le niveau se choisit sur l'écran de la matière ; au niveau Facile, les nombres sont des tables.
-async function maths(page, { signes = ['plus'], nombres = [2, 3], dizaines = [], centaines = [], niveau = 'facile' } = {}) {
+async function maths(page, { signes = ['plus'], nombres = [2, 3], dizaines = [], centaines = [], milliers = [], niveau = 'facile', nbSignes = null } = {}) {
   await page.locator('#matieres input[value="maths"]').check();
   await page.locator('#niveau-maths input[value="' + niveau + '"]').check();
+  // v6.14 : nombres de signes par calcul (1 coché au départ).
+  const max = { facile: 1, moyen: 2, difficile: 3, expert: 4 }[niveau];
+  if (nbSignes) for (const n of [...nbSignes, 1, 2, 3, 4].filter((n, i, t) => n <= max && t.indexOf(n) === i)) {
+    await page.locator('#nb-signes input[value="' + n + '"]').setChecked(nbSignes.includes(n));
+  }
   await valider(page);
   await page.locator('#reglages-maths').waitFor();
   for (const s of signes) await page.locator('#signes input[value="' + s + '"]').check();
   for (const n of nombres) await page.locator('#nombres input[value="' + n + '"]').check();
   for (const n of dizaines) await page.locator('#dizaines input[value="' + n + '"]').check();
   for (const n of centaines) await page.locator('#centaines input[value="' + n + '"]').check();
+  for (const n of milliers) await page.locator('#milliers input[value="' + n + '"]').check();
 }
 
 // Écran 3 : packs et questions sont décochés au départ (v3.9) : coche tout pour chaque joueur et valide

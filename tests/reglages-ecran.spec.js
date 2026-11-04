@@ -11,7 +11,7 @@ async function boites(page, sel) {
 async function remplit(page, ecran, part = 0.5) {
   const r = await page.evaluate((sel) => {
     const corps = document.querySelector('#reglages-joueur');
-    const packs = [...document.querySelectorAll(sel + ' .pack span')].map((e) => e.getBoundingClientRect());
+    const packs = [...document.querySelectorAll(sel + ' .pack span')].map((e) => e.getBoundingClientRect()).filter((b) => b.height > 0); // choix visibles
     const haut = Math.min(...packs.map((b) => b.top)), bas = Math.max(...packs.map((b) => b.bottom));
     const c = corps.getBoundingClientRect();
     return { defile: document.documentElement.scrollHeight > innerHeight + 1 || corps.scrollHeight > corps.clientHeight + 1,
@@ -29,7 +29,8 @@ test('mathématiques : signes sur une ligne, unités, dizaines et centaines en l
   await rapide(page);
   await page.goto('./');
   await versReglages(page, 1);
-  await maths(page, { signes: [], nombres: [], niveau: 'moyen' });
+  // Difficile : unités, dizaines et centaines (v6.14 : les groupes dépendent du niveau).
+  await maths(page, { signes: [], nombres: [], niveau: 'difficile' });
   const s = await boites(page, '#signes');
   for (let k = 1; k < 4; k++) expect(s[k][1]).toBe(s[0][1]); // les 4 signes sur la même ligne
   let haut = s[0][1];
@@ -45,10 +46,20 @@ test('mathématiques : signes sur une ligne, unités, dizaines et centaines en l
     haut = n[n.length - 1][1];
   }
   // Aucun texte ne déborde de son bouton, et chaque bouton « Tout » est visible.
-  const deborde = await page.locator('#reglages-maths .pack span, #reglages-maths .btn-tout').evaluateAll((l) => l.some((e) => e.scrollWidth > e.clientWidth + 1));
+  const deborde = await page.locator('#reglages-maths .reglage:not([hidden]) .pack span, #reglages-maths .reglage:not([hidden]) .btn-tout').evaluateAll((l) => l.some((e) => e.scrollWidth > e.clientWidth + 1));
   expect(deborde).toBe(false);
-  for (const b of await page.locator('#reglages-maths .btn-tout').all()) await expect(b).toBeInViewport();
+  for (const b of await page.locator('#reglages-maths .reglage:not([hidden]) .btn-tout').all()) await expect(b).toBeInViewport();
   await remplit(page, '#reglages-maths');
+  // Les autres niveaux tiennent aussi sans défiler (Expert : une ligne « 1000+ » en plus).
+  for (const nv of ['facile', 'moyen', 'expert']) {
+    await page.getByRole('button', { name: /Retour/ }).click();
+    await page.locator('#niveau-maths input[value="' + nv + '"]').check();
+    await page.locator('#btn-valider-reglages').click();
+    await remplit(page, '#reglages-maths', nv === 'facile' ? 0.3 : 0.5);
+  }
+  await page.getByRole('button', { name: /Retour/ }).click();
+  await page.locator('#niveau-maths input[value="difficile"]').check();
+  await page.locator('#btn-valider-reglages').click();
   // Les choix restent utilisables.
   await page.locator('#signes label').nth(2).click();
   await page.locator('#nombres label').nth(9).click();

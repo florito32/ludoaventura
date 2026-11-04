@@ -16,11 +16,11 @@ test.describe('logique des calculs', () => {
     expect(K.evaluer([2, 5], ['moins'])).toBeNull();
   });
 
-  test('le niveau donne le nombre de signes ; seulement les signes et nombres choisis ; résultat ≥ 0 à une décimale au plus', () => {
+  test('le nombre de signes choisi (jusqu\'au maximum du niveau) ; seulement les signes et nombres choisis ; résultat ≥ 0 à une décimale au plus', () => {
     const attendus = { facile: 1, moyen: 2, difficile: 3, expert: 4 };
     for (const [niveau, n] of Object.entries(attendus)) {
       for (let i = 0; i < 300; i++) {
-        const c = K.generer({ signes: ['plus', 'moins', 'fois', 'divise'], nombres: [2, 5, 7, 10], niveau });
+        const c = K.generer({ signes: ['plus', 'moins', 'fois', 'divise'], nombres: [2, 5, 7, 10], niveau, nbSignes: [n] });
         expect(c.operations).toHaveLength(n);
         expect(c.nombres).toHaveLength(n + 1);
         // (au niveau Facile, ce sont des tables : seul le nombre de la table vient de la liste)
@@ -80,7 +80,7 @@ test('étape 3 : Mathématiques et son niveau sur le même écran, puis signes e
   await expect(page.locator('#niveau-maths input[value="facile"]')).toBeChecked();
   await expect(page.locator('#niveau-maths-aide')).toContainText('les tables');
   await page.locator('#niveau-maths label', { hasText: 'Moyen' }).click();
-  await expect(page.locator('#niveau-maths-aide')).toHaveText('Moyen : 2 signes par calcul, au moins 4 nombres.');
+  await expect(page.locator('#niveau-maths-aide')).toHaveText('Moyen : les nombres de 1 à 99, jusqu’à 2 signes.');
   await page.locator('#niveau-maths label', { hasText: 'Facile' }).click();
   await valider(page); // deuxième écran : signes et tables
   await expect(page.locator('#reglages-maths')).toBeVisible();
@@ -110,57 +110,85 @@ test('étape 3 : Mathématiques et son niveau sur le même écran, puis signes e
   await expect(page.locator('#nombres-titre')).toContainText('Unités');
 });
 
-// v7.0 (04/11/2026) : signes seuls dans des ronds sur une ligne, dizaines et centaines, « Tout sélectionner »,
-// au moins 4 nombres aux niveaux Moyen, Difficile et Expert.
-test('signes seuls, dizaines et centaines, « Tout sélectionner », minimum de 4 nombres hors Facile', async ({ page }) => {
+// v6.12 : signes seuls dans des ronds, « Tout sélectionner ». v6.14 (04/11/2026) : le niveau décide des groupes
+// de nombres (Facile : unités ; Moyen : + dizaines ; Difficile : + centaines ; Expert : + « 1000+ ») et des
+// nombres de signes proposés (1 ; 1–2 ; 1–3 ; 1–4, plusieurs possibles).
+test('le niveau montre les groupes de nombres et les nombres de signes possibles ; « Tout sélectionner »', async ({ page }) => {
   await versMaths(page);
-  await maths(page, { signes: [], nombres: [], niveau: 'moyen' });
-  // Les signes : le symbole seul, sans le mot, lu quand même par les lecteurs d'écran.
+  await page.locator('#matieres input[value="maths"]').check();
+  const visibles = async (sel) => (await page.locator(sel).evaluateAll((l) => l.filter((e) => e.offsetParent).map((e) => e.textContent.trim())));
+  for (const [niveau, nb] of [['facile', ['1']], ['moyen', ['1', '2']], ['difficile', ['1', '2', '3']], ['expert', ['1', '2', '3', '4']]]) {
+    await page.locator('#niveau-maths input[value="' + niveau + '"]').check();
+    expect(await visibles('#nb-signes .pack')).toEqual(nb);
+  }
+  // Moyen : 1 et 2 signes cochés ; les dizaines apparaissent, pas les centaines ni « 1000+ ».
+  await page.locator('#niveau-maths input[value="moyen"]').check();
+  await page.locator('#nb-signes input[value="2"]').check();
+  expect(await page.evaluate(() => window.Aventura.partie.maths[0].nbSignes)).toEqual([1, 2]);
+  await valider(page);
   await expect(page.locator('#signes .pack span')).toHaveText(['+', '−', '×', '÷']);
   await expect(page.getByRole('checkbox', { name: 'Diviser' })).toHaveCount(1);
-  const ronds = await page.locator('#signes .pack span').evaluateAll((l) => l.map((e) => { const r = e.getBoundingClientRect(); return [r.y, r.width, r.height]; }));
-  for (const r of ronds) { expect(r[0]).toBe(ronds[0][0]); expect(Math.abs(r[1] - r[2])).toBeLessThanOrEqual(1); } // une ligne, des ronds
-  // Dizaines et centaines, expliquées au joueur.
-  await expect(page.locator('#dizaines input')).toHaveCount(9);
-  await expect(page.locator('#centaines input')).toHaveCount(9);
+  await expect(page.locator('#nombres')).toBeVisible();
+  await expect(page.locator('#dizaines')).toBeVisible();
   await expect(page.locator('#dizaines-titre')).toContainText('30 = de 30 à 39');
-  await expect(page.locator('#centaines-titre')).toContainText('300 = de 300 à 399');
-  await expect(page.getByRole('checkbox', { name: 'Dizaine 30 : nombres de 30 à 39' })).toHaveCount(1);
-  // Minimum : 3 nombres ne suffisent pas au niveau Moyen.
-  await page.locator('#signes input[value="plus"]').check();
-  for (const n of [2, 5]) await page.locator('#nombres input[value="' + n + '"]').check();
-  await page.locator('#dizaines input[value="30"]').check();
+  await expect(page.locator('#centaines')).toBeHidden();
+  await expect(page.locator('#milliers')).toBeHidden();
+  // Il faut un signe et au moins un nombre (plus de minimum de 4).
+  await page.locator('#signes input[value="fois"]').check();
   await valider(page);
-  await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir au moins 4 nombres (unités, dizaines ou centaines).');
-  await page.locator('#centaines input[value="300"]').check();
-  expect(await page.evaluate(() => window.Aventura.partie.maths[0])).toMatchObject({ nombres: [2, 5], dizaines: [30], centaines: [300] });
-  // « Tout sélectionner » puis « Tout désélectionner » pour chaque groupe.
-  for (const [g, nb] of [['nombres', 10], ['dizaines', 9], ['centaines', 9]]) {
-    const b = page.getByRole('button', { name: new RegExp('^Tout sélectionner : ' + { nombres: 'unités', dizaines: 'dizaines', centaines: 'centaines' }[g]) });
-    await b.click();
+  await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir au moins un nombre.');
+  for (const [g, nb] of [['nombres', 10], ['dizaines', 9]]) {
+    const nom = { nombres: 'unités', dizaines: 'dizaines' }[g];
+    await page.getByRole('button', { name: 'Tout sélectionner : ' + nom }).click();
     await expect(page.locator('#' + g + ' input:checked')).toHaveCount(nb);
-    await page.getByRole('button', { name: new RegExp('^Tout désélectionner : ' + { nombres: 'unités', dizaines: 'dizaines', centaines: 'centaines' }[g]) }).click();
+    await page.getByRole('button', { name: 'Tout désélectionner : ' + nom }).click();
     await expect(page.locator('#' + g + ' input:checked')).toHaveCount(0);
   }
-  await page.getByRole('button', { name: /^Tout sélectionner : dizaines/ }).click();
-  await valider(page); // 9 dizaines : assez de nombres
+  await page.locator('#dizaines input[value="50"]').check();
+  await valider(page);
   await expect(page.getByRole('button', { name: 'Lancer la partie' })).toBeVisible();
+  // Retour : Expert montre « 1000+ » ; le nombre de signes 2 reste coché.
+  await page.getByRole('button', { name: /Retour/ }).click();
+  await page.getByRole('button', { name: /Retour/ }).click();
+  await page.locator('#niveau-maths input[value="expert"]').check();
+  await expect(page.locator('#nb-signes input[value="2"]')).toBeChecked();
+  await valider(page);
+  await expect(page.locator('#centaines')).toBeVisible();
+  await expect(page.locator('#milliers .pack span')).toHaveText('1000+');
 });
 
-test('logique : dizaines et centaines donnent des nombres de leur tranche ; Facile = tables des dizaines', () => {
+test('logique : un nombre de chaque groupe choisi ; groupes différents s\'il y a peu de nombres ; 1000+', () => {
   test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit');
   const vus = new Set();
-  for (let i = 0; i < 500; i++) {
-    const c = K.generer({ signes: ['plus'], nombres: [], dizaines: [30], centaines: [300], niveau: 'moyen' });
-    for (const x of c.nombres) { expect((x >= 30 && x <= 39) || (x >= 300 && x <= 399)).toBe(true); vus.add(x >= 300 ? 'c' : 'd'); }
-    const t = K.generer({ signes: ['fois'], nombres: [], dizaines: [30], niveau: 'facile' });
-    expect(t.table).toBeGreaterThanOrEqual(30); expect(t.table).toBeLessThanOrEqual(39);
-    expect(t.resultat).toBe(t.table * t.nombres[1]);
+  for (let i = 0; i < 400; i++) {
+    // Moyen, 1 signe, tables 7, 8 et 50 → 7 × 54 ou 8 × 56, jamais 7 × 8.
+    const a = K.generer({ niveau: 'moyen', nbSignes: [1], signes: ['fois'], nombres: [7, 8], dizaines: [50] });
+    expect(a.nombres).toHaveLength(2);
+    expect(a.nombres.filter((x) => x >= 50 && x <= 59)).toHaveLength(1);
+    expect(a.nombres.filter((x) => x === 7 || x === 8)).toHaveLength(1);
+    // Difficile, 3 signes, 2, 30 et 500 → un nombre de chaque groupe au moins (2 + 35 × 520…), jamais 2 × 2 × 2.
+    const b = K.generer({ niveau: 'difficile', nbSignes: [3], signes: ['plus', 'fois'], nombres: [2], dizaines: [30], centaines: [500] });
+    expect(b.operations).toHaveLength(3);
+    expect(b.nombres).toContain(2);
+    expect(b.nombres.some((x) => x >= 30 && x <= 39)).toBe(true);
+    expect(b.nombres.some((x) => x >= 500 && x <= 599)).toBe(true);
+    // Difficile, 1 signe avec 3 groupes : 2 nombres de groupes différents.
+    const c = K.generer({ niveau: 'difficile', nbSignes: [1], signes: ['plus'], nombres: [2], dizaines: [30], centaines: [500] });
+    const [x, y] = c.nombres.map((n) => (n >= 500 ? 'c' : n >= 30 ? 'd' : 'u'));
+    expect(x).not.toBe(y);
+    // Plusieurs nombres de signes : chaque carte en prend un.
+    const d = K.generer({ niveau: 'expert', nbSignes: [2, 3], signes: ['plus'], nombres: [4], milliers: [1000] });
+    expect([2, 3]).toContain(d.operations.length);
+    vus.add(d.operations.length);
+    expect(d.nombres.some((n) => n >= 1000 && n <= 9999)).toBe(true);
+    // Groupes au-dessus du niveau ignorés : centaines cochées mais niveau Moyen.
+    const e = K.generer({ niveau: 'moyen', nbSignes: [2], signes: ['plus'], nombres: [3], centaines: [300] });
+    for (const n of e.nombres) expect(n).toBe(3);
   }
-  expect(vus.size).toBe(2);
-  expect(K.compter({ nombres: [1, 2], dizaines: [10], centaines: [100] })).toBe(4);
-  expect(K.minimum('facile')).toBe(1);
-  for (const n of ['moyen', 'difficile', 'expert']) expect(K.minimum(n)).toBe(4);
+  expect(vus).toEqual(new Set([2, 3]));
+  expect(K.choixSignes('difficile')).toEqual([1, 2, 3]);
+  expect(K.groupes('moyen').map((g) => g.id)).toEqual(['nombres', 'dizaines']);
+  expect(K.groupes('expert').map((g) => g.id)).toEqual(['nombres', 'dizaines', 'centaines', 'milliers']);
 });
 
 test('niveau Facile : la carte est une question de la table choisie', async ({ page }) => {
@@ -174,7 +202,7 @@ test('niveau Facile : la carte est une question de la table choisie', async ({ p
 
 test('partie en mathématiques : bonne réponse → dé FORT, mauvaise → correction et dé FAIBLE @smoke', async ({ page }) => {
   await versMaths(page);
-  await maths(page, { signes: ['plus', 'fois'], nombres: [2, 3, 4, 5], niveau: 'moyen' });
+  await maths(page, { signes: ['plus', 'fois'], nombres: [2, 3], niveau: 'moyen', nbSignes: [2] });
   await lancer(page);
   for (const [bonne, min, max] of [[true, 4, 6], [false, 1, 3]]) {
     await page.getByRole('button', { name: 'Piocher une carte' }).click();
@@ -239,12 +267,12 @@ test('un joueur en mathématiques, l\'autre en orthographe ; « Mêmes réglages
   // Mêmes réglages : la matière et les réglages de calcul sont copiés (nouvelle partie dans l'onglet).
   await ouvrirNeuf(page);
   await versReglages(page, 3);
-  await maths(page, { signes: ['plus'], nombres: [1, 2, 3, 4], niveau: 'expert' });
+  await maths(page, { signes: ['plus'], nombres: [1], niveau: 'expert', nbSignes: [3, 4] });
   await page.getByRole('button', { name: 'Mêmes réglages pour tous' }).click();
   const p = await page.evaluate(() => window.Aventura.partie);
   for (let k = 1; k < 3; k++) {
     expect(p.matiere[k]).toBe('maths');
-    expect(p.maths[k]).toEqual({ signes: ['plus'], nombres: [1, 2, 3, 4], dizaines: [], centaines: [], niveau: 'expert' });
+    expect(p.maths[k]).toEqual({ signes: ['plus'], nbSignes: [3, 4], nombres: [1], dizaines: [], centaines: [], milliers: [], niveau: 'expert' });
   }
 });
 
@@ -270,7 +298,7 @@ test('rafraîchir après la réponse : la correction reste et les points ne comp
 test('formule Expert : la page ne défile jamais de côté', async ({ page }) => {
   await versMaths(page);
   // v7.0 : au moins 4 nombres ; les centaines donnent les formules les plus longues.
-  await maths(page, { signes: ['plus', 'moins', 'fois', 'divise'], nombres: [], centaines: [600, 700, 800, 900], niveau: 'expert' });
+  await maths(page, { signes: ['plus', 'moins', 'fois', 'divise'], nombres: [], centaines: [600, 700, 800, 900], milliers: [1000], niveau: 'expert', nbSignes: [4] });
   await lancer(page);
   await page.getByRole('button', { name: 'Piocher une carte' }).click();
   await expect(page.locator('#carte-mot')).toHaveText(/^\d+(\s[+−×÷]\s\d+){1,4}\s=\s\?$/);
