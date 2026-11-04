@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.15';
+  var VERSION = '6.16';
 
   var HISTORY = [
+    { v: '6.16', date: '2026-11-04', changes: [
+      "Orthographe : 15 nouveaux packs de mots — Animaux, Lieux et constructions, Pays, Villes, Paysages et nature, Météo et saisons, Le corps, Aliments, Dans la maison, Vêtements, L\u2019école, Métiers, Transports, Couleurs et formes, Sports et musique.",
+      "Préparation : en orthographe, on choisit d\u2019abord ses packs sur un écran, puis ses questions sur l\u2019écran suivant."
+    ] },
     { v: '6.15', date: '2026-11-04', changes: [
       "Mathématiques : le niveau décide des nombres proposés. Facile : les tables de 1 à 10 ; Moyen : jusqu\u2019à 99 (unités et dizaines) ; Difficile : jusqu\u2019à 999 (et centaines) ; Expert : aussi « 1000+ ».",
       "Sous le niveau, le nombre de signes par calcul : 1 au Facile, jusqu\u2019à 2 au Moyen, 3 au Difficile, 4 en Expert. On peut en choisir plusieurs, chaque carte en prend un au hasard.",

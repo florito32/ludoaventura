@@ -21,15 +21,19 @@ async function matiere(page, valeur) {
     await page.locator('#francais input[value="' + valeur + '"]').check();
   }
   await valider(page);
-  await page.locator(valeur === 'maths' ? '#reglages-maths' : valeur === 'orthographe' ? '#reglages-ortho' : '#conj-temps').waitFor();
+  await page.locator(valeur === 'maths' ? '#reglages-maths' : valeur === 'orthographe' ? '#ortho-packs' : '#conj-temps').waitFor();
 }
 // Français → Orthographe, puis coche tous les packs et toutes les questions du joueur affiché.
 async function orthographe(page) { await matiere(page, 'orthographe'); }
 // Depuis v7.0, seules « Épeler » et « Réécrire le mot » se jouent avec « Bonne / Mauvaise réponse » :
 // par défaut les tests cochent ces deux-là (les questions écrites ont leurs propres tests, avec { types }).
-async function cocherJoueur(page, { types = ['epeler', 'ecrire'] } = {}) {
+// Depuis v6.16, l'orthographe a deux écrans : les packs (par défaut les 4 packs d'origine), « Valider », puis les questions.
+const PACKS_ORIGINE = ['mots-simples', 'mots-compliques', 'temps', 'numerique'];
+async function cocherJoueur(page, { packs = PACKS_ORIGINE, types = ['epeler', 'ecrire'] } = {}) {
   await orthographe(page);
-  for (const c of await page.locator('#packs input').all()) await c.check();
+  for (const p of packs) await page.locator('#packs input[value="' + p + '"]').check();
+  await valider(page);
+  await page.locator('#reglages-ortho').waitFor();
   for (const t of types) await page.locator('#types-questions input[value="' + t + '"]').check();
 }
 // Écran 3 : Mathématiques avec les signes, nombres et niveau donnés.

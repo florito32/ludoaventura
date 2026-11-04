@@ -68,19 +68,29 @@ test('mathématiques : signes sur une ligne, unités, dizaines et centaines en l
 });
 
 
-test('orthographe : packs et questions en grille régulière qui remplit l\'écran, sans défiler', async ({ page }) => {
+test('orthographe : packs puis questions, chacun en grille régulière qui remplit l\'écran, sans défiler', async ({ page }) => {
   await rapide(page);
   await page.goto('./');
   await versReglages(page, 1);
   await orthographe(page);
-  const p = await boites(page, '#packs'), q = await boites(page, '#types-questions');
-  // Tous les boutons ont la même taille ; 2 ou 4 par ligne selon la forme de l'écran.
-  for (const b of [...p, ...q]) { expect(Math.round(b[2])).toBe(Math.round(p[0][2])); expect(Math.round(b[3])).toBe(Math.round(p[0][3])); }
-  const parLigne = p.filter((b) => b[1] === p[0][1]).length;
-  expect([2, 4]).toContain(parLigne);
   // Aucun texte ne déborde de son bouton.
-  const deborde = await page.locator('#reglages-ortho .pack span').evaluateAll((l) => l.some((e) => e.scrollWidth > e.clientWidth + 1 || e.scrollHeight > e.clientHeight + 1));
-  expect(deborde).toBe(false);
+  const deborde = (sel) => page.locator(sel + ' .pack span').evaluateAll((l) => l.some((e) => e.offsetHeight > 0 && (e.scrollWidth > e.clientWidth + 1 || e.scrollHeight > e.clientHeight + 1)));
+  const egaux = (l) => { for (const b of l) { expect(Math.round(b[2])).toBe(Math.round(l[0][2])); expect(Math.round(b[3])).toBe(Math.round(l[0][3])); } };
+  // Écran des packs (v6.16) : 19 packs, 3 ou 5 par ligne selon la forme de l'écran.
+  const p = await boites(page, '#packs');
+  expect(p).toHaveLength(19);
+  egaux(p);
+  expect([3, 5]).toContain(p.filter((b) => b[1] === p[0][1]).length);
+  expect(await deborde('#ortho-packs')).toBe(false);
+  await remplit(page, '#ortho-packs', 0.55);
+  await page.locator('#packs label', { hasText: 'Animaux' }).click();
+  await page.getByRole('button', { name: 'Valider', exact: true }).click();
+  // Écran des questions : 2 ou 4 par ligne.
+  await page.locator('#reglages-ortho').waitFor();
+  const q = await boites(page, '#types-questions');
+  egaux(q);
+  expect([2, 4]).toContain(q.filter((b) => b[1] === q[0][1]).length);
+  expect(await deborde('#reglages-ortho')).toBe(false);
   await remplit(page, '#reglages-ortho', 0.55);
   await page.locator('#types-questions label', { hasText: 'Syllabes' }).click();
   expect(await page.evaluate(() => window.Aventura.partie.types[0])).toEqual(['syllabes']);
