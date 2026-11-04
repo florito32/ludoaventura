@@ -216,3 +216,18 @@ test('orthographe, « Mauvaise réponse » : la réponse s\'affiche, le dé FAIB
   await expect(page.getByRole('button', { name: 'J’ai compris' })).toHaveCount(0);
   await expect.poll(async () => Number(await page.locator('#points').textContent())).toBeGreaterThanOrEqual(5);
 });
+
+// v6.21 : à la fin d'une manche, on annonce où l'équipe part (demande du 04/11/2026) au lieu de « croix suivante ».
+test('v6.21 : fin de manche, « en route vers le lac / le marais / les collines / le volcan »', async ({ page }) => {
+  test.skip(test.info().project.name !== 'ordinateur', 'texte identique sur tous les formats');
+  await rapide(page, { pause: 1200 });
+  await lancerPartie(page, { joueurs: 1 });
+  for (const lieu of ['le lac', 'le marais', 'les collines', 'le volcan']) {
+    await page.getByRole('button', { name: 'Piocher une carte' }).click();
+    await page.getByRole('button', { name: 'Bonne réponse' }).click();
+    await lancerLeDe(page);
+    await expect(page.locator('#bandeau')).toContainText('Au tour de Léa, en route vers ' + lieu + '.');
+    await expect(page.locator('#bandeau')).not.toContainText('croix suivante');
+    await attendreJoueur(page, 'Léa');
+  }
+});

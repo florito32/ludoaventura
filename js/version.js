@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.20';
+  var VERSION = '6.21';
 
   var HISTORY = [
+    { v: '6.21', date: '2026-11-04', changes: [
+      "Fin d'une manche : au lieu de « croix suivante », le jeu annonce où l'équipe part — « Au tour de Léa, en route vers le lac. » (puis le marais, les collines et le volcan)."
+    ] },
     { v: '6.20', date: '2026-11-04', changes: [
       "Préparation : 1 joueur est sélectionné au départ (au lieu de 2)."
     ] },

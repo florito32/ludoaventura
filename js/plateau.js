@@ -15,6 +15,10 @@
   ];
 
   // Tracé de la route entre deux cases (points intermédiaires, en % de l'image), relevé sur l'illustration :
+  // Destination de chaque manche, annoncée à la fin d'un tour (« Au tour de Léa, en route vers le lac. »).
+  // La croix 2 est le pont sur le lac ; la manche 1 (la prairie) n'est jamais annoncée : c'est le départ.
+  var DESTINATIONS = { 2: 'le lac', 3: 'le marais', 4: 'les collines', 5: 'le volcan' };
+
   // ROUTE[i] mène de CASES[i - 1] à CASES[i]. Les pions suivent ces points au lieu d'aller en ligne droite.
   var ROUTE = [
     null,
@@ -882,7 +886,8 @@
       var suite;
       if (r.etape === 'suivant') {
         var k = r.joueur + 1 < r.nbJoueurs ? r.joueur + 1 : 0;
-        suite = 'Au tour de ' + partie.joueurs[k].nom + (k === 0 ? ', croix suivante' : '') + '.';
+        // Nouvelle manche : on dit où l'équipe part (« en route vers le lac »…), demande du 04/11/2026.
+        suite = 'Au tour de ' + partie.joueurs[k].nom + (k === 0 ? ', en route vers ' + DESTINATIONS[r.manche + 1] : '') + '.';
       } else {
         suite = 'Tout le monde est arrivé au volcan !';
       }
