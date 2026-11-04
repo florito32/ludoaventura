@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.19';
+  var VERSION = '6.20';
 
   var HISTORY = [
+    { v: '6.20', date: '2026-11-04', changes: [
+      "Préparation : 1 joueur est sélectionné au départ (au lieu de 2)."
+    ] },
     { v: '6.19', date: '2026-11-04', changes: [
       "Nouveaux personnages : les 10 aventuriers sont maintenant tes illustrations. Au choix des aventuriers, on voit leur buste sur un fond clair de la couleur de leur tenue ; sur le plateau, ils sont en pied et marchent d\u2019une croix à l\u2019autre en balançant les jambes."
     ] },
