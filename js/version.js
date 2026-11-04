@@ -4,9 +4,15 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.11';
+  var VERSION = '6.12';
 
   var HISTORY = [
+    { v: '6.12', date: '2026-11-04', changes: [
+      "Mathématiques : les signes +, −, × et ÷ sont seuls dans des ronds, sur une seule ligne (le mot « Additionner » ne tenait pas dans sa case).",
+      "Nouveaux choix : les dizaines (30 = les nombres de 30 à 39) et les centaines (300 = les nombres de 300 à 399), en plus des unités de 1 à 10. Au niveau Facile, ce sont des tables (30 → tables de 30 à 39).",
+      "Un bouton « Tout sélectionner / Tout désélectionner » pour les unités, les dizaines et les centaines.",
+      "Niveaux Moyen, Difficile et Expert : il faut choisir au moins 4 nombres (unités, dizaines et centaines comptées ensemble)."
+    ] },
     { v: '6.11', date: '2026-11-04', changes: [
       "Ouverture de l\u2019application installée : sur iPhone, l\u2019écran de lancement est l\u2019image de l\u2019accueil en plein écran (aventurier, arche et boutons), sans saut à l\u2019arrivée sur l\u2019accueil.",
       "Sur Android, le téléphone fabrique lui-même cet écran (petite icône au centre) : son fond passe du vert au bleu du ciel de l\u2019accueil pour s\u2019y fondre. Le changement arrive sur le téléphone en général sous un ou deux jours, ou tout de suite en réinstallant l\u2019application."

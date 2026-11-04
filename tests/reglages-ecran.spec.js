@@ -24,24 +24,36 @@ async function remplit(page, ecran, part = 0.5) {
   return r;
 }
 
-test('mathématiques : signes 2 par ligne (+ −, × ÷), nombres 1 à 5 puis 6 à 10, en grand, sans défiler', async ({ page }) => {
+// v7.0 : signes seuls sur une ligne ; unités, dizaines et centaines, 5 par ligne (une seule ligne par groupe sur écran peu haut).
+test('mathématiques : signes sur une ligne, unités, dizaines et centaines en lignes de 5, sans défiler', async ({ page }) => {
   await rapide(page);
   await page.goto('./');
   await versReglages(page, 1);
-  await maths(page, { signes: [], nombres: [] });
+  await maths(page, { signes: [], nombres: [], niveau: 'moyen' });
   const s = await boites(page, '#signes');
-  expect(s[0][1]).toBe(s[1][1]); // Additionner et Soustraire sur la même ligne
-  expect(s[2][1]).toBe(s[3][1]); // Multiplier et Diviser sur la suivante
-  expect(s[2][1]).toBeGreaterThan(s[0][1]);
-  const n = await boites(page, '#nombres');
-  for (let k = 1; k < 5; k++) { expect(n[k][1]).toBe(n[0][1]); expect(n[k + 5][1]).toBe(n[5][1]); }
-  expect(n[5][1]).toBeGreaterThan(n[0][1]);
-  expect(n[0][3]).toBeGreaterThanOrEqual(30); // cible tactile confortable (≥ 24 px, WCAG 2.5.8)
+  for (let k = 1; k < 4; k++) expect(s[k][1]).toBe(s[0][1]); // les 4 signes sur la même ligne
+  let haut = s[0][1];
+  for (const g of ['#nombres', '#dizaines', '#centaines']) {
+    const n = await boites(page, g);
+    // 5 par ligne ; sur un écran peu haut (téléphone carré), tout le groupe sur une seule ligne.
+    const parLigne = n.filter((b) => b[1] === n[0][1]).length;
+    expect([5, n.length]).toContain(parLigne);
+    for (let k = parLigne + 1; k < n.length; k++) expect(n[k][1]).toBe(n[parLigne][1]);
+    if (parLigne === 5) expect(n[5][1]).toBeGreaterThan(n[0][1]);
+    expect(n[0][1]).toBeGreaterThan(haut); // chaque groupe sous le précédent
+    expect(n[0][3]).toBeGreaterThanOrEqual(24); // cible tactile (≥ 24 px, WCAG 2.2, critère 2.5.8)
+    haut = n[n.length - 1][1];
+  }
+  // Aucun texte ne déborde de son bouton, et chaque bouton « Tout » est visible.
+  const deborde = await page.locator('#reglages-maths .pack span, #reglages-maths .btn-tout').evaluateAll((l) => l.some((e) => e.scrollWidth > e.clientWidth + 1));
+  expect(deborde).toBe(false);
+  for (const b of await page.locator('#reglages-maths .btn-tout').all()) await expect(b).toBeInViewport();
   await remplit(page, '#reglages-maths');
   // Les choix restent utilisables.
-  await page.locator('#signes label', { hasText: 'Multiplier' }).click();
+  await page.locator('#signes label').nth(2).click();
   await page.locator('#nombres label').nth(9).click();
-  expect(await page.evaluate(() => window.Aventura.partie.maths[0])).toMatchObject({ signes: ['fois'], nombres: [10] });
+  await page.locator('#centaines label').nth(8).click();
+  expect(await page.evaluate(() => window.Aventura.partie.maths[0])).toMatchObject({ signes: ['fois'], nombres: [10], centaines: [900] });
 });
 
 

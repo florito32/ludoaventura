@@ -55,7 +55,7 @@ test('conjugaison fausse puis « ? » : tout reste à l\'écran, l\'encadré rem
 });
 
 test('calcul faux (niveau Expert) : correction et « J\'ai compris » à l\'écran, sans défiler', async ({ page }) => {
-  await partie(page, (p) => maths(p, { signes: ['plus', 'fois'], nombres: [7, 8], niveau: 'expert' }));
+  await partie(page, (p) => maths(p, { signes: ['plus', 'fois'], nombres: [5, 6, 7, 8], niveau: 'expert' }));
   await page.getByRole('button', { name: 'Piocher une carte' }).click();
   await tient(page, 'carte');
   await expect(page.getByLabel('Ta réponse')).toBeInViewport();
