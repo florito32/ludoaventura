@@ -10,14 +10,14 @@ const possible = (id, mot) => Q.possibles(mot, C.INFOS[mot], [id]).length === 1;
 test.describe('réponses attendues', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
 
-  test('8 types de questions', () => {
-    expect(Q.TYPES.map((t) => t.nom)).toEqual(['Épeler', 'Nombre de lettres', 'Syllabes', 'Consonnes', 'Voyelles', 'Lettres muettes', 'Réécrire le mot']);
+  test('7 types de questions', () => {
+    expect(Q.TYPES.map((t) => t.nom)).toEqual(['Épeler', 'Nombre de lettres', 'Nombre de syllabes', 'Consonnes', 'Voyelles', 'Lettres muettes', 'Réécrire le mot']);
   });
 
   test('AVION', () => {
     expect(rep('epeler', 'AVION')).toBe('A - V - I - O - N');
     expect(rep('nombre', 'AVION')).toBe('5 lettres');
-    expect(rep('syllabes', 'AVION')).toBe('A · VION (2 syllabes)');
+    expect(rep('syllabes', 'AVION')).toBe('2 syllabes (A · VION)');
     expect(rep('consonnes', 'AVION')).toBe('V, N');
     expect(rep('voyelles', 'AVION')).toBe('A, I, O');
     expect(Q.trouver('premiere')).toBeNull(); // « Première lettre » n'est plus proposée (v4.9)
@@ -34,8 +34,8 @@ test.describe('réponses attendues', () => {
   });
 
   test('syllabes relues à la main et mots composés', () => {
-    expect(rep('syllabes', 'LION')).toBe('LI · ON (2 syllabes)');
-    expect(rep('syllabes', 'CÔTE À CÔTE')).toBe('CÔ · TE · À · CÔ · TE (5 syllabes)');
+    expect(rep('syllabes', 'LION')).toBe('2 syllabes (LI · ON)');
+    expect(rep('syllabes', 'CÔTE À CÔTE')).toBe('5 syllabes (CÔ · TE · À · CÔ · TE)');
     expect(rep('nombre', 'PEUT-ÊTRE')).toBe('8 lettres');
     expect(rep('voyelles', 'YOGA')).toBe('Y, O, A'); // y est une voyelle
     expect(possible('nombre', 'SŒUR')).toBe(false);
@@ -47,31 +47,31 @@ test.describe('réponses attendues', () => {
   });
 });
 
-async function preparer(page) {
+async function preparer(page, types) {
   await rapide(page);
   await page.goto('./');
   await versReglages(page, 1);
-  await cocherJoueur(page);
+  await cocherJoueur(page, types ? { types } : undefined);
 }
 
-test('le joueur choisit ses questions ; « Lettres muettes » seule → la réponse surligne les lettres muettes @smoke', async ({ page }) => {
-  await preparer(page);
+test('le joueur choisit ses questions ; « Lettres muettes » seule → il les écrit, la correction les surligne @smoke', async ({ page }) => {
+  await preparer(page, ['muettes']);
   await expect(page.locator('#types-questions input')).toHaveCount(7);
   await expect(page.getByRole('checkbox', { name: 'Première lettre', exact: true })).toHaveCount(0);
-  for (const t of ['Épeler', 'Nombre de lettres', 'Syllabes', 'Consonnes', 'Voyelles', 'Réécrire le mot']) {
-    await page.getByRole('checkbox', { name: t, exact: true }).uncheck();
-  }
   expect(await page.evaluate(() => window.Aventura.partie.types[0])).toEqual(['muettes']);
   await lancer(page);
   for (let t = 0; t < 3; t++) {
     await page.getByRole('button', { name: 'Piocher une carte' }).click();
     await expect(page.locator('#carte-consigne')).toHaveText('Quelles sont les lettres muettes du mot :');
-    await page.getByRole('button', { name: 'Voir la réponse' }).click();
-    const mot = (await page.locator('#carte-mot').innerText()).trim();
+    // Plus de « Voir la réponse » ni de « Bonne / Mauvaise réponse » : le joueur écrit.
+    await expect(page.getByRole('button', { name: 'Voir la réponse' })).toBeHidden();
+    await expect(page.getByRole('button', { name: 'Bonne réponse' })).toHaveCount(0);
+    const mot = await page.evaluate(() => window.Aventura.partie.carte.mot);
     const muettes = C.INFOS[mot].muettes.map((i) => mot[i]);
+    await page.getByLabel('Ta réponse').fill(muettes.join(' ').toLowerCase());
+    await page.getByRole('button', { name: 'Valider', exact: true }).click();
     await expect(page.locator('#carte-mot .muette')).toHaveText(muettes);
-    await expect(page.locator('#carte-reponse')).toHaveText('Réponse : ' + muettes.join(', '));
-    await page.getByRole('button', { name: 'Bonne réponse' }).click();
+    await expect(page.locator('#carte-reponse')).toHaveText('Bonne réponse ! ' + muettes.join(', '));
     await lancerLeDe(page);
     if (t < 2) await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
   }
@@ -83,17 +83,10 @@ test('la voix lit la question tirée, puis le mot', async ({ page }) => {
     window.SpeechSynthesisUtterance = function (t) { this.text = t; };
     Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: { speak: (u) => window.__lu.push(u.text), cancel() {}, getVoices: () => [] } });
   });
-  await preparer(page);
-  for (const t of ['Épeler', 'Nombre de lettres', 'Consonnes', 'Voyelles', 'Lettres muettes', 'Réécrire le mot']) {
-    await page.getByRole('checkbox', { name: t, exact: true }).uncheck();
-  }
+  await preparer(page, ['syllabes']);
   await lancer(page);
   await page.getByRole('button', { name: 'Piocher une carte' }).click();
   await page.getByRole('button', { name: 'Écouter' }).click();
-  await page.getByRole('button', { name: 'Voir la réponse' }).click();
-  const mot = (await page.locator('#carte-mot').innerText()).trim();
-  // La voix ne lit pas les points de suspension (« NE… JAMAIS » → « ne jamais », js/voix.js) :
-  // le test fait le même nettoyage, sinon il échoue au hasard quand ce mot est tiré (ligne 96 du backlog).
-  const lu = mot.replace(/(\.\.\.|…)/g, ' ').replace(/\s+/g, ' ').trim().toLocaleLowerCase('fr-FR');
-  expect(await page.evaluate(() => window.__lu.pop())).toBe('Découpe en syllabes le mot : ' + lu + '.');
+  const mot = await page.evaluate(() => window.Aventura.partie.carte.mot);
+  expect(await page.evaluate(() => window.__lu.pop())).toBe('Combien de syllabes y a-t-il dans le mot : ' + mot.replace(/(\.\.\.|…)/g, ' ').replace(/\s+/g, ' ').trim().toLocaleLowerCase('fr-FR') + '.');
 });

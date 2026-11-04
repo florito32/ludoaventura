@@ -25,9 +25,12 @@ async function matiere(page, valeur) {
 }
 // Français → Orthographe, puis coche tous les packs et toutes les questions du joueur affiché.
 async function orthographe(page) { await matiere(page, 'orthographe'); }
-async function cocherJoueur(page) {
+// Depuis v7.0, seules « Épeler » et « Réécrire le mot » se jouent avec « Bonne / Mauvaise réponse » :
+// par défaut les tests cochent ces deux-là (les questions écrites ont leurs propres tests, avec { types }).
+async function cocherJoueur(page, { types = ['epeler', 'ecrire'] } = {}) {
   await orthographe(page);
-  for (const c of await page.locator('#packs input, #types-questions input').all()) await c.check();
+  for (const c of await page.locator('#packs input').all()) await c.check();
+  for (const t of types) await page.locator('#types-questions input[value="' + t + '"]').check();
 }
 // Écran 3 : Mathématiques avec les signes, nombres et niveau donnés.
 // Depuis v5.9, le niveau se choisit sur l'écran de la matière ; au niveau Facile, les nombres sont des tables.
