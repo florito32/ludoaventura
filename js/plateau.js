@@ -99,6 +99,8 @@
   function afficher(id) {
     partie.ecran = id;
     sauver();
+    if (id !== 'ecran-accueil') quitter = false;
+    if (id !== 'ecran-accueil') armerRetour(navigator.userActivation ? navigator.userActivation.isActive : true);
     document.querySelectorAll('.ecran').forEach(function (s) { s.hidden = s.id !== id; });
     var titre = $(id).querySelector('h1, h2');
     if (titre) { titre.setAttribute('tabindex', '-1'); titre.focus({ preventScroll: true }); }
@@ -1586,6 +1588,36 @@
   }
   $('btn-commencer').addEventListener('click', function () { preparer(1); });
   $('btn-prepa-retour').addEventListener('click', revenir);
+
+  // ---------- Touche « précédent » du téléphone ou de la tablette (v6.23) ----------
+  // Sans rien faire, elle quitte la page (et ferme l'application installée). On garde donc une entrée
+  // « garde » dans l'historique (History API, pushState) : la touche la retire, l'évènement popstate arrive,
+  // et on fait comme le bouton « ← Retour » : écran précédent de la préparation, ou menu sur le plateau.
+  // Sur l'accueil, il n'y a pas d'écran précédent : la touche quitte normalement.
+  // Chrome ignore les entrées ajoutées sans geste de l'utilisateur : la garde est reposée au toucher suivant.
+  var quitter = false;
+  function armerRetour(geste) {
+    var st = history.state;
+    if (st && st.aventura === 'garde' && (st.geste || !geste)) return;
+    try { history.pushState({ aventura: 'garde', geste: !!geste }, ''); } catch (e) { /* historique indisponible */ }
+  }
+  function surInteraction() { if ((partie.ecran || 'ecran-accueil') !== 'ecran-accueil') armerRetour(true); }
+  document.addEventListener('pointerdown', surInteraction, true);
+  document.addEventListener('keydown', surInteraction, true);
+  window.addEventListener('popstate', function () {
+    var ecran = partie.ecran || 'ecran-accueil';
+    if (quitter || ecran === 'ecran-accueil') {
+      // Accueil : on laisse la touche quitter, en sautant les gardes restées dans l'historique.
+      quitter = true;
+      if (history.state && history.state.aventura === 'garde') history.back();
+      return;
+    }
+    if ($('menu-partie').open) fermerMenu();
+    else if ($('fin').open) { /* fin de partie : on reste sur le résultat */ }
+    else if (ecran === 'ecran-preparation') revenir();
+    else if (ecran === 'ecran-plateau') ouvrirMenu();
+    if ((partie.ecran || 'ecran-accueil') !== 'ecran-accueil') armerRetour(false);
+  });
   ['btn-valider-nb', 'btn-valider-aventurier', 'btn-valider-reglages'].forEach(function (id) { $(id).addEventListener('click', valider); });
   // Entrée dans le formulaire : « Valider » sur les premiers écrans, « Lancer la partie » sur le dernier.
   $('form-preparation').addEventListener('submit', function (e) {

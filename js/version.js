@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.22';
+  var VERSION = '6.23';
 
   var HISTORY = [
+    { v: '6.23', date: '2026-11-04', changes: [
+      "Touche « précédent » du téléphone ou de la tablette : pendant la préparation, elle revient à l'étape précédente ; sur le plateau, elle ouvre le menu. Elle ne ferme plus l'application (sauf depuis l'accueil)."
+    ] },
     { v: '6.22', date: '2026-11-04', changes: [
       "Plateau : le bouton « ☰ Menu » (en haut à gauche) ouvre trois choix au milieu de l'écran : « Redémarrer partie », « Modifier les choix » et « Retour à l'accueil ».",
       "« Modifier les choix » ramène à la préparation avec tous les choix gardés ; « Reprendre la partie » la continue là où elle en était, avec les nouveaux réglages (les points sont gardés)."
