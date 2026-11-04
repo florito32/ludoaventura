@@ -401,7 +401,9 @@
     // Progression : « Étape 2 sur 4 · Joueur 1 sur 3 ».
     $('prepa-progres').textContent = 'Étape ' + n + ' sur ' + NB_ETAPES +
       ((n === 2 || n === 3) && nb > 1 ? ' · Joueur ' + (partie.actif + 1) + ' sur ' + nb : '');
-    $('prepa-retour-texte').textContent = n === 1 ? 'Accueil' : 'Retour';
+    // « Modifier les choix » (menu, v6.22) : depuis le premier écran on retourne à la partie, et le dernier bouton la reprend.
+    $('prepa-retour-texte').textContent = n === 1 ? (partie.modif ? 'Partie' : 'Accueil') : 'Retour';
+    $('btn-lancer').textContent = partie.modif ? 'Reprendre la partie' : 'Lancer la partie';
     var f = document.querySelector('#form-preparation .etape[data-etape="' + n + '"]');
     if (!$('ecran-preparation').hidden) f.focus({ preventScroll: true });
     sauver();
@@ -451,6 +453,7 @@
     if (n === 3 && (partie.sousEtape === 'modes' || partie.sousEtape === 'packs')) { partie.sousEtape = 'matiere'; montrerEtape(3); return; }
     if (n === 3 && partie.actif > 0) { partie.actif--; partie.sousEtape = 'reglages'; montrerEtape(3); return; }
     if (n === 4) partie.sousEtape = 'reglages';
+    if (n === 1 && partie.modif) { if (verifierReglages()) reprendreApresModif(); return; }
     if (n === 1) { afficher('ecran-accueil'); return; }
     if ((n === 2 || n === 3) && partie.actif > 0) { partie.actif--; montrerEtape(n); return; }
     partie.actif = n === 2 ? 0 : nb - 1; // on revient sur le dernier joueur de l'écran précédent
@@ -651,6 +654,7 @@
 
   function lancerPartie() {
     annulerMinuteurs();
+    partie.modif = false;
     lireChoix();
     var av = partie.aventure;
     partie.joueurs = [];
@@ -1375,7 +1379,7 @@
     $('fin').showModal();
   }
   $('btn-rejouer').addEventListener('click', function () { $('fin').close(); lancerPartie(); });
-  $('btn-nouvelle').addEventListener('click', function () { $('fin').close(); annulerMinuteurs(); preparer(1); });
+  $('btn-nouvelle').addEventListener('click', function () { $('fin').close(); annulerMinuteurs(); partie.modif = false; preparer(1); });
 
   // ---------- Sauvegarde de la partie (stockage de session) ----------
   // sessionStorage : « survit aux rechargements et restaurations de la page ; fermer l'onglet efface les données »
@@ -1406,7 +1410,7 @@
       aventure: avRadio ? avRadio.value : partie.aventure.id,
       choix: partie.choix, packs: partie.packs, types: partie.types, actif: partie.actif,
       matiere: partie.matiere, francais: partie.francais, maths: partie.maths, conj: partie.conj,
-      etapePrepa: partie.etapePrepa, sousEtape: partie.sousEtape
+      etapePrepa: partie.etapePrepa, sousEtape: partie.sousEtape, modif: !!partie.modif
     };
     if (partie.regles && partie.joueurs.length) {
       d.jeu = {
@@ -1432,6 +1436,7 @@
       partie.choix = d.choix; partie.packs = d.packs.map(function (l) { return l.filter(function (id) { return TOUS_PACKS.indexOf(id) >= 0; }); }); partie.types = d.types.map(function (l) { return l.filter(function (id) { return TOUS_TYPES.indexOf(id) >= 0; }); }); partie.actif = d.actif || 0;
       partie.etapePrepa = d.etapePrepa || 1;
       partie.sousEtape = d.sousEtape || 'matiere';
+      partie.modif = !!(d.modif && d.jeu); // « Modifier les choix » en cours : la partie attend d'être reprise
       if (d.matiere) {
         partie.matiere = d.matiere.map(function (m) { return MATIERES.indexOf(m) >= 0 ? m : null; });
         partie.francais = d.francais || partie.francais;
@@ -1470,21 +1475,7 @@
       }
       montrerEtape(partie.etapePrepa);
 
-      // Plateau : on reprend l'étape en cours. Une animation interrompue (dé, pause de lecture) est rejouée ou terminée.
-      var r = partie.regles;
-      afficher('ecran-plateau');
-      if (r.etape === 'suivant') R.suivant(r); // les points étaient déjà comptés : on passe au joueur suivant
-      var j = partie.joueurs[r.joueur];
-      if ((r.etape === 'repondre' || r.etape === 'lancer') && partie.carte) {
-        partie.vue = d.jeu.vue || 'cache'; // orthographe écrite : « Voir le mot » reste ouvert après un rechargement
-        montrerCarte(j);
-        if (!partie.carte.lettre && !aSaisir(partie.carte)) {
-          if (d.jeu.vue === 'mot') montrerMotSeul(); else if (d.jeu.vue === 'reponse') montrerReponse();
-        }
-      }
-      rendre();
-      if (r.etape === 'lancer') lancerApresReaction();
-      if (r.etape === 'fin') montrerFin();
+      reprendreLePlateau(d.jeu.vue);
       return true;
     } catch (e) {
       // Sauvegarde illisible (ancienne version du jeu…) : on repart de l'accueil.
@@ -1492,6 +1483,95 @@
       return false;
     }
   }
+
+
+  // Plateau : on reprend l'étape en cours. Une animation interrompue (dé, pause de lecture) est rejouée ou terminée.
+  // vue : ce qui était ouvert sur la carte (« cache », « mot » ou « reponse »).
+  function reprendreLePlateau(vue) {
+    var r = partie.regles;
+    afficher('ecran-plateau');
+    if (r.etape === 'suivant') R.suivant(r); // les points étaient déjà comptés : on passe au joueur suivant
+    var j = partie.joueurs[r.joueur];
+    if ((r.etape === 'repondre' || r.etape === 'lancer') && partie.carte) {
+      partie.vue = vue || 'cache'; // orthographe écrite : « Voir le mot » reste ouvert après un rechargement
+      montrerCarte(j);
+      if (!partie.carte.lettre && !aSaisir(partie.carte)) {
+        if (vue === 'mot') montrerMotSeul(); else if (vue === 'reponse') montrerReponse();
+      }
+    } else $('carte-piochee').hidden = true;
+    rendre();
+    if (r.etape === 'lancer') lancerApresReaction();
+    if (r.etape === 'fin') montrerFin();
+  }
+
+  // ---------- Menu de la partie (v6.22) ----------
+  // « Redémarrer partie » : même préparation, on recommence à zéro.
+  // « Modifier les choix » : retour à la préparation (tous les choix gardés), puis « Reprendre la partie »
+  //   la continue là où elle en était, avec les nouveaux réglages.
+  // « Retour à l'accueil » : la partie est arrêtée et tout repart de zéro.
+  function ouvrirMenu() { if (!$('menu-partie').open) $('menu-partie').showModal(); }
+  function fermerMenu() { if ($('menu-partie').open) $('menu-partie').close(); }
+
+  // Reprend la partie après « Modifier les choix ». Hypothèses (à valider, voir BACKLOG) :
+  //  - la carte piochée mais pas encore répondue retourne dans le tas (le joueur repioche avec ses nouveaux réglages) ;
+  //  - les tas de cartes sont refaits avec les nouveaux réglages ; les points de l'équipe sont gardés ;
+  //  - l'objectif suit l'aventure et le nombre de joueurs choisis ;
+  //  - un joueur ajouté attend sur la croix d'avant et joue cette manche à son tour ;
+  //  - si le joueur dont c'était le tour est retiré, on passe à la manche suivante.
+  function reprendreApresModif() {
+    annulerMinuteurs();
+    partie.modif = false;
+    lireChoix();
+    var r = partie.regles, nb = partie.nbJoueurs, avant = r.nbJoueurs;
+    if (r.etape === 'repondre') { r.pioches[r.joueur]--; r.etape = 'piocher'; partie.carte = null; }
+    if (nb !== avant) {
+      r.positions.length = Math.min(r.positions.length, nb);
+      r.pioches.length = Math.min(r.pioches.length, nb);
+      for (var i = avant; i < nb; i++) {
+        // Un joueur ajouté vient après le joueur en cours : il attend sur la croix d'avant et joue cette manche à son tour.
+        r.positions.push(r.manche - 1);
+        r.pioches.push(0);
+      }
+      r.nbJoueurs = nb;
+      if (r.joueur >= nb) {
+        // Le joueur dont c'était le tour n'est plus là : manche suivante (ou fin après le volcan).
+        partie.carte = null; r.de = null; r.dernierLancer = null; r.joueur = 0;
+        if (r.manche >= R.NB_CROIX) r.etape = 'fin';
+        else { r.manche++; r.positions[0] = r.manche; r.etape = 'piocher'; }
+      } else if (r.etape === 'fin' && r.joueur < nb - 1) {
+        r.etape = 'suivant'; // des joueurs ajoutés n'ont pas encore joué au volcan
+      }
+    }
+    partie.joueurs = [];
+    for (var k = 0; k < nb; k++) {
+      var perso = P.trouver(partie.choix[k]);
+      partie.joueurs.push({ nom: perso.nom, aventurier: perso, couleur: COULEURS[k], index: k, tas: melanger(cartesDuJoueur(k)) });
+    }
+    partie.objectif = A.objectif(partie.aventure, nb);
+    r.objectif = partie.objectif;
+    preparerPlateau(false);
+    reprendreLePlateau(partie.vue);
+  }
+
+  $('btn-menu').addEventListener('click', ouvrirMenu);
+  $('btn-menu-fermer').addEventListener('click', fermerMenu);
+  // Un toucher à côté de la boîte (sur le fond sombre) referme aussi le menu.
+  $('menu-partie').addEventListener('click', function (e) { if (e.target === $('menu-partie')) fermerMenu(); });
+  $('btn-redemarrer').addEventListener('click', function () { fermerMenu(); lancerPartie(); });
+  $('btn-modifier').addEventListener('click', function () {
+    fermerMenu();
+    annulerMinuteurs();
+    partie.modif = true;
+    preparer(1);
+  });
+  $('btn-accueil').addEventListener('click', function () {
+    fermerMenu();
+    annulerMinuteurs();
+    // Tout repart de zéro : on efface la partie gardée dans l'onglet et on recharge la page sur l'accueil.
+    pretASauver = false;
+    try { sessionStorage.removeItem(CLE); } catch (e) { /* rien */ }
+    window.location.reload();
+  });
 
   // Sauvegarde aussi au moment où la page est quittée ou masquée (veille, autre application).
   window.addEventListener('pagehide', sauver);
@@ -1505,20 +1585,14 @@
     montrerEtape(n);
   }
   $('btn-commencer').addEventListener('click', function () { preparer(1); });
-  // Depuis le plateau, « ← Préparation » revient sur le choix de l'aventure (dernier écran).
-  document.querySelectorAll('[data-vers]').forEach(function (b) {
-    b.addEventListener('click', function () {
-      annulerMinuteurs();
-      if (b.dataset.vers === 'ecran-preparation') preparer(4); else afficher(b.dataset.vers);
-    });
-  });
   $('btn-prepa-retour').addEventListener('click', revenir);
   ['btn-valider-nb', 'btn-valider-aventurier', 'btn-valider-reglages'].forEach(function (id) { $(id).addEventListener('click', valider); });
   // Entrée dans le formulaire : « Valider » sur les premiers écrans, « Lancer la partie » sur le dernier.
   $('form-preparation').addEventListener('submit', function (e) {
     e.preventDefault();
     if (partie.etapePrepa < NB_ETAPES) { valider(); return; }
-    if (verifierReglages()) lancerPartie();
+    if (!verifierReglages()) return;
+    if (partie.modif && partie.regles) reprendreApresModif(); else lancerPartie();
   });
 
   construireAventures();

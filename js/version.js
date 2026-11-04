@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.21';
+  var VERSION = '6.22';
 
   var HISTORY = [
+    { v: '6.22', date: '2026-11-04', changes: [
+      "Plateau : le bouton « ☰ Menu » (en haut à gauche) ouvre trois choix au milieu de l'écran : « Redémarrer partie », « Modifier les choix » et « Retour à l'accueil ».",
+      "« Modifier les choix » ramène à la préparation avec tous les choix gardés ; « Reprendre la partie » la continue là où elle en était, avec les nouveaux réglages (les points sont gardés)."
+    ] },
     { v: '6.21', date: '2026-11-04', changes: [
       "Fin d'une manche : au lieu de « croix suivante », le jeu annonce où l'équipe part — « Au tour de Léa, en route vers le lac. » (puis le marais, les collines et le volcan)."
     ] },
