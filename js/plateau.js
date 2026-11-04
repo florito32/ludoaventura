@@ -925,7 +925,7 @@
   }
 
   // Cartes où le joueur écrit lui-même sa réponse, corrigée par le jeu (calcul, v5.7).
-  // Orthographe (v7.0) : nombre de lettres, de syllabes, consonnes, voyelles, lettres muettes s'écrivent aussi ;
+  // Orthographe (v6.12) : nombre de lettres, de syllabes, consonnes, voyelles, lettres muettes s'écrivent aussi ;
   // « Épeler » et « Réécrire le mot » restent à l'oral avec « Bonne / Mauvaise réponse » (choix du 04/11/2026).
   function aSaisir(c) { return !!(c && (c.type === 'calcul' || c.type === 'conjugaison' || (c.question && c.question.saisie))); }
   function orthoSaisie(c) { return !!(c && c.question && c.question.saisie); }
