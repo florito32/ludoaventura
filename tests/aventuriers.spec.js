@@ -96,16 +96,22 @@ test('v4.6 : chaque écran de la préparation tient sans défiler', async ({ pag
   await tient('nombre de joueurs');
 });
 
-test('chaque portrait est un SVG valide (un attribut en double l\'empêchait de s\'afficher)', async ({ page, baseURL }) => {
+test('v6.19 : chaque aventurier a son buste et son corps entier en WebP, et une figurine SVG valide', async ({ page }) => {
   test.skip(test.info().project.name !== 'ordinateur', 'un seul format suffit');
+  const fs = require('fs');
+  const F = require('../js/figurines.js');
+  for (const a of P.LISTE) {
+    for (const f of [a.image, a.pied]) {
+      const b = fs.readFileSync(f);
+      expect(b.subarray(0, 4).toString() + b.subarray(8, 12).toString(), f).toBe('RIFFWEBP');
+      expect(b.length, f).toBeGreaterThan(5000);
+    }
+    expect(F[a.id], a.id).toContain(a.pied);
+  }
   await page.goto('./');
   for (const a of P.LISTE) {
-    const erreur = await page.evaluate(async (url) => {
-      const txt = await (await fetch(url)).text();
-      const doc = new DOMParser().parseFromString(txt, 'image/svg+xml');
-      return doc.querySelector('parsererror')?.textContent || '';
-    }, new URL(a.image, baseURL).href);
-    expect(erreur, a.image).toBe('');
+    const erreur = await page.evaluate((s) => new DOMParser().parseFromString(s, 'image/svg+xml').querySelector('parsererror')?.textContent || '', F[a.id]);
+    expect(erreur, a.id).toBe('');
   }
 });
 

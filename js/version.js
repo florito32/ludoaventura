@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.18';
+  var VERSION = '6.19';
 
   var HISTORY = [
+    { v: '6.19', date: '2026-11-04', changes: [
+      "Nouveaux personnages : les 10 aventuriers sont maintenant tes illustrations. Au choix des aventuriers, on voit leur buste sur un fond clair de la couleur de leur tenue ; sur le plateau, ils sont en pied et marchent d\u2019une croix à l\u2019autre en balançant les jambes."
+    ] },
     { v: '6.18', date: '2026-11-04', changes: [
       "Orthographe : 2 nouvelles questions — « Le ou la ? » (« Un ou une ? » devant une voyelle : l\u2019école) et « Au pluriel » (un cheval → des chevaux)."
     ] },
