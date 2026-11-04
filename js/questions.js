@@ -80,7 +80,7 @@
         return pluriel(l.length, 'consonne') + ' (' + l.join(', ') + ')';
       } },
     // Combien de fois une lettre : de préférence une lettre présente plusieurs fois (3 fois sur 4).
-    { id: 'combien-lettre', nom: 'Combien de fois cette lettre\u00a0?', court: 'Combien de fois\u00a0?', // espace insécable : le « ? » ne passe pas seul à la ligne saisie: 'nombre',
+    { id: 'combien-lettre', nom: 'Combien de fois cette lettre\u00a0?', court: 'Combien de fois\u00a0?', saisie: 'nombre', // espace insécable : le « ? » ne passe pas seul à la ligne
       possible: function (mot) { return lettres(mot).length >= 3 && !/Œ/.test(mot); },
       preparer: function (mot) {
         var n = {};
