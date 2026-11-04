@@ -343,6 +343,14 @@
     <button type="button" class="btn btn-secondaire" id="btn-modifier">Modifier les choix</button>
     <button type="button" class="btn btn-secondaire" id="btn-accueil">Retour à l’accueil</button>
   </div>
+  <!-- Confirmation (v6.25) avant d'effacer la partie : « Redémarrer partie » et « Retour à l'accueil ». -->
+  <div class="menu-confirmer" id="menu-confirmer" hidden>
+    <p id="menu-confirmer-texte"></p>
+    <div class="menu-actions">
+      <button type="button" class="btn btn-principal" id="btn-confirmer-oui"></button>
+      <button type="button" class="btn btn-secondaire" id="btn-confirmer-non">Non, continuer la partie</button>
+    </div>
+  </div>
 </dialog>
 
 <!-- Installer l'application quand le navigateur ne propose pas sa propre fenêtre (iPhone, iPad, Firefox…). -->
