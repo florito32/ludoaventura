@@ -134,3 +134,12 @@ Statuts : à faire / en cours / fait à valider / terminé / question en attente
 | 128 | Mettre à jour les personnages avec les images du dossier « Images/personnages/détouré » (fond blanc) : buste pour la sélection, corps entier sur le plateau, fond d'une autre couleur à la sélection ; ils doivent marcher comme les personnages actuels ; fichiers nommés avec le nom de chaque personnage | fait à valider (v6.19) — détourage automatique du fond blanc et des ombres (outils/personnages.py) ; tapis sous Papi Jo et intérieur de son filet retirés. Choix de l'utilisateur : fond du buste = teinte claire de la couleur de sa tenue. Sur le plateau, l'image est découpée en corps + 2 jambes : les jambes se balancent et le corps se dandine et sautille. À valider : les bras restent avec le corps (ils tiennent des objets) ; le portrait du panneau « Tour de jeu » utilise aussi le buste | ✅ local (4 formats) + CI (PR #82) |
 | 129 | Livraison des lignes 122 et 127 (04/11/2026) | terminé — v6.18 en ligne (PR #81), tests GitHub passés ; test en ligne GitHub Pages passé | ✅ CI + en ligne |
 | 130 | Livraison de la ligne 128 (04/11/2026) | terminé — v6.19 en ligne (PR #82), tests GitHub passés ; test en ligne GitHub Pages passé (workflow « Test en ligne ») | ✅ CI + en ligne |
+| 131 | Accueil, sur téléphone et tablette seulement : un bouton pour installer l'application sur l'appareil (icône sur l'écran d'accueil) ; il n'apparaît que si le jeu est ouvert dans un navigateur | à faire | — |
+| 132 | Fin d'un tour : remplacer « croix suivante » par « en route vers le lac », « en route vers le volcan »… selon la croix où les joueurs doivent aller | à faire | — |
+| 133 | Préparation, étape 1 : 1 joueur sélectionné par défaut (au lieu de 2) | en cours | — |
+| 134 | Touche « précédent » du téléphone ou de la tablette : revenir à l'étape précédente, ne pas fermer l'application | à faire — hypothèse : le message disait « étape suivante », compris comme « étape précédente » | — |
+| 135 | Une icône près du plateau ouvre un menu de choix au milieu de l'écran | à faire | — |
+| 136 | Menu, « Modifier les choix » : retourner à la préparation pour changer ses réglages, puis reprendre la partie là où elle en était | à faire | — |
+| 137 | Menu, « Redémarrer partie » : recommencer la partie sans repasser par la préparation | à faire | — |
+| 138 | Menu, « Retour à l'accueil » : arrêter la partie en cours et tout recommencer | à faire | — |
+| 139 | Les trois choix s'appellent « Redémarrer partie », « Modifier les choix », « Retour à l'accueil » | à faire | — |

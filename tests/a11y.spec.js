@@ -15,6 +15,7 @@ test('aucune violation WCAG A/AA : accueil, préparation et plateau', async ({ p
   await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
   await expect(page.getByRole('heading', { name: 'Préparer la partie' })).toBeVisible();
   expect(await audit(page)).toEqual([]); // écran 1 : nombre de joueurs
+  await page.getByRole('radio', { name: '2 joueurs' }).check(); // 1 joueur par défaut depuis la v6.20
   await valider(page);
   expect(await audit(page)).toEqual([]); // écran 2 : aventuriers
   await valider(page); await valider(page);

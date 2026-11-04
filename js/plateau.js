@@ -76,7 +76,7 @@
   // packs[i] = packs où le joueur i pioche (tous niveaux mêlés : plus de choix du niveau depuis la v4.8).
   // Packs et types de questions sont décochés au départ : c'est au joueur de les cocher (demande du 02/11/2026).
   var partie = {
-    nbJoueurs: 2, aventure: A.LISTE[0], joueurs: [], choix: ['lea', 'tom', 'nour', 'malo'], actif: 0, regles: null,
+    nbJoueurs: 1, aventure: A.LISTE[0], joueurs: [], choix: ['lea', 'tom', 'nour', 'malo'], actif: 0, regles: null,
     etapePrepa: 1, // écran de la préparation affiché (1 à 4), voir montrerEtape
     // Étape 3 en deux écrans par joueur (v5.8, choix de l'utilisateur) : 'matiere' puis 'reglages'.
     // Conjugaison (v6.0) : trois écrans, 'matiere' → 'modes' → 'reglages'.
