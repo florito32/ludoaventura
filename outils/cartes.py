@@ -17,6 +17,11 @@ NOMS = {
     'pack temps': 'Temps',
     'pack numerique': 'Numérique',
     'pack lettres': 'Lettres',
+    # 15 packs ajoutés le 04/11/2026 (idées acceptées par l'utilisateur)
+    'pack animaux': 'Animaux', 'pack lieux': 'Lieux et constructions', 'pack pays': 'Pays', 'pack villes': 'Villes',
+    'pack nature': 'Paysages et nature', 'pack meteo': 'Météo et saisons', 'pack corps': 'Le corps', 'pack aliments': 'Aliments',
+    'pack maison': 'Dans la maison', 'pack vetements': 'Vêtements', 'pack ecole': 'L’école', 'pack metiers': 'Métiers',
+    'pack transports': 'Transports', 'pack couleurs': 'Couleurs et formes', 'pack loisirs': 'Sports et musique',
 }
 
 CORRECTIONS = {
@@ -83,6 +88,10 @@ def syl(expr):
 SYLLABES_CORRIGEES = {
     'LION': 'LI-ON', 'NUAGE': 'NU-A-GE', 'KOALA': 'KO-A-LA', 'YAOURT': 'YA-OURT', 'JOUET': 'JOU-ET',
     "AUJOURD'HUI": "AU-JOUR-D'HUI",
+    # Packs du 04/11/2026 : voyelles qui se prononcent séparément (comme LI-ON)
+    'AÉROPORT': 'A-É-RO-PORT', 'OCÉAN': 'O-CÉ-AN', 'IMPERMÉABLE': 'IM-PER-MÉ-A-BLE', 'RÉCRÉATION': 'RÉ-CRÉ-A-TION',
+    'ACCORDÉON': 'AC-COR-DÉ-ON', 'PIANO': 'PI-A-NO', 'VIOLET': 'VI-O-LET', 'VIOLON': 'VI-O-LON', 'TRIANGLE': 'TRI-AN-GLE',
+    'LYON': 'LY-ON', 'BIBLIOTHÈQUE': 'BI-BLI-O-THÈ-QUE', 'CRAYON': 'CRA-YON',
 }
 
 # ---------- Lettres muettes ----------
@@ -124,6 +133,70 @@ MUETTES = {
     'YAOURT': None, 'ZÈBRE': 'ZÈBRe', 'ABEILLE': 'ABEILLe', 'CHOCOLAT': 'CHOCOLAt', 'DINOSAURE': 'DINOSAURe', 'ÉTOILE': 'ÉTOILe',
     'FORÊT': 'FORÊt', 'HABIT': 'hABIt', 'IMAGE': 'IMAGe', 'JOUET': 'JOUEt', 'LUNE': 'LUNe', 'NEIGE': 'NEIGe', 'ORANGE': 'ORANGe',
     'ROBOT': 'ROBOt', 'SERPENT': 'SERPENt', 'USINE': 'USINe', 'VOITURE': 'VOITURe',
+    # ----- Packs du 04/11/2026 (mêmes règles : consonne finale non prononcée, e muet final, h hors ch/ph/th) -----
+    # Animaux
+    'LOUP': 'LOUp', 'VACHE': 'VACHe', 'POULE': 'POULe', 'CANARD': 'CANARd', 'TORTUE': 'TORTUe', 'SINGE': 'SINGe',
+    'CHÈVRE': 'CHÈVRe', 'BALEINE': 'BALEINe', 'CROCODILE': 'CROCODILe', 'HIPPOPOTAME': 'HIPPOPOTAMe', 'HÉRISSON': 'hÉRISSON',
+    'PANTHÈRE': 'PANTHÈRe', 'GUÊPE': 'GUÊPe',
+    # Lieux et constructions
+    'PONT': 'PONt', 'GARE': 'GARe', 'PORT': 'PORt', 'RUE': 'RUe', 'ÉCOLE': 'ÉCOLe', 'CABANE': 'CABANe', 'GRENIER': 'GRENIEr',
+    'VILLAGE': 'VILLAGe', 'FERME': 'FERMe', 'HÔPITAL': 'hÔPITAL', 'BIBLIOTHÈQUE': 'BIBLIOTHÈQUe', 'IMMEUBLE': 'IMMEUBLe',
+    'ÉGLISE': 'ÉGLISe', 'MUSÉE': 'MUSÉe', 'BOULANGERIE': 'BOULANGERIe', 'PHARE': 'PHARe', 'AÉROPORT': 'AÉROPORt',
+    # Pays
+    'FRANCE': 'FRANCe', 'ITALIE': 'ITALIe', 'CHINE': 'CHINe', 'INDE': 'INDe', 'ESPAGNE': 'ESPAGNe', 'BELGIQUE': 'BELGIQUe',
+    'SUISSE': 'SUISSe', 'ÉGYPTE': 'ÉGYPTe', 'GRÈCE': 'GRÈCe', 'ALLEMAGNE': 'ALLEMAGNe', 'ANGLETERRE': 'ANGLETERRe',
+    'AUSTRALIE': 'AUSTRALIe', 'MEXIQUE': 'MEXIQUe', 'ARGENTINE': 'ARGENTINe', 'NORVÈGE': 'NORVÈGe',
+    # Villes
+    'PARIS': 'PARIs', 'NICE': 'NICe', 'LILLE': 'LILLe', 'NANTES': 'NANTes', 'ROME': 'ROMe', 'MARSEILLE': 'MARSEILLe',
+    'BORDEAUX': 'BORDEAUx', 'TOULOUSE': 'TOULOUSe', 'RENNES': 'RENNes', 'LONDRES': 'LONDRes', 'STRASBOURG': 'STRASBOURg',
+    'MONTPELLIER': 'MONtPELLIEr', 'GRENOBLE': 'GRENOBLe', 'BRUXELLES': 'BRUXELLes', 'GENÈVE': 'GENÈVe', 'LISBONNE': 'LISBONNe',
+    # Paysages et nature
+    'BOIS': 'BOIs', 'ARBRE': 'ARBRe', 'SABLE': 'SABLe', 'PLAGE': 'PLAGe', 'RIVIÈRE': 'RIVIÈRe', 'COLLINE': 'COLLINe',
+    'DÉSERT': 'DÉSERt', 'GROTTE': 'GROTTe', 'MONTAGNE': 'MONTAGNe', 'CASCADE': 'CASCADe', 'FALAISE': 'FALAISe',
+    'MARÉCAGE': 'MARÉCAGe', 'PRAIRIE': 'PRAIRIe', 'GLACIER': 'GLACIEr', 'ROCHER': 'ROCHEr', 'VALLÉE': 'VALLÉe',
+    # Météo et saisons
+    'PLUIE': 'PLUIe', 'VENT': 'VENt', 'FROID': 'FROId', 'CHAUD': 'CHAUd', 'ORAGE': 'ORAGe', 'AUTOMNE': 'AUTOmNe',
+    'BROUILLARD': 'BROUILLARd', 'TEMPÊTE': 'TEMPÊTe', 'PRINTEMPS': 'PRINTEMps', 'TONNERRE': 'TONNERRe', 'GRÊLE': 'GRÊLe',
+    'VERGLAS': 'VERGLAs', 'TEMPÉRATURE': 'TEMPÉRATURe', 'AVERSE': 'AVERSe', 'ROSÉE': 'ROSÉe',
+    # Le corps
+    'TÊTE': 'TÊTe', 'PIED': 'PIEd', 'BRAS': 'BRAs', 'NEZ': 'NEz', 'DOS': 'DOs', 'DENT': 'DENt', 'JAMBE': 'JAMBe',
+    'OREILLE': 'OREILLe', 'ÉPAULE': 'ÉPAULe', 'CHEVEUX': 'CHEVEUx', 'VENTRE': 'VENTRe', 'BOUCHE': 'BOUCHe', 'DOIGT': 'DOIgt',
+    'ESTOMAC': 'ESTOMAc', 'POIGNET': 'POIGNEt', 'CHEVILLE': 'CHEVILLe', 'PAUPIÈRE': 'PAUPIÈRe', 'MOLLET': 'MOLLEt',
+    'SQUELETTE': 'SQUELETTe', 'COUDE': 'COUDe',
+    # Aliments
+    'LAIT': 'LAIt', 'RIZ': 'RIz', 'POIRE': 'POIRe', 'SOUPE': 'SOUPe', 'JUS': 'JUs', 'FROMAGE': 'FROMAGe', 'CAROTTE': 'CAROTTe',
+    'CERISE': 'CERISe', 'BANANE': 'BANANe', 'TOMATE': 'TOMATe', 'BEURRE': 'BEURRe', 'SALADE': 'SALADe', 'POULET': 'POULEt',
+    'CONCOMBRE': 'CONCOMBRe', 'AUBERGINE': 'AUBERGINe', 'FRAMBOISE': 'FRAMBOISe', 'ÉPINARD': 'ÉPINARd',
+    'CITROUILLE': 'CITROUILLe', 'HARICOT': 'hARICOt', 'ANANAS': None,
+    # Dans la maison
+    'LIT': 'LIt', 'TABLE': 'TABLe', 'LAMPE': 'LAMPe', 'PORTE': 'PORTe', 'TAPIS': 'TAPIs', 'VERRE': 'VERRe', 'CHAISE': 'CHAISe',
+    'FENÊTRE': 'FENÊTRe', 'ARMOIRE': 'ARMOIRe', 'ESCALIER': 'ESCALIEr', 'CUISINE': 'CUISINe', 'PLACARD': 'PLACARd',
+    'BAIGNOIRE': 'BAIGNOIRe', 'CHEMINÉE': 'CHEMINÉe', 'ÉTAGÈRE': 'ÉTAGÈRe', 'CASSEROLE': 'CASSEROLe', 'OREILLER': 'OREILLEr',
+    # Vêtements
+    'ROBE': 'ROBe', 'JUPE': 'JUPe', 'GANT': 'GANt', 'BOTTE': 'BOTTe', 'BONNET': 'BONNEt', 'VESTE': 'VESTe', 'CAPE': 'CAPe',
+    'CHAUSSETTE': 'CHAUSSETTe', 'ÉCHARPE': 'ÉCHARPe', 'CHEMISE': 'CHEMISe', 'CEINTURE': 'CEINTURe', 'IMPERMÉABLE': 'IMPERMÉABLe',
+    'SANDALE': 'SANDALe', 'CASQUETTE': 'CASQUETTe', 'SALOPETTE': 'SALOPETTe', 'MAILLOT': 'MAILLOt', 'PANTOUFLE': 'PANTOUFLe',
+    'CHAUSSURE': 'CHAUSSURe',
+    # L'école
+    'LIVRE': 'LIVRe', 'COLLE': 'COLLe', 'GOMME': 'GOMMe', 'CRAIE': 'CRAIe', 'CLASSE': 'CLASSe', 'CAHIER': 'CAhIEr', 'RÈGLE': 'RÈGLe',
+    'TROUSSE': 'TROUSSe', 'CARTABLE': 'CARTABLe', 'CISEAUX': 'CISEAUx', 'MAÎTRE': 'MAÎTRe', 'MAÎTRESSE': 'MAÎTRESSe',
+    'DICTIONNAIRE': 'DICTIONNAIRe', 'COMPAS': 'COMPAs', 'FEUTRE': 'FEUTRe', 'ÉQUERRE': 'ÉQUERRe',
+    # Métiers
+    'JUGE': 'JUGe', 'PILOTE': 'PILOTe', 'FERMIER': 'FERMIEr', 'POMPIER': 'POMPIEr', 'PEINTRE': 'PEINTRe', 'BOULANGER': 'BOULANGEr',
+    'JARDINIER': 'JARDINIEr', 'INFIRMIER': 'INFIRMIEr', 'CUISINIER': 'CUISINIEr', 'BOUCHER': 'BOUCHEr', 'DENTISTE': 'DENTISTe',
+    'VÉTÉRINAIRE': 'VÉTÉRINAIRe', 'ARCHITECTE': 'ARCHITECTe', 'POLICIER': 'POLICIEr', 'ASTRONAUTE': 'ASTRONAUTe', 'MENUISIER': 'MENUISIEr',
+    # Transports
+    'LUGE': 'LUGe', 'FUSÉE': 'FUSÉe', 'BARQUE': 'BARQUe', 'HÉLICOPTÈRE': 'hÉLICOPTÈRe', 'AMBULANCE': 'AMBULANCe',
+    'MONTGOLFIÈRE': 'MONtGOLFIÈRe', 'TROTTINETTE': 'TROTTINETTe', 'SOUS-MARIN': 'SOUs-MARIN', 'PAQUEBOT': 'PAQUEBOt',
+    'TÉLÉPHÉRIQUE': 'TÉLÉPHÉRIQUe',
+    # Couleurs et formes
+    'ROUGE': 'ROUGe', 'VERT': 'VERt', 'GRIS': 'GRIs', 'ROSE': 'ROSe', 'ROND': 'RONd', 'BLANC': 'BLANc', 'JAUNE': 'JAUNe',
+    'VIOLET': 'VIOLEt', 'CERCLE': 'CERCLe', 'LIGNE': 'LIGNe', 'POINT': 'POINt', 'TRIANGLE': 'TRIANGLe', 'RECTANGLE': 'RECTANGLe',
+    'LOSANGE': 'LOSANGe', 'TURQUOISE': 'TURQUOISe', 'BEIGE': 'BEIGe', 'OVALE': 'OVALe', 'CYLINDRE': 'CYLINDRe',
+    # Sports et musique
+    'DANSE': 'DANSe', 'BALLE': 'BALLe', 'FLÛTE': 'FLÛTe', 'CHANT': 'CHANt', 'COURSE': 'COURSe', 'GUITARE': 'GUITARe',
+    'TROMPETTE': 'TROMPETTe', 'ESCRIME': 'ESCRIMe', 'GYMNASTIQUE': 'GYMNASTIQUe', 'ESCALADE': 'ESCALADe', 'BATTERIE': 'BATTERIe',
+    'HARPE': 'hARPe',
 }
 SANS_COMPTE_DE_LETTRES = {'SŒUR'}  # Œ : une ou deux lettres selon les usages → pas de question « combien de lettres »
 

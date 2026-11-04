@@ -110,6 +110,10 @@
       return { cle: cle + '-b', cible: tempsManquant() || valider,
         texte: 'Dans chaque mode choisi, touche au moins un temps, puis « Valider ».' };
     }
+    if (p.sousEtape === 'packs') {
+      if (vide('packs')) return { cle: cle + '-a', cible: $('packs'), texte: 'Choisis les packs de mots où tu vas piocher : animaux, pays, métiers…' };
+      return { cle: cle + '-b', cible: valider, texte: 'Tu peux en prendre plusieurs. Puis « Valider » pour choisir tes questions.' };
+    }
     // sousEtape 'reglages'
     var fin = ' Puis « Valider ». « Mêmes réglages pour tous » donne tes choix aux autres joueurs.';
     if (mat === 'maths') {
@@ -125,7 +129,6 @@
       if (vide('groupes')) return { cle: cle + '-a', cible: $('groupes'), texte: 'Choisis les groupes de verbes : 1er (chanter), 2e (finir), 3e (prendre…).' };
       return { cle: cle + '-b', choix: $('niveau-conj'), cible: valider, texte: 'Choisis ton niveau : plus il est haut, plus les verbes sont rares.' + fin };
     }
-    if (vide('packs')) return { cle: cle + '-a', cible: $('packs'), texte: 'Choisis les packs de mots où tu vas piocher.' };
     if (vide('types-questions')) return { cle: cle + '-b', cible: $('types-questions'),
       texte: 'Choisis les questions qu’on peut te poser : épeler le mot, compter ses lettres, ses syllabes…' };
     return { cle: cle + '-c', cible: valider, texte: 'Bravo, tes cartes sont prêtes !' + fin };

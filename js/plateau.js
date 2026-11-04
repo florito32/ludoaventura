@@ -65,6 +65,7 @@
   function ecranDe(m) {
     if (m === 'matiere' || m === 'francais') return 'matiere';
     if (m === 'mode' || m === 'temps' || m === 'tempsMode') return 'modes';
+    if (m === 'pack') return 'packs'; // orthographe : écran des packs (v6.16)
     return 'reglages';
   }
 
@@ -410,7 +411,14 @@
     if (n === 3 && partie.sousEtape === 'matiere') {
       var m = manque(partie.actif);
       if (ecranDe(m) === 'matiere') { reglagesComplets(partie.actif); return; }
-      partie.sousEtape = partie.matiere[partie.actif] === 'conjugaison' ? 'modes' : 'reglages';
+      partie.sousEtape = { conjugaison: 'modes', orthographe: 'packs' }[partie.matiere[partie.actif]] || 'reglages';
+      montrerEtape(3);
+      return;
+    }
+    // Orthographe, deuxième écran : les packs choisis, on passe aux questions.
+    if (n === 3 && partie.sousEtape === 'packs') {
+      if (ecranDe(manque(partie.actif)) === 'packs') { reglagesComplets(partie.actif); return; }
+      partie.sousEtape = 'reglages';
       montrerEtape(3);
       return;
     }
@@ -432,11 +440,11 @@
     var n = partie.etapePrepa, nb = nbChoisi();
     // Étape 3 : des réglages on revient à la matière ; de la matière, aux réglages du joueur précédent.
     if (n === 3 && partie.sousEtape === 'reglages') {
-      partie.sousEtape = partie.matiere[partie.actif] === 'conjugaison' ? 'modes' : 'matiere';
+      partie.sousEtape = { conjugaison: 'modes', orthographe: 'packs' }[partie.matiere[partie.actif]] || 'matiere';
       montrerEtape(3);
       return;
     }
-    if (n === 3 && partie.sousEtape === 'modes') { partie.sousEtape = 'matiere'; montrerEtape(3); return; }
+    if (n === 3 && (partie.sousEtape === 'modes' || partie.sousEtape === 'packs')) { partie.sousEtape = 'matiere'; montrerEtape(3); return; }
     if (n === 3 && partie.actif > 0) { partie.actif--; partie.sousEtape = 'reglages'; montrerEtape(3); return; }
     if (n === 4) partie.sousEtape = 'reglages';
     if (n === 1) { afficher('ecran-accueil'); return; }
@@ -523,12 +531,15 @@
     // Étape 3 : écran de la matière ou écran de ses réglages.
     var ecran = partie.sousEtape, surMatiere = ecran === 'matiere';
     if (ecran === 'modes' && mat !== 'conjugaison') ecran = partie.sousEtape = 'reglages';
+    if (ecran === 'packs' && mat !== 'orthographe') ecran = partie.sousEtape = 'reglages';
     $('choix-matiere').hidden = !surMatiere;
     $('conj-temps').hidden = ecran !== 'modes';
+    $('ortho-packs').hidden = ecran !== 'packs';
     if (ecran !== 'reglages') { $('reglages-maths').hidden = $('reglages-ortho').hidden = $('reglages-conj').hidden = true; }
     var NOMS_MATIERES = { maths: 'Mathématiques', orthographe: 'Orthographe', conjugaison: 'Conjugaison' };
     var sousTitre = surMatiere ? 'quelle matière ?' : NOMS_MATIERES[mat] +
-      (mat === 'conjugaison' ? (ecran === 'modes' ? ', les temps' : ', les verbes') : '');
+      (mat === 'conjugaison' ? (ecran === 'modes' ? ', les temps' : ', les verbes') : '') +
+      (mat === 'orthographe' ? (ecran === 'packs' ? ', les packs' : ', les questions') : '');
     $('reglages-titre').innerHTML = '<img src="' + actif.image + '" alt="" width="200" height="220">' +
       actif.nom + ' (Joueur ' + (partie.actif + 1) + ') : ' + sousTitre;
     $('btn-memes-reglages').hidden = nb < 2 || ecran !== 'reglages';

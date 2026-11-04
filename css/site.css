@@ -371,12 +371,25 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
   .reglages-remplir .reglage-titre { font-size: .95rem; }
 }
 
-/* Orthographe : 4 packs et 7 questions ; en largeur, 4 par ligne (3 lignes), en hauteur 2 par ligne (6 lignes). */
-#reglages-ortho { --rangs: 3; --cols: 4; --larg: min(100cqi, 1000px); }
+/* Orthographe (v6.16) : deux écrans.
+   Packs (19) : en largeur 5 par ligne (4 lignes), en hauteur 3 par ligne (7 lignes).
+   Questions (7) : en largeur 4 par ligne (2 lignes), en hauteur 2 par ligne (4 lignes). */
+#ortho-packs { --rangs: 4; --cols: 5; --larg: min(100cqi, 1100px); }
+#ortho-packs .packs { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+#reglages-ortho { --rangs: 2; --cols: 4; --larg: min(100cqi, 1000px); }
 #reglages-ortho .packs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.reglages-joueur #reglages-ortho .pack span { border-radius: 18px; } /* boutons hauts : coins arrondis plutôt qu'ovales */
+.reglages-joueur #reglages-ortho .pack span, .reglages-joueur #ortho-packs .pack span { border-radius: 18px; } /* boutons hauts : coins arrondis plutôt qu'ovales */
+/* 19 packs : texte un peu plus petit que sur les autres écrans pour que « Lieux et constructions »
+   tienne dans un bouton, même sur téléphone carré (3 lignes au plus). */
+.reglages-joueur #ortho-packs .pack span {
+  font-size: clamp(.7rem, min(calc(var(--h) * .3), calc(var(--larg) / var(--cols) / 8.5)), 1.7rem);
+  line-height: 1; padding: 1px 4px; hyphens: auto;
+}
+#ortho-packs .pack { display: flex; } /* sinon un nom sur 3 lignes décale son bouton vers le bas (alignement sur la ligne de base) */
 @container (max-aspect-ratio: 1/1) {
-  #reglages-ortho { --rangs: 6; --cols: 2; }
+  #ortho-packs { --rangs: 7; --cols: 3; }
+  #ortho-packs .packs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #reglages-ortho { --rangs: 4; --cols: 2; }
   #reglages-ortho .packs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 

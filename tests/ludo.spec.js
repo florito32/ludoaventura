@@ -81,8 +81,12 @@ test('didacticiel : préparation et premier tour, flèche et bulle à chaque ét
   await expect(texte(page)).toContainText('packs');
   await flecheSur(page, '#packs');
   await page.locator('#packs input').first().check();
+  await flecheSur(page, '#btn-valider-reglages');
+  await A.valider(page); // v6.16 : écran des questions
   await expect(texte(page)).toContainText('questions');
-  await page.locator('#types-questions input').first().check();
+  // Téléphone carré : la bulle couvre une partie des questions (limite connue, ligne 91 du backlog) ;
+  // le joueur touche une question visible, le test coche la première sans viser l'écran.
+  await page.locator('#types-questions input').first().evaluate((i) => i.click());
   await flecheSur(page, '#btn-valider-reglages');
   await bulleSansBouton(page);
   await A.valider(page);

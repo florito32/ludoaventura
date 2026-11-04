@@ -26,24 +26,39 @@ async function seulement(page, types) {
 }
 
 // Arrive sur l'écran 3 (cartes du joueur 1), tout coché pour le joueur 1.
-async function preparer(page, joueurs = 1) {
+async function preparer(page, joueurs = 1, options) {
   if (!page.__rapide) { await rapide(page); page.__rapide = true; }
   await page.goto('./');
   await versReglages(page, joueurs);
-  await cocherJoueur(page);
+  await cocherJoueur(page, options);
 }
 
 test.describe('données des cartes', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
 
-  test('5 packs (feuilles « pack » de l\'Excel), 3 niveaux chacun, 300 cartes', () => {
-    expect(C.PACKS.map((p) => p.nom)).toEqual(['Mots simples', 'Mots compliqués', 'Temps', 'Numérique', 'Lettres']);
+  test('20 packs (feuilles « pack » de l\'Excel), 3 niveaux chacun, 660 cartes', () => {
+    expect(C.PACKS.map((p) => p.nom)).toEqual(['Mots simples', 'Mots compliqués', 'Temps', 'Numérique', 'Lettres',
+      // 15 packs ajoutés le 04/11/2026 (v6.16), 8 mots par niveau
+      'Animaux', 'Lieux et constructions', 'Pays', 'Villes', 'Paysages et nature', 'Météo et saisons', 'Le corps', 'Aliments',
+      'Dans la maison', 'Vêtements', 'L’école', 'Métiers', 'Transports', 'Couleurs et formes', 'Sports et musique']);
+    for (const p of C.PACKS.slice(5)) for (const n of ['1', '2', '3']) expect(p.niveaux[n], p.nom).toHaveLength(8);
     let total = 0;
     for (const p of C.PACKS) {
       expect(Object.keys(p.niveaux)).toEqual(['1', '2', '3']);
       for (const n of ['1', '2', '3']) { expect(p.niveaux[n].length).toBeGreaterThan(0); total += p.niveaux[n].length; }
     }
-    expect(total).toBe(300);
+    expect(total).toBe(660);
+  });
+
+  test('nouveaux packs : syllabes et lettres muettes relues (exemples)', () => {
+    const muettes = (m) => C.INFOS[m].muettes.map((i) => m[i]).join('');
+    expect(C.INFOS['OCÉAN'].syllabes).toBe('O-CÉ-AN');
+    expect(C.INFOS['LYON'].syllabes).toBe('LY-ON');
+    expect(muettes('PRINTEMPS')).toBe('PS');
+    expect(muettes('DOIGT')).toBe('GT');
+    expect(muettes('HÉRISSON')).toBe('H');
+    expect(muettes('PARIS')).toBe('S');
+    expect(C.INFOS['ANANAS'].muettes).toBeNull(); // « s » prononcé ou non selon les régions : question non posée
   });
 
   test('accents et fautes corrigés (choix de l\'utilisateur)', () => {
@@ -60,29 +75,43 @@ test.describe('données des cartes', () => {
 });
 
 test('préparation : chaque joueur choisit ses packs, sur son propre écran, sans choix du niveau', async ({ page }) => {
-  await preparer(page, 2);
-  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Orthographe');
+  if (!page.__rapide) { await rapide(page); page.__rapide = true; }
+  await page.goto('./');
+  await versReglages(page, 2);
+  await orthographe(page);
+  // v6.16 : un écran pour les packs, puis un écran pour les questions.
+  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Orthographe, les packs');
+  await expect(page.locator('#reglages-ortho')).toBeHidden();
   // Plus de choix du niveau (v4.8).
   await expect(page.locator('input[name="niveau-cartes"]')).toHaveCount(0);
-  await expect(page.locator('#reglages-ortho').getByText('Niveau')).toHaveCount(0);
-  // Le pack « Lettres » n'est plus proposé (v4.8).
-  await expect(page.locator('#packs input')).toHaveCount(4);
+  await expect(page.locator('#ortho-packs').getByText('Niveau')).toHaveCount(0);
+  // 19 packs ; le pack « Lettres » n'est plus proposé (v4.8).
+  await expect(page.locator('#packs input')).toHaveCount(19);
   await expect(page.getByRole('checkbox', { name: 'Lettres', exact: true })).toHaveCount(0);
-  await page.getByRole('checkbox', { name: 'Mots simples', exact: true }).uncheck();
+  for (const n of ['Animaux', 'Pays', 'Villes', 'Lieux et constructions', 'Sports et musique']) await expect(page.getByRole('checkbox', { name: n, exact: true })).toHaveCount(1);
+  await page.getByRole('checkbox', { name: 'Animaux', exact: true }).check();
+  await valider(page);
+  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Orthographe, les questions');
+  await expect(page.locator('#ortho-packs')).toBeHidden();
+  await page.getByRole('checkbox', { name: 'Épeler', exact: true }).check();
   await valider(page);
   // Joueur 2 : il commence par l'écran de la matière (v5.8), rien de choisi.
   await expect(page.locator('#reglages-titre')).toHaveText('Tom (Joueur 2) : quelle matière ?');
   await expect(page.locator('#prepa-progres')).toHaveText('Étape 3 sur 4 · Joueur 2 sur 2');
-  await expect(page.locator('#reglages-ortho')).toBeHidden();
+  await expect(page.locator('#ortho-packs')).toBeHidden();
   for (const c of await page.locator('#matieres input').all()) await expect(c).not.toBeChecked();
   await orthographe(page);
-  await expect(page.locator('#reglages-titre')).toHaveText('Tom (Joueur 2) : Orthographe');
-  await expect(page.getByRole('checkbox', { name: 'Mots simples', exact: true })).not.toBeChecked();
-  // Retour : la matière du joueur 2, puis les réglages du joueur 1, gardés.
+  await expect(page.locator('#reglages-titre')).toHaveText('Tom (Joueur 2) : Orthographe, les packs');
+  await expect(page.getByRole('checkbox', { name: 'Animaux', exact: true })).not.toBeChecked();
+  // Retour : la matière du joueur 2, puis les questions et les packs du joueur 1, gardés.
   await page.getByRole('button', { name: /Retour/ }).click();
   await expect(page.locator('#reglages-titre')).toHaveText('Tom (Joueur 2) : quelle matière ?');
   await page.getByRole('button', { name: /Retour/ }).click();
-  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Orthographe');
+  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Orthographe, les questions');
+  await expect(page.getByRole('checkbox', { name: 'Épeler', exact: true })).toBeChecked();
+  await page.getByRole('button', { name: /Retour/ }).click();
+  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Orthographe, les packs');
+  await expect(page.getByRole('checkbox', { name: 'Animaux', exact: true })).toBeChecked();
   await expect(page.getByRole('checkbox', { name: 'Mots simples', exact: true })).not.toBeChecked();
 });
 
@@ -97,15 +126,17 @@ test('packs et questions décochés au départ ; « Valider » demande au moins 
   await valider(page);
   await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir Orthographe ou Conjugaison.');
   await page.locator('#francais input[value="orthographe"]').check();
-  await valider(page); // écran des réglages de l'orthographe
+  await valider(page); // écran des packs (v6.16)
   for (const c of await page.locator('#packs input, #types-questions input').all()) await expect(c).not.toBeChecked();
-  // Rien de coché : on reste sur le joueur 1 avec un message.
+  // Aucun pack : on reste sur l'écran des packs avec un message.
   await valider(page);
-  await expect(page.locator('#reglages-titre')).toContainText('Léa (Joueur 1)');
+  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Orthographe, les packs');
   await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir au moins un pack.');
   await expect(page.locator('#packs input').first()).toBeFocused();
-  // Un pack coché mais aucune question → message pour les questions.
+  // Un pack coché → écran des questions ; aucune question → message.
   await page.getByRole('checkbox', { name: 'Temps', exact: true }).check();
+  await valider(page);
+  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Orthographe, les questions');
   await valider(page);
   await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir au moins un type de question.');
   await page.getByRole('checkbox', { name: 'Épeler', exact: true }).check();
@@ -116,6 +147,7 @@ test('packs et questions décochés au départ ; « Valider » demande au moins 
   await valider(page);
   await expect(page.locator('#packs-alerte')).toHaveText('Tom (Joueur 2) doit choisir au moins un pack.');
   await page.getByRole('checkbox', { name: 'Numérique', exact: true }).check();
+  await valider(page);
   await page.getByRole('checkbox', { name: 'Épeler', exact: true }).check();
   await valider(page);
   await lancer(page);
@@ -123,8 +155,7 @@ test('packs et questions décochés au départ ; « Valider » demande au moins 
 });
 
 test('la carte piochée vient des packs du joueur, tous niveaux mêlés ; mot caché puis « Voir la réponse » @smoke', async ({ page }) => {
-  await preparer(page, 1);
-  for (const nom of ['Mots simples', 'Mots compliqués', 'Numérique']) await page.getByRole('checkbox', { name: nom, exact: true }).uncheck();
+  await preparer(page, 1, { packs: ['temps'] });
   await seulement(page, ['Épeler']);
   await lancer(page);
   const temps = Object.values(C.PACKS.find((p) => p.id === 'temps').niveaux).flat();
@@ -161,8 +192,7 @@ test('pack « Lettres » plus proposé : aucune carte lettre n\'est piochée, m�
 
 test('🔊 Écouter : la voix lit la consigne et le mot (en français)', async ({ page }) => {
   await voixEspion(page);
-  await preparer(page, 1);
-  for (const nom of ['Mots simples', 'Mots compliqués', 'Numérique']) await page.getByRole('checkbox', { name: nom, exact: true }).uncheck();
+  await preparer(page, 1, { packs: ['temps'] });
   await seulement(page, ['Épeler']);
   await lancer(page);
   await page.getByRole('button', { name: 'Piocher une carte' }).click();
@@ -175,9 +205,8 @@ test('🔊 Écouter : la voix lit la consigne et le mot (en français)', async (
 });
 
 test('« Mêmes réglages pour tous » copie packs et questions, puis passe au choix de l\'aventure', async ({ page }) => {
-  await preparer(page, 3);
+  await preparer(page, 3, { packs: ['mots-simples', 'mots-compliques', 'numerique'] });
   for (const c of await page.locator('#types-questions input').all()) await c.check(); // les 7 questions
-  await page.getByRole('checkbox', { name: 'Temps', exact: true }).uncheck();
   await page.getByRole('checkbox', { name: 'Nombre de syllabes', exact: true }).uncheck();
   await page.getByRole('button', { name: 'Mêmes réglages pour tous' }).click();
   await expect(page.getByRole('button', { name: 'Lancer la partie' })).toBeVisible();
@@ -191,7 +220,9 @@ test('« Mêmes réglages pour tous » copie packs et questions, puis passe au c
   // En revenant en arrière, le joueur 3 a bien ces réglages.
   await page.getByRole('button', { name: /Retour/ }).click();
   await expect(page.locator('#reglages-titre')).toContainText('(Joueur 3)');
+  await page.getByRole('button', { name: /Retour/ }).click(); // écran des packs du joueur 3
   await expect(page.getByRole('checkbox', { name: 'Temps', exact: true })).not.toBeChecked();
+  await expect(page.getByRole('checkbox', { name: 'Numérique', exact: true })).toBeChecked();
 });
 
 test('le bouton « Mêmes réglages » n\'apparaît pas pour un seul joueur', async ({ page }) => {
