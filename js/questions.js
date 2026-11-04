@@ -48,7 +48,7 @@
 
   function morceaux(info) { return info.syllabes.split(/[\s-]+/).filter(function (m) { return /\p{L}/u.test(m); }); }
 
-  // ---------- Correction des réponses écrites (v6.12, demande du 04/11/2026) ----------
+  // ---------- Correction des réponses écrites (v6.14, demande du 04/11/2026) ----------
   // Lettres comparées sans accents ni majuscules : « é » = « E » ; « œ » = « OE ».
   function normaliser(c) {
     return c.toUpperCase().replace(/Œ/g, 'OE').replace(/Æ/g, 'AE').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
