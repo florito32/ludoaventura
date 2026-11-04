@@ -96,3 +96,89 @@ test('« Épeler » garde « Bonne / Mauvaise réponse »', async ({ page }) => 
   await expect(page.locator('#carte-saisie')).toBeHidden();
   await expect(page.getByRole('button', { name: 'Bonne réponse' })).toBeVisible();
 });
+
+// ---------- v6.17 : lettre manquante, mot mélangé, nombre de voyelles / consonnes, combien de fois ----------
+test.describe('nouvelles questions : logique', () => {
+  test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
+  const Qt = (id) => Q.trouver(id);
+
+  test('lettre manquante : une lettre sans accent remplacée par « _ »', () => {
+    for (let k = 0; k < 30; k++) {
+      const p = Qt('manquante').preparer('ÉLÉPHANT');
+      const vu = Qt('manquante').montrer('ÉLÉPHANT', null, p);
+      expect(vu).toMatch(/^[^_]*_[^_]*$/);
+      expect('ÉLÉPHANT'[p.pos]).toMatch(/[A-Z]/); // jamais É
+      expect(Q.juste(Qt('manquante'), 'ÉLÉPHANT'[p.pos].toLowerCase(), 'ÉLÉPHANT', null, p)).toBe(true);
+    }
+    expect(Q.juste(Qt('manquante'), 'n', 'BANANE', null, { pos: 1 })).toBe(false);
+  });
+
+  test('mot mélangé : jamais dans le bon ordre ; le mot est accepté sans accents ; pas pour les expressions', () => {
+    for (let k = 0; k < 30; k++) expect(Qt('melange').montrer('CHAT', null, Qt('melange').preparer('CHAT')).replace(/ /g, '')).not.toBe('CHAT');
+    expect(Q.juste(Qt('melange'), 'elephant', 'ÉLÉPHANT', null, {})).toBe(true);
+    expect(Q.juste(Qt('melange'), 'éléfant', 'ÉLÉPHANT', null, {})).toBe(false);
+    expect(Q.possibles('PARCE QUE', C.INFOS['PARCE QUE'], ['melange'])).toHaveLength(0);
+    expect(Q.possibles('LE', C.INFOS['LE'], ['melange'])).toHaveLength(0); // trop court
+  });
+
+  test('nombre de voyelles, de consonnes, combien de fois une lettre', () => {
+    expect(Q.juste(Qt('nb-voyelles'), '3', 'AVION', null)).toBe(true);
+    expect(Q.juste(Qt('nb-consonnes'), 'deux', 'AVION', null)).toBe(true);
+    expect(Qt('nb-voyelles').reponse('AVION')).toBe('3 voyelles (A, I, O)');
+    expect(Q.juste(Qt('combien-lettre'), '2', 'BANANE', null, { lettre: 'A' })).toBe(true);
+    expect(Q.juste(Qt('combien-lettre'), '2', 'ÉLÉPHANT', null, { lettre: 'E' })).toBe(true); // É compte comme E
+    expect(Q.consigne(Qt('combien-lettre'), 'BANANE', null, { lettre: 'N' })).toBe('Combien de fois vois-tu la lettre N dans le mot :');
+    // 3 fois sur 4, une lettre présente plusieurs fois
+    let doubles = 0;
+    for (let k = 0; k < 200; k++) if (['A', 'N'].includes(Qt('combien-lettre').preparer('BANANE').lettre)) doubles++;
+    expect(doubles).toBeGreaterThan(120);
+  });
+});
+
+async function partieMots(page, types, packs) {
+  await rapide(page);
+  await page.goto('./');
+  await versReglages(page, 1);
+  await cocherJoueur(page, { types, packs });
+  await lancer(page);
+  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  return page.evaluate(() => window.Aventura.partie.carte);
+}
+
+test('lettre manquante : le mot s\'affiche avec « _ », pas de « Voir le mot » ; bonne réponse → dé FORT @smoke', async ({ page }) => {
+  const c = await partieMots(page, ['manquante']);
+  await expect(page.locator('#carte-consigne')).toHaveText('Quelle lettre manque dans le mot :');
+  await expect(page.locator('#carte-mot')).toHaveText(c.mot.slice(0, c.params.pos) + '_' + c.mot.slice(c.params.pos + 1));
+  await expect(page.locator('#btn-voir-mot')).toBeHidden();
+  await page.getByLabel('Ta réponse').fill(c.mot[c.params.pos].toLowerCase());
+  await page.getByRole('button', { name: 'Valider', exact: true }).click();
+  await expect(page.locator('#carte-reponse')).toContainText('Bonne réponse !');
+  expect(await page.evaluate(() => window.Aventura.partie.regles.de)).toBe('fort');
+});
+
+test('mot mélangé : lettres en désordre, la voix ne dit pas le mot ; réponse fausse → la correction donne le mot', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.__lu = [];
+    window.SpeechSynthesisUtterance = function (t) { this.text = t; };
+    Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: { speak: (u) => window.__lu.push(u.text), cancel() {}, getVoices: () => [] } });
+  });
+  const c = await partieMots(page, ['melange'], ['animaux']);
+  await expect(page.locator('#carte-mot')).toHaveText(c.params.melange);
+  await page.getByRole('button', { name: 'Écouter' }).click();
+  expect(await page.evaluate(() => window.__lu.pop())).toBe('Remets les lettres dans l’ordre :');
+  await page.getByLabel('Ta réponse').fill('zzzz');
+  await page.getByRole('button', { name: 'Valider', exact: true }).click();
+  await expect(page.locator('#carte-reponse')).toContainText('La bonne réponse : ' + c.mot + '.');
+  await expect(page.locator('#carte-mot')).toHaveText(c.mot);
+  await page.getByRole('button', { name: 'J’ai compris' }).click();
+});
+
+test('combien de fois une lettre : la consigne nomme la lettre ; le mot reste caché avec « Voir le mot »', async ({ page }) => {
+  const c = await partieMots(page, ['combien-lettre']);
+  await expect(page.locator('#carte-consigne')).toHaveText('Combien de fois vois-tu la lettre ' + c.params.lettre + ' dans le mot :');
+  await expect(page.locator('#carte-mot')).toHaveClass(/cache/);
+  await expect(page.getByRole('button', { name: 'Voir le mot' })).toBeVisible();
+  // Rechargement : la même lettre est gardée.
+  await page.reload();
+  await expect(page.locator('#carte-consigne')).toHaveText('Combien de fois vois-tu la lettre ' + c.params.lettre + ' dans le mot :');
+});

@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.16';
+  var VERSION = '6.17';
 
   var HISTORY = [
+    { v: '6.17', date: '2026-11-04', changes: [
+      "Orthographe : 5 nouvelles questions — Lettre manquante (B_NANE), Mot mélangé (les lettres en désordre), Nombre de voyelles, Nombre de consonnes et Combien de fois cette lettre ?. Le joueur écrit sa réponse, le jeu corrige."
+    ] },
     { v: '6.16', date: '2026-11-04', changes: [
       "Orthographe : 15 nouveaux packs de mots — Animaux, Lieux et constructions, Pays, Villes, Paysages et nature, Météo et saisons, Le corps, Aliments, Dans la maison, Vêtements, L\u2019école, Métiers, Transports, Couleurs et formes, Sports et musique.",
       "Préparation : en orthographe, on choisit d\u2019abord ses packs sur un écran, puis ses questions sur l\u2019écran suivant."

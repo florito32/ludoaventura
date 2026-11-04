@@ -206,7 +206,7 @@ test('🔊 Écouter : la voix lit la consigne et le mot (en français)', async (
 
 test('« Mêmes réglages pour tous » copie packs et questions, puis passe au choix de l\'aventure', async ({ page }) => {
   await preparer(page, 3, { packs: ['mots-simples', 'mots-compliques', 'numerique'] });
-  for (const c of await page.locator('#types-questions input').all()) await c.check(); // les 7 questions
+  for (const c of await page.locator('#types-questions input').all()) await c.check(); // toutes les questions
   await page.getByRole('checkbox', { name: 'Nombre de syllabes', exact: true }).uncheck();
   await page.getByRole('button', { name: 'Mêmes réglages pour tous' }).click();
   await expect(page.getByRole('button', { name: 'Lancer la partie' })).toBeVisible();
@@ -214,7 +214,7 @@ test('« Mêmes réglages pour tous » copie packs et questions, puis passe au c
   for (const k of [1, 2]) {
     expect(p.packs[k]).toEqual(p.packs[0]);
     expect(p.packs[k]).not.toContain('temps');
-    expect(p.types[k]).toHaveLength(6);
+    expect(p.types[k]).toHaveLength(11);
     expect(p.types[k]).not.toContain('syllabes');
   }
   // En revenant en arrière, le joueur 3 a bien ces réglages.

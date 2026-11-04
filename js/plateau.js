@@ -594,7 +594,12 @@
       var c = j.tas.pop();
       if (c.lettre) { c.question = null; return c; }
       var poss = Q.possibles(c.mot, C.INFOS[c.mot], choisis);
-      if (poss.length) { c.question = poss[Math.floor(Math.random() * poss.length)]; return c; }
+      if (poss.length) {
+        c.question = poss[Math.floor(Math.random() * poss.length)];
+        // Réglages tirés pour cette carte (lettre cachée, lettres mélangées, lettre à compter : v6.17).
+        c.params = c.question.preparer ? c.question.preparer(c.mot, C.INFOS[c.mot]) : null;
+        return c;
+      }
       j.tas.unshift(c);
     }
     c.question = Q.trouver('epeler'); // filet de sécurité (ne devrait pas servir)
@@ -968,7 +973,7 @@
   // après validation, le mot (lettres muettes surlignées) et la correction.
   function montrerOrthoSaisie(c) {
     var q = c.question, info = C.INFOS[c.mot];
-    $('carte-consigne').textContent = q.consigne;
+    $('carte-consigne').textContent = Q.consigne(q, c.mot, info, c.params);
     $('carte-boutons').hidden = true; // pas de « Voir la réponse » : c'est le jeu qui corrige
     $('btn-tableau').hidden = true;
     $('carte-tableau').hidden = true;
@@ -980,6 +985,15 @@
     champ.disabled = corrigee;
     $('btn-valider-reponse').disabled = corrigee;
     champ.removeAttribute('aria-invalid');
+    if (!corrigee && q.montrer) {
+      // Lettre manquante, mot mélangé : le joueur voit le mot transformé ; « Voir le mot » donnerait la réponse.
+      $('btn-voir-mot').hidden = true;
+      var vu = $('carte-mot');
+      vu.className = 'carte-mot montre';
+      vu.textContent = q.montrer(c.mot, info, c.params);
+      rep.hidden = true; rep.className = 'carte-reponse';
+      return;
+    }
     if (!corrigee) {
       $('btn-voir-mot').hidden = false;
       if (partie.vue === 'mot') montrerMotSeul(); else cacherMot();
@@ -996,8 +1010,8 @@
     } else mot.textContent = c.mot;
     rep.hidden = false;
     rep.className = 'carte-reponse ' + (c.juste ? 'juste' : 'fausse');
-    rep.textContent = c.juste ? 'Bonne réponse ! ' + q.reponse(c.mot, info)
-      : 'Ce n\u2019est pas ça (tu as écrit « ' + c.reponseDonnee + ' »). La bonne réponse : ' + q.reponse(c.mot, info) + '.';
+    rep.textContent = c.juste ? 'Bonne réponse ! ' + q.reponse(c.mot, info, c.params)
+      : 'Ce n\u2019est pas ça (tu as écrit « ' + c.reponseDonnee + ' »). La bonne réponse : ' + q.reponse(c.mot, info, c.params) + '.';
   }
 
   // Carte de calcul : la formule, la case de réponse ; après validation, la correction.
@@ -1073,7 +1087,7 @@
       rep.hidden = false;
       rep.className = 'carte-reponse alerte';
       rep.textContent = !texte ? 'Écris ta réponse dans la case.'
-        : ortho ? (c.question.saisie === 'nombre' ? 'Écris un nombre, par exemple 5.' : 'Écris des lettres, par exemple : a, e.')
+        : ortho ? ({ nombre: 'Écris un nombre, par exemple 5.', mot: 'Écris le mot en lettres.' }[c.question.saisie] || 'Écris des lettres, par exemple : a, e.')
         : 'Écris un nombre, par exemple 12 ou 3,5.';
       champ.setAttribute('aria-invalid', 'true');
       champ.focus();
@@ -1081,7 +1095,7 @@
     }
     c.reponseDonnee = texte;
     champ.blur(); // le clavier se referme : la carte rend la place au plateau et au dé (v6.13)
-    c.juste = ortho ? Q.juste(c.question, texte, c.mot, C.INFOS[c.mot])
+    c.juste = ortho ? Q.juste(c.question, texte, c.mot, C.INFOS[c.mot], c.params)
       : conj ? V.juste(texte, c.verbe, c.temps, c.personne) : K.juste(texte, c.resultat);
     // Réponse fausse (calcul ou conjugaison) : on attend « J'ai compris » avant de lancer le dé (v6.1).
     c.attente = !c.juste;
@@ -1107,7 +1121,7 @@
     $('carte-reponse').className = 'carte-reponse';
     $('carte-titre').innerHTML = 'Carte n° ' + partie.regles.pioches[j.index] + ' de ' + j.nom +
       '<small>' + c.packNom + (c.question ? ' · ' + c.question.nom : '') + '</small>';
-    $('carte-consigne').textContent = c.lettre ? 'Quelle est cette lettre ?' : c.question.consigne;
+    $('carte-consigne').textContent = c.lettre ? 'Quelle est cette lettre ?' : Q.consigne(c.question, c.mot, C.INFOS[c.mot], c.params);
     var mot = $('carte-mot');
     var boutons = $('carte-boutons'), voirMot = $('btn-voir-mot');
     $('carte-reponse').hidden = true;
