@@ -89,7 +89,11 @@ test('les personnages sont debout sur le plateau (corps entier, pas un visage da
   for (let k = 0; k < 4; k++) {
     const pion = page.locator('.pion').nth(k);
     await expect(pion.locator('svg.figurine-svg')).toHaveCount(1);
-    for (const partie of ['.tete', '.corps', '.jambe-g', '.jambe-d', '.bras-g', '.bras-d']) await expect(pion.locator(partie)).toHaveCount(1);
+    for (const partie of ['.corps', '.jambe-g', '.jambe-d']) await expect(pion.locator(partie)).toHaveCount(1);
+    // v6.19 : le corps entier est l'illustration de l'utilisateur (img/aventuriers/<id>-pied.webp).
+    const id = await pion.getAttribute('data-aventurier');
+    const hrefs = await pion.locator('image').evaluateAll((els) => els.map((e) => e.getAttribute('href')));
+    expect(hrefs).toEqual(Array(3).fill('img/aventuriers/' + id + '-pied.webp'));
     await expect(pion.locator('.socle')).toHaveCount(1); // socle à la couleur du joueur
     const b = await pion.boundingBox();
     expect(b.height).toBeGreaterThan(b.width * 1.6); // silhouette debout, plus haute que large
@@ -97,12 +101,15 @@ test('les personnages sont debout sur le plateau (corps entier, pas un visage da
   }
 });
 
-test('pendant le déplacement, le personnage marche : jambes et bras bougent, puis s\'arrêtent', async ({ page }) => {
+test('pendant le déplacement, le personnage marche : jambes et corps bougent, puis s\'arrêtent', async ({ page }) => {
   await lancerPartie(page, { joueurs: 1 });
   const pion = page.locator('.pion').first();
   await expect(pion).toHaveClass(/marche/);
-  const enMarche = await pion.evaluate((p) => ['.jambe-g', '.jambe-d', '.bras-g', '.bras-d'].map((s) => p.querySelector(s).getAnimations().length));
-  expect(enMarche).toEqual([1, 1, 1, 1]);
+  const enMarche = await pion.evaluate((p) => ['.jambe-g', '.jambe-d', '.corps'].map((s) => p.querySelector(s).getAnimations().length));
+  expect(enMarche).toEqual([1, 1, 1]);
+  // Les jambes pivotent autour de la hanche (point donné dans le SVG), pas autour du coin de l'image.
+  const origine = await pion.evaluate((p) => getComputedStyle(p.querySelector('.jambe-g')).transformOrigin);
+  expect(origine).not.toBe('0px 0px');
   await expect(pion).not.toHaveClass(/marche/, { timeout: 4000 });
   const arrete = await pion.evaluate((p) => p.querySelector('.jambe-g').getAnimations().length);
   expect(arrete).toBe(0);

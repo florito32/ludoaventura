@@ -555,12 +555,15 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 @keyframes poser { from { transform: translateY(-40%); opacity: 0; } }
 /* Le personnage regarde dans le sens de la marche (propriété « scale », indépendante des animations). */
 .pion.gauche .figurine-svg { scale: -1 1; }
-/* Marche : jambes et bras se balancent en alternance, le corps monte et descend à chaque pas. */
-.figurine-svg .jambe-g, .figurine-svg .jambe-d, .figurine-svg .bras-g, .figurine-svg .bras-d { transform-box: fill-box; transform-origin: 50% 4%; }
-.pion.marche .jambe-g, .pion.marche .bras-d { animation: pas .3s ease-in-out infinite alternate; }
-.pion.marche .jambe-d, .pion.marche .bras-g { animation: pas .3s ease-in-out infinite alternate-reverse; }
+/* Marche : les jambes se balancent en alternance, le corps se dandine et monte et descend à chaque pas.
+   Chaque personnage est son illustration découpée en corps + 2 jambes (js/figurines.js, outils/personnages.py) ;
+   le point de pivot (hanche) est donné dans le SVG. Les bras tiennent des objets : ils restent avec le corps. */
+.pion.marche .jambe-g { animation: pas .3s ease-in-out infinite alternate; }
+.pion.marche .jambe-d { animation: pas .3s ease-in-out infinite alternate-reverse; }
+.pion.marche .corps { animation: dandine .3s ease-in-out infinite alternate; }
 .pion.marche .figurine-svg { animation: hop .15s ease-in-out infinite alternate; }
-@keyframes pas { from { transform: rotate(-20deg); } to { transform: rotate(20deg); } }
+@keyframes pas { from { transform: rotate(-16deg); } to { transform: rotate(16deg); } }
+@keyframes dandine { from { transform: rotate(-3deg); } to { transform: rotate(3deg); } }
 @keyframes hop { to { transform: translateY(-3%); } }
 @media (prefers-reduced-motion: reduce) { .figurine, .pion.arrive .figurine, .pion.marche .figurine-svg, .pion.marche .figurine-svg * { animation: none; } }
 .pion-rouge { --c: var(--rouge); }
