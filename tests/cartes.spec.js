@@ -17,10 +17,10 @@ async function voixEspion(page) {
 
 // Ne garder que certains types de questions pour le joueur actif.
 async function seulement(page, types) {
-  for (const t of ['Épeler', 'Nombre de lettres', 'Syllabes', 'Consonnes', 'Voyelles', 'Lettres muettes', 'Réécrire le mot']) {
+  for (const t of ['Épeler', 'Nombre de lettres', 'Nombre de syllabes', 'Consonnes', 'Voyelles', 'Lettres muettes', 'Réécrire le mot']) {
     if (types.includes(t)) await page.getByRole('checkbox', { name: t, exact: true }).check();
   }
-  for (const t of ['Épeler', 'Nombre de lettres', 'Syllabes', 'Consonnes', 'Voyelles', 'Lettres muettes', 'Réécrire le mot']) {
+  for (const t of ['Épeler', 'Nombre de lettres', 'Nombre de syllabes', 'Consonnes', 'Voyelles', 'Lettres muettes', 'Réécrire le mot']) {
     if (!types.includes(t)) await page.getByRole('checkbox', { name: t, exact: true }).uncheck();
   }
 }
@@ -176,8 +176,9 @@ test('🔊 Écouter : la voix lit la consigne et le mot (en français)', async (
 
 test('« Mêmes réglages pour tous » copie packs et questions, puis passe au choix de l\'aventure', async ({ page }) => {
   await preparer(page, 3);
+  for (const c of await page.locator('#types-questions input').all()) await c.check(); // les 7 questions
   await page.getByRole('checkbox', { name: 'Temps', exact: true }).uncheck();
-  await page.getByRole('checkbox', { name: 'Syllabes', exact: true }).uncheck();
+  await page.getByRole('checkbox', { name: 'Nombre de syllabes', exact: true }).uncheck();
   await page.getByRole('button', { name: 'Mêmes réglages pour tous' }).click();
   await expect(page.getByRole('button', { name: 'Lancer la partie' })).toBeVisible();
   const p = await page.evaluate(() => window.Aventura.partie);

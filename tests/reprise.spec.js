@@ -81,14 +81,14 @@ test('rafraîchir la préparation garde l\'écran et les choix (joueurs, joueur 
   await versReglages(page, 3);
   await orthographe(page);
   await page.getByRole('checkbox', { name: 'Temps', exact: true }).check();
-  await page.getByRole('checkbox', { name: 'Syllabes', exact: true }).check();
+  await page.getByRole('checkbox', { name: 'Nombre de syllabes', exact: true }).check();
   await valider(page); // joueur 2
   await page.reload();
   await expect(page.getByRole('heading', { name: /Préparer/ })).toBeVisible();
   await expect(page.locator('#prepa-progres')).toHaveText('Étape 3 sur 4 · Joueur 2 sur 3');
   await page.getByRole('button', { name: /Retour/ }).click();
   await expect(page.getByRole('checkbox', { name: 'Temps', exact: true })).toBeChecked();
-  await expect(page.getByRole('checkbox', { name: 'Syllabes', exact: true })).toBeChecked();
+  await expect(page.getByRole('checkbox', { name: 'Nombre de syllabes', exact: true })).toBeChecked();
   await expect(page.getByRole('checkbox', { name: 'Numérique', exact: true })).not.toBeChecked();
   // On est revenu sur les réglages du joueur 1 (deuxième écran de l'étape 3) : il valide, puis les joueurs 2 et 3.
   await valider(page);

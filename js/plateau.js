@@ -257,7 +257,7 @@
     Q.TYPES.forEach(function (t) {
       var l = document.createElement('label');
       l.className = 'pack';
-      l.innerHTML = '<input type="checkbox" name="type" value="' + t.id + '"><span>' + t.nom + '</span>';
+      l.innerHTML = '<input type="checkbox" name="type" value="' + t.id + '" aria-label="' + t.nom + '"><span>' + (t.court || t.nom) + '</span>';
       types.appendChild(l);
     });
     types.addEventListener('change', function () {

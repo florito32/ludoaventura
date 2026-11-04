@@ -20,7 +20,8 @@
       reponse: function (mot, info) { return pluriel(info.lettres, 'lettre'); } },
     // Syllabes : le joueur écrit le NOMBRE de syllabes (choix de l'utilisateur, 04/11/2026) ;
     // la correction montre aussi le découpage.
-    { id: 'syllabes', nom: 'Nombre de syllabes', consigne: 'Combien de syllabes y a-t-il dans le mot :', saisie: 'nombre',
+    { id: 'syllabes', nom: 'Nombre de syllabes', court: 'Syllabes', // bouton de la préparation : « Syllabes » tient sur téléphone carré
+      consigne: 'Combien de syllabes y a-t-il dans le mot :', saisie: 'nombre',
       attendu: function (mot, info) { return morceaux(info).length; },
       reponse: function (mot, info) {
         var m = morceaux(info);
