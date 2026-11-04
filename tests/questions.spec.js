@@ -92,5 +92,8 @@ test('la voix lit la question tirée, puis le mot', async ({ page }) => {
   await page.getByRole('button', { name: 'Écouter' }).click();
   await page.getByRole('button', { name: 'Voir la réponse' }).click();
   const mot = (await page.locator('#carte-mot').innerText()).trim();
-  expect(await page.evaluate(() => window.__lu.pop())).toBe('Découpe en syllabes le mot : ' + mot.toLocaleLowerCase('fr-FR') + '.');
+  // La voix ne lit pas les points de suspension (« NE… JAMAIS » → « ne jamais », js/voix.js) :
+  // le test fait le même nettoyage, sinon il échoue au hasard quand ce mot est tiré (ligne 96 du backlog).
+  const lu = mot.replace(/(\.\.\.|…)/g, ' ').replace(/\s+/g, ' ').trim().toLocaleLowerCase('fr-FR');
+  expect(await page.evaluate(() => window.__lu.pop())).toBe('Découpe en syllabes le mot : ' + lu + '.');
 });
