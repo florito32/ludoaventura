@@ -373,10 +373,10 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 
 /* Orthographe (v6.16) : deux écrans.
    Packs (19) : en largeur 5 par ligne (4 lignes), en hauteur 3 par ligne (7 lignes).
-   Questions (12 depuis v6.17) : en largeur 4 par ligne (3 lignes), en hauteur 2 par ligne (6 lignes). */
+   Questions (14 depuis v6.18) : en largeur 4 par ligne (4 lignes), en hauteur 2 par ligne (7 lignes). */
 #ortho-packs { --rangs: 4; --cols: 5; --larg: min(100cqi, 1100px); }
 #ortho-packs .packs { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-#reglages-ortho { --rangs: 3; --cols: 4; --larg: min(100cqi, 1000px); }
+#reglages-ortho { --rangs: 4; --cols: 4; --larg: min(100cqi, 1000px); }
 #reglages-ortho .packs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .reglages-joueur #reglages-ortho .pack span, .reglages-joueur #ortho-packs .pack span { border-radius: 18px; } /* boutons hauts : coins arrondis plutôt qu'ovales */
 /* 19 packs et 12 questions (v6.17) : texte un peu plus petit que sur les autres écrans pour que « Lieux et constructions »
@@ -389,7 +389,7 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 @container (max-aspect-ratio: 1/1) {
   #ortho-packs { --rangs: 7; --cols: 3; }
   #ortho-packs .packs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  #reglages-ortho { --rangs: 6; --cols: 2; }
+  #reglages-ortho { --rangs: 7; --cols: 2; }
   #reglages-ortho .packs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 

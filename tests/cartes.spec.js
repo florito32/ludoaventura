@@ -214,7 +214,7 @@ test('« Mêmes réglages pour tous » copie packs et questions, puis passe au c
   for (const k of [1, 2]) {
     expect(p.packs[k]).toEqual(p.packs[0]);
     expect(p.packs[k]).not.toContain('temps');
-    expect(p.types[k]).toHaveLength(11);
+    expect(p.types[k]).toHaveLength(13);
     expect(p.types[k]).not.toContain('syllabes');
   }
   // En revenant en arrière, le joueur 3 a bien ces réglages.

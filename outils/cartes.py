@@ -200,6 +200,91 @@ MUETTES = {
 }
 SANS_COMPTE_DE_LETTRES = {'SŒUR'}  # Œ : une ou deux lettres selon les usages → pas de question « combien de lettres »
 
+# ---------- Genre et pluriel des noms (v6.18 : questions « Le ou la ? » et « Au pluriel ») ----------
+# Seuls les noms ont un genre ; les mots outils, nombres, adjectifs de couleur et noms de villes n'en ont pas ici.
+# m = masculin, f = féminin. Les métiers qui s'écrivent pareil au masculin et au féminin (juge, pilote,
+# dentiste…) n'ont pas de question « Le ou la ? » : les deux réponses seraient justes.
+_M = """TONTON PAPA COUSIN FRÈRE
+LUNDI MARDI MERCREDI JEUDI VENDREDI SAMEDI DIMANCHE JOUR MOIS SIÈCLE JANVIER FÉVRIER MARS AVRIL MAI JUIN JUILLET AOÛT SEPTEMBRE OCTOBRE NOVEMBRE DÉCEMBRE
+MILLIER MILLION MILLIARD
+CHIEN LAPIN OURS LOUP COQ CANARD CHEVAL MOUTON SINGE OISEAU COCHON CROCODILE ÉCUREUIL HIPPOPOTAME KANGOUROU PINGOUIN HÉRISSON
+PONT MUR PORT PARC CHÂTEAU GRENIER MAGASIN VILLAGE CHEMIN HÔPITAL IMMEUBLE MUSÉE PHARE AÉROPORT
+JAPON MAROC PÉROU CHILI CANADA BRÉSIL KENYA PORTUGAL MEXIQUE SÉNÉGAL
+LAC BOIS CIEL ARBRE PRÉ SABLE DÉSERT VOLCAN OCÉAN MARÉCAGE GLACIER ROCHER
+VENT ÉTÉ GEL SOLEIL NUAGE ORAGE HIVER AUTOMNE BROUILLARD ÉCLAIR PRINTEMPS ARC-EN-CIEL TONNERRE VERGLAS
+PIED BRAS NEZ DOS COU GENOU CHEVEUX VENTRE DOIGT ESTOMAC POIGNET MOLLET POUMON SQUELETTE COUDE
+PAIN LAIT RIZ MIEL JUS SEL FROMAGE BEURRE POULET CHAMPIGNON CONCOMBRE ÉPINARD HARICOT ANANAS
+LIT TAPIS BOL VERRE FOUR ESCALIER PLACARD COUSSIN MIROIR RÉFRIGÉRATEUR OREILLER TIROIR ASPIRATEUR
+PULL GANT BONNET CHAPEAU MANTEAU PANTALON PYJAMA BLOUSON IMPERMÉABLE MAILLOT
+LIVRE STYLO SAC AMI CAHIER CRAYON CARTABLE TABLEAU CISEAUX MAÎTRE DICTIONNAIRE COMPAS PINCEAU FEUTRE BUREAU
+MAÇON FERMIER POMPIER FACTEUR BOULANGER COIFFEUR JARDINIER INFIRMIER CUISINIER BOUCHER PHARMACIEN POLICIER CHIRURGIEN MENUISIER ÉLECTRICIEN
+BUS TRAIN VÉLO TAXI TRAM MÉTRO AVION BATEAU CAMION TRACTEUR HÉLICOPTÈRE SOUS-MARIN PAQUEBOT TÉLÉPHÉRIQUE AUTOBUS
+CARRÉ CERCLE POINT TRIANGLE RECTANGLE LOSANGE CYLINDRE
+JUDO SKI PIANO CHANT TENNIS FOOTBALL TAMBOUR VIOLON BASKET ACCORDÉON XYLOPHONE"""
+_F = """MAMAN SŒUR COUSINE TANTE
+SEMAINE ANNÉE UNITÉ DIZAINE CENTAINE
+VACHE POULE TORTUE CHÈVRE BALEINE PANTHÈRE GUÊPE
+MAISON TOUR GARE RUE ÉCOLE CABANE FERME BIBLIOTHÈQUE ÉGLISE BOULANGERIE
+FRANCE ITALIE CHINE INDE ESPAGNE BELGIQUE SUISSE ÉGYPTE GRÈCE ALLEMAGNE ANGLETERRE AUSTRALIE ARGENTINE NORVÈGE
+MER FLEUR FORÊT PLAGE RIVIÈRE COLLINE GROTTE MONTAGNE CASCADE FALAISE PRAIRIE VALLÉE
+PLUIE NEIGE TEMPÊTE CHALEUR GRÊLE TEMPÉRATURE AVERSE ROSÉE
+TÊTE MAIN DENT JAMBE OREILLE ÉPAULE BOUCHE CHEVILLE PAUPIÈRE
+POIRE SOUPE CAROTTE CERISE BANANE TOMATE SALADE AUBERGINE FRAMBOISE CITROUILLE
+TABLE LAMPE PORTE CHAISE FENÊTRE ARMOIRE CUISINE BAIGNOIRE CHEMINÉE ÉTAGÈRE CASSEROLE
+ROBE JUPE BOTTE VESTE CAPE CHAUSSETTE ÉCHARPE CHEMISE CEINTURE SANDALE CASQUETTE SALOPETTE PANTOUFLE CHAUSSURE
+COLLE GOMME CRAIE CLASSE RÈGLE TROUSSE RÉCRÉATION MAÎTRESSE ÉQUERRE
+LUGE AUTO MOTO VOITURE FUSÉE BARQUE AMBULANCE MONTGOLFIÈRE TROTTINETTE
+LIGNE
+DANSE BALLE FLÛTE COURSE NATATION GUITARE TROMPETTE ESCRIME GYMNASTIQUE ÉQUITATION ESCALADE BATTERIE HARPE"""
+GENRES = {}
+for g, liste in (('m', _M), ('f', _F)):
+    for m in liste.split():
+        if m in GENRES:
+            raise SystemExit('Genre en double : ' + m)
+        GENRES[m] = g
+# h aspiré : on dit « le hérisson », pas « l'hérisson » → la question reste « Le ou la ? ».
+H_ASPIRE = {'HÉRISSON', 'HARICOT', 'HARPE'}
+
+# Pluriel : par défaut le mot + S. Exceptions ci-dessous ; None = pas de question « Au pluriel »
+# (noms qu'on ne compte pas, déjà au pluriel, pays, ou pluriel discuté).
+PLURIELS = {
+    'CHEVAL': 'CHEVAUX', 'OISEAU': 'OISEAUX', 'CHÂTEAU': 'CHÂTEAUX', 'HÔPITAL': 'HÔPITAUX', 'GENOU': 'GENOUX',
+    'CHAPEAU': 'CHAPEAUX', 'MANTEAU': 'MANTEAUX', 'TABLEAU': 'TABLEAUX', 'BATEAU': 'BATEAUX', 'BUREAU': 'BUREAUX',
+    'PINCEAU': 'PINCEAUX', 'AOÛT': None,
+    # mots qui finissent déjà par s, x ou z : pluriel identique
+    'OURS': 'OURS', 'BOIS': 'BOIS', 'BRAS': 'BRAS', 'NEZ': 'NEZ', 'DOS': 'DOS', 'TAPIS': 'TAPIS', 'COMPAS': 'COMPAS',
+    'BUS': 'BUS', 'AUTOBUS': 'AUTOBUS', 'JUS': 'JUS', 'MOIS': 'MOIS', 'PRINTEMPS': 'PRINTEMPS', 'ANANAS': 'ANANAS',
+    'MARS': None,
+    'SOUS-MARIN': 'SOUS-MARINS',
+    # pas de pluriel demandé
+    'CHEVEUX': None, 'CISEAUX': None, 'CIEL': None, 'ARC-EN-CIEL': None, 'LAIT': None, 'MIEL': None, 'SEL': None,
+    'BEURRE': None, 'RIZ': None, 'SABLE': None, 'GEL': None, 'VERGLAS': None, 'CHALEUR': None, 'TONNERRE': None,
+    'GRÊLE': None, 'ROSÉE': None, 'SOLEIL': None, 'NEIGE': None, 'BROUILLARD': None, 'ÉPINARD': None,
+    'JUDO': None, 'SKI': None, 'CHANT': None, 'TENNIS': None, 'FOOTBALL': None, 'BASKET': None, 'NATATION': None,
+    'ESCRIME': None, 'GYMNASTIQUE': None, 'ÉQUITATION': None, 'ESCALADE': None, 'DANSE': None,
+    # mois de l'année : pas de pluriel demandé
+    'JANVIER': None, 'FÉVRIER': None, 'AVRIL': None, 'MAI': None, 'JUIN': None, 'JUILLET': None, 'SEPTEMBRE': None,
+    'OCTOBRE': None, 'NOVEMBRE': None, 'DÉCEMBRE': None,
+}
+PAYS = {'FRANCE', 'ITALIE', 'CHINE', 'INDE', 'ESPAGNE', 'BELGIQUE', 'SUISSE', 'ÉGYPTE', 'GRÈCE', 'ALLEMAGNE', 'ANGLETERRE',
+        'AUSTRALIE', 'ARGENTINE', 'NORVÈGE', 'JAPON', 'MAROC', 'PÉROU', 'CHILI', 'CANADA', 'BRÉSIL', 'KENYA', 'PORTUGAL',
+        'MEXIQUE', 'SÉNÉGAL'}
+
+def genre_pluriel(mot):
+    """(genre, pluriel) d'un mot ; None si la question n'est pas posée."""
+    g = GENRES.get(mot)
+    if not g:
+        return None, None
+    if mot in PAYS:
+        return g, None
+    p = PLURIELS.get(mot, mot + 'S')
+    return g, p
+
+VOYELLES_DEBUT = set('AEIOUYÀÂÉÈÊËÎÏÔÙÛ')
+def devant_voyelle(mot):
+    """Vrai si on dit « l' » devant le mot (voyelle ou h muet) : la question devient « Un ou une ? »."""
+    return mot[0] in VOYELLES_DEBUT or (mot[0] == 'H' and mot not in H_ASPIRE)
+
 def infos(mot):
     m = MUETTES.get(mot, '')
     if m is None:
@@ -212,6 +297,10 @@ def infos(mot):
         'syllabes': SYLLABES_CORRIGEES.get(mot, syl(mot).upper()),
         'muettes': muettes,
         'lettres': None if mot in SANS_COMPTE_DE_LETTRES else sum(1 for ch in mot if ch.isalpha()),
+        # v6.18 : genre (m/f, None = pas un nom), pluriel (None = question non posée), « l' » devant le mot
+        'genre': genre_pluriel(mot)[0],
+        'pluriel': genre_pluriel(mot)[1],
+        'elision': devant_voyelle(mot) if genre_pluriel(mot)[0] else None,
     }
 
 wb = openpyxl.load_workbook(SOURCE, data_only=True)
@@ -239,6 +328,9 @@ for p_ in packs:
         for m_ in mots_:
             if not (p_['id'] == 'lettres' and n_ == '1'):
                 INFOS[m_] = infos(m_)
+inconnus = [k for k in GENRES if k not in INFOS]
+if inconnus:
+    raise SystemExit('Mots de GENRES absents des cartes : ' + ', '.join(inconnus))
 inconnus = [k for k in MUETTES if k not in INFOS]
 if inconnus:
     raise SystemExit('Mots de MUETTES absents des cartes : ' + ', '.join(inconnus))
@@ -248,7 +340,8 @@ js = """// Cartes JEU d'Aventura — GÉNÉRÉ par outils/cartes.py depuis « ca
 (function (racine) {
   'use strict';
   var PACKS = %s;
-  // Pour chaque mot : syllabes écrites, positions des lettres muettes (null = question non posée), nombre de lettres.
+  // Pour chaque mot : syllabes écrites, positions des lettres muettes (null = question non posée), nombre de lettres,
+  // genre (m / f, null = pas un nom), pluriel (null = question non posée), elision (on dit « l' » devant le mot).
   var INFOS = %s;
   if (typeof module !== 'undefined' && module.exports) module.exports = { PACKS: PACKS, INFOS: INFOS };
   else racine.Cartes = { PACKS: PACKS, INFOS: INFOS };
