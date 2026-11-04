@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.9';
+  var VERSION = '6.10';
 
   var HISTORY = [
+    { v: '6.10', date: '2026-11-04', changes: [
+      "Accueil : la bulle de Ludo se place en haut, dans le ciel, et ne cache plus sa tête ni l\u2019arche « Aventura ». Sur les petits écrans sans assez de ciel, elle se fait plus étroite et se pose à côté de Ludo, dans l\u2019herbe."
+    ] },
     { v: '6.9', date: '2026-11-03', changes: [
       "Ludo, l\u2019aventurier de l\u2019accueil, devient le guide du jeu. Au premier démarrage, il se présente et propose de montrer comment jouer ; le bouton « Didacticiel avec Ludo » de l\u2019accueil le relance.",
       "Didacticiel : à chaque écran de la préparation et pendant le premier tour, Ludo explique l\u2019étape dans une bulle de bande dessinée et une flèche rouge, qui grandit et rétrécit, montre où toucher.",

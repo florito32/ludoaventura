@@ -144,3 +144,28 @@ test('didacticiel : continue après un rechargement de la page', async ({ page }
   await page.getByRole('button', { name: 'Arrêter le guide' }).click();
   await expect(bulle(page)).toBeHidden();
 });
+
+// v6.10 (demande du 04/11/2026) : sur l'accueil, la bulle ne cache ni la tête de Ludo ni l'arche.
+for (const taille of [null, { width: 360, height: 640 }, { width: 915, height: 412 }]) {
+  test('accueil : la bulle laisse voir la tête de Ludo et l’arche' + (taille ? ' (' + taille.width + '×' + taille.height + ')' : ''), async ({ page }, info) => {
+    if (taille && info.project.name !== 'telephone') test.skip();
+    if (taille) await page.setViewportSize(taille);
+    await page.goto('./');
+    for (const etape of ['presentation', 'didacticiel']) {
+      if (etape === 'didacticiel') await page.getByRole('button', { name: 'Oui, guide-moi' }).click();
+      await expect(bulle(page)).toBeVisible();
+      await page.waitForTimeout(300);
+      const m = await page.evaluate(() => {
+        const r = (el) => el.getBoundingClientRect();
+        const b = r(document.getElementById('ludo-bulle'));
+        const p = r(document.querySelector('.calque.perso'));
+        const a = r(document.querySelector('.calque.arche'));
+        const tete = { left: p.left + p.width * 0.2, right: p.left + p.width * 0.72, top: p.top, bottom: p.top + p.height * 0.27 };
+        const commun = (x, y) => Math.max(0, Math.min(x.right, y.right) - Math.max(x.left, y.left)) * Math.max(0, Math.min(x.bottom, y.bottom) - Math.max(x.top, y.top));
+        return { tete: commun(b, tete), arche: commun(b, a) / (a.width * a.height) };
+      });
+      expect(m.tete, 'la bulle cache la tête de Ludo').toBe(0);
+      expect(m.arche, 'la bulle cache l’arche').toBeLessThan(0.03);
+    }
+  });
+}
