@@ -802,6 +802,7 @@
       annoncer(j.nom + ' pioche une carte dans son tas.');
       bouton('Piocher une carte', 'btn-principal', function () {
         partie.carte = piocherCarte(j);
+        partie.vue = 'cache'; // nouvelle carte : mot caché
         R.piocher(r);
         montrerCarte(j);
         rendre();
@@ -924,7 +925,46 @@
   }
 
   // Cartes où le joueur écrit lui-même sa réponse, corrigée par le jeu (calcul, v5.7).
-  function aSaisir(c) { return !!(c && (c.type === 'calcul' || c.type === 'conjugaison')); }
+  // Orthographe (v7.0) : nombre de lettres, de syllabes, consonnes, voyelles, lettres muettes s'écrivent aussi ;
+  // « Épeler » et « Réécrire le mot » restent à l'oral avec « Bonne / Mauvaise réponse » (choix du 04/11/2026).
+  function aSaisir(c) { return !!(c && (c.type === 'calcul' || c.type === 'conjugaison' || (c.question && c.question.saisie))); }
+  function orthoSaisie(c) { return !!(c && c.question && c.question.saisie); }
+
+  // Carte d'orthographe à écrire : la consigne, le mot caché (« Voir le mot » l'aide), la case de réponse ;
+  // après validation, le mot (lettres muettes surlignées) et la correction.
+  function montrerOrthoSaisie(c) {
+    var q = c.question, info = C.INFOS[c.mot];
+    $('carte-consigne').textContent = q.consigne;
+    $('carte-boutons').hidden = true; // pas de « Voir la réponse » : c'est le jeu qui corrige
+    $('btn-tableau').hidden = true;
+    $('carte-tableau').hidden = true;
+    var saisie = $('carte-saisie'), champ = $('reponse-joueur'), rep = $('carte-reponse');
+    var corrigee = c.reponseDonnee != null;
+    saisie.hidden = corrigee;
+    champ.setAttribute('inputmode', q.saisie === 'nombre' ? 'numeric' : 'text');
+    champ.value = corrigee ? c.reponseDonnee : '';
+    champ.disabled = corrigee;
+    $('btn-valider-reponse').disabled = corrigee;
+    champ.removeAttribute('aria-invalid');
+    if (!corrigee) {
+      $('btn-voir-mot').hidden = false;
+      if (partie.vue === 'mot') montrerMotSeul(); else cacherMot();
+      rep.hidden = true; rep.className = 'carte-reponse';
+      return;
+    }
+    $('btn-voir-mot').hidden = true;
+    var mot = $('carte-mot');
+    mot.className = 'carte-mot';
+    if (q.id === 'muettes') {
+      mot.innerHTML = c.mot.split('').map(function (ch, i) {
+        return info.muettes.indexOf(i) >= 0 ? '<span class="muette">' + ch + '</span>' : ch;
+      }).join('');
+    } else mot.textContent = c.mot;
+    rep.hidden = false;
+    rep.className = 'carte-reponse ' + (c.juste ? 'juste' : 'fausse');
+    rep.textContent = c.juste ? 'Bonne réponse ! ' + q.reponse(c.mot, info)
+      : 'Ce n\u2019est pas ça (tu as écrit « ' + c.reponseDonnee + ' »). La bonne réponse : ' + q.reponse(c.mot, info) + '.';
+  }
 
   // Carte de calcul : la formule, la case de réponse ; après validation, la correction.
   function montrerCalcul(c) {
@@ -993,21 +1033,25 @@
     if (!r || r.etape !== 'repondre' || !aSaisir(c)) return;
     var champ = $('reponse-joueur'), texte = champ.value.trim();
     var rep = $('carte-reponse');
-    var conj = c.type === 'conjugaison';
-    if (!texte || (!conj && isNaN(K.lire(texte)))) {
+    var conj = c.type === 'conjugaison', ortho = orthoSaisie(c);
+    var illisible = ortho ? !Q.lisible(c.question, texte) : (!conj && isNaN(K.lire(texte)));
+    if (!texte || illisible) {
       rep.hidden = false;
       rep.className = 'carte-reponse alerte';
-      rep.textContent = texte ? 'Écris un nombre, par exemple 12 ou 3,5.' : 'Écris ta réponse dans la case.';
+      rep.textContent = !texte ? 'Écris ta réponse dans la case.'
+        : ortho ? (c.question.saisie === 'nombre' ? 'Écris un nombre, par exemple 5.' : 'Écris des lettres, par exemple : a, e.')
+        : 'Écris un nombre, par exemple 12 ou 3,5.';
       champ.setAttribute('aria-invalid', 'true');
       champ.focus();
       return;
     }
     c.reponseDonnee = texte;
     champ.blur(); // le clavier se referme : la carte rend la place au plateau et au dé (v6.13)
-    c.juste = conj ? V.juste(texte, c.verbe, c.temps, c.personne) : K.juste(texte, c.resultat);
+    c.juste = ortho ? Q.juste(c.question, texte, c.mot, C.INFOS[c.mot])
+      : conj ? V.juste(texte, c.verbe, c.temps, c.personne) : K.juste(texte, c.resultat);
     // Réponse fausse (calcul ou conjugaison) : on attend « J'ai compris » avant de lancer le dé (v6.1).
     c.attente = !c.juste;
-    montrerCalcul(c);
+    if (ortho) { montrerOrthoSaisie(c); ajusterTour(); } else montrerCalcul(c);
     R.repondre(r, c.juste);
     reagir(c.juste);
     rendre();
@@ -1021,7 +1065,7 @@
     box.hidden = false;
     box.className = 'carte-piochee joueur-' + j.couleur;
     $('carte-saisie').hidden = true;
-    if (aSaisir(c)) {
+    if (aSaisir(c) && !orthoSaisie(c)) {
       $('carte-titre').innerHTML = 'Carte n° ' + partie.regles.pioches[j.index] + ' de ' + j.nom + '<small>' + c.packNom + '</small>';
       montrerCalcul(c);
       return;
@@ -1037,6 +1081,8 @@
       mot.textContent = c.mot;
       mot.className = 'carte-mot lettre';
       boutons.hidden = true; voirMot.hidden = true;
+    } else if (orthoSaisie(c)) {
+      montrerOrthoSaisie(c);
     } else {
       cacherMot();
       boutons.hidden = false; voirMot.hidden = false;
@@ -1376,6 +1422,7 @@
       if (r.etape === 'suivant') R.suivant(r); // les points étaient déjà comptés : on passe au joueur suivant
       var j = partie.joueurs[r.joueur];
       if ((r.etape === 'repondre' || r.etape === 'lancer') && partie.carte) {
+        partie.vue = d.jeu.vue || 'cache'; // orthographe écrite : « Voir le mot » reste ouvert après un rechargement
         montrerCarte(j);
         if (!partie.carte.lettre && !aSaisir(partie.carte)) {
           if (d.jeu.vue === 'mot') montrerMotSeul(); else if (d.jeu.vue === 'reponse') montrerReponse();

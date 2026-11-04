@@ -4,9 +4,14 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.13';
+  var VERSION = '6.14';
 
   var HISTORY = [
+    { v: '6.14', date: '2026-11-04', changes: [
+      "Orthographe : pour le nombre de lettres, le nombre de syllabes, les consonnes, les voyelles et les lettres muettes, le joueur écrit lui-même sa réponse et le jeu la corrige. Plusieurs lettres peuvent être séparées par un espace, une virgule ou rien du tout (« a i o », « a,i,o » ou « aio ») ; les accents ne comptent pas.",
+      "La question « Syllabes » devient « Nombre de syllabes » : on écrit combien il y en a, la correction montre le découpage.",
+      "« Épeler » et « Réécrire le mot » restent à l\u2019oral, avec « Bonne réponse » / « Mauvaise réponse »."
+    ] },
     { v: '6.13', date: '2026-11-04', changes: [
       "Téléphone et tablette : quand tu écris ta réponse, la carte se pose par-dessus le plateau et prend toute la place au-dessus du clavier. Rien n\u2019est caché par le clavier ni coupé en haut ; la case de réponse est juste au-dessus du clavier.",
       "Après « Valider », ou si tu refermes le clavier, le plateau revient tout seul."
