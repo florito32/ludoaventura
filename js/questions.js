@@ -80,7 +80,7 @@
         return pluriel(l.length, 'consonne') + ' (' + l.join(', ') + ')';
       } },
     // Combien de fois une lettre : de préférence une lettre présente plusieurs fois (3 fois sur 4).
-    { id: 'combien-lettre', nom: 'Combien de fois cette lettre ?', court: 'Combien de fois ?', saisie: 'nombre',
+    { id: 'combien-lettre', nom: 'Combien de fois cette lettre\u00a0?', court: 'Combien de fois\u00a0?', // espace insécable : le « ? » ne passe pas seul à la ligne saisie: 'nombre',
       possible: function (mot) { return lettres(mot).length >= 3 && !/Œ/.test(mot); },
       preparer: function (mot) {
         var n = {};
@@ -94,7 +94,21 @@
       reponse: function (mot, info, p) {
         var n = lettres(mot).filter(function (c) { return normaliser(c) === p.lettre; }).length;
         return n + ' fois';
-      } }
+      } },
+    // ---------- v6.18 : genre et pluriel des noms (données : js/cartes.js → INFOS) ----------
+    // Le ou la ? Devant une voyelle ou un h muet on dit « l' » : la question devient « Un ou une ? ».
+    { id: 'genre', nom: 'Le ou la\u00a0?', saisie: 'article',
+      possible: function (mot, info) { return !!(info && info.genre); },
+      consigneDe: function (mot, info) { return info && info.elision ? 'Un ou une ? Écris le mot qui va devant :' : 'Le ou la ? Écris le mot qui va devant :'; },
+      montrer: function (mot) { return mot; },
+      attendu: function (mot, info) { return info.elision ? (info.genre === 'f' ? 'une' : 'un') : (info.genre === 'f' ? 'la' : 'le'); },
+      reponse: function (mot, info) { return this.attendu(mot, info).toUpperCase() + ' ' + mot; } },
+    // Au pluriel : « UN CHEVAL → DES … » ; le joueur écrit le mot au pluriel (« des » peut être écrit ou non).
+    { id: 'pluriel', nom: 'Au pluriel', consigne: 'Écris ce mot au pluriel :', saisie: 'mot',
+      possible: function (mot, info) { return !!(info && info.pluriel); },
+      montrer: function (mot, info) { return (info.genre === 'f' ? 'UNE ' : 'UN ') + mot + ' → DES …'; },
+      attendu: function (mot, info) { return info.pluriel; },
+      reponse: function (mot, info) { return 'DES ' + info.pluriel; } }
   ];
 
   // Positions des lettres sans accent (A à Z) : seules celles-là peuvent être cachées.
@@ -136,6 +150,7 @@
   }
   // Vrai si l'écrit du joueur est lisible pour ce type de question (sinon on lui demande de corriger).
   function lisible(type, texte) {
+    if (type.saisie === 'article') return /^(le|la|un|une)$/i.test(texte.trim().split(/[\s'’]+/)[0]);
     return type.saisie === 'nombre' ? !isNaN(nombreEcrit(texte)) : lettresEcrites(texte).length > 0;
   }
   // Mot écrit : comparé sans accents ni majuscules, espaces et tirets ignorés (« avion » = AVION).
@@ -145,7 +160,15 @@
   function juste(type, texte, mot, info, p) {
     var att = type.attendu(mot, info, p || {});
     if (type.saisie === 'nombre') return nombreEcrit(texte) === att;
-    if (type.saisie === 'mot') return motEcrit(texte) === motEcrit(att);
+    if (type.saisie === 'mot') return motEcrit(texte.replace(/^\s*(des|les)\s+/i, '')) === motEcrit(att);
+    // Le ou la : le premier mot écrit (« la », « la maison », « La ») ; la majuscule ne compte pas.
+    // « une » pour « la maison » est accepté (même genre) ; devant une voyelle, seuls « un » et « une » vont.
+    if (type.saisie === 'article') {
+      var ecrit = texte.trim().split(/[\s'’]+/)[0].toLowerCase();
+      var genre = { le: 'm', un: 'm', la: 'f', une: 'f' }[ecrit];
+      if (info.elision && (ecrit === 'le' || ecrit === 'la')) return false;
+      return genre === info.genre;
+    }
     var ensemble = function (l) { var o = {}; l.forEach(function (c) { normaliser(c).split('').forEach(function (x) { o[x] = 1; }); }); return Object.keys(o).sort().join(''); };
     return ensemble(lettresEcrites(texte)) === ensemble(att);
   }

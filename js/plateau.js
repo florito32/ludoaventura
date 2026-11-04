@@ -1087,7 +1087,8 @@
       rep.hidden = false;
       rep.className = 'carte-reponse alerte';
       rep.textContent = !texte ? 'Écris ta réponse dans la case.'
-        : ortho ? ({ nombre: 'Écris un nombre, par exemple 5.', mot: 'Écris le mot en lettres.' }[c.question.saisie] || 'Écris des lettres, par exemple : a, e.')
+        : ortho ? ({ nombre: 'Écris un nombre, par exemple 5.', mot: 'Écris le mot en lettres.',
+          article: C.INFOS[c.mot].elision ? 'Écris « un » ou « une ».' : 'Écris « le » ou « la ».' }[c.question.saisie] || 'Écris des lettres, par exemple : a, e.')
         : 'Écris un nombre, par exemple 12 ou 3,5.';
       champ.setAttribute('aria-invalid', 'true');
       champ.focus();

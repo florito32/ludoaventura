@@ -182,3 +182,69 @@ test('combien de fois une lettre : la consigne nomme la lettre ; le mot reste ca
   await page.reload();
   await expect(page.locator('#carte-consigne')).toHaveText('Combien de fois vois-tu la lettre ' + c.params.lettre + ' dans le mot :');
 });
+
+// ---------- v6.18 : Le ou la ? et Au pluriel ----------
+test.describe('genre et pluriel : logique', () => {
+  test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
+  const j = (id, t, m) => Q.juste(Q.trouver(id), t, m, C.INFOS[m]);
+
+  test('Le ou la ? : le / la, ou un / une devant une voyelle ou un h muet', () => {
+    expect(Q.consigne(Q.trouver('genre'), 'MAISON', C.INFOS.MAISON)).toBe('Le ou la ? Écris le mot qui va devant :');
+    expect(Q.consigne(Q.trouver('genre'), 'ÉCOLE', C.INFOS['ÉCOLE'])).toBe('Un ou une ? Écris le mot qui va devant :');
+    expect(Q.consigne(Q.trouver('genre'), 'HÉRISSON', C.INFOS['HÉRISSON'])).toBe('Le ou la ? Écris le mot qui va devant :'); // h aspiré
+    expect(j('genre', 'la', 'MAISON')).toBe(true);
+    expect(j('genre', 'La maison', 'MAISON')).toBe(true);
+    expect(j('genre', 'une', 'MAISON')).toBe(true); // même genre
+    expect(j('genre', 'le', 'MAISON')).toBe(false);
+    expect(j('genre', 'un', 'HÔPITAL')).toBe(true);
+    expect(j('genre', 'le', 'HÔPITAL')).toBe(false); // on dit « l'hôpital »
+    expect(j('genre', 'la', 'FRANCE')).toBe(true);
+    expect(Q.lisible(Q.trouver('genre'), 'maison')).toBe(false);
+  });
+
+  test('Au pluriel : pluriels en -aux, mots déjà en -s ; « des » peut être écrit', () => {
+    expect(j('pluriel', 'chevaux', 'CHEVAL')).toBe(true);
+    expect(j('pluriel', 'des chevaux', 'CHEVAL')).toBe(true);
+    expect(j('pluriel', 'chevals', 'CHEVAL')).toBe(false);
+    expect(j('pluriel', 'bateaux', 'BATEAU')).toBe(true);
+    expect(j('pluriel', 'bras', 'BRAS')).toBe(true);
+    expect(j('pluriel', 'maisons', 'MAISON')).toBe(true);
+    expect(Q.trouver('pluriel').montrer('CHEVAL', C.INFOS.CHEVAL)).toBe('UN CHEVAL → DES …');
+    expect(Q.trouver('pluriel').montrer('MAISON', C.INFOS.MAISON)).toBe('UNE MAISON → DES …');
+  });
+
+  test('pas de question pour les mots qui ne sont pas des noms, les métiers épicènes, les pays (pluriel)', () => {
+    const poss = (m) => Q.possibles(m, C.INFOS[m], ['genre', 'pluriel']).map((t) => t.id);
+    expect(poss('LE')).toEqual([]);
+    expect(poss('ROUGE')).toEqual([]);
+    expect(poss('PILOTE')).toEqual([]); // un ou une pilote : les deux sont justes
+    expect(poss('PARIS')).toEqual([]);
+    expect(poss('FRANCE')).toEqual(['genre']);
+    expect(poss('CISEAUX')).toEqual(['genre']);
+    expect(poss('CHEVAL')).toEqual(['genre', 'pluriel']);
+  });
+});
+
+test('Au pluriel : « UN … → DES … » affiché, bonne réponse écrite → dé FORT', async ({ page }) => {
+  const c = await partieMots(page, ['pluriel'], ['animaux']);
+  const info = C.INFOS[c.mot];
+  await expect(page.locator('#carte-mot')).toHaveText((info.genre === 'f' ? 'UNE ' : 'UN ') + c.mot + ' → DES …');
+  await page.getByLabel('Ta réponse').fill('des ' + info.pluriel.toLowerCase());
+  await page.getByRole('button', { name: 'Valider', exact: true }).click();
+  await expect(page.locator('#carte-reponse')).toHaveText('Bonne réponse ! DES ' + info.pluriel);
+  expect(await page.evaluate(() => window.Aventura.partie.regles.de)).toBe('fort');
+});
+
+test('Le ou la ? : réponse illisible → message ; fausse → correction « LA MAISON »', async ({ page }) => {
+  const c = await partieMots(page, ['genre'], ['lieux']);
+  const info = C.INFOS[c.mot];
+  await expect(page.locator('#carte-mot')).toHaveText(c.mot);
+  await page.getByLabel('Ta réponse').fill('bof');
+  await page.getByRole('button', { name: 'Valider', exact: true }).click();
+  await expect(page.locator('#carte-reponse')).toHaveText(info.elision ? 'Écris « un » ou « une ».' : 'Écris « le » ou « la ».');
+  const faux = info.elision ? (info.genre === 'f' ? 'un' : 'une') : (info.genre === 'f' ? 'le' : 'la');
+  await page.getByLabel('Ta réponse').fill(faux);
+  await page.getByRole('button', { name: 'Valider', exact: true }).click();
+  await expect(page.locator('#carte-reponse')).toContainText(Q.trouver('genre').reponse(c.mot, info));
+  expect(await page.evaluate(() => window.Aventura.partie.regles.de)).toBe('faible');
+});

@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.17';
+  var VERSION = '6.18';
 
   var HISTORY = [
+    { v: '6.18', date: '2026-11-04', changes: [
+      "Orthographe : 2 nouvelles questions — « Le ou la ? » (« Un ou une ? » devant une voyelle : l\u2019école) et « Au pluriel » (un cheval → des chevaux)."
+    ] },
     { v: '6.17', date: '2026-11-04', changes: [
       "Orthographe : 5 nouvelles questions — Lettre manquante (B_NANE), Mot mélangé (les lettres en désordre), Nombre de voyelles, Nombre de consonnes et Combien de fois cette lettre ?. Le joueur écrit sa réponse, le jeu corrige."
     ] },
