@@ -4,9 +4,15 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.14';
+  var VERSION = '6.15';
 
   var HISTORY = [
+    { v: '6.15', date: '2026-11-04', changes: [
+      "Mathématiques : le niveau décide des nombres proposés. Facile : les tables de 1 à 10 ; Moyen : jusqu\u2019à 99 (unités et dizaines) ; Difficile : jusqu\u2019à 999 (et centaines) ; Expert : aussi « 1000+ ».",
+      "Sous le niveau, le nombre de signes par calcul : 1 au Facile, jusqu\u2019à 2 au Moyen, 3 au Difficile, 4 en Expert. On peut en choisir plusieurs, chaque carte en prend un au hasard.",
+      "Chaque calcul prend un nombre de chaque groupe choisi : avec 7, 8 et 50, on a 7 × 54 ou 8 × 56, plus 7 × 8.",
+      "La règle « au moins 4 nombres » est retirée."
+    ] },
     { v: '6.14', date: '2026-11-04', changes: [
       "Orthographe : pour le nombre de lettres, le nombre de syllabes, les consonnes, les voyelles et les lettres muettes, le joueur écrit lui-même sa réponse et le jeu la corrige. Plusieurs lettres peuvent être séparées par un espace, une virgule ou rien du tout (« a i o », « a,i,o » ou « aio ») ; les accents ne comptent pas.",
       "La question « Syllabes » devient « Nombre de syllabes » : on écrit combien il y en a, la correction montre le découpage.",

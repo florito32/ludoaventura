@@ -101,7 +101,7 @@
       if (!mat) return { cle: cle + '-b', cible: $('francais'),
         texte: 'En français, choisis Orthographe (des mots à épeler, découper…) ou Conjugaison (des verbes à conjuguer).' };
       if (mat === 'maths') return { cle: cle + '-c', choix: $('niveau-maths'), cible: valider,
-        texte: 'Choisis ton niveau : Facile, ce sont les tables ; plus c’est dur, plus il y a de signes dans le calcul. Puis « Valider ».' };
+        texte: 'Choisis ton niveau : Facile, ce sont les tables ; plus c’est dur, plus les nombres sont grands. Puis le nombre de signes par calcul, et « Valider ».' };
       return { cle: cle + '-d', cible: valider, texte: 'C’est noté ! Touche « Valider » pour régler tes questions.' };
     }
     if (p.sousEtape === 'modes') {
@@ -114,11 +114,11 @@
     var fin = ' Puis « Valider ». « Mêmes réglages pour tous » donne tes choix aux autres joueurs.';
     if (mat === 'maths') {
       if (vide('signes')) return { cle: cle + '-a', cible: $('signes'), texte: 'Choisis les signes de tes calculs : +, −, × ou ÷.' };
-      // v7.0 : au moins une table au niveau Facile, au moins 4 nombres (unités, dizaines, centaines) sinon.
+      // v6.14 : au moins une table (Facile) ou un nombre ; chaque calcul prend un nombre de chaque groupe choisi.
       var mm = p.maths[p.actif];
-      if (window.Calcul.compter(mm) < window.Calcul.minimum(mm.niveau)) return { cle: cle + '-b', cible: $('nombres'),
+      if (!window.Calcul.compter(mm)) return { cle: cle + '-b', cible: $('nombres'),
         texte: mm.niveau === 'facile' ? 'Choisis les tables que tu veux réviser. « Tout » les choisit toutes d’un coup.'
-          : 'Choisis au moins 4 nombres : des unités, des dizaines (30 = de 30 à 39) ou des centaines. « Tout » les choisit d’un coup.' };
+          : 'Choisis tes nombres : des unités, des dizaines (30 = de 30 à 39)… Chaque calcul prendra un nombre de chaque groupe choisi.' };
       return { cle: cle + '-c', cible: valider, texte: 'Parfait !' + fin };
     }
     if (mat === 'conjugaison') {
