@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.26';
+  var VERSION = '6.27';
 
   var HISTORY = [
+    { v: '6.27', date: '2026-11-09', changes: [
+      "Cartes : le titre « Carte n° 3 de Sam » disparaît ; seul le thème reste (ex. « Numérique · Mot mélangé »), écrit plus gros.",
+      "Le bouton pour envoyer sa réponse s'appelle maintenant « OK » (au lieu de « Valider »)."
+    ] },
     { v: '6.26', date: '2026-11-09', changes: [
       "Plateau : le bouton « Piocher une carte » s'appelle maintenant « Question suivante ».",
       "Plateau : le dé et ses points gagnés ne cachent plus le message « … gagne N points ! Au tour de … » : le dé glisse juste au-dessus du message.",

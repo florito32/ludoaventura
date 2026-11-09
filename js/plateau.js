@@ -1124,7 +1124,7 @@
     ajusterTour(); // sur téléphone, l'encadré remonte sur le plateau pour montrer tout le tableau
   }
 
-  // « Valider » la réponse écrite : le jeu la corrige, puis le bon dé se lance tout seul.
+  // « OK » (ex-« Valider ») : la réponse écrite : le jeu la corrige, puis le bon dé se lance tout seul.
   function validerSaisie(e) {
     e.preventDefault();
     var r = partie.regles, c = partie.carte;
@@ -1165,13 +1165,13 @@
     box.className = 'carte-piochee joueur-' + j.couleur;
     $('carte-saisie').hidden = true;
     if (aSaisir(c) && !orthoSaisie(c)) {
-      $('carte-titre').innerHTML = 'Carte n° ' + partie.regles.pioches[j.index] + ' de ' + j.nom + '<small>' + c.packNom + '</small>';
+      // Le titre de la carte = son thème seul, écrit gros (v6.27 : plus de « Carte n° … de … »).
+      $('carte-titre').textContent = c.packNom;
       montrerCalcul(c);
       return;
     }
     $('carte-reponse').className = 'carte-reponse';
-    $('carte-titre').innerHTML = 'Carte n° ' + partie.regles.pioches[j.index] + ' de ' + j.nom +
-      '<small>' + c.packNom + (c.question ? ' · ' + c.question.nom : '') + '</small>';
+    $('carte-titre').textContent = c.packNom + (c.question ? ' · ' + c.question.nom : '');
     $('carte-consigne').textContent = c.lettre ? 'Quelle est cette lettre ?' : Q.consigne(c.question, c.mot, C.INFOS[c.mot], c.params);
     var mot = $('carte-mot');
     var boutons = $('carte-boutons'), voirMot = $('btn-voir-mot');
@@ -1327,7 +1327,7 @@
     afficherSaisie();
   }
 
-  // Entrée immédiate (le curseur arrive dans la case). Sortie différée : un toucher sur « Valider »
+  // Entrée immédiate (le curseur arrive dans la case). Sortie différée : un toucher sur « OK »
   // ou « Écouter » déplace le focus, et le clic doit tomber sur le bouton visé, pas sur ce qui
   // apparaîtrait dessous si la carte se rangeait au même instant.
   function majSaisieBientot() { clearTimeout(saisie.minuteur); saisie.minuteur = setTimeout(majSaisie, 300); }

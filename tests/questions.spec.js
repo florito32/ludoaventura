@@ -73,7 +73,7 @@ test('le joueur choisit ses questions ; « Lettres muettes » seule → il les �
     const mot = await page.evaluate(() => window.Aventura.partie.carte.mot);
     const muettes = C.INFOS[mot].muettes.map((i) => mot[i]);
     await page.getByLabel('Ta réponse').fill(muettes.join(' ').toLowerCase());
-    await page.getByRole('button', { name: 'Valider', exact: true }).click();
+    await page.getByRole('button', { name: 'OK', exact: true }).click();
     await expect(page.locator('#carte-mot .muette')).toHaveText(muettes);
     await expect(page.locator('#carte-reponse')).toHaveText('Bonne réponse ! ' + muettes.join(', '));
     await lancerLeDe(page);
