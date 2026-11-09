@@ -50,7 +50,7 @@ test('un tour complet : piocher, répondre, lancer, message écrit puis joueur s
   await expect(page.locator('#tour-nom')).toHaveText('Léa');
   // Le tour de jeu n'écrit plus « Croix 1 sur 5 — la prairie » (demande du 02/11/2026).
   await expect(page.locator('#tour')).not.toContainText(/Croix \d sur \d/);
-  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await page.getByRole('button', { name: 'Question suivante' }).click();
   await expect(page.locator('#carte-titre')).toContainText('Carte n° 1 de Léa');
   await page.getByRole('button', { name: 'Bonne réponse' }).click();
   await lancerLeDe(page);
@@ -70,10 +70,10 @@ test('un tour complet : piocher, répondre, lancer, message écrit puis joueur s
 
 async function jouerPartie(page, bonne) {
   for (let t = 0; t < 10; t++) {
-    await page.getByRole('button', { name: 'Piocher une carte' }).click();
+    await page.getByRole('button', { name: 'Question suivante' }).click();
     await page.getByRole('button', { name: bonne ? 'Bonne réponse' : 'Mauvaise réponse' }).click();
     await lancerLeDe(page);
-    if (t < 9) await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
+    if (t < 9) await page.getByRole('button', { name: 'Question suivante' }).waitFor();
   }
   // Après le dernier lancer, le résultat s'affiche tout seul.
 }
@@ -109,7 +109,7 @@ test('partie entière perdue : toutes les réponses mauvaises → aventure manqu
 
 test('animation de réponse : « Bravo ! » et confettis si bonne, « Oups ! » si mauvaise', async ({ page }) => {
   await lancerPartie(page, { joueurs: 2 });
-  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await page.getByRole('button', { name: 'Question suivante' }).click();
   await page.getByRole('button', { name: 'Bonne réponse' }).click();
   const reaction = page.locator('#reaction');
   await expect(reaction).toHaveClass(/bonne/);
@@ -118,7 +118,7 @@ test('animation de réponse : « Bravo ! » et confettis si bonne, « Oups ! » 
   await expect(page.locator('.pion').nth(0)).toHaveClass(/saute/);
   await lancerLeDe(page);
   await attendreJoueur(page, 'Tom');
-  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await page.getByRole('button', { name: 'Question suivante' }).click();
   await page.getByRole('button', { name: 'Mauvaise réponse' }).click();
   await expect(reaction).toHaveClass(/mauvaise/);
   await expect(reaction).toContainText('Oups !');
@@ -131,7 +131,7 @@ test('après l\u2019animation de réponse, le bon dé se lance tout seul (FORT s
   await lancerPartie(page, { joueurs: 2 });
   for (const [reponse, min, max, nom] of [['Bonne réponse', 4, 6, 'Tom'], ['Mauvaise réponse', 1, 3, 'Léa']]) {
     const avant = Number(await page.locator('#points').textContent());
-    await page.getByRole('button', { name: 'Piocher une carte' }).click();
+    await page.getByRole('button', { name: 'Question suivante' }).click();
     await page.getByRole('button', { name: reponse }).click();
     // v4.3 : ni commentaire visible ni bouton « Lancer le dé » dans le tour de jeu ;
     // v6.1 : après une mauvaise réponse, seul le bouton « J'ai compris ».
@@ -151,19 +151,19 @@ test('lancer le dé avant le lancer automatique ne le lance pas deux fois', asyn
   await rapide(page, { autoDe: 400 });
   page.__rapide = true;
   await lancerPartie(page, { joueurs: 1 });
-  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await page.getByRole('button', { name: 'Question suivante' }).click();
   await page.getByRole('button', { name: 'Bonne réponse' }).click();
   await lancerLeDe(page);
   const pts = Number(await page.locator('#points').textContent());
-  await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
+  await page.getByRole('button', { name: 'Question suivante' }).waitFor();
   await page.waitForTimeout(800);
   await expect(page.locator('#points')).toHaveText(String(pts));
-  await expect(page.getByRole('button', { name: 'Piocher une carte' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Question suivante' })).toBeVisible();
 });
 
 test('v4.3 : pas de commentaire visible dans le tour de jeu au moment de piocher', async ({ page }) => {
   await lancerPartie(page, { joueurs: 2 });
-  await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
+  await page.getByRole('button', { name: 'Question suivante' }).waitFor();
   // Seul un texte pour lecteurs d'écran (masqué à l'écran) reste dans la consigne.
   const visibles = await page.locator('#tour-consigne').evaluate((el) =>
     Array.from(el.childNodes).filter((n) => !(n.classList && n.classList.contains('visually-hidden')) && n.textContent.trim()).length);
@@ -176,7 +176,7 @@ test('v4.5 : à la fin de « Bravo ! » / « Oups ! », le personnage reste sur 
   page.__rapide = true;
   await lancerPartie(page, { joueurs: 2 });
   for (const reponse of ['Bonne réponse', 'Mauvaise réponse']) {
-    await page.getByRole('button', { name: 'Piocher une carte' }).click();
+    await page.getByRole('button', { name: 'Question suivante' }).click();
     // L'arrivée normale des personnages en début de partie doit être finie avant de compter.
     await page.waitForFunction(() => [...document.querySelectorAll('.pion .figurine')]
       .every((f) => f.getAnimations().every((a) => a.animationName !== 'poser' || a.playState === 'finished')));
@@ -191,7 +191,7 @@ test('v4.5 : à la fin de « Bravo ! » / « Oups ! », le personnage reste sur 
     if (reponse === 'Mauvaise réponse') await page.getByRole('button', { name: 'J’ai compris' }).click(); // v6.1
     await expect(page.locator('#de-plateau')).toHaveClass(/pose/);
     expect(await page.evaluate(() => window.__arrivees)).toBe(0);
-    await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
+    await page.getByRole('button', { name: 'Question suivante' }).waitFor();
   }
 });
 
@@ -199,7 +199,7 @@ test('v4.5 : à la fin de « Bravo ! » / « Oups ! », le personnage reste sur 
 test('orthographe, « Mauvaise réponse » : la réponse s\'affiche, le dé FAIBLE attend « J\'ai compris »', async ({ page }) => {
   await rapide(page, { autoDe: 50 });
   await lancerPartie(page, { joueurs: 2 });
-  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await page.getByRole('button', { name: 'Question suivante' }).click();
   await page.getByRole('button', { name: 'Mauvaise réponse' }).click();
   await expect(page.locator('#carte-reponse')).toBeVisible();
   await expect(page.locator('#carte-mot')).not.toHaveClass(/cache/);
@@ -211,7 +211,7 @@ test('orthographe, « Mauvaise réponse » : la réponse s\'affiche, le dé FAIB
   expect(Number(await page.locator('#points').textContent())).toBeLessThanOrEqual(3);
   // Une bonne réponse, elle, lance le dé FORT tout seul.
   await attendreJoueur(page, 'Tom');
-  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await page.getByRole('button', { name: 'Question suivante' }).click();
   await page.getByRole('button', { name: 'Bonne réponse' }).click();
   await expect(page.getByRole('button', { name: 'J’ai compris' })).toHaveCount(0);
   await expect.poll(async () => Number(await page.locator('#points').textContent())).toBeGreaterThanOrEqual(5);
@@ -223,7 +223,7 @@ test('v6.21 : fin de manche, « en route vers le lac / le marais / les collines 
   await rapide(page, { pause: 1200 });
   await lancerPartie(page, { joueurs: 1 });
   for (const lieu of ['le lac', 'le marais', 'les collines', 'le volcan']) {
-    await page.getByRole('button', { name: 'Piocher une carte' }).click();
+    await page.getByRole('button', { name: 'Question suivante' }).click();
     await page.getByRole('button', { name: 'Bonne réponse' }).click();
     await lancerLeDe(page);
     await expect(page.locator('#bandeau')).toContainText('Au tour de Léa, en route vers ' + lieu + '.');

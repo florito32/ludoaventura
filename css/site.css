@@ -615,6 +615,9 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
   margin: calc(clamp(48px, 9cqw, 96px) / -2) 0 0 calc(clamp(48px, 9cqw, 96px) / -2);
   perspective: 600px;
 }
+/* Le dé se range en glissant quand il cacherait le message (js/plateau.js → degagerDe). */
+.de-plateau { transition: top .3s ease-out, left .3s ease-out; }
+@media (prefers-reduced-motion: reduce) { .de-plateau { transition: none; } }
 .de3d { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; }
 .de3d .face {
   position: absolute; inset: 0; display: grid; grid-template: repeat(3, 1fr) / repeat(3, 1fr); padding: 14%; gap: 2%;
@@ -743,6 +746,10 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 .saisie-ligne input[aria-invalid="true"] { border-color: var(--rouge-texte); }
 .saisie-ligne .btn { flex: none; min-height: 48px; padding: 6px 16px; }
 .saisie-ligne .btn:disabled { opacity: .6; cursor: default; }
+/* Contour de focus serré sur la case de réponse (v6.26) : le contour général (3 px + 3 px d'écart + ombre de 6 px)
+   débordait sur le cadre de couleur de la carte, surtout sur téléphone quand la carte est en grand au-dessus du clavier.
+   Ici : contour jaune collé à la case (son bord foncé fait déjà le contraste), qui reste dans la marge intérieure de la carte. */
+.saisie-ligne input:focus-visible { outline: 3px solid var(--jaune); outline-offset: 0; box-shadow: none; }
 .carte-mot.conj { font-size: clamp(1.3rem, 5.4vw, 1.9rem); letter-spacing: .02em; }
 .temps-carte { display: inline-block; padding: 0 8px; border-radius: 99px; background: var(--parchemin); border: 1px solid var(--parchemin-bord); font-size: .9rem; }
 /* Correction et « ? » (tableau de conjugaison) côte à côte. */
@@ -1004,9 +1011,12 @@ body.saisie-clavier .tour .carte-piochee { flex: 1 0 auto; margin: 0; display: f
 /* La question occupe l'espace libre, centrée, en grand. */
 body.saisie-clavier .tour .carte-mot { flex: 1 0 auto; display: flex; align-items: center; justify-content: center; margin: 4px 0 !important; font-size: clamp(1.6rem, 9vw, 2.6rem); }
 body.saisie-clavier .carte-saisie { margin: 4px 0 0; }
+/* La carte garde une marge intérieure plus grande que son cadre de couleur (5 px) + le contour de focus (3 px) :
+   la case et « Valider » ne touchent jamais le cadre (capture du 09/11/2026). */
+body.saisie-clavier .tour .carte-piochee { padding: 10px 12px 12px; }
 body.saisie-clavier .carte-correction:has(.carte-reponse:not([hidden])) { margin: 4px 0 0; }
 /* Très peu de hauteur (téléphone en paysage) : on resserre tout, la case de réponse reste visible. */
-body.saisie-basse .tour .carte-piochee { padding: 4px 8px; }
+body.saisie-basse .tour .carte-piochee { padding: 9px 10px; }
 body.saisie-basse .tour .carte-entete .btn-ecouter { min-height: 34px; padding: 0 10px; }
 body.saisie-basse .tour .carte-consigne { margin-top: 0 !important; }
 body.saisie-basse .tour .carte-mot { font-size: 1.5rem; margin: 0 !important; }

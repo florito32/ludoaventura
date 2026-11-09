@@ -65,7 +65,7 @@ test('le joueur choisit ses questions ; « Lettres muettes » seule → il les �
   expect(await page.evaluate(() => window.Aventura.partie.types[0])).toEqual(['muettes']);
   await lancer(page);
   for (let t = 0; t < 3; t++) {
-    await page.getByRole('button', { name: 'Piocher une carte' }).click();
+    await page.getByRole('button', { name: 'Question suivante' }).click();
     await expect(page.locator('#carte-consigne')).toHaveText('Quelles sont les lettres muettes du mot :');
     // Plus de « Voir la réponse » ni de « Bonne / Mauvaise réponse » : le joueur écrit.
     await expect(page.getByRole('button', { name: 'Voir la réponse' })).toBeHidden();
@@ -77,7 +77,7 @@ test('le joueur choisit ses questions ; « Lettres muettes » seule → il les �
     await expect(page.locator('#carte-mot .muette')).toHaveText(muettes);
     await expect(page.locator('#carte-reponse')).toHaveText('Bonne réponse ! ' + muettes.join(', '));
     await lancerLeDe(page);
-    if (t < 2) await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
+    if (t < 2) await page.getByRole('button', { name: 'Question suivante' }).waitFor();
   }
 });
 
@@ -89,7 +89,7 @@ test('la voix lit la question tirée, puis le mot', async ({ page }) => {
   });
   await preparer(page, ['syllabes']);
   await lancer(page);
-  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await page.getByRole('button', { name: 'Question suivante' }).click();
   await page.getByRole('button', { name: 'Écouter' }).click();
   const mot = await page.evaluate(() => window.Aventura.partie.carte.mot);
   expect(await page.evaluate(() => window.__lu.pop())).toBe('Combien de syllabes y a-t-il dans le mot : ' + mot.replace(/(\.\.\.|…)/g, ' ').replace(/\s+/g, ' ').trim().toLocaleLowerCase('fr-FR') + '.');

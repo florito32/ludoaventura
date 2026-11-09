@@ -4,9 +4,14 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.25';
+  var VERSION = '6.26';
 
   var HISTORY = [
+    { v: '6.26', date: '2026-11-09', changes: [
+      "Plateau : le bouton « Piocher une carte » s'appelle maintenant « Question suivante ».",
+      "Plateau : le dé et ses points gagnés ne cachent plus le message « … gagne N points ! Au tour de … » : le dé glisse juste au-dessus du message.",
+      "Téléphone : pendant qu'on écrit sa réponse, la case et « Valider » ne débordent plus sur le cadre de la carte."
+    ] },
     { v: '6.25', date: '2026-11-04', changes: [
       "Menu : « Redémarrer partie » et « Retour à l'accueil » demandent une confirmation avant d'effacer la partie en cours."
     ] },

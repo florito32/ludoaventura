@@ -146,7 +146,7 @@
     var cle = 'plateau-' + r.historique.length + '-' + r.etape + (c && c.attente ? '-attente' : '');
     if (r.etape === 'piocher') {
       return { cle: cle, cible: $('tour-actions').querySelector('button'),
-        texte: 'C’est au tour de ' + j.nom + '. Touche « Piocher une carte » : une question de son tas va s’afficher.' };
+        texte: 'C’est au tour de ' + j.nom + '. Touche « Question suivante » : une question de son tas va s’afficher.' };
     }
     var saisie = c && (c.type === 'calcul' || c.type === 'conjugaison' || (c.question && c.question.saisie));
     if (r.etape === 'repondre' && saisie) {

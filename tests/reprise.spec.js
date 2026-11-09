@@ -4,7 +4,7 @@ const { test, expect } = require('@playwright/test');
 const { lancerPartie, attendreJoueur, rapide, lancerLeDe, versReglages, cocherJoueur, valider, orthographe } = require('./aide');
 
 async function unTour(page) {
-  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await page.getByRole('button', { name: 'Question suivante' }).click();
   await page.getByRole('button', { name: 'Bonne réponse' }).click();
   await lancerLeDe(page);
 }
@@ -23,13 +23,13 @@ test('rafraîchir la page en pleine partie : on reprend au même joueur, mêmes 
   await expect(page.locator('.pion').nth(0)).toHaveAttribute('data-case', '1');
   await expect(page.locator('.pion').nth(1)).toHaveAttribute('data-case', '1');
   // On peut continuer à jouer : la carte suivante de Tom est sa 1re.
-  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await page.getByRole('button', { name: 'Question suivante' }).click();
   await expect(page.locator('#carte-titre')).toContainText('Carte n° 1 de Tom');
 });
 
 test('rafraîchir pendant une carte : la même carte reste affichée, avec la réponse si elle était montrée', async ({ page }) => {
   await lancerPartie(page, { joueurs: 1 });
-  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await page.getByRole('button', { name: 'Question suivante' }).click();
   const titre = await page.locator('#carte-titre').textContent();
   const consigne = await page.locator('#carte-consigne').textContent();
   await page.reload();
@@ -41,7 +41,7 @@ test('rafraîchir pendant une carte : la même carte reste affichée, avec la r�
 
 test('rafraîchir après « Bonne réponse » : le dé FORT se lance et les points ne sont comptés qu\'une fois', async ({ page }) => {
   await lancerPartie(page, { joueurs: 2 });
-  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await page.getByRole('button', { name: 'Question suivante' }).click();
   await page.getByRole('button', { name: 'Bonne réponse' }).click();
   await page.reload();
   await expect(page.locator('#points')).toHaveText('0');
