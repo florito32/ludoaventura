@@ -28,14 +28,14 @@ async function partie(page, reglage) {
   await versReglages(page, 1);
   await reglage(page);
   await lancer(page);
-  await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
+  await page.getByRole('button', { name: 'Question suivante' }).waitFor();
 }
 
 
 test('conjugaison fausse puis « ? » : tout reste à l\'écran, l\'encadré remonte puis redescend après « J\'ai compris »', async ({ page }) => {
   await partie(page, (p) => conjugaison(p, { temps: ['subjonctif.plus-que-parfait'], groupes: [3], niveau: 'expert' }));
   await tient(page, 'avant de piocher');
-  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await page.getByRole('button', { name: 'Question suivante' }).click();
   await tient(page, 'carte');
   await page.getByLabel('Ta réponse').fill('faux');
   await page.getByRole('button', { name: 'Valider' }).click();
@@ -56,7 +56,7 @@ test('conjugaison fausse puis « ? » : tout reste à l\'écran, l\'encadré rem
 
 test('calcul faux (niveau Expert) : correction et « J\'ai compris » à l\'écran, sans défiler', async ({ page }) => {
   await partie(page, (p) => maths(p, { signes: ['plus', 'fois'], nombres: [5, 6, 7, 8], niveau: 'expert' }));
-  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await page.getByRole('button', { name: 'Question suivante' }).click();
   await tient(page, 'carte');
   await expect(page.getByLabel('Ta réponse')).toBeInViewport();
   await page.getByLabel('Ta réponse').fill('1');
@@ -69,7 +69,7 @@ test('calcul faux (niveau Expert) : correction et « J\'ai compris » à l\'écr
 
 test('orthographe : carte, « Voir la réponse » et « Mauvaise réponse » sans défiler', async ({ page }) => {
   await partie(page, (p) => cocherJoueur(p));
-  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await page.getByRole('button', { name: 'Question suivante' }).click();
   await tient(page, 'carte');
   await expect(page.getByRole('button', { name: 'Mauvaise réponse' })).toBeInViewport();
   await page.getByRole('button', { name: 'Voir la réponse' }).click();

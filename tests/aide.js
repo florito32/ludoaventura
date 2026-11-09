@@ -111,7 +111,7 @@ async function lancerLeDe(page) {
 // Attend que le tour passe au joueur suivant (enchaînement automatique après le dé).
 async function attendreJoueur(page, nom) {
   await page.locator('#tour-nom').filter({ hasText: new RegExp('^' + nom + '$') }).waitFor();
-  await page.getByRole('button', { name: 'Piocher une carte' }).waitFor();
+  await page.getByRole('button', { name: 'Question suivante' }).waitFor();
 }
 
 // Écran 3 : Français → Conjugaison avec les temps, groupes et niveau donnés.

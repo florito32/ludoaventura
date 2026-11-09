@@ -56,7 +56,7 @@ test('la pyramide se construit avec les points et est complète à l\'objectif @
 
 test('la construction suit les points gagnés pendant la partie', async ({ page }) => {
   await lancerPartie(page, { joueurs: 1, aventure: 'Viking' }); // objectif 15
-  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await page.getByRole('button', { name: 'Question suivante' }).click();
   await page.getByRole('button', { name: 'Bonne réponse' }).click();
   await lancerLeDe(page);
   const pts = Number(await page.locator('#points').textContent());

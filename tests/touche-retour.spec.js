@@ -20,7 +20,7 @@ test('préparation : la touche précédent revient à l\'étape précédente, pu
 
 test('plateau : la touche précédent ouvre le menu, une deuxième fois le referme ; la partie reste', async ({ page }) => {
   await lancerPartie(page, { joueurs: 2 });
-  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await page.getByRole('button', { name: 'Question suivante' }).click();
   await page.goBack();
   await expect(page.locator('#menu-partie')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Le plateau' })).toBeAttached();

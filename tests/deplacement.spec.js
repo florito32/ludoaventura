@@ -69,7 +69,7 @@ test('au tour suivant, le personnage suit la route du pont jusqu\'au marais', as
   await page.addInitScript(() => { window.AVENTURA_MARCHE = 1500; });
   await lancerPartie(page, { joueurs: 1 });
   for (let t = 0; t < 2; t++) {
-    await page.getByRole('button', { name: 'Piocher une carte' }).click();
+    await page.getByRole('button', { name: 'Question suivante' }).click();
     await page.getByRole('button', { name: 'Bonne réponse' }).click();
     await lancerLeDe(page);
     await attendreJoueur(page, 'Léa');
@@ -120,7 +120,7 @@ test('le personnage se tourne dans le sens de la marche (vers la gauche entre le
   const pion = page.locator('.pion').first();
   await expect(pion).not.toHaveClass(/gauche/); // DÉPART → prairie : il part vers la droite
   for (let t = 0; t < 3; t++) {
-    await page.getByRole('button', { name: 'Piocher une carte' }).click();
+    await page.getByRole('button', { name: 'Question suivante' }).click();
     await page.getByRole('button', { name: 'Bonne réponse' }).click();
     await lancerLeDe(page);
     await attendreJoueur(page, 'Léa');

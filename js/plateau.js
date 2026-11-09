@@ -673,7 +673,7 @@
     // …puis le premier joueur se déplace de DÉPART jusqu'à la première croix (animation de début de partie).
     rendre({ sansDeplacement: true });
     // Seulement le déplacement du pion : reconstruire les boutons à ce moment-là pouvait faire perdre
-    // un toucher sur « Piocher une carte » qui tombait pile au même instant (v6.8).
+    // un toucher sur « Question suivante » (ex-« Piocher une carte ») qui tombait pile au même instant (v6.8).
     plusTard(function () { placerPions(); }, 450);
   }
 
@@ -819,6 +819,45 @@
     b.classList.remove('montre');
     void b.offsetWidth;
     b.classList.add('montre');
+    // Le dé est posé au même moment : on le range une fois le message à sa place (après son apparition).
+    var anims = b.getAnimations ? b.getAnimations() : [];
+    if (anims.length) Promise.all(anims.map(function (a) { return a.finished; })).then(degagerDe, degagerDe);
+    else degagerDe();
+  }
+
+  // Le dé et son « +N » ne cachent jamais le message (capture du 09/11/2026) : s'ils le chevauchent,
+  // le dé glisse juste au-dessus du message (en dessous s'il n'y a pas la place), sans couvrir l'encadré des points.
+  function degagerDe() {
+    var de = $('de-plateau'), b = $('bandeau');
+    // Mesure à la place d'origine, sans glissement en cours.
+    de.style.transition = 'none';
+    de.style.top = ''; de.style.left = '';
+    if (de.hidden || b.hidden || !de.offsetParent) { de.style.transition = ''; return; }
+    var cadre = de.offsetParent.getBoundingClientRect();
+    var m = b.getBoundingClientRect();
+    var d = de.getBoundingClientRect(), g = $('de-gain').getBoundingClientRect();
+    var marge = 6;
+    // Emprise du dé : le cube, son ombre dessous (14 %) et le « +N » à droite.
+    var e = { top: Math.min(d.top, g.top), bottom: d.bottom + d.height * 0.14, left: d.left, right: Math.max(d.right, g.right) };
+    function touche(a, z) { return a.top < z.bottom && a.bottom > z.top && a.left < z.right && a.right > z.left; }
+    if (!touche(e, m)) { de.style.transition = ''; return; }
+    var haut = m.top - marge - e.bottom;   // décalage vers le haut (négatif)
+    var bas = m.bottom + marge - e.top;    // décalage vers le bas
+    var dy = e.top + haut >= cadre.top + 2 ? haut : (e.bottom + bas <= cadre.bottom - 2 ? bas : cadre.top + 2 - e.top);
+    var dx = 0;
+    var pts = document.querySelector('.points-plateau');
+    if (pts && pts.offsetParent) {
+      var p = pts.getBoundingClientRect();
+      var e2 = { top: e.top + dy, bottom: e.bottom + dy, left: e.left, right: e.right };
+      // À la hauteur de l'encadré des points : le dé passe à sa droite.
+      if (touche(e2, p)) dx = p.right + marge - e.left;
+    }
+    var cs = getComputedStyle(de);
+    var top = parseFloat(cs.top), left = parseFloat(cs.left);
+    void de.offsetWidth;
+    de.style.transition = '';
+    de.style.top = (top + dy) + 'px';
+    if (dx) de.style.left = (left + dx) + 'px';
   }
 
   function points(n) { return n + ' point' + (n > 1 ? 's' : ''); }
@@ -849,7 +888,7 @@
       $('carte-piochee').hidden = true;
       // Pas de commentaire visible (v4.3) : seulement pour les lecteurs d'écran.
       annoncer(j.nom + ' pioche une carte dans son tas.');
-      bouton('Piocher une carte', 'btn-principal', function () {
+      bouton('Question suivante', 'btn-principal', function () {
         partie.carte = piocherCarte(j);
         partie.vue = 'cache'; // nouvelle carte : mot caché
         R.piocher(r);
@@ -1226,6 +1265,7 @@
     if (tour.scrollHeight > tour.clientHeight + 1) table.classList.add('tour-monte');
   }
   window.addEventListener('resize', ajusterTour);
+  window.addEventListener('resize', degagerDe);
 
   // ---------- Saisie au clavier sur écran tactile (v6.13, lignes 106-107 du backlog) ----------
   // Quand le joueur écrit sa réponse, le clavier du téléphone couvre une bonne partie de l'écran.
@@ -1338,6 +1378,7 @@
     zone.hidden = false;
     zone.dataset.valeur = v;
     $('de-gain').textContent = '';
+    zone.style.top = ''; zone.style.left = ''; // repart de sa place d'origine (voir degagerDe)
     var fin = 'rotateX(' + (ORIENTATIONS[k][0] - 720) + 'deg) rotateY(' + (ORIENTATIONS[k][1] - 1080) + 'deg)';
     var calme = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 

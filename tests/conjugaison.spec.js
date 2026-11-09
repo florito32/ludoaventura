@@ -181,7 +181,7 @@ test('partie en conjugaison : bonne réponse → dé FORT tout seul @smoke', asy
   await preparer(page);
   await conjugaison(page, { temps: ['indicatif.imparfait'], groupes: [2], niveau: 'facile' });
   await lancer(page);
-  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await page.getByRole('button', { name: 'Question suivante' }).click();
   await expect(page.locator('#carte-consigne')).toContainText(/Conjugue (finir|choisir|grandir|remplir)/);
   await expect(page.locator('#carte-consigne')).toContainText('Indicatif · imparfait');
   await expect(page.locator('#carte-mot')).toHaveText(/^(je|tu|il|nous|vous|ils) …$/);
@@ -197,7 +197,7 @@ test('conjugaison fausse : bonne réponse affichée, « ? » montre tout le verb
   await preparer(page);
   await conjugaison(page, { temps: ['indicatif.present'], groupes: [3], niveau: 'facile' });
   await lancer(page);
-  await page.getByRole('button', { name: 'Piocher une carte' }).click();
+  await page.getByRole('button', { name: 'Question suivante' }).click();
   const c = await repondre(page, false);
   await expect(page.locator('#carte-reponse')).toHaveText('Ce n’est pas ça (tu as écrit « ' + c.ecrit + ' »). La bonne réponse : ' + c.bonne + '.');
   await expect(page.locator('#reaction')).toHaveClass(/mauvaise/);
@@ -229,8 +229,8 @@ test('impératif : pronom entre parenthèses ; subjonctif : « que » devant le 
   await conjugaison(page, { temps: ['imperatif.present', 'subjonctif.present'], groupes: [1], niveau: 'facile' });
   await lancer(page);
   for (let i = 0; i < 2; i++) {
-    if (i) { await lancerLeDe(page); await page.getByRole('button', { name: 'Piocher une carte' }).waitFor(); }
-    await page.getByRole('button', { name: 'Piocher une carte' }).click();
+    if (i) { await lancerLeDe(page); await page.getByRole('button', { name: 'Question suivante' }).waitFor(); }
+    await page.getByRole('button', { name: 'Question suivante' }).click();
     const c = await page.evaluate(() => window.Aventura.partie.carte);
     await expect(page.locator('#carte-mot')).toHaveText(c.temps === 'imperatif.present' ? /^\((tu|nous|vous)\) …$/ : /^(que|qu’)/);
     await repondre(page, true);
