@@ -89,21 +89,42 @@ test('épeler à l\'oral : lettres collées en un mot par la reconnaissance (« 
   expect(await page.evaluate(() => window.Aventura.partie.regles.de)).toBe('fort');
 });
 
-test('épeler à l\'oral : 3 essais ; ce qui est entendu s\'affiche ; au 3e essai faux, correction et dé FAIBLE', async ({ page }) => {
+// v6.34 (demande du 09/11/2026) : plus d'essais ; si la voix se trompe, le joueur corrige les lettres puis « OK ».
+test('épeler à l\'oral : une lettre mal entendue se corrige dans la case, puis « OK » → bonne réponse', async ({ page }) => {
   const mot = await partieEpeler(page);
-  await page.evaluate(() => window.__dire.push('z z z', 'zède'));
+  const lettres = P.lettresDuMot(mot);
+  const faux = lettres.slice(0, -1).concat(lettres[lettres.length - 1] === 'Z' ? 'X' : 'Z'); // dernière lettre mal entendue
+  await page.evaluate((t) => window.__dire.push(t), faux.join(' ').toLowerCase());
   await page.getByRole('button', { name: /Parler/ }).click();
-  await expect(page.locator('#carte-reponse')).toContainText('J’ai entendu « Z - Z - Z »');
-  await expect(page.locator('#carte-reponse')).toContainText('Essai 2 sur 3');
+  const champ = page.getByLabel('Ta réponse');
+  await expect(champ).toHaveValue(faux.join(' '));
+  await expect(page.locator('#carte-reponse')).toContainText('Corrige-les si besoin');
+  await expect(page.locator('#carte-reponse')).not.toContainText('Essai');
   expect(await page.evaluate(() => window.Aventura.partie.regles.etape)).toBe('repondre');
-  await page.getByRole('button', { name: /Réessayer/ }).click();
-  await expect(page.locator('#carte-reponse')).toContainText('Essai 3 sur 3');
-  // Rien entendu : l'essai ne compte pas.
-  await page.getByRole('button', { name: /Réessayer/ }).click();
-  await expect(page.locator('#carte-reponse')).toContainText('Essai 3 sur 3');
+  // Rechargement : les lettres à corriger restent.
+  await champ.fill(lettres.slice(0, -1).join(' '));
+  await page.reload();
+  await expect(page.getByLabel('Ta réponse')).toHaveValue(lettres.slice(0, -1).join(' '));
+  await page.getByLabel('Ta réponse').fill(lettres.join(' ').toLowerCase());
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
+  await expect(page.locator('#carte-reponse')).toContainText('Bonne réponse !');
+  expect(await page.evaluate(() => window.Aventura.partie.regles.de)).toBe('fort');
+});
+
+test('épeler à l\'oral : « Redire les lettres » recommence l\'écoute ; lettres fausses validées → correction et dé FAIBLE', async ({ page }) => {
+  const mot = await partieEpeler(page);
+  await page.evaluate(() => window.__dire.push('z z z', 'x'));
+  await page.getByRole('button', { name: /Parler/ }).click();
+  await expect(page.getByLabel('Ta réponse')).toHaveValue('Z Z Z');
+  await page.getByRole('button', { name: /Redire les lettres/ }).click();
+  await expect(page.getByLabel('Ta réponse')).toHaveValue('X');
+  // Rien entendu : un message, on peut reparler.
+  await page.getByRole('button', { name: /Redire les lettres/ }).click();
+  await expect(page.locator('#carte-reponse')).toContainText('Je n’ai rien entendu');
   await page.evaluate(() => window.__dire.push('x'));
-  await page.getByRole('button', { name: /Réessayer/ }).click();
-  await expect(page.locator('#carte-reponse')).toContainText('j’ai entendu « X »');
+  await page.getByRole('button', { name: /Parler/ }).click();
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
+  await expect(page.locator('#carte-reponse')).toContainText('tu as donné « X »');
   await expect(page.locator('#carte-reponse')).toContainText('La bonne réponse : ' + Q.trouver('epeler').reponse(mot));
   await expect(page.locator('#carte-mot')).toHaveText(mot);
   expect(await page.evaluate(() => window.Aventura.partie.regles.de)).toBe('faible');
