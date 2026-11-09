@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.25';
+  var VERSION = '6.26';
 
   var HISTORY = [
+    { v: '6.26', date: '2026-11-09', changes: [
+      "Cartes : le titre « Carte n° 3 de Sam » disparaît ; seul le thème reste (ex. « Numérique · Mot mélangé »), écrit plus gros.",
+      "Le bouton pour envoyer sa réponse s'appelle maintenant « OK » (au lieu de « Valider »)."
+    ] },
     { v: '6.25', date: '2026-11-04', changes: [
       "Menu : « Redémarrer partie » et « Retour à l'accueil » demandent une confirmation avant d'effacer la partie en cours."
     ] },

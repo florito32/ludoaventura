@@ -22,9 +22,12 @@ test('rafraîchir la page en pleine partie : on reprend au même joueur, mêmes 
   await expect(page.locator('.pion')).toHaveCount(2);
   await expect(page.locator('.pion').nth(0)).toHaveAttribute('data-case', '1');
   await expect(page.locator('.pion').nth(1)).toHaveAttribute('data-case', '1');
-  // On peut continuer à jouer : la carte suivante de Tom est sa 1re.
+  // On peut continuer à jouer : c'est à Tom, et sa carte suivante est sa 1re.
+  // (v6.26 : la carte n'affiche plus « Carte n° 1 de Tom », on vérifie le compteur et « À Tom de jouer ».)
+  await expect(page.locator('#tour-nom')).toHaveText('Tom');
   await page.getByRole('button', { name: 'Piocher une carte' }).click();
-  await expect(page.locator('#carte-titre')).toContainText('Carte n° 1 de Tom');
+  await expect(page.locator('#carte-piochee')).toBeVisible();
+  expect(await page.evaluate(() => { const r = window.Aventura.partie.regles; return r.pioches[r.joueur]; })).toBe(1);
 });
 
 test('rafraîchir pendant une carte : la même carte reste affichée, avec la réponse si elle était montrée', async ({ page }) => {

@@ -51,7 +51,8 @@ test('un tour complet : piocher, répondre, lancer, message écrit puis joueur s
   // Le tour de jeu n'écrit plus « Croix 1 sur 5 — la prairie » (demande du 02/11/2026).
   await expect(page.locator('#tour')).not.toContainText(/Croix \d sur \d/);
   await page.getByRole('button', { name: 'Piocher une carte' }).click();
-  await expect(page.locator('#carte-titre')).toContainText('Carte n° 1 de Léa');
+  await expect(page.locator('#carte-piochee')).toBeVisible();
+  await expect(page.locator('#carte-titre')).not.toContainText('Carte n°'); // v6.26
   await page.getByRole('button', { name: 'Bonne réponse' }).click();
   await lancerLeDe(page);
   const pts = Number(await page.locator('#points').textContent());

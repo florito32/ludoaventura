@@ -171,7 +171,7 @@ async function repondre(page, bonne) {
   const juste = await page.evaluate((c) => window.Conjugaison.formes(c.verbe, c.temps, c.personne)[0], c);
   c.ecrit = bonne ? juste : juste + 'x';
   await page.getByLabel('Ta réponse').fill(c.ecrit);
-  await page.getByRole('button', { name: 'Valider' }).click();
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
   return c;
 }
 

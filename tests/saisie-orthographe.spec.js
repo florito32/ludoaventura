@@ -63,7 +63,7 @@ test('voyelles : bonne réponse écrite → « Bonne réponse », le dé FORT se
   await expect(page.getByRole('button', { name: 'Voir le mot' })).toBeVisible(); // aide toujours là
   const voy = Q.lettres(mot).filter(Q.estVoyelle);
   await page.getByLabel('Ta réponse').fill(voy.join('').toLowerCase()); // sans séparateur
-  await page.getByRole('button', { name: 'Valider', exact: true }).click();
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
   await expect(page.locator('#carte-reponse')).toHaveText('Bonne réponse ! ' + voy.join(', '));
   await expect(page.locator('#carte-mot')).toHaveText(mot); // le mot s'affiche avec la correction
   expect(await page.evaluate(() => window.Aventura.partie.regles.de)).toBe('fort');
@@ -75,7 +75,7 @@ test('nombre de syllabes faux → correction avec le découpage, « J’ai compr
   await expect(page.locator('#reponse-joueur')).toHaveAttribute('inputmode', 'numeric');
   const n = C.INFOS[mot].syllabes.split(/[\s-]+/).filter((m) => /\p{L}/u.test(m)).length;
   await page.getByLabel('Ta réponse').fill(String(n + 1));
-  await page.getByRole('button', { name: 'Valider', exact: true }).click();
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
   await expect(page.locator('#carte-reponse')).toContainText('tu as écrit « ' + (n + 1) + ' »');
   await expect(page.locator('#carte-reponse')).toContainText(n + ' syllabe');
   expect(await page.evaluate(() => window.Aventura.partie.regles.de)).toBe('faible');
@@ -86,7 +86,7 @@ test('nombre de syllabes faux → correction avec le découpage, « J’ai compr
 test('réponse illisible : un message demande de corriger, sans compter de faute', async ({ page }) => {
   await partieAvec(page, ['nombre']);
   await page.getByLabel('Ta réponse').fill('beaucoup');
-  await page.getByRole('button', { name: 'Valider', exact: true }).click();
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
   await expect(page.locator('#carte-reponse')).toHaveText('Écris un nombre, par exemple 5.');
   expect(await page.evaluate(() => window.Aventura.partie.regles.etape)).toBe('repondre');
 });
@@ -151,7 +151,7 @@ test('lettre manquante : le mot s\'affiche avec « _ », pas de « Voir le mot �
   await expect(page.locator('#carte-mot')).toHaveText(c.mot.slice(0, c.params.pos) + '_' + c.mot.slice(c.params.pos + 1));
   await expect(page.locator('#btn-voir-mot')).toBeHidden();
   await page.getByLabel('Ta réponse').fill(c.mot[c.params.pos].toLowerCase());
-  await page.getByRole('button', { name: 'Valider', exact: true }).click();
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
   await expect(page.locator('#carte-reponse')).toContainText('Bonne réponse !');
   expect(await page.evaluate(() => window.Aventura.partie.regles.de)).toBe('fort');
 });
@@ -167,7 +167,7 @@ test('mot mélangé : lettres en désordre, la voix ne dit pas le mot ; réponse
   await page.getByRole('button', { name: 'Écouter' }).click();
   expect(await page.evaluate(() => window.__lu.pop())).toBe('Remets les lettres dans l’ordre :');
   await page.getByLabel('Ta réponse').fill('zzzz');
-  await page.getByRole('button', { name: 'Valider', exact: true }).click();
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
   await expect(page.locator('#carte-reponse')).toContainText('La bonne réponse : ' + c.mot + '.');
   await expect(page.locator('#carte-mot')).toHaveText(c.mot);
   await page.getByRole('button', { name: 'J’ai compris' }).click();
@@ -230,7 +230,7 @@ test('Au pluriel : « UN … → DES … » affiché, bonne réponse écrite →
   const info = C.INFOS[c.mot];
   await expect(page.locator('#carte-mot')).toHaveText((info.genre === 'f' ? 'UNE ' : 'UN ') + c.mot + ' → DES …');
   await page.getByLabel('Ta réponse').fill('des ' + info.pluriel.toLowerCase());
-  await page.getByRole('button', { name: 'Valider', exact: true }).click();
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
   await expect(page.locator('#carte-reponse')).toHaveText('Bonne réponse ! DES ' + info.pluriel);
   expect(await page.evaluate(() => window.Aventura.partie.regles.de)).toBe('fort');
 });
@@ -240,11 +240,11 @@ test('Le ou la ? : réponse illisible → message ; fausse → correction « LA 
   const info = C.INFOS[c.mot];
   await expect(page.locator('#carte-mot')).toHaveText(c.mot);
   await page.getByLabel('Ta réponse').fill('bof');
-  await page.getByRole('button', { name: 'Valider', exact: true }).click();
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
   await expect(page.locator('#carte-reponse')).toHaveText(info.elision ? 'Écris « un » ou « une ».' : 'Écris « le » ou « la ».');
   const faux = info.elision ? (info.genre === 'f' ? 'un' : 'une') : (info.genre === 'f' ? 'le' : 'la');
   await page.getByLabel('Ta réponse').fill(faux);
-  await page.getByRole('button', { name: 'Valider', exact: true }).click();
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
   await expect(page.locator('#carte-reponse')).toContainText(Q.trouver('genre').reponse(c.mot, info));
   expect(await page.evaluate(() => window.Aventura.partie.regles.de)).toBe('faible');
 });

@@ -60,7 +60,7 @@ test('calcul : réponse validée, le clavier se ferme et le plateau revient (dé
   await clavier(page, 0.5);
   await toutVisible(page, 'calcul');
   await page.getByLabel('Ta réponse').fill('0');
-  await page.getByRole('button', { name: 'Valider' }).click();
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
   await expect(page.locator('body')).not.toHaveClass(/saisie-clavier/);
   await expect(page.locator('#carte-reponse')).toContainText('tu as écrit « 0 »');
   await expect(page.getByRole('button', { name: 'J’ai compris' })).toBeInViewport();

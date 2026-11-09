@@ -151,7 +151,7 @@
     var saisie = c && (c.type === 'calcul' || c.type === 'conjugaison' || (c.question && c.question.saisie));
     if (r.etape === 'repondre' && saisie) {
       return { cle: cle, cible: $('reponse-joueur'),
-        texte: j.nom + ', écris ta réponse dans la case, puis touche « Valider ». « Écouter » lit la question à voix haute.' };
+        texte: j.nom + ', écris ta réponse dans la case, puis touche « OK ». « Écouter » lit la question à voix haute.' };
     }
     if (r.etape === 'repondre') {
       return { cle: cle, cible: $('tour-actions'),
