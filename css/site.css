@@ -377,6 +377,9 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 @container (max-width: 520px) {
   .btn-tout .long { display: none; }
   .btn-tout .court { display: inline; }
+  /* Orthographe (v6.27) : le titre est court, « Tout sélectionner » tient en entier à côté. */
+  #ortho-packs .btn-tout .long, #reglages-ortho .btn-tout .long { display: inline; }
+  #ortho-packs .btn-tout .court, #reglages-ortho .btn-tout .court { display: none; }
   .reglages-remplir .reglage-titre { font-size: .95rem; }
 }
 
@@ -1082,4 +1085,10 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
   .ludo-texte { font-size: .9rem; line-height: 1.25; }
   .ludo-actions { margin-top: 6px; }
   .ludo-actions .btn { min-height: 36px; padding: 4px 12px; font-size: .88rem; }
+}
+
+/* Très petits écrans : « Tout » / « Aucun » aussi en orthographe. */
+@container (max-width: 330px) {
+  #ortho-packs .btn-tout .long, #reglages-ortho .btn-tout .long { display: none; }
+  #ortho-packs .btn-tout .court, #reglages-ortho .btn-tout .court { display: inline; }
 }

@@ -80,7 +80,9 @@ test('didacticiel : préparation et premier tour, flèche et bulle à chaque ét
 
   await expect(texte(page)).toContainText('packs');
   await flecheSur(page, '#packs');
-  await page.locator('#packs input').first().check();
+  // v6.27 : la bulle ne cache jamais « Tout sélectionner » (sur téléphone carré, elle couvre une partie des packs).
+  await expect(texte(page)).toContainText('Tout sélectionner');
+  await page.locator('#ortho-packs .btn-tout').click();
   await flecheSur(page, '#btn-valider-reglages');
   await A.valider(page); // v6.16 : écran des questions
   await expect(texte(page)).toContainText('questions');
