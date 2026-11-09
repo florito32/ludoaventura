@@ -286,6 +286,16 @@
       partie.types[partie.actif] = coches;
       majAventuriers();
     });
+    // « Tout sélectionner » / « Tout désélectionner » des packs et des questions d'orthographe (v6.27, demande du 09/11/2026).
+    document.querySelectorAll('.btn-tout[data-liste]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var cle = b.dataset.liste === 'packs' ? 'packs' : 'types', j = partie.actif;
+        var tous = Array.prototype.map.call($(b.dataset.liste).querySelectorAll('input'), function (i) { return i.value; });
+        partie[cle][j] = partie[cle][j].length === tous.length ? [] : tous;
+        $('packs-alerte').textContent = '';
+        majAventuriers();
+      });
+    });
     // Copie les packs et les questions du joueur affiché vers tous les joueurs,
     // puis passe directement au choix de l'aventure (tous les joueurs sont réglés).
     $('btn-memes-reglages').addEventListener('click', function () {
@@ -537,6 +547,14 @@
     $('niveau-maths').querySelectorAll('input').forEach(function (i) { i.checked = i.value === mm.niveau; });
     $('packs').querySelectorAll('input').forEach(function (i) { i.checked = partie.packs[partie.actif].indexOf(i.value) >= 0; });
     $('types-questions').querySelectorAll('input').forEach(function (i) { i.checked = partie.types[partie.actif].indexOf(i.value) >= 0; });
+    // Libellé des boutons « Tout » des packs et des questions : « Tout désélectionner » quand tout est coché.
+    document.querySelectorAll('.btn-tout[data-liste]').forEach(function (b) {
+      var n = $(b.dataset.liste).querySelectorAll('input').length;
+      var plein = partie[b.dataset.liste === 'packs' ? 'packs' : 'types'][partie.actif].length === n;
+      b.innerHTML = plein ? '<span class="long">Tout désélectionner</span><span class="court">Aucun</span>'
+        : '<span class="long">Tout sélectionner</span><span class="court">Tout</span>';
+      b.setAttribute('aria-label', (plein ? 'Tout désélectionner : ' : 'Tout sélectionner : ') + (b.dataset.liste === 'packs' ? 'packs' : 'questions'));
+    });
     // Étape 3 : écran de la matière ou écran de ses réglages.
     var ecran = partie.sousEtape, surMatiere = ecran === 'matiere';
     if (ecran === 'modes' && mat !== 'conjugaison') ecran = partie.sousEtape = 'reglages';

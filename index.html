@@ -201,13 +201,19 @@
           <!-- Orthographe (v6.16) : 19 packs → un écran pour les packs, puis un écran pour les questions. -->
           <div class="reglages-matiere reglages-remplir" id="ortho-packs" hidden>
             <div class="reglage">
-              <p class="reglage-titre" id="packs-titre">Packs où piocher <span>(au moins un)</span></p>
+              <div class="reglage-tete">
+                <p class="reglage-titre" id="packs-titre">Packs où piocher <span>(au moins un)</span></p>
+                <button type="button" class="btn-tout" data-liste="packs"></button>
+              </div>
               <div class="packs" id="packs" role="group" aria-labelledby="packs-titre"></div>
             </div>
           </div>
           <div class="reglages-matiere reglages-remplir" id="reglages-ortho" hidden>
             <div class="reglage">
-              <p class="reglage-titre" id="types-titre">Questions posées <span>(une au hasard à chaque carte)</span></p>
+              <div class="reglage-tete">
+                <p class="reglage-titre" id="types-titre">Questions posées <span>(une au hasard à chaque carte)</span></p>
+                <button type="button" class="btn-tout" data-liste="types-questions"></button>
+              </div>
               <div class="packs" id="types-questions" role="group" aria-labelledby="types-titre"></div>
             </div>
           </div>

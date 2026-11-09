@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.27';
+  var VERSION = '6.28';
 
   var HISTORY = [
+    { v: '6.28', date: '2026-11-09', changes: [
+      "Orthographe : un bouton « Tout sélectionner » sur l'écran des packs et sur celui des questions (il devient « Tout désélectionner » quand tout est coché)."
+    ] },
     { v: '6.27', date: '2026-11-09', changes: [
       "Cartes : le titre « Carte n° 3 de Sam » disparaît ; seul le thème reste (ex. « Numérique · Mot mélangé »), écrit plus gros.",
       "Le bouton pour envoyer sa réponse s'appelle maintenant « OK » (au lieu de « Valider »)."
