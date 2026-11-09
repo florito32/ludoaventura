@@ -1,5 +1,5 @@
 // v7.0 (demande du 04/11/2026) : en orthographe, nombre de lettres, nombre de syllabes, consonnes,
-// voyelles et lettres muettes s'écrivent ; le jeu corrige. « Épeler » et « Réécrire » restent à l'oral.
+// voyelles et lettres muettes s'écrivent ; le jeu corrige. « Épeler à l'oral » se dit au micro ; « Réécrire le mot » s'écrit (dictée, v6.31).
 const { test, expect } = require('@playwright/test');
 const Q = require('../js/questions.js');
 const C = require('../js/cartes.js');
@@ -41,9 +41,9 @@ test.describe('correction des réponses écrites', () => {
     expect(Q.lisible(Q.trouver('voyelles'), '1 2')).toBe(false);
   });
 
-  test('« Épeler » et « Réécrire » restent à l’oral', () => {
+  test('« Épeler à l’oral » se dit ; « Réécrire le mot » s’écrit (v6.31)', () => {
     expect(Q.trouver('epeler').saisie).toBeUndefined();
-    expect(Q.trouver('ecrire').saisie).toBeUndefined();
+    expect(Q.trouver('ecrire').saisie).toBe('mot');
   });
 });
 
@@ -247,4 +247,50 @@ test('Le ou la ? : réponse illisible → message ; fausse → correction « LA 
   await page.getByRole('button', { name: 'OK', exact: true }).click();
   await expect(page.locator('#carte-reponse')).toContainText(Q.trouver('genre').reponse(c.mot, info));
   expect(await page.evaluate(() => window.Aventura.partie.regles.de)).toBe('faible');
+});
+
+// v6.31 (demande du 09/11/2026) : « Réécrire le mot » au clavier ; la voix dicte le mot avec une phrase d'exemple.
+test('Réécrire le mot : dictée lue tout de suite (mot, phrase, mot), mot caché sans « Voir le mot », réponse écrite corrigée @smoke', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.__lu = [];
+    window.SpeechSynthesisUtterance = function (t) { this.text = t; };
+    Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: { speak: (u) => window.__lu.push(u.text), cancel() {}, getVoices: () => [] } });
+  });
+  const mot = await partieAvec(page, ['ecrire']);
+  const P = require('../js/phrases.js');
+  await expect(page.locator('#carte-consigne')).toHaveText('Écris le mot que tu entends :');
+  await expect(page.locator('#carte-mot')).toHaveClass(/cache/);
+  await expect(page.locator('#btn-voir-mot')).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Bonne réponse' })).toHaveCount(0);
+  const m = mot.toLocaleLowerCase('fr-FR');
+  const lu = await page.evaluate(() => window.__lu.slice());
+  expect(lu).toEqual(['Écris le mot que tu entends : ' + m + '. ' + P[mot] + ' ' + m.charAt(0).toLocaleUpperCase('fr-FR') + m.slice(1) + '.']);
+  // Les accents ne sont pas exigés (hypothèse à valider) : « elephant » = ÉLÉPHANT.
+  await page.getByLabel('Ta réponse').fill(Q.lettres(mot).join('').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase());
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
+  await expect(page.locator('#carte-reponse')).toHaveText('Bonne réponse ! ' + mot);
+  await expect(page.locator('#carte-mot')).toHaveText(mot);
+  expect(await page.evaluate(() => window.Aventura.partie.regles.de)).toBe('fort');
+});
+
+test('Réécrire le mot : faute → correction avec le bon mot, dé FAIBLE', async ({ page }) => {
+  const mot = await partieAvec(page, ['ecrire']);
+  await page.getByLabel('Ta réponse').fill('zzz');
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
+  await expect(page.locator('#carte-reponse')).toContainText('La bonne réponse : ' + mot + '.');
+  expect(await page.evaluate(() => window.Aventura.partie.regles.de)).toBe('faible');
+});
+
+test.describe('phrases de la dictée', () => {
+  test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
+  test('chaque mot des packs (sauf les lettres seules) a sa phrase, qui contient le mot', () => {
+    const P = require('../js/phrases.js');
+    const n = (s) => s.toLowerCase().replace(/œ/g, 'oe').normalize('NFD').replace(/[^a-z]/g, '');
+    const mots = new Set();
+    for (const p of C.PACKS) for (const l of Object.values(p.niveaux)) for (const m of l) if (!(p.id === 'lettres' && m.length === 1)) mots.add(m);
+    for (const m of mots) {
+      expect(P[m], m).toBeTruthy();
+      if (!/\.\.\.|…/.test(m)) expect(n(P[m]), m).toContain(n(m));
+    }
+  });
 });

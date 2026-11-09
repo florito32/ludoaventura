@@ -27,11 +27,11 @@ async function matiere(page, valeur) {
 }
 // Français → Orthographe, puis coche tous les packs et toutes les questions du joueur affiché.
 async function orthographe(page) { await matiere(page, 'orthographe'); }
-// Depuis v7.0, seules « Épeler » et « Réécrire le mot » se jouent avec « Bonne / Mauvaise réponse » :
+// Depuis la v6.31, seule « Épeler à l'oral » (en mode juge, voir rapide()) se joue avec « Bonne / Mauvaise réponse » :
 // par défaut les tests cochent ces deux-là (les questions écrites ont leurs propres tests, avec { types }).
 // Depuis v6.16, l'orthographe a deux écrans : les packs (par défaut les 4 packs d'origine), « Valider », puis les questions.
 const PACKS_ORIGINE = ['mots-simples', 'mots-compliques', 'temps', 'numerique'];
-async function cocherJoueur(page, { packs = PACKS_ORIGINE, types = ['epeler', 'ecrire'] } = {}) {
+async function cocherJoueur(page, { packs = PACKS_ORIGINE, types = ['epeler'] } = {}) {
   await orthographe(page);
   for (const p of packs) await page.locator('#packs input[value="' + p + '"]').check();
   await valider(page);
