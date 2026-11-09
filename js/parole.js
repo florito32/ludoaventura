@@ -49,7 +49,9 @@
   // Lettres entendues dans le texte écrit par la reconnaissance vocale.
   // Rend { lettres: ['A','V',…], douteux: ['bonjour'] } : les mots qui ne sont ni une lettre ni un mot ignoré.
   // « deux L » ou « double L » = L L ; « double vé » = W ; « i grec » = Y ; « AVI » (sigle en majuscules) = A V I.
-  function lettresEntendues(texte) {
+  // colle = true (v6.33) : un mot qui n'est pas un nom de lettre est découpé en lettres (« estomac » = E S T O M A C) :
+  // la reconnaissance vocale de Google assemble souvent les lettres épelées en un mot (capture du 09/11/2026).
+  function lettresEntendues(texte, colle) {
     var mots = String(texte || '').replace(/[.,;:!?()«»"]/g, ' ').split(/[\s-]+/).filter(Boolean);
     var lettres = [], douteux = [];
     for (var i = 0; i < mots.length; i++) {
@@ -64,7 +66,9 @@
       if (l) { lettres.push(l); continue; }
       if (IGNORES.indexOf(m) >= 0) continue;
       // Sigle en majuscules (« AVI ») : la reconnaissance a collé les lettres.
-      if (/^[A-ZÀ-Ý]{2,}$/.test(brut)) { brut.split('').forEach(function (c) { lettres.push(cle(c).toUpperCase()); }); continue; }
+      if (/^[A-ZÀ-Ý]{2,}$/.test(brut) || (colle && /^[a-z]{2,}$/.test(cle(brut).replace(/'/g, '')))) {
+        cle(brut).replace(/'/g, '').toUpperCase().split('').forEach(function (c) { lettres.push(c); }); continue;
+      }
       douteux.push(brut);
     }
     return { lettres: lettres, douteux: douteux };
@@ -81,10 +85,15 @@
     return cle(mot).toUpperCase().replace(/[^A-Z]/g, '').split('');
   }
 
-  // Vrai si l'une des propositions de la reconnaissance donne exactement les lettres du mot.
+  // Vrai si l'une des propositions de la reconnaissance donne exactement les lettres du mot :
+  // lettres dites une par une, ou lettres collées en un mot par la reconnaissance (« estomac », « est o mac »).
+  // Choix de l'utilisateur (09/11/2026) : accepté sans contrôle, même si le joueur a dit le mot sans l'épeler.
   function juste(mot, propositions) {
     var att = lettresDuMot(mot).join('');
-    return propositions.some(function (t) { return lettresEntendues(t).lettres.join('') === att; });
+    return propositions.some(function (t) {
+      return lettresEntendues(t).lettres.join('') === att || lettresEntendues(t, true).lettres.join('') === att ||
+        cle(t).toUpperCase().replace(/[^A-Z]/g, '') === att; // « pomme de terre » écrit tel quel
+    });
   }
 
   // ---------- Reconnaissance vocale du navigateur ----------
