@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.33';
+  var VERSION = '6.34';
 
   var HISTORY = [
+    { v: '6.34', date: '2026-11-09', changes: [
+      "Épeler à l'oral : une réponse juste n'est plus refusée quand la reconnaissance vocale colle les lettres en un mot (« E, S, T, O, M, A, C » écrit « estomac »)."
+    ] },
     { v: '6.33', date: '2026-11-09', changes: [
       "Orthographe : les questions sont rangées en 3 familles encadrées (✏️ Écrire un mot, 🔍 Trouver des lettres, 🔢 Compter), 3 par ligne, avec un bouton « Tout » par famille ; Voyelles et Consonnes sont côte à côte."
     ] },

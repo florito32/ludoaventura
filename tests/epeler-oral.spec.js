@@ -18,7 +18,13 @@ test.describe('lettres entendues', () => {
     expect(P.lettresEntendues('bonjour').douteux).toEqual(['bonjour']);
     expect(P.juste('ÉTÉ', ['e t e'])).toBe(true);
     expect(P.juste('SŒUR', ['s o e u r'])).toBe(true);
-    expect(P.juste('AVION', ['avion'])).toBe(false); // dire le mot n'est pas l'épeler
+    // Bug du 09/11/2026 (capture ESTOMAC) : la reconnaissance de Google colle les lettres épelées en un mot.
+    // Choix de l'utilisateur : accepté sans contrôle (même si le joueur a dit le mot sans l'épeler).
+    expect(P.juste('ESTOMAC', ['estomac'])).toBe(true);
+    expect(P.juste('ESTOMAC', ['est o mac'])).toBe(true);
+    expect(P.juste('ÉLÉPHANT', ['éléphant'])).toBe(true);
+    expect(P.juste('ESTOMAC', ['estomaque'])).toBe(false);
+    expect(P.lettresEntendues('bonjour', true).lettres.join('')).toBe('BONJOUR');
     expect(P.juste('AVION', ['a b i o n', 'a v i o n'])).toBe(true); // une des propositions suffit
   });
 });
@@ -73,6 +79,14 @@ test('épeler à l\'oral : la carte cache le mot, « Parler », lettres justes �
   await expect(page.locator('#carte-mot')).toHaveText(mot);
   expect(await page.evaluate(() => window.Aventura.partie.regles.de)).toBe('fort');
   await lancerLeDe(page);
+});
+
+test('épeler à l\'oral : lettres collées en un mot par la reconnaissance (« estomac ») → « Bonne réponse » (bug du 09/11/2026)', async ({ page }) => {
+  const mot = await partieEpeler(page);
+  await page.evaluate((t) => window.__dire.push(t), mot.toLowerCase());
+  await page.getByRole('button', { name: /Parler/ }).click();
+  await expect(page.locator('#carte-reponse')).toContainText('Bonne réponse !');
+  expect(await page.evaluate(() => window.Aventura.partie.regles.de)).toBe('fort');
 });
 
 test('épeler à l\'oral : 3 essais ; ce qui est entendu s\'affiche ; au 3e essai faux, correction et dé FAIBLE', async ({ page }) => {
