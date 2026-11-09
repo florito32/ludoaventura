@@ -917,6 +917,9 @@
         rendre();
         // Calcul : le curseur est mis dans la case de réponse (sans faire défiler la page).
         if (aSaisir(partie.carte)) $('reponse-joueur').focus({ preventScroll: true });
+        // Dictée (v6.31) : le mot est caché, la voix le lit tout de suite (« Écouter » le relit).
+        var q = partie.carte.question;
+        if (q && q.dictee) window.Voix.lire(window.Voix.texteCarte(partie.carte));
       });
     } else if (r.etape === 'repondre' && aSaisir(partie.carte)) {
       // Calcul : le joueur écrit sa réponse dans la carte, le jeu la corrige (pas de maître du jeu).
@@ -1046,7 +1049,7 @@
 
   // Cartes où le joueur écrit lui-même sa réponse, corrigée par le jeu (calcul, v5.7).
   // Orthographe (v6.14) : nombre de lettres, de syllabes, consonnes, voyelles, lettres muettes s'écrivent aussi ;
-  // « Épeler » et « Réécrire le mot » restent à l'oral avec « Bonne / Mauvaise réponse » (choix du 04/11/2026).
+  // « Réécrire le mot » s'écrit aussi depuis la v6.31 (dictée) ; « Épeler à l'oral » se dit au micro (v6.30).
   function aSaisir(c) { return !!(c && (c.type === 'calcul' || c.type === 'conjugaison' || (c.question && c.question.saisie))); }
   function orthoSaisie(c) { return !!(c && c.question && c.question.saisie); }
 
@@ -1171,7 +1174,7 @@
       return;
     }
     if (!corrigee) {
-      $('btn-voir-mot').hidden = false;
+      $('btn-voir-mot').hidden = !!q.sansVoirMot; // dictée : voir le mot donnerait la réponse
       if (partie.vue === 'mot') montrerMotSeul(); else cacherMot();
       rep.hidden = true; rep.className = 'carte-reponse';
       return;

@@ -39,6 +39,9 @@
     var consigne = q ? (Q ? Q.consigne(q, carte.mot, null, carte.params) : q.consigne) : 'Épelle le mot :';
     // Mot mélangé (v6.17) : dire le mot donnerait la réponse, on ne lit que la consigne.
     if (q && q.voixSansMot) return consigne;
+    // Dictée (v6.31) : le mot, une phrase d'exemple, puis le mot encore (« Écris le mot : cheval. Le cheval galope… Cheval. »).
+    var phrase = q && q.dictee && racine.Phrases ? racine.Phrases[carte.mot] : null;
+    if (phrase) return consigne + ' ' + mot + '. ' + phrase + ' ' + mot.charAt(0).toLocaleUpperCase('fr-FR') + mot.slice(1) + '.';
     return consigne + ' ' + mot + '.';
   }
 

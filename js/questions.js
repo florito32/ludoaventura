@@ -43,7 +43,10 @@
       reponse: function (mot, info) {
         return info.muettes.map(function (i) { return mot[i]; }).join(', ');
       } },
-    { id: 'ecrire', nom: 'Réécrire le mot', consigne: 'Écris le mot :',
+    // v6.31 : « Réécrire le mot » au clavier (demande du 09/11/2026). Le mot est caché : la voix le dicte,
+    // avec une phrase d'exemple (js/phrases.js) ; « Voir le mot » donnerait la réponse (sansVoirMot).
+    { id: 'ecrire', nom: 'Réécrire le mot', consigne: 'Écris le mot que tu entends :', saisie: 'mot', dictee: true, sansVoirMot: true,
+      attendu: function (mot) { return mot; },
       reponse: function (mot) { return mot; } },
     // ---------- v6.17 : questions acceptées par l'utilisateur le 04/11/2026 ----------
     // Certaines questions ont des réglages tirés pour chaque carte (preparer → c.params) :
