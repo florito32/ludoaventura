@@ -1721,8 +1721,27 @@
   pretASauver = true;
   sauver();
 
-  // Préchargement discret du plateau pendant que l'accueil est affiché.
-  window.addEventListener('load', function () { new Image().src = 'img/plateau-jour.webp'; });
+  // Préchargement discret des deux plateaux (jour et soir) pendant que l'accueil est affiché (v6.26).
+  // Les images restent référencées : une fois la page ouverte, le plateau s'affiche même si le
+  // réseau est coupé ensuite (mode avion), sans dépendre de la copie hors ligne.
+  var plateauxGardes = [];
+  window.addEventListener('load', function () {
+    ['jour', 'soir'].forEach(function (a) {
+      var im = new Image();
+      im.src = 'img/plateau-' + a + '.webp';
+      if (im.decode) im.decode().catch(function () {});
+      plateauxGardes.push(im);
+    });
+  });
+  // Si le plateau n'a pas pu se charger (hors ligne), il se recharge seul au retour du réseau.
+  $('plateau-img').addEventListener('error', function () {
+    var img = this;
+    window.addEventListener('online', function () {
+      var src = img.getAttribute('src');
+      img.src = '';
+      img.src = src;
+    }, { once: true });
+  });
 
   window.Aventura = { cases: CASES, route: ROUTE, trajet: trajet, decalages: DECALAGES, partie: partie, cartesDuJoueur: cartesDuJoueur, majConstruction: majConstruction,
     // Tests : lancer le dé sans attendre le lancer automatique (il n'y a plus de bouton depuis v4.3).
