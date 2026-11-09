@@ -52,7 +52,10 @@
   var PACKS = C.PACKS.filter(function (p) { return p.id !== 'lettres'; });
   var TOUS_PACKS = PACKS.map(function (p) { return p.id; });
   var Q = window.Questions;
-  var TOUS_TYPES = Q.TYPES.map(function (t) { return t.id; });
+  // « Épeler à l'oral » n'est proposée que si l'appareil sait reconnaître la voix (choix de l'utilisateur, 09/11/2026).
+  var PAROLE = window.Parole;
+  function typeDisponible(t) { return !t.oral || PAROLE.disponible(); }
+  var TOUS_TYPES = Q.TYPES.filter(typeDisponible).map(function (t) { return t.id; });
   var K = window.Calcul;
   var V = window.Conjugaison;
   var MATIERES = ['maths', 'orthographe', 'conjugaison']; // matières jouables (Français → Orthographe ou Conjugaison)
@@ -273,7 +276,7 @@
     });
     // Types de questions (cases à cocher, au moins un).
     var types = $('types-questions');
-    Q.TYPES.forEach(function (t) {
+    Q.TYPES.filter(typeDisponible).forEach(function (t) {
       var l = document.createElement('label');
       l.className = 'pack';
       l.innerHTML = '<input type="checkbox" name="type" value="' + t.id + '" aria-label="' + t.nom + '"><span>' + (t.court || t.nom) + '</span>';
@@ -918,6 +921,15 @@
     } else if (r.etape === 'repondre' && aSaisir(partie.carte)) {
       // Calcul : le joueur écrit sa réponse dans la carte, le jeu la corrige (pas de maître du jeu).
       annoncer(j.nom + ' écrit sa réponse puis valide.');
+    } else if (r.etape === 'repondre' && epelerOral(partie.carte)) {
+      // Épeler à l'oral (v6.28) : « Parler », le joueur dit les lettres, « J'ai fini » (ou un silence) arrête l'écoute.
+      if (ecoute) {
+        annoncer(j.nom + ' dit les lettres du mot, puis touche « J\u2019ai fini ».');
+        bouton('\u23f9\ufe0f J\u2019ai fini', 'btn-principal btn-parler ecoute', function () { ecoute.arreter(); });
+      } else {
+        annoncer(j.nom + ' touche « Parler » et dit les lettres du mot une par une.');
+        bouton('\ud83c\udfa4 ' + (partie.carte.essais ? 'Réessayer' : 'Parler'), 'btn-principal btn-parler', parler);
+      }
     } else if (r.etape === 'repondre') {
       consigne.textContent = 'La réponse de ' + j.nom + ' est-elle bonne ?';
       bouton('Bonne réponse', 'btn-bonne', function () { R.repondre(r, true); reagir(true); rendre(); lancerApresReaction(); });
@@ -1037,6 +1049,101 @@
   // « Épeler » et « Réécrire le mot » restent à l'oral avec « Bonne / Mauvaise réponse » (choix du 04/11/2026).
   function aSaisir(c) { return !!(c && (c.type === 'calcul' || c.type === 'conjugaison' || (c.question && c.question.saisie))); }
   function orthoSaisie(c) { return !!(c && c.question && c.question.saisie); }
+
+  // ---------- Épeler à l'oral (v6.28, demande du 09/11/2026) ----------
+  // Le mot est caché (la voix le lit ; « Voir le mot » et « Voir la réponse » donneraient la réponse).
+  // Le jeu montre les lettres entendues ; 3 essais (choix de l'utilisateur), puis la réponse compte fausse.
+  // Si le micro ne marche pas (refusé, pas de connexion…), la carte repasse en « Bonne / Mauvaise réponse »
+  // jugée par les autres joueurs (c.juge). Les tests forcent ce mode avec window.AVENTURA_JUGE.
+  var ecoute = null; // écoute en cours (js/parole.js)
+  function epelerOral(c) { return !!(c && c.question && c.question.oral && !c.juge && !window.AVENTURA_JUGE); }
+
+  function montrerEpeler(c) {
+    $('carte-boutons').hidden = true;
+    $('btn-voir-mot').hidden = true;
+    var rep = $('carte-reponse'), mot = $('carte-mot');
+    if (c.reponseDonnee != null) {
+      // Réponse jugée : le mot et la correction.
+      mot.className = 'carte-mot';
+      mot.textContent = c.mot;
+      rep.hidden = false;
+      rep.className = 'carte-reponse ' + (c.juste ? 'juste' : 'fausse');
+      rep.textContent = c.juste ? 'Bonne réponse ! ' + c.question.reponse(c.mot)
+        : 'Ce n\u2019est pas ça (j\u2019ai entendu « ' + (c.entendu || '…') + ' »). La bonne réponse : ' + c.question.reponse(c.mot) + '.';
+      return;
+    }
+    cacherMot();
+    $('btn-voir-mot').hidden = true; // cacherMot() remet les boutons à jour
+    rep.className = 'carte-reponse entendu';
+    if (ecoute) {
+      rep.hidden = false;
+      rep.textContent = c.entendu ? 'J\u2019entends : ' + c.entendu : 'Je t\u2019écoute… dis les lettres une par une.';
+    } else if (c.essais) {
+      rep.hidden = false;
+      rep.textContent = 'J\u2019ai entendu « ' + (c.entendu || 'rien') + ' » : ce n\u2019est pas tout à fait ça. Essai ' +
+        (c.essais + 1) + ' sur ' + PAROLE.ESSAIS + '.';
+    } else rep.hidden = true;
+  }
+
+  // Lettres entendues, écrites « B - A - T… » (les mots non compris restent tels quels).
+  function texteEntendu(t) {
+    var e = PAROLE.lettresEntendues(t);
+    return e.lettres.concat(e.douteux).join(' - ');
+  }
+
+  function parler() {
+    var c = partie.carte, r = partie.regles;
+    if (!c || r.etape !== 'repondre' || ecoute) return;
+    if (window.speechSynthesis) window.speechSynthesis.cancel(); // la voix du jeu ne doit pas être entendue par le micro
+    c.entendu = '';
+    var derniers = [];
+    ecoute = PAROLE.ecouter({
+      texte: function (props) {
+        derniers = props;
+        c.entendu = texteEntendu(props[0] || '');
+        montrerEpeler(c);
+        // Toutes les lettres sont là : inutile d'attendre la fin du silence.
+        if (PAROLE.juste(c.mot, props)) ecoute.arreter();
+      },
+      fin: function (props) {
+        ecoute = null;
+        if (props && props.length) derniers = props;
+        juger(derniers);
+      },
+      erreur: function (code) {
+        ecoute = null;
+        if (code === 'no-speech' || code === 'aborted') { montrerEpeler(c); rendre(); return; } // rien entendu : on peut retoucher « Parler »
+        // Micro refusé, pas de connexion… : les autres joueurs jugent (« Bonne / Mauvaise réponse »).
+        c.juge = true;
+        montrerCarte(partie.joueurs[r.joueur]);
+        var rep = $('carte-reponse');
+        rep.hidden = false;
+        rep.className = 'carte-reponse alerte';
+        rep.textContent = 'Le micro ne marche pas ici. Épelle le mot à voix haute : les autres joueurs disent si c\u2019est juste.';
+        rendre();
+      }
+    });
+    montrerEpeler(c);
+    rendre();
+  }
+
+  // Fin de l'écoute : juste → dé FORT ; faux → nouvel essai, ou au 3e la correction et le dé FAIBLE.
+  function juger(props) {
+    var c = partie.carte, r = partie.regles;
+    if (!c || r.etape !== 'repondre') return;
+    if (!props.length) { montrerEpeler(c); rendre(); return; } // rien entendu : l'essai ne compte pas
+    c.essais = (c.essais || 0) + 1;
+    var juste = PAROLE.juste(c.mot, props);
+    if (!juste && c.essais < PAROLE.ESSAIS) { montrerEpeler(c); rendre(); ajusterTour(); return; }
+    c.juste = juste;
+    c.reponseDonnee = c.entendu;
+    c.attente = !juste;
+    montrerEpeler(c);
+    R.repondre(r, juste);
+    reagir(juste);
+    rendre();
+    lancerApresReaction();
+  }
 
   // Carte d'orthographe à écrire : la consigne, le mot caché (« Voir le mot » l'aide), la case de réponse ;
   // après validation, le mot (lettres muettes surlignées) et la correction.
@@ -1201,6 +1308,8 @@
       boutons.hidden = true; voirMot.hidden = true;
     } else if (orthoSaisie(c)) {
       montrerOrthoSaisie(c);
+    } else if (epelerOral(c)) {
+      montrerEpeler(c);
     } else {
       cacherMot();
       boutons.hidden = false; voirMot.hidden = false;

@@ -2,8 +2,10 @@
 // Va de l'accueil au plateau : nombre de joueurs et aventure au choix.
 // Les tests raccourcissent la pause entre deux joueurs (2,2 s en vrai) et repoussent le lancer
 // automatique du dé (1,6 s en vrai) pour pouvoir lancer le dé (lancerLeDe) sans course.
-async function rapide(page, { autoDe = 600000, pause = 80 } = {}) {
-  await page.addInitScript(([a, p]) => { window.AVENTURA_PAUSE = p; window.AVENTURA_DUREE_DE = 0; window.AVENTURA_AUTO_DE = a; }, [autoDe, pause]);
+// « Épeler à l'oral » (v6.28) : par défaut les tests jugent avec « Bonne / Mauvaise réponse » (window.AVENTURA_JUGE,
+// le mode utilisé quand le micro ne marche pas) ; les tests de la voix passent { juge: false } (tests/epeler-oral.spec.js).
+async function rapide(page, { autoDe = 600000, pause = 80, juge = true } = {}) {
+  await page.addInitScript(([a, p, j]) => { window.AVENTURA_PAUSE = p; window.AVENTURA_DUREE_DE = 0; window.AVENTURA_AUTO_DE = a; window.AVENTURA_JUGE = j; }, [autoDe, pause, juge]);
   page.__rapide = true;
 }
 

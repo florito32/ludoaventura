@@ -11,7 +11,7 @@ test.describe('réponses attendues', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
 
   test('14 types de questions', () => {
-    expect(Q.TYPES.map((t) => t.nom)).toEqual(['Épeler', 'Nombre de lettres', 'Nombre de syllabes', 'Consonnes', 'Voyelles', 'Lettres muettes', 'Réécrire le mot',
+    expect(Q.TYPES.map((t) => t.nom)).toEqual(['Épeler à l’oral', 'Nombre de lettres', 'Nombre de syllabes', 'Consonnes', 'Voyelles', 'Lettres muettes', 'Réécrire le mot',
       // v6.17 : questions acceptées le 04/11/2026
       'Lettre manquante', 'Mot mélangé', 'Nombre de voyelles', 'Nombre de consonnes', 'Combien de fois cette lettre\u00a0?',
       // v6.18
