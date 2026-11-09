@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.29';
+  var VERSION = '6.30';
 
   var HISTORY = [
+    { v: '6.30', date: '2026-11-09', changes: [
+      "Hors ligne (mode avion) : le plateau s'affiche correctement. Les deux plateaux (jour et soir) sont gardés en mémoire dès l'ouverture du jeu, un fichier manquant dans la copie hors ligne est retéléchargé dès que le réseau revient, et l'image se recharge seule au retour du réseau."
+    ] },
     { v: '6.29', date: '2026-11-09', changes: [
       "Plus de « points » : chaque aventure compte dans son unité. Encadré du plateau « Pierres taillées 17 / 18 », message « Léa taille 3 pierres ! », fin de partie « L'équipe a taillé 17 pierres, il en fallait 18. » (troncs, épées, silex, gazelles, blocs, briques, rails, menhirs, pierres selon l'aventure)."
     ] },

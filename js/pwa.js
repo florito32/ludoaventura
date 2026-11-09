@@ -50,6 +50,12 @@
     document.getElementById('btn-installer-ok').addEventListener('click', function () { boite.close(); });
   })();
 
+  // Stockage persistant (v6.26) : demande au navigateur de ne pas effacer la copie hors ligne du jeu
+  // quand l'appareil manque de place. Chrome décide seul, sans fenêtre (web.dev/articles/persistent-storage).
+  if (navigator.storage && navigator.storage.persist) {
+    navigator.storage.persisted().then(function (p) { return p || navigator.storage.persist(); }).catch(function () {});
+  }
+
   if (!('serviceWorker' in navigator)) return;
   // sw.js est à la racine du site, à côté du dossier js/ : on le localise depuis ce script
   // pour que l'enregistrement fonctionne depuis n'importe quelle page (accueil, aventures).
