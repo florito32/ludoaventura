@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.34';
+  var VERSION = '6.35';
 
   var HISTORY = [
+    { v: '6.35', date: '2026-11-09', changes: [
+      "Épeler à l'oral : plus d'essais. Si le micro se trompe de lettre, les lettres entendues s'affichent dans la case : corrige-les au clavier, puis touche « OK ». « Redire les lettres » recommence l'écoute."
+    ] },
     { v: '6.34', date: '2026-11-09', changes: [
       "Épeler à l'oral : une réponse juste n'est plus refusée quand la reconnaissance vocale colle les lettres en un mot (« E, S, T, O, M, A, C » écrit « estomac »)."
     ] },

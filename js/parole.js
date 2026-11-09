@@ -136,7 +136,7 @@
     return morceaux[morceaux.length - 1].map(function (a) { return (debut + ' ' + a).trim(); });
   }
 
-  var api = { lettresEntendues: lettresEntendues, lettresDuMot: lettresDuMot, juste: juste, disponible: disponible, ecouter: ecouter, ESSAIS: 3 };
+  var api = { lettresEntendues: lettresEntendues, lettresDuMot: lettresDuMot, juste: juste, disponible: disponible, ecouter: ecouter };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else racine.Parole = api;
 })(this);

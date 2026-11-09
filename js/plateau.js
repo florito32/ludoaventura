@@ -961,7 +961,9 @@
         bouton('\u23f9\ufe0f J\u2019ai fini', 'btn-principal btn-parler ecoute', function () { ecoute.arreter(); });
       } else {
         annoncer(j.nom + ' touche « Parler » et dit les lettres du mot une par une.');
-        bouton('\ud83c\udfa4 ' + (partie.carte.essais ? 'Réessayer' : 'Parler'), 'btn-principal btn-parler', parler);
+        // Une fois les lettres dans la case, « OK » est le bouton principal : « Redire » devient secondaire.
+        var corr = partie.carte.aCorriger;
+        bouton('\ud83c\udfa4 ' + (corr ? 'Redire les lettres' : 'Parler'), (corr ? 'btn-secondaire' : 'btn-principal') + ' btn-parler', parler);
       }
     } else if (r.etape === 'repondre') {
       consigne.textContent = 'La réponse de ' + j.nom + ' est-elle bonne ?';
@@ -1085,7 +1087,9 @@
 
   // ---------- Épeler à l'oral (v6.28, demande du 09/11/2026) ----------
   // Le mot est caché (la voix le lit ; « Voir le mot » et « Voir la réponse » donneraient la réponse).
-  // Le jeu montre les lettres entendues ; 3 essais (choix de l'utilisateur), puis la réponse compte fausse.
+  // v6.34 (demande du 09/11/2026) : plus d'essais. Si la reconnaissance vocale se trompe de lettre, le joueur
+  // corrige les lettres entendues au clavier (elles s'affichent dans la case de réponse), puis touche « OK ».
+  // Lettres entendues justes : bonne réponse tout de suite. « Parler » peut être retouché pour tout redire.
   // Si le micro ne marche pas (refusé, pas de connexion…), la carte repasse en « Bonne / Mauvaise réponse »
   // jugée par les autres joueurs (c.juge). Les tests forcent ce mode avec window.AVENTURA_JUGE.
   var ecoute = null; // écoute en cours (js/parole.js)
@@ -1094,7 +1098,8 @@
   function montrerEpeler(c) {
     $('carte-boutons').hidden = true;
     $('btn-voir-mot').hidden = true;
-    var rep = $('carte-reponse'), mot = $('carte-mot');
+    var rep = $('carte-reponse'), mot = $('carte-mot'), saisie = $('carte-saisie'), champ = $('reponse-joueur');
+    saisie.hidden = true;
     if (c.reponseDonnee != null) {
       // Réponse jugée : le mot et la correction.
       mot.className = 'carte-mot';
@@ -1102,7 +1107,7 @@
       rep.hidden = false;
       rep.className = 'carte-reponse ' + (c.juste ? 'juste' : 'fausse');
       rep.textContent = c.juste ? 'Bonne réponse ! ' + c.question.reponse(c.mot)
-        : 'Ce n\u2019est pas ça (j\u2019ai entendu « ' + (c.entendu || '…') + ' »). La bonne réponse : ' + c.question.reponse(c.mot) + '.';
+        : 'Ce n\u2019est pas ça (tu as donné « ' + (c.reponseDonnee || '…') + ' »). La bonne réponse : ' + c.question.reponse(c.mot) + '.';
       return;
     }
     cacherMot();
@@ -1111,17 +1116,28 @@
     if (ecoute) {
       rep.hidden = false;
       rep.textContent = c.entendu ? 'J\u2019entends : ' + c.entendu : 'Je t\u2019écoute… dis les lettres une par une.';
-    } else if (c.essais) {
+    } else if (c.aCorriger) {
+      // Les lettres entendues sont dans la case : le joueur les corrige si besoin, puis « OK ».
       rep.hidden = false;
-      rep.textContent = 'J\u2019ai entendu « ' + (c.entendu || 'rien') + ' » : ce n\u2019est pas tout à fait ça. Essai ' +
-        (c.essais + 1) + ' sur ' + PAROLE.ESSAIS + '.';
+      rep.textContent = 'Vérifie les lettres entendues. Corrige-les si besoin, puis touche « OK ».';
+      saisie.hidden = false;
+      champ.setAttribute('inputmode', 'text');
+      champ.setAttribute('autocapitalize', 'characters');
+      champ.disabled = false;
+      $('btn-valider-reponse').disabled = false;
+      champ.removeAttribute('aria-invalid');
+      if (champ.value !== c.entendu) champ.value = c.entendu || '';
+    } else if (c.rienEntendu) {
+      rep.hidden = false;
+      rep.textContent = 'Je n\u2019ai rien entendu. Touche « Parler » et dis les lettres une par une.';
     } else rep.hidden = true;
   }
 
-  // Lettres entendues, écrites « B - A - T… » (les mots non compris restent tels quels).
+  // Lettres entendues, écrites « B A T … » ; un mot collé par la reconnaissance est découpé en lettres (v6.34),
+  // pour que le joueur n'ait qu'à corriger la lettre fausse.
   function texteEntendu(t) {
-    var e = PAROLE.lettresEntendues(t);
-    return e.lettres.concat(e.douteux).join(' - ');
+    var e = PAROLE.lettresEntendues(t, true);
+    return e.lettres.concat(e.douteux).join(' ');
   }
 
   function parler() {
@@ -1129,6 +1145,9 @@
     if (!c || r.etape !== 'repondre' || ecoute) return;
     if (window.speechSynthesis) window.speechSynthesis.cancel(); // la voix du jeu ne doit pas être entendue par le micro
     c.entendu = '';
+    c.aCorriger = false;
+    c.rienEntendu = false;
+    $('reponse-joueur').blur();
     var derniers = [];
     ecoute = PAROLE.ecouter({
       texte: function (props) {
@@ -1141,11 +1160,11 @@
       fin: function (props) {
         ecoute = null;
         if (props && props.length) derniers = props;
-        juger(derniers);
+        finEcoute(derniers);
       },
       erreur: function (code) {
         ecoute = null;
-        if (code === 'no-speech' || code === 'aborted') { montrerEpeler(c); rendre(); return; } // rien entendu : on peut retoucher « Parler »
+        if (code === 'no-speech' || code === 'aborted') { c.rienEntendu = true; montrerEpeler(c); rendre(); return; }
         // Micro refusé, pas de connexion… : les autres joueurs jugent (« Bonne / Mauvaise réponse »).
         c.juge = true;
         montrerCarte(partie.joueurs[r.joueur]);
@@ -1160,16 +1179,41 @@
     rendre();
   }
 
-  // Fin de l'écoute : juste → dé FORT ; faux → nouvel essai, ou au 3e la correction et le dé FAIBLE.
-  function juger(props) {
+  // Fin de l'écoute : lettres justes → bonne réponse ; sinon le joueur corrige les lettres dans la case.
+  function finEcoute(props) {
     var c = partie.carte, r = partie.regles;
     if (!c || r.etape !== 'repondre') return;
-    if (!props.length) { montrerEpeler(c); rendre(); return; } // rien entendu : l'essai ne compte pas
-    c.essais = (c.essais || 0) + 1;
-    var juste = PAROLE.juste(c.mot, props);
-    if (!juste && c.essais < PAROLE.ESSAIS) { montrerEpeler(c); rendre(); ajusterTour(); return; }
+    if (!props.length || !c.entendu) { c.rienEntendu = true; montrerEpeler(c); rendre(); return; }
+    if (PAROLE.juste(c.mot, props)) { jugerEpeler(true, c.entendu); return; }
+    c.aCorriger = true;
+    montrerEpeler(c);
+    rendre();
+    ajusterTour();
+    $('reponse-joueur').focus({ preventScroll: true });
+  }
+
+  // « OK » après correction : les lettres de la case, comparées à celles du mot (accents non demandés).
+  function validerEpeler() {
+    var c = partie.carte, champ = $('reponse-joueur'), rep = $('carte-reponse');
+    var lettres = Q.lettresEcrites(champ.value);
+    if (!lettres.length) {
+      rep.hidden = false;
+      rep.className = 'carte-reponse alerte';
+      rep.textContent = 'Écris les lettres du mot, par exemple : B A T E A U.';
+      champ.setAttribute('aria-invalid', 'true');
+      champ.focus();
+      return;
+    }
+    champ.blur();
+    jugerEpeler(lettres.join('') === PAROLE.lettresDuMot(c.mot).join(''), lettres.join(' '));
+  }
+
+  // Réponse définitive : dé FORT si juste ; sinon la correction et « J'ai compris » avant le dé FAIBLE.
+  function jugerEpeler(juste, donne) {
+    var c = partie.carte, r = partie.regles;
     c.juste = juste;
-    c.reponseDonnee = c.entendu;
+    c.reponseDonnee = donne;
+    c.aCorriger = false;
     c.attente = !juste;
     montrerEpeler(c);
     R.repondre(r, juste);
@@ -1287,6 +1331,7 @@
   function validerSaisie(e) {
     e.preventDefault();
     var r = partie.regles, c = partie.carte;
+    if (r && r.etape === 'repondre' && epelerOral(c) && c.aCorriger) { validerEpeler(); return; } // v6.34
     if (!r || r.etape !== 'repondre' || !aSaisir(c)) return;
     var champ = $('reponse-joueur'), texte = champ.value.trim();
     var rep = $('carte-reponse');
@@ -1323,6 +1368,7 @@
     box.hidden = false;
     box.className = 'carte-piochee joueur-' + j.couleur;
     $('carte-saisie').hidden = true;
+    $('reponse-joueur').setAttribute('autocapitalize', 'off'); // « Épeler à l'oral » met des majuscules (v6.34)
     if (aSaisir(c) && !orthoSaisie(c)) {
       // Le titre de la carte = son thème seul, écrit gros (v6.27 : plus de « Carte n° … de … »).
       $('carte-titre').textContent = c.packNom;
@@ -1400,6 +1446,11 @@
 
   function brancherCarte() {
     $('carte-saisie').addEventListener('submit', validerSaisie);
+    // Épeler à l'oral (v6.34) : les lettres corrigées par le joueur sont gardées sur la carte (rechargement de la page).
+    $('reponse-joueur').addEventListener('input', function () {
+      var c = partie.carte;
+      if (epelerOral(c) && c.aCorriger) { c.entendu = this.value; sauver(); }
+    });
     $('btn-tableau').addEventListener('click', basculerTableau);
     $('btn-voir-mot').addEventListener('click', function () { if (partie.vue === 'mot') cacherMot(); else montrerMotSeul(); });
     $('btn-voir').addEventListener('click', function () { if (partie.vue === 'reponse') cacherMot(); else montrerReponse(); });

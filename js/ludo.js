@@ -156,7 +156,7 @@
     // Épeler à l'oral (v6.28) : le joueur parle, le jeu écoute et corrige.
     if (r.etape === 'repondre' && c && c.question && c.question.oral && !c.juge && !window.AVENTURA_JUGE) {
       return { cle: cle, cible: $('tour-actions').querySelector('button'),
-        texte: j.nom + ', écoute le mot (« Écouter »), puis touche « Parler » et dis ses lettres une par une. Tu as 3 essais.' };
+        texte: j.nom + ', écoute le mot (« Écouter »), puis touche « Parler » et dis ses lettres une par une. Si le micro se trompe, corrige les lettres dans la case, puis « OK ».' };
     }
     if (r.etape === 'repondre') {
       return { cle: cle, cible: $('tour-actions'),
