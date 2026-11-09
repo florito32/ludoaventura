@@ -711,8 +711,8 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 }
 .carte-piochee p { margin: 0; }
 .carte-entete { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
-.carte-titre { font-weight: 800; }
-.carte-titre small { display: block; font-weight: 600; font-size: .78rem; color: var(--encre-douce); }
+/* Titre de la carte = son thème (ex. « Numérique · Mot mélangé »), écrit gros (v6.27). */
+.carte-titre { font-weight: 800; font-size: 1.3rem; line-height: 1.25; }
 .btn-ecouter {
   flex: none; font: inherit; font-weight: 700; cursor: pointer; min-height: 44px; padding: 6px 12px;
   background: var(--encre); color: #fff; border: 2px solid var(--encre); border-radius: 99px;
@@ -986,7 +986,10 @@ body:has(#ecran-plateau:not([hidden])) .pied { padding-block: 2px calc(2px + env
   .table.tour-monte .panneau { position: absolute; left: 0; right: 0; bottom: 0; max-height: 100%; z-index: 6; }
   .table.tour-monte .panneau .tour { flex: 0 1 auto; }
   .table.tour-monte .tour { box-shadow: 0 -6px 18px rgb(0 0 0 / .35); }
-  .table.tour-monte .tour-joueur { display: none; } /* la carte dit déjà « Carte n° 1 de Léa » */
+  /* v6.27 : la carte ne dit plus « Carte n° 1 de Léa » : « À Léa de jouer » reste visible, sur une ligne fine (sans portrait). */
+  .table.tour-monte .tour-joueur img { display: none; }
+  .table.tour-monte .tour-joueur p { font-size: .9rem; line-height: 1.2; }
+  .table.tour-monte .tour .carte-titre { font-size: 1.15rem; }
   .table.tour-monte .tour .carte-piochee { margin-top: 0; }
   .tour .carte-mot { margin: 2px 0 !important; }
   .tour .carte-consigne { margin-top: 4px !important; }

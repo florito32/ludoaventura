@@ -200,6 +200,22 @@ test('niveau Facile : la carte est une question de la table choisie', async ({ p
   await expect(page.locator('#carte-titre')).toContainText('table de 7');
 });
 
+// Demande du 09/11/2026 (v6.27) : plus de « Carte n° … de … », le thème écrit gros, « OK » au lieu de « Valider ».
+test('la carte montre seulement son thème, en gros, et le bouton de réponse s\'appelle « OK »', async ({ page }) => {
+  await versMaths(page);
+  await maths(page, { signes: ['fois'], nombres: [7], niveau: 'facile' });
+  await lancer(page);
+  await page.getByRole('button', { name: 'Question suivante' }).click();
+  const titre = page.locator('#carte-titre');
+  await expect(titre).not.toContainText('Carte n°');
+  await expect(titre).not.toContainText('Léa');
+  await expect(titre.locator('small')).toHaveCount(0);
+  const taille = await titre.evaluate((e) => parseFloat(getComputedStyle(e).fontSize));
+  expect(taille).toBeGreaterThanOrEqual(18); // l'ancien thème faisait ~12 px
+  await expect(page.locator('#btn-valider-reponse')).toHaveText('OK');
+  await expect(page.locator('#tour-nom')).toBeVisible(); // « À Léa de jouer » reste visible, même encadré remonté
+});
+
 test('partie en mathématiques : bonne réponse → dé FORT, mauvaise → correction et dé FAIBLE @smoke', async ({ page }) => {
   await versMaths(page);
   await maths(page, { signes: ['plus', 'fois'], nombres: [2, 3], niveau: 'moyen', nbSignes: [2] });
@@ -213,7 +229,7 @@ test('partie en mathématiques : bonne réponse → dé FORT, mauvaise → corre
     const res = await page.evaluate(() => window.Aventura.partie.carte.resultatTexte);
     const avant = Number(await page.locator('#points').textContent());
     await page.getByLabel('Ta réponse').fill(bonne ? res : res + '1');
-    await page.getByRole('button', { name: 'Valider' }).click();
+    await page.getByRole('button', { name: 'OK', exact: true }).click();
     await expect(page.locator('#carte-reponse')).toContainText(bonne ? 'Bonne réponse !' : 'La bonne réponse est');
     await expect(page.locator('#carte-reponse')).toContainText('= ' + res);
     await expect(page.locator('#reaction')).toHaveClass(bonne ? /bonne/ : /mauvaise/);
@@ -233,10 +249,10 @@ test('réponse vide ou qui n\'est pas un nombre : message, rien n\'est compté',
   await maths(page, { signes: ['divise'], nombres: [7, 2], niveau: 'facile' });
   await lancer(page);
   await page.getByRole('button', { name: 'Question suivante' }).click();
-  await page.getByRole('button', { name: 'Valider' }).click();
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
   await expect(page.locator('#carte-reponse')).toHaveText('Écris ta réponse dans la case.');
   await page.getByLabel('Ta réponse').fill('trois');
-  await page.getByRole('button', { name: 'Valider' }).click();
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
   await expect(page.locator('#carte-reponse')).toHaveText('Écris un nombre, par exemple 12 ou 3,5.');
   expect(await page.evaluate(() => window.Aventura.partie.regles.etape)).toBe('repondre');
   // Une division peut donner une décimale : la virgule est acceptée.
@@ -256,7 +272,7 @@ test('un joueur en mathématiques, l\'autre en orthographe ; « Mêmes réglages
   await expect(page.getByLabel('Ta réponse')).toBeVisible();
   const res = await page.evaluate(() => window.Aventura.partie.carte.resultatTexte);
   await page.getByLabel('Ta réponse').fill(res);
-  await page.getByRole('button', { name: 'Valider' }).click();
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
   await lancerLeDe(page);
   // Joueur 2 : carte d'orthographe, avec le maître du jeu.
   await page.locator('#tour-nom').filter({ hasText: 'Tom' }).waitFor();
@@ -283,7 +299,7 @@ test('rafraîchir après la réponse : la correction reste et les points ne comp
   await page.getByRole('button', { name: 'Question suivante' }).click();
   const c = await page.evaluate(() => window.Aventura.partie.carte);
   await page.getByLabel('Ta réponse').fill(c.resultatTexte);
-  await page.getByRole('button', { name: 'Valider' }).click();
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
   await expect(page.locator('#carte-reponse')).toContainText('Bonne réponse !');
   await page.reload();
   await expect(page.locator('#carte-reponse')).toContainText('Bonne réponse ! ' + c.formule + ' = ' + c.resultatTexte);
@@ -304,7 +320,7 @@ test('formule Expert : la page ne défile jamais de côté', async ({ page }) =>
   await expect(page.locator('#carte-mot')).toHaveText(/^\d+(\s[+−×÷]\s\d+){1,4}\s=\s\?$/);
   expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
   await page.getByLabel('Ta réponse').fill('12345678901234567890');
-  await page.getByRole('button', { name: 'Valider' }).click();
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
   expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
 });
 
@@ -317,7 +333,7 @@ test('calcul faux : la correction reste à l\'écran jusqu\'à « J\'ai compris 
   await lancer(page);
   await page.getByRole('button', { name: 'Question suivante' }).click();
   await page.getByLabel('Ta réponse').fill('1000');
-  await page.getByRole('button', { name: 'Valider' }).click();
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
   await expect(page.locator('#carte-reponse')).toContainText('La bonne réponse est');
   await page.waitForTimeout(400);
   expect(Number(await page.locator('#points').textContent())).toBe(0);
