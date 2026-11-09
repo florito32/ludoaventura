@@ -184,7 +184,16 @@
     return TYPES.filter(function (t) { return choisis.indexOf(t.id) >= 0 && (!t.possible || t.possible(mot, info)); });
   }
 
-  var api = { TYPES: TYPES, trouver: trouver, juste: juste, consigne: consigne, lisible: lisible, lettresEcrites: lettresEcrites, nombreEcrit: nombreEcrit, possibles: possibles, lettres: lettres, estVoyelle: estVoyelle };
+  // Familles de questions à l'écran de préparation (v6.33, choix de l'utilisateur du 09/11/2026, test A/B) :
+  // regroupées selon la réponse attendue, 3 par ligne (Voyelles à côté de Consonnes,
+  // Nombre de voyelles à côté de Nombre de consonnes).
+  var FAMILLES = [
+    { id: 'ecrire-mot', nom: 'Écrire un mot', icone: '\u270f\ufe0f', types: ['epeler', 'ecrire', 'melange', 'manquante', 'genre', 'pluriel'] },
+    { id: 'trouver', nom: 'Trouver des lettres', icone: '\ud83d\udd0d', types: ['voyelles', 'consonnes', 'muettes'] },
+    { id: 'compter', nom: 'Compter', icone: '\ud83d\udd22', types: ['nb-voyelles', 'nb-consonnes', 'nombre', 'syllabes', 'combien-lettre'] }
+  ];
+
+  var api = { TYPES: TYPES, FAMILLES: FAMILLES, trouver: trouver, juste: juste, consigne: consigne, lisible: lisible, lettresEcrites: lettresEcrites, nombreEcrit: nombreEcrit, possibles: possibles, lettres: lettres, estVoyelle: estVoyelle };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else racine.Questions = api;
 })(this);

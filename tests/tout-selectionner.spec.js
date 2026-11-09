@@ -26,7 +26,7 @@ test('orthographe : « Tout sélectionner » coche tous les packs puis toutes le
   await valider(page);
   // Écran des questions
   await page.locator('#reglages-ortho').waitFor();
-  const toutQ = page.locator('#reglages-ortho .btn-tout');
+  const toutQ = page.locator('#reglages-ortho .btn-tout[data-liste]');
   await expect(toutQ).toBeInViewport();
   await toutQ.click();
   const nQ = await page.locator('#types-questions input').count();
@@ -36,4 +36,31 @@ test('orthographe : « Tout sélectionner » coche tous les packs puis toutes le
   // Le bouton ne déborde pas et ne pousse pas les questions hors de l'écran.
   expect(await toutQ.evaluate((e) => e.scrollWidth <= e.clientWidth + 1)).toBe(true);
   await expect(page.locator('#types-questions .pack').last()).toBeInViewport();
+});
+
+// v6.33 (choix de l'utilisateur au test A/B du 09/11/2026) : 3 familles encadrées selon la réponse, icônes,
+// 3 boutons par ligne, un « Tout » par famille ; Voyelles et Consonnes sur la même ligne.
+test('questions d\'orthographe rangées en 3 familles, chacune avec son « Tout »', async ({ page }) => {
+  await rapide(page);
+  await page.goto('./');
+  await versReglages(page, 1);
+  await orthographe(page);
+  await page.locator('#ortho-packs .btn-tout').click();
+  await valider(page);
+  await page.locator('#reglages-ortho').waitFor();
+  const familles = page.locator('#types-questions .famille');
+  await expect(familles).toHaveCount(3);
+  await expect(familles.locator('.famille-nom')).toHaveText([/Écrire un mot/, /Trouver des lettres/, /Compter/]);
+  await expect(familles.nth(1).locator('.pack')).toHaveText(['Voyelles', 'Consonnes', 'Lettres muettes']);
+  const y = async (t) => (await page.locator('#types-questions .pack', { hasText: new RegExp('^' + t + '$') }).boundingBox()).y;
+  expect(Math.round(await y('Voyelles'))).toBe(Math.round(await y('Consonnes')));
+  expect(Math.round(await y('Nombre de voyelles'))).toBe(Math.round(await y('Nombre de consonnes')));
+  // « Tout » de « Compter » : seulement ses 5 questions ; un 2e toucher les retire.
+  const tout = page.getByRole('button', { name: 'Tout sélectionner : Compter' });
+  await expect(tout).toBeInViewport();
+  await tout.click();
+  expect((await page.evaluate(() => window.Aventura.partie.types[0])).sort()).toEqual(['combien-lettre', 'nb-consonnes', 'nb-voyelles', 'nombre', 'syllabes']);
+  await page.getByRole('button', { name: 'Tout désélectionner : Compter' }).click();
+  expect(await page.evaluate(() => window.Aventura.partie.types[0])).toEqual([]);
+  await expect(familles.last().locator('.pack').last()).toBeInViewport();
 });
