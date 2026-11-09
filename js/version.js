@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.28';
+  var VERSION = '6.29';
 
   var HISTORY = [
+    { v: '6.29', date: '2026-11-09', changes: [
+      "Plus de « points » : chaque aventure compte dans son unité. Encadré du plateau « Pierres taillées 17 / 18 », message « Léa taille 3 pierres ! », fin de partie « L'équipe a taillé 17 pierres, il en fallait 18. » (troncs, épées, silex, gazelles, blocs, briques, rails, menhirs, pierres selon l'aventure)."
+    ] },
     { v: '6.28', date: '2026-11-09', changes: [
       "Orthographe : un bouton « Tout sélectionner » sur l'écran des packs et sur celui des questions (il devient « Tout désélectionner » quand tout est coché)."
     ] },

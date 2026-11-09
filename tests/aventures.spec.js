@@ -27,6 +27,17 @@ test.describe('données des aventures', () => {
   });
 
 
+  test('chaque aventure a son unité à la place de « points » (demande du 09/11/2026)', () => {
+    for (const a of A.LISTE) {
+      expect(a.unite, a.id).not.toMatch(/point/);
+      for (const k of ['un', 'des', 'verbe', 'participe', 'titre']) expect(a.objet[k], a.id + ' ' + k).toBeTruthy();
+      expect(a.unite.startsWith(a.objet.des + ' '), a.id).toBe(true);
+    }
+    expect(A.quantite(A.trouver('mayas'), 1)).toBe('1 pierre');
+    expect(A.quantite(A.trouver('mayas'), 17)).toBe('17 pierres');
+    expect(A.quantite(A.trouver('prehistoire'), 3)).toBe('3 silex');
+  });
+
   test('objectif = 15 / 18 / 21 points par joueur × nombre de joueurs', () => {
     expect(A.objectif(A.trouver('viking'), 1)).toBe(15);
     expect(A.objectif(A.trouver('viking'), 3)).toBe(45);
@@ -75,6 +86,9 @@ test('plateau : nom et image de l\'aventure sur le rouleau, objectif affiché @s
   await expect.poll(() => img.evaluate((i) => i.complete && i.naturalWidth > 0)).toBe(true);
   await expect(page.locator('#objectif')).toHaveText('54');
   await expect(page.locator('#objectif-texte')).toHaveText('54 pierres à tailler');
+  // Encadré : l'unité de l'aventure, pas « Points de l'équipe » (demande du 09/11/2026).
+  await expect(page.locator('#titre-points')).toHaveText('Pierres taillées');
+  await expect(page.locator('#points-plateau')).not.toContainText(/point/i);
   // Le rouleau reste dans le parchemin du plateau.
   const r = await page.locator('#rouleau').boundingBox();
   const p = await page.locator('#plateau').boundingBox();

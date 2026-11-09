@@ -90,7 +90,7 @@
     }
     if (n === 4) {
       return { cle: cle, choix: $('liste-aventures'), cible: $('btn-lancer'),
-        texte: 'Choisissez votre aventure. Chacune donne un nombre de points à gagner ensemble avant d’arriver au volcan. Puis « Lancer la partie ».' };
+        texte: 'Choisissez votre aventure. Chacune a son objectif à atteindre ensemble avant d’arriver au volcan (pierres à tailler, épées à forger…). Puis « Lancer la partie ».' };
     }
     // Étape 3 : la matière, puis ses réglages (un écran ou deux selon la matière).
     valider = $('btn-valider-reglages');
@@ -164,7 +164,8 @@
     if (r.etape === 'lancer') {
       return { cle: cle, texte: 'Le dé se lance tout seul : le dé FORT (4 à 6 points) après une bonne réponse, le dé FAIBLE (1 à 3) après une erreur.' };
     }
-    return { cle: cle, texte: 'Les points du dé s’ajoutent à ceux de l’équipe, en haut à gauche. Gagnez-en assez avant d’arriver au volcan !' };
+    var o = p.aventure.objet; // le dé donne des pierres, des épées… selon l'aventure (demande du 09/11/2026)
+    return { cle: cle, texte: 'Le chiffre du dé, c’est le nombre de ' + o.des + ' pour l’équipe : le compte est en haut à gauche. Il en faut assez avant d’arriver au volcan !' };
   }
 
   // ---------- Affichage ----------

@@ -707,6 +707,7 @@
     $('rouleau-img').src = av.image;
     $('rouleau-img').alt = 'Aventure ' + av.nom;
     $('rouleau-nom').textContent = av.nom;
+    $('titre-points').textContent = av.objet.titre; // « Pierres taillées » plutôt que « Points de l'équipe »
     $('objectif').textContent = partie.objectif;
     $('objectif-texte').textContent = libelleObjectif(av, partie.nbJoueurs);
     $('jauge').setAttribute('aria-valuemax', partie.objectif);
@@ -878,7 +879,6 @@
     if (dx) de.style.left = (left + dx) + 'px';
   }
 
-  function points(n) { return n + ' point' + (n > 1 ? 's' : ''); }
 
   // Met tout l'écran à jour selon l'état de la partie (js/regles.js).
   function rendre(options) {
@@ -945,7 +945,8 @@
       annoncer(j.nom + ' lance le dé ' + r.de.toUpperCase() + '.');
     } else if (r.etape === 'suivant' || r.etape === 'fin') {
       // Points ajoutés : on l'écrit, puis on passe tout seul au joueur suivant (ou au résultat).
-      var gain = j.nom + ' gagne ' + points(r.dernierLancer) + ' !';
+      var av = partie.aventure; // « Léa taille 3 pierres ! » plutôt que « gagne 3 points »
+      var gain = j.nom + ' ' + av.objet.verbe + ' ' + A.quantite(av, r.dernierLancer) + ' !';
       var suite;
       if (r.etape === 'suivant') {
         var k = r.joueur + 1 < r.nbJoueurs ? r.joueur + 1 : 0;
@@ -1434,7 +1435,7 @@
     var ok = R.reussie(r);
     $('fin-icone').textContent = ok ? '🏆' : '🌋';
     $('fin-titre').textContent = ok ? 'Aventure réussie !' : 'Aventure manquée…';
-    $('fin-texte').textContent = 'L’équipe a gagné ' + r.points + ' points pour un objectif de ' + r.objectif + ' ' + av.unite + '. ' +
+    $('fin-texte').textContent = 'L’équipe a ' + av.objet.participe + ' ' + A.quantite(av, r.points) + ', il en fallait ' + r.objectif + '. ' +
       (ok ? 'Bravo, vous avez tous réussi l’aventure ' + av.nom + ' !' : 'Vous ferez mieux la prochaine fois !');
     $('fin').className = 'fin ' + (ok ? 'gagne' : 'perdu');
     $('fin').showModal();
