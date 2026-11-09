@@ -24,14 +24,14 @@ test.describe('règles des dés', () => {
 });
 
 test('bonne réponse → dé FORT (4 à 6 points), mauvaise → dé FAIBLE (1 à 3 points)', async ({ page }) => {
-  await rapide(page, { pause: 1500 }); // le message « … gagne … » reste affiché assez longtemps pour être lu par le test
+  await rapide(page, { pause: 1500 }); // le message « Léa coupe … » reste affiché assez longtemps pour être lu par le test
   await lancerPartie(page);
   let total = 0;
   for (const [reponse, min, max] of [['Bonne réponse', 4, 6], ['Mauvaise réponse', 1, 3]]) {
     await page.getByRole('button', { name: 'Question suivante' }).click();
     await page.getByRole('button', { name: reponse }).click();
     await lancerLeDe(page);
-    await expect(page.locator('#tour-consigne')).toContainText('gagne');
+    await expect(page.locator('#tour-consigne')).toContainText(/ coupe \d troncs? !/); // Viking : des troncs, pas des points
     const pts = Number(await page.locator('#points').textContent());
     expect(pts - total).toBeGreaterThanOrEqual(min);
     expect(pts - total).toBeLessThanOrEqual(max);

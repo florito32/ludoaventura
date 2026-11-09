@@ -45,8 +45,8 @@ test.describe('règles du déroulement', () => {
 });
 
 test('un tour complet : piocher, répondre, lancer, message écrit puis joueur suivant automatiquement', async ({ page }) => {
-  await rapide(page, { pause: 1500 }); // le message « Léa gagne… » reste affiché assez longtemps pour être lu par le test
-  await lancerPartie(page, { joueurs: 2 });
+  await rapide(page, { pause: 1500 }); // le message « Léa taille… » reste affiché assez longtemps pour être lu par le test
+  await lancerPartie(page, { joueurs: 2, aventure: 'Mayas' });
   await expect(page.locator('#tour-nom')).toHaveText('Léa');
   // Le tour de jeu n'écrit plus « Croix 1 sur 5 — la prairie » (demande du 02/11/2026).
   await expect(page.locator('#tour')).not.toContainText(/Croix \d sur \d/);
@@ -59,12 +59,12 @@ test('un tour complet : piocher, répondre, lancer, message écrit puis joueur s
   expect(pts).toBeGreaterThanOrEqual(4);
   expect(pts).toBeLessThanOrEqual(6);
   // C'est écrit sur le plateau (bandeau), puis on passe tout seul au joueur suivant.
-  await expect(page.locator('#bandeau')).toHaveText(`Léa gagne ${pts} points ! Au tour de Tom.`);
+  await expect(page.locator('#bandeau')).toHaveText(`Léa taille ${pts} pierres ! Au tour de Tom.`);
   await expect(page.locator('#bandeau')).toBeVisible();
   // v5.2 : plus écrit dans l'encadré Tour de jeu (seulement pour les lecteurs d'écran).
-  await expect(page.locator('#tour-consigne .visually-hidden')).toHaveText(`Léa gagne ${pts} points ! Au tour de Tom.`);
+  await expect(page.locator('#tour-consigne .visually-hidden')).toHaveText(`Léa taille ${pts} pierres ! Au tour de Tom.`);
   expect(await page.locator('#tour-consigne').evaluate((el) => el.offsetHeight > 0 && [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()))).toBe(false);
-  await expect(page.locator('#tour')).not.toContainText(/gagne \d+ points?/, { useInnerText: true });
+  await expect(page.locator('#tour')).not.toContainText(/taille \d+ pierres?/, { useInnerText: true });
   await attendreJoueur(page, 'Tom');
   await expect(page.locator('.pion').nth(1)).toHaveAttribute('data-case', '1');
 });
@@ -90,7 +90,8 @@ test('partie entière gagnée : toutes les réponses bonnes → aventure réussi
   const fin = page.getByRole('dialog');
   await expect(fin).toBeVisible();
   await expect(fin.getByRole('heading')).toHaveText(pts >= 42 ? 'Aventure réussie !' : 'Aventure manquée…');
-  await expect(fin).toContainText(`${pts} points pour un objectif de 42 gazelles à chasser`);
+  await expect(fin).toContainText(`L’équipe a chassé ${pts} gazelles, il en fallait 42.`);
+  await expect(fin).not.toContainText('point'); // demande du 09/11/2026 : l'unité de l'aventure, jamais « points »
   await fin.getByRole('button', { name: 'Rejouer cette aventure' }).click();
   await expect(page.locator('#points')).toHaveText('0');
   await expect(page.locator('#rouleau-nom')).toHaveText('Savane');
