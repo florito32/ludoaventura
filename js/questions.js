@@ -12,7 +12,8 @@
   function pluriel(n, mot) { return n + ' ' + mot + (n > 1 ? 's' : ''); }
 
   var TYPES = [
-    { id: 'epeler', nom: 'Épeler', consigne: 'Épelle le mot :',
+    // v6.28 : « Épeler à l'oral » : le joueur dit les lettres, la reconnaissance vocale les écrit (js/parole.js).
+    { id: 'epeler', nom: 'Épeler à l\u2019oral', consigne: 'Épelle le mot à voix haute :', oral: true,
       reponse: function (mot) { return lettres(mot).join(' - '); } },
     { id: 'nombre', nom: 'Nombre de lettres', consigne: 'Combien de lettres y a-t-il dans le mot :',
       possible: function (mot, info) { return info.lettres != null; }, saisie: 'nombre',

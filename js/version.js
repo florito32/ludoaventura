@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.30';
+  var VERSION = '6.31';
 
   var HISTORY = [
+    { v: '6.31', date: '2026-11-09', changes: [
+      "Orthographe : « Épeler » devient « Épeler à l'oral » : touche « Parler » et dis les lettres du mot, le jeu les écoute et corrige (3 essais). Proposée seulement si l'appareil sait reconnaître la voix (pas dans Firefox, ni dans l'application installée sur iPhone).",
+      "Si le micro ne marche pas pendant la partie, les autres joueurs jugent avec « Bonne / Mauvaise réponse »."
+    ] },
     { v: '6.30', date: '2026-11-09', changes: [
       "Hors ligne (mode avion) : le plateau s'affiche correctement. Les deux plateaux (jour et soir) sont gardés en mémoire dès l'ouverture du jeu, un fichier manquant dans la copie hors ligne est retéléchargé dès que le réseau revient, et l'image se recharge seule au retour du réseau."
     ] },

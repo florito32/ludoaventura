@@ -41,7 +41,7 @@ test('bonne réponse → dé FORT (4 à 6 points), mauvaise → dé FAIBLE (1 à
 });
 
 test('le dé roule sur le plateau puis montre, face visible, les points gagnés', async ({ page }) => {
-  await page.addInitScript(() => { window.AVENTURA_PAUSE = 80; window.AVENTURA_DUREE_DE = 700; window.AVENTURA_AUTO_DE = 600000; });
+  await page.addInitScript(() => { window.AVENTURA_PAUSE = 80; window.AVENTURA_DUREE_DE = 700; window.AVENTURA_AUTO_DE = 600000; window.AVENTURA_JUGE = true; });
   page.__rapide = true; // garder la durée réelle du roulé
   await lancerPartie(page);
   await page.getByRole('button', { name: 'Question suivante' }).click();

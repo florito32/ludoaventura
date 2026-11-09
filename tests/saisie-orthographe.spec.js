@@ -91,7 +91,7 @@ test('réponse illisible : un message demande de corriger, sans compter de faute
   expect(await page.evaluate(() => window.Aventura.partie.regles.etape)).toBe('repondre');
 });
 
-test('« Épeler » garde « Bonne / Mauvaise réponse »', async ({ page }) => {
+test('« Épeler à l’oral » sans micro (mode juge) : « Bonne / Mauvaise réponse »', async ({ page }) => {
   await partieAvec(page, ['epeler']);
   await expect(page.locator('#carte-saisie')).toBeHidden();
   await expect(page.getByRole('button', { name: 'Bonne réponse' })).toBeVisible();
