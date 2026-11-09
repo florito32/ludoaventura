@@ -275,12 +275,36 @@
       majAventuriers();
     });
     // Types de questions (cases à cocher, au moins un).
+    // v6.33 : rangées en 3 familles encadrées (Q.FAMILLES), chacune avec son icône et son bouton « Tout ».
     var types = $('types-questions');
-    Q.TYPES.filter(typeDisponible).forEach(function (t) {
-      var l = document.createElement('label');
-      l.className = 'pack';
-      l.innerHTML = '<input type="checkbox" name="type" value="' + t.id + '" aria-label="' + t.nom + '"><span>' + (t.court || t.nom) + '</span>';
-      types.appendChild(l);
+    Q.FAMILLES.forEach(function (f) {
+      var liste = f.types.map(Q.trouver).filter(typeDisponible);
+      if (!liste.length) return;
+      var boite = document.createElement('div');
+      boite.className = 'famille';
+      boite.setAttribute('role', 'group');
+      boite.setAttribute('aria-labelledby', 'famille-' + f.id);
+      boite.innerHTML = '<div class="famille-tete"><p class="famille-nom" id="famille-' + f.id + '"><span aria-hidden="true">' + f.icone + '</span> ' + f.nom + '</p>' +
+        '<button type="button" class="btn-tout btn-tout-famille" data-famille="' + f.id + '"></button></div><div class="packs"></div>';
+      var grille = boite.querySelector('.packs');
+      liste.forEach(function (t) {
+        var l = document.createElement('label');
+        l.className = 'pack';
+        l.innerHTML = '<input type="checkbox" name="type" value="' + t.id + '" aria-label="' + t.nom + '"><span>' + (t.court || t.nom) + '</span>';
+        grille.appendChild(l);
+      });
+      types.appendChild(boite);
+    });
+    // « Tout » d'une famille : coche (ou décoche) toutes ses questions, sans toucher aux autres familles.
+    types.addEventListener('click', function (e) {
+      var b = e.target.closest('.btn-tout-famille');
+      if (!b) return;
+      var j = partie.actif, ids = Array.prototype.map.call(b.closest('.famille').querySelectorAll('input'), function (i) { return i.value; });
+      var plein = ids.every(function (id) { return partie.types[j].indexOf(id) >= 0; });
+      var reste = partie.types[j].filter(function (id) { return ids.indexOf(id) < 0; });
+      partie.types[j] = plein ? reste : reste.concat(ids);
+      $('packs-alerte').textContent = '';
+      majAventuriers();
     });
     types.addEventListener('change', function () {
       var coches = Array.prototype.filter.call(types.querySelectorAll('input'), function (i) { return i.checked; })
@@ -557,6 +581,12 @@
       b.innerHTML = plein ? '<span class="long">Tout désélectionner</span><span class="court">Aucun</span>'
         : '<span class="long">Tout sélectionner</span><span class="court">Tout</span>';
       b.setAttribute('aria-label', (plein ? 'Tout désélectionner : ' : 'Tout sélectionner : ') + (b.dataset.liste === 'packs' ? 'packs' : 'questions'));
+    });
+    document.querySelectorAll('.btn-tout-famille').forEach(function (b) {
+      var boite = b.closest('.famille'), ids = Array.prototype.map.call(boite.querySelectorAll('input'), function (i) { return i.value; });
+      var plein = ids.every(function (id) { return partie.types[partie.actif].indexOf(id) >= 0; });
+      b.textContent = plein ? 'Aucun' : 'Tout';
+      b.setAttribute('aria-label', (plein ? 'Tout désélectionner : ' : 'Tout sélectionner : ') + boite.querySelector('.famille-nom').textContent.replace(/^\S+\s/, ''));
     });
     // Étape 3 : écran de la matière ou écran de ses réglages.
     var ecran = partie.sousEtape, surMatiere = ecran === 'matiere';

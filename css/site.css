@@ -385,11 +385,19 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 
 /* Orthographe (v6.16) : deux écrans.
    Packs (19) : en largeur 5 par ligne (4 lignes), en hauteur 3 par ligne (7 lignes).
-   Questions (14 depuis v6.18) : en largeur 4 par ligne (4 lignes), en hauteur 2 par ligne (7 lignes). */
+   Questions : voir plus bas (familles, v6.33). */
 #ortho-packs { --rangs: 4; --cols: 5; --larg: min(100cqi, 1100px); }
 #ortho-packs .packs { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-#reglages-ortho { --rangs: 4; --cols: 4; --larg: min(100cqi, 1000px); }
-#reglages-ortho .packs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+/* Questions (v6.33, choix de l'utilisateur, test A/B) : 3 familles encadrées, 3 boutons par ligne
+   (5 lignes de boutons + 3 têtes de famille : d'où les 9 rem retirés de la hauteur). */
+#reglages-ortho { --rangs: 5; --cols: 3; --larg: min(100cqi, 820px);
+  --h: clamp(26px, calc((100cqh - 9.5rem) / var(--rangs) - 1.6cqh), 96px); }
+#types-questions { display: flex; flex-direction: column; gap: clamp(4px, 1.2cqh, 12px); }
+#reglages-ortho .famille .packs { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(4px, 1cqh, 10px) clamp(5px, 1.4cqi, 12px); }
+#reglages-ortho .famille { border: 2px solid var(--parchemin-bord); background: #fffaf0; border-radius: 12px; padding: clamp(3px, 1cqh, 10px) clamp(5px, 1.2cqi, 12px); }
+.famille-tete { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: clamp(2px, .8cqh, 8px); }
+.famille-nom { margin: 0; font-weight: 800; font-size: clamp(.8rem, 2.8cqh, 1.1rem); color: var(--encre-douce); }
+.reglages-joueur .btn-tout-famille { min-height: 24px; padding: 0 12px; font-size: .8rem; }
 .reglages-joueur #reglages-ortho .pack span, .reglages-joueur #ortho-packs .pack span { border-radius: 18px; } /* boutons hauts : coins arrondis plutôt qu'ovales */
 /* 19 packs et 12 questions (v6.17) : texte un peu plus petit que sur les autres écrans pour que « Lieux et constructions »
    tienne dans un bouton, même sur téléphone carré (3 lignes au plus). */
@@ -401,8 +409,6 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 @container (max-aspect-ratio: 1/1) {
   #ortho-packs { --rangs: 7; --cols: 3; }
   #ortho-packs .packs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  #reglages-ortho { --rangs: 7; --cols: 2; }
-  #reglages-ortho .packs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 /* Conjugaison, écran des temps (v6.6) : chaque mode choisi est un cadre qui entoure SES temps,
@@ -1100,3 +1106,15 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .btn-parler.ecoute { animation: micro 1.2s ease-in-out infinite; }
 @keyframes micro { 50% { box-shadow: 0 0 0 8px rgb(227 38 42 / .25); } }
 @media (prefers-reduced-motion: reduce) { .btn-parler.ecoute { animation: none; outline: 3px solid var(--rouge); } }
+/* Questions d'orthographe sur écran peu haut (téléphone carré, paysage) : le nom de la famille et son « Tout »
+   passent à gauche des boutons, pour gagner les 3 lignes de titres (v6.33). */
+@container (max-height: 420px) {
+  #reglages-ortho { --h: clamp(24px, calc((100cqh - 6.4rem) / var(--rangs) - 1.2cqh), 60px); }
+  #reglages-ortho .famille { display: grid; grid-template-columns: 6.2rem 1fr; align-items: center; gap: 6px; padding: 3px 6px; }
+  #reglages-ortho .famille-tete { flex-direction: column; align-items: flex-start; gap: 2px; margin: 0; }
+  #reglages-ortho .famille-nom { font-size: .78rem; line-height: 1.1; }
+  #reglages-ortho .famille .packs { gap: 3px 5px; }
+  #reglages-ortho .reglage-tete { margin-bottom: 2px; }
+  #types-questions { gap: 4px; }
+  .reglages-joueur #reglages-ortho .pack span { font-size: clamp(.7rem, calc(var(--h) * .42), .95rem); }
+}

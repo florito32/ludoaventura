@@ -85,11 +85,11 @@ test('orthographe : packs puis questions, chacun en grille régulière qui rempl
   await remplit(page, '#ortho-packs', 0.55);
   await page.locator('#packs label', { hasText: 'Animaux' }).click();
   await page.getByRole('button', { name: 'Valider', exact: true }).click();
-  // Écran des questions : 2 ou 4 par ligne.
+  // Écran des questions (v6.33) : 3 familles encadrées, 3 boutons par ligne.
   await page.locator('#reglages-ortho').waitFor();
   const q = await boites(page, '#types-questions');
   egaux(q);
-  expect([2, 4]).toContain(q.filter((b) => b[1] === q[0][1]).length);
+  expect(q.filter((b) => b[1] === q[0][1]).length).toBe(3);
   expect(await deborde('#reglages-ortho')).toBe(false);
   await remplit(page, '#reglages-ortho', 0.55);
   await page.locator('#types-questions label', { hasText: 'Syllabes' }).click();

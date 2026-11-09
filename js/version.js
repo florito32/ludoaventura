@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.32';
+  var VERSION = '6.33';
 
   var HISTORY = [
+    { v: '6.33', date: '2026-11-09', changes: [
+      "Orthographe : les questions sont rangées en 3 familles encadrées (✏️ Écrire un mot, 🔍 Trouver des lettres, 🔢 Compter), 3 par ligne, avec un bouton « Tout » par famille ; Voyelles et Consonnes sont côte à côte."
+    ] },
     { v: '6.32', date: '2026-11-09', changes: [
       "Orthographe : « Réécrire le mot » devient une dictée au clavier : la voix lit le mot, une petite phrase d'exemple, puis le mot encore ; le joueur l'écrit et le jeu corrige (plus de « Bonne / Mauvaise réponse »)."
     ] },
