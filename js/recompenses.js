@@ -48,10 +48,11 @@
   function majAccueil() {
     var nv = compte.niveau(), total = compte.etat.total;
     if (window.Defis) {
-      var reste = ['solo', 'equipe'].filter(function (t) { return compte.defiDuJour(t) === undefined; }).length;
+      // Défis encore à faire : ni réussis ni quittés (v6.47).
+      var reste = ['solo', 'equipe'].filter(function (t) { return compte.defiAFaire(t); }).length;
       $('defi-badge').textContent = reste;
       $('defi-badge').hidden = !reste;
-      $('defi-aide').textContent = reste ? ' à faire' : ' : tous réussis';
+      $('defi-aide').textContent = reste ? ' à faire' : ' : plus rien à gagner aujourd’hui';
     }
     $('accueil-total').textContent = total;
     $('accueil-gemmes').textContent = compte.etat.gemmes || 0; // pierres précieuses (v6.46)
@@ -196,6 +197,7 @@
       ['solo', 'equipe'].forEach(function (t) {
         var g = compte.defiDuJour(t);
         taches.push({ ico: ico('i-defi'), nom: t === 'solo' ? 'Défi solo' : 'Défi en équipe', fait: g !== undefined, gain: g,
+          quitte: g === undefined && compte.defiQuitte(t),
           action: '<button type="button" class="btn-petit" data-defi="' + t + '">Jouer</button>' });
       });
     }
@@ -205,7 +207,7 @@
       '<p class="petit">' + faits + ' sur ' + taches.length + ' terminé' + (faits > 1 ? 's' : '') + '</p><ul class="taches-jour">';
     taches.forEach(function (t) {
       h += '<li class="' + (t.fait ? 'fait' : '') + '">' + t.ico + '<span class="t-nom">' + t.nom + '</span>' +
-        (t.fait ? '<span class="etat fait"><span aria-hidden="true">✔</span> +' + t.gain + ' ⭐</span>' : t.action) + '</li>';
+        (t.fait ? '<span class="etat fait"><span aria-hidden="true">✔</span> +' + t.gain + ' ⭐</span>' : t.quitte ? '<span class="etat quitte">Quitté</span>' : t.action) + '</li>';
     });
     h += '</ul></section>';
 
@@ -280,7 +282,7 @@
       var g = compte.defiDuJour(t);
       h += '<label class="defi-type"><input type="radio" name="defi-type" value="' + t + '"' + (choixDefi.type === t ? ' checked' : '') + '>' +
         '<span>' + ico('i-defi') + '<strong>' + (t === 'solo' ? 'Défi solo' : 'Défi en équipe') + '</strong>' +
-        '<small class="' + (g !== undefined ? 'fait' : '') + '">' + (g !== undefined ? '✔ Réussi · +' + g + ' ⭐' : 'À faire') + '</small></span></label>';
+        '<small class="' + (g !== undefined ? 'fait' : compte.defiQuitte(t) ? 'quitte' : '') + '">' + (g !== undefined ? '✔ Réussi · +' + g + ' ⭐' : compte.defiQuitte(t) ? 'Quitté aujourd’hui' : 'À faire') + '</small></span></label>';
     });
     h += '</fieldset>';
     h += radios('defi-matiere', 'Matière', [['maths', 'Maths'], ['francais', 'Français']], choixDefi.matiere);
@@ -288,7 +290,8 @@
     if (choixDefi.type === 'equipe') h += radios('defi-joueurs', 'Joueurs', [[2, '2'], [3, '3'], [4, '4']], choixDefi.joueurs);
     var g = compte.defiDuJour(choixDefi.type);
     h += '<div class="defi-valider" aria-live="polite">' +
-      (g !== undefined ? '<p class="defi-recompense fait">✔ Défi déjà réussi aujourd’hui (+' + g + ' ⭐). Tu peux rejouer : étoiles normales.</p>'
+      (g === undefined && compte.defiQuitte(choixDefi.type) ? '<p class="defi-recompense quitte">Tu as quitté ce défi avant la fin aujourd’hui : tu peux y rejouer, mais il ne rapporte plus rien jusqu’à demain.</p>'
+        : g !== undefined ? '<p class="defi-recompense fait">✔ Défi déjà réussi aujourd’hui (+' + g + ' ⭐). Tu peux rejouer : étoiles normales.</p>'
         : '<p class="defi-recompense">' + ico('i-etoile') + '<span>L’aventure reste une surprise. Gagne-la : tes étoiles sont <strong>doublées</strong> !</span></p>') +
       (choixDefi.matiere ? '' : '<p class="petit" id="defi-manque">Choisis la matière pour valider.</p>') +
       '<button type="button" class="btn btn-principal" id="btn-lancer-defi"' + (choixDefi.matiere ? '' : ' disabled aria-describedby="defi-manque"') + '>Valider</button>' +
@@ -352,10 +355,13 @@
     if (!r.id) r.id = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
     var texte = (info.defi ? (info.defi === 'solo' ? 'Défi solo' : 'Défi en équipe') + ' réussi · ' : 'Aventure réussie · ') + av.nom;
     var res = compte.recompenserPartie(r.id, r.points, info.gagnee, info.defi, texte);
-    if (res) r.recompense = { base: res.base, bonus: res.bonus, deja: !!res.defiDejaFait, avant: res.gain ? res.gain.avant : 0, apres: res.gain ? res.gain.apres : 0, gemmes: res.gemmes || 0 };
+    if (res) r.recompense = { base: res.base, bonus: res.bonus, deja: !!res.defiDejaFait, avant: res.gain ? res.gain.avant : 0, apres: res.gain ? res.gain.apres : 0, gemmes: res.gemmes || 0, quitte: !!res.quitte };
     var rc = r.recompense || { base: 0, bonus: 0 };
     var h = '';
-    if (info.gagnee) {
+    if (rc.quitte) {
+      // Défi quitté plus tôt aujourd'hui (v6.47) : pas de récompense, même gagné.
+      h += '<p class="fin-quitte">Tu as quitté ce défi avant la fin aujourd’hui : pas d’étoiles ni de pierres pour lui avant demain.</p>';
+    } else if (info.gagnee) {
       h += '<p class="fin-gain">' + ico('i-etoile', 'ico-gain') + '<strong>+' + etoiles(rc.base + rc.bonus) + '</strong></p>';
       if (rc.bonus) h += '<p class="fin-bonus">' + ico('i-defi') + ' Défi du jour réussi : étoiles doublées !</p>';
       else if (rc.deja) h += '<p class="petit">Défi déjà réussi aujourd’hui : étoiles normales.</p>';

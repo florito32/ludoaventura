@@ -1219,6 +1219,9 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .palier span { font-size: .85rem; color: var(--encre-douce); }
 .etat { font-size: .88rem; font-weight: 700; color: var(--encre-douce); text-align: right; }
 .etat.fait { color: #1f7a3a; }
+/* Défi quitté avant la fin (v6.47) : plus de récompense aujourd'hui. */
+.etat.quitte, .defi-type small.quitte, .defi-recompense.quitte, .fin-quitte { color: var(--rouge-texte); }
+.fin-quitte { font-weight: 700; margin: 6px 0; }
 .btn-petit {
   font: inherit; font-weight: 800; cursor: pointer; min-height: 44px; padding: 6px 16px; border-radius: 10px;
   border: 2px solid var(--encre); background: var(--rouge); color: #fff; box-shadow: 0 3px 0 var(--encre); margin-left: auto;
