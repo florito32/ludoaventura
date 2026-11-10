@@ -12,9 +12,7 @@
   function pluriel(n, mot) { return n + ' ' + mot + (n > 1 ? 's' : ''); }
 
   var TYPES = [
-    // v6.28 : « Épeler à l'oral » : le joueur dit les lettres, la reconnaissance vocale les écrit (js/parole.js).
-    { id: 'epeler', nom: 'Épeler à l\u2019oral', consigne: 'Épelle le mot à voix haute :', oral: true,
-      reponse: function (mot) { return lettres(mot).join(' - '); } },
+    // « Épeler à l'oral » n'est plus proposée (demande du 10/11/2026).
     { id: 'nombre', nom: 'Nombre de lettres', consigne: 'Combien de lettres y a-t-il dans le mot :',
       possible: function (mot, info) { return info.lettres != null; }, saisie: 'nombre',
       attendu: function (mot, info) { return info.lettres; },
@@ -188,7 +186,7 @@
   // regroupées selon la réponse attendue, 3 par ligne (Voyelles à côté de Consonnes,
   // Nombre de voyelles à côté de Nombre de consonnes).
   var FAMILLES = [
-    { id: 'ecrire-mot', nom: 'Écrire un mot', icone: '\u270f\ufe0f', types: ['epeler', 'ecrire', 'melange', 'manquante', 'genre', 'pluriel'] },
+    { id: 'ecrire-mot', nom: 'Écrire un mot', icone: '\u270f\ufe0f', types: ['ecrire', 'melange', 'manquante', 'genre', 'pluriel'] },
     { id: 'trouver', nom: 'Trouver des lettres', icone: '\ud83d\udd0d', types: ['voyelles', 'consonnes', 'muettes'] },
     { id: 'compter', nom: 'Compter', icone: '\ud83d\udd22', types: ['nb-voyelles', 'nb-consonnes', 'nombre', 'syllabes', 'combien-lettre'] }
   ];

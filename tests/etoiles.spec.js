@@ -1,7 +1,7 @@
 // Étoiles, niveaux et coffres (v6.36, demande du 10/11/2026, backlog lignes 164 à 173).
 const { test, expect } = require('@playwright/test');
 const E = require('../js/etoiles.js');
-const { lancerPartie, lancerLeDe, rapide, ouvrirNeuf } = require('./aide');
+const { repondre, lancerPartie, lancerLeDe, rapide, ouvrirNeuf } = require('./aide');
 
 // Stockage imité pour les tests de logique.
 function memoire() { const m = {}; return { getItem: (k) => (k in m ? m[k] : null), setItem: (k, v) => { m[k] = String(v); } }; }
@@ -138,7 +138,7 @@ test('une aventure gagnée rapporte ses unités en étoiles, une seule fois mêm
   await lancerPartie(page, { joueurs: 1 });
   for (let t = 0; t < 5; t++) {
     await page.getByRole('button', { name: 'Question suivante' }).click();
-    await page.getByRole('button', { name: 'Bonne réponse' }).click();
+    await repondre(page, true);
     await lancerLeDe(page);
   }
   const fin = page.locator('#fin');
@@ -162,7 +162,7 @@ test('fin de partie : passer le niveau 5 propose d\'ouvrir le coffre d\'argent',
   await lancerPartie(page, { joueurs: 1 });
   for (let t = 0; t < 5; t++) {
     await page.getByRole('button', { name: 'Question suivante' }).click();
-    await page.getByRole('button', { name: 'Bonne réponse' }).click();
+    await repondre(page, true);
     await lancerLeDe(page);
   }
   await expect(page.locator('#fin-etoiles')).toContainText('Niveau 5 atteint !');

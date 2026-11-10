@@ -1,7 +1,7 @@
 // Tours de jeu : pioche dans son tas, bonne / mauvaise réponse, dé, points cumulés, fin de partie.
 const { test, expect } = require('@playwright/test');
 const R = require('../js/regles.js');
-const { lancerPartie, attendreJoueur, rapide, lancerLeDe } = require('./aide');
+const { repondre, lancerPartie, attendreJoueur, rapide, lancerLeDe } = require('./aide');
 
 test.describe('règles du déroulement', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
@@ -53,7 +53,7 @@ test('un tour complet : piocher, répondre, lancer, message écrit puis joueur s
   await page.getByRole('button', { name: 'Question suivante' }).click();
   await expect(page.locator('#carte-piochee')).toBeVisible();
   await expect(page.locator('#carte-titre')).not.toContainText('Carte n°'); // v6.27
-  await page.getByRole('button', { name: 'Bonne réponse' }).click();
+  await repondre(page, true);
   await lancerLeDe(page);
   const pts = Number(await page.locator('#points').textContent());
   expect(pts).toBeGreaterThanOrEqual(4);
@@ -72,8 +72,9 @@ test('un tour complet : piocher, répondre, lancer, message écrit puis joueur s
 async function jouerPartie(page, bonne) {
   for (let t = 0; t < 10; t++) {
     await page.getByRole('button', { name: 'Question suivante' }).click();
-    await page.getByRole('button', { name: bonne ? 'Bonne réponse' : 'Mauvaise réponse' }).click();
-    await lancerLeDe(page);
+    await repondre(page, bonne);
+    if (bonne) await lancerLeDe(page);
+    else await page.getByRole('button', { name: 'J’ai compris' }).click(); // « J'ai compris » lance le dé FAIBLE
     if (t < 9) await page.getByRole('button', { name: 'Question suivante' }).waitFor();
   }
   // Après le dernier lancer, le résultat s'affiche tout seul.
@@ -112,7 +113,7 @@ test('partie entière perdue : toutes les réponses mauvaises → aventure manqu
 test('animation de réponse : « Bravo ! » et confettis si bonne, « Oups ! » si mauvaise', async ({ page }) => {
   await lancerPartie(page, { joueurs: 2 });
   await page.getByRole('button', { name: 'Question suivante' }).click();
-  await page.getByRole('button', { name: 'Bonne réponse' }).click();
+  await repondre(page, true);
   const reaction = page.locator('#reaction');
   await expect(reaction).toHaveClass(/bonne/);
   await expect(reaction).toContainText('Bravo !');
@@ -121,7 +122,7 @@ test('animation de réponse : « Bravo ! » et confettis si bonne, « Oups ! » 
   await lancerLeDe(page);
   await attendreJoueur(page, 'Tom');
   await page.getByRole('button', { name: 'Question suivante' }).click();
-  await page.getByRole('button', { name: 'Mauvaise réponse' }).click();
+  await repondre(page, false);
   await expect(reaction).toHaveClass(/mauvaise/);
   await expect(reaction).toContainText('Oups !');
   await expect(page.locator('.pion').nth(1)).toHaveClass(/secoue/);
@@ -134,7 +135,7 @@ test('après l\u2019animation de réponse, le bon dé se lance tout seul (FORT s
   for (const [reponse, min, max, nom] of [['Bonne réponse', 4, 6, 'Tom'], ['Mauvaise réponse', 1, 3, 'Léa']]) {
     const avant = Number(await page.locator('#points').textContent());
     await page.getByRole('button', { name: 'Question suivante' }).click();
-    await page.getByRole('button', { name: reponse }).click();
+    await repondre(page, reponse === 'Bonne réponse');
     // v4.3 : ni commentaire visible ni bouton « Lancer le dé » dans le tour de jeu ;
     // v6.1 : après une mauvaise réponse, seul le bouton « J'ai compris ».
     if (reponse === 'Bonne réponse') await expect(page.locator('#tour-actions')).toBeEmpty();
@@ -154,7 +155,7 @@ test('lancer le dé avant le lancer automatique ne le lance pas deux fois', asyn
   page.__rapide = true;
   await lancerPartie(page, { joueurs: 1 });
   await page.getByRole('button', { name: 'Question suivante' }).click();
-  await page.getByRole('button', { name: 'Bonne réponse' }).click();
+  await repondre(page, true);
   await lancerLeDe(page);
   const pts = Number(await page.locator('#points').textContent());
   await page.getByRole('button', { name: 'Question suivante' }).waitFor();
@@ -187,7 +188,7 @@ test('v4.5 : à la fin de « Bravo ! » / « Oups ! », le personnage reste sur 
       window.__arrivees = 0;
       document.querySelector('#pions').addEventListener('animationstart', (e) => { if (e.animationName === 'poser') window.__arrivees++; });
     });
-    await page.getByRole('button', { name: reponse }).click();
+    await repondre(page, reponse === 'Bonne réponse');
     await page.locator('#reaction:not([hidden])').waitFor({ state: 'attached' });
     await page.locator('#reaction[hidden]').waitFor({ state: 'attached', timeout: 5000 }); // fin de l'animation de réponse
     if (reponse === 'Mauvaise réponse') await page.getByRole('button', { name: 'J’ai compris' }).click(); // v6.1
@@ -202,7 +203,7 @@ test('orthographe, « Mauvaise réponse » : la réponse s\'affiche, le dé FAIB
   await rapide(page, { autoDe: 50 });
   await lancerPartie(page, { joueurs: 2 });
   await page.getByRole('button', { name: 'Question suivante' }).click();
-  await page.getByRole('button', { name: 'Mauvaise réponse' }).click();
+  await repondre(page, false);
   await expect(page.locator('#carte-reponse')).toBeVisible();
   await expect(page.locator('#carte-mot')).not.toHaveClass(/cache/);
   await page.waitForTimeout(400);
@@ -214,7 +215,7 @@ test('orthographe, « Mauvaise réponse » : la réponse s\'affiche, le dé FAIB
   // Une bonne réponse, elle, lance le dé FORT tout seul.
   await attendreJoueur(page, 'Tom');
   await page.getByRole('button', { name: 'Question suivante' }).click();
-  await page.getByRole('button', { name: 'Bonne réponse' }).click();
+  await repondre(page, true);
   await expect(page.getByRole('button', { name: 'J’ai compris' })).toHaveCount(0);
   await expect.poll(async () => Number(await page.locator('#points').textContent())).toBeGreaterThanOrEqual(5);
 });
@@ -226,7 +227,7 @@ test('v6.21 : fin de manche, « en route vers le lac / le marais / les collines 
   await lancerPartie(page, { joueurs: 1 });
   for (const lieu of ['le lac', 'le marais', 'les collines', 'le volcan']) {
     await page.getByRole('button', { name: 'Question suivante' }).click();
-    await page.getByRole('button', { name: 'Bonne réponse' }).click();
+    await repondre(page, true);
     await lancerLeDe(page);
     await expect(page.locator('#bandeau')).toContainText('Au tour de Léa, en route vers ' + lieu + '.');
     await expect(page.locator('#bandeau')).not.toContainText('croix suivante');

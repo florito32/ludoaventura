@@ -1,5 +1,5 @@
 // v7.0 (demande du 04/11/2026) : en orthographe, nombre de lettres, nombre de syllabes, consonnes,
-// voyelles et lettres muettes s'écrivent ; le jeu corrige. « Épeler à l'oral » se dit au micro ; « Réécrire le mot » s'écrit (dictée, v6.31).
+// voyelles et lettres muettes s'écrivent ; le jeu corrige. « Réécrire le mot » s'écrit (dictée, v6.31) ; « Épeler à l'oral » n'existe plus (v6.38).
 const { test, expect } = require('@playwright/test');
 const Q = require('../js/questions.js');
 const C = require('../js/cartes.js');
@@ -41,8 +41,10 @@ test.describe('correction des réponses écrites', () => {
     expect(Q.lisible(Q.trouver('voyelles'), '1 2')).toBe(false);
   });
 
-  test('« Épeler à l’oral » se dit ; « Réécrire le mot » s’écrit (v6.31)', () => {
-    expect(Q.trouver('epeler').saisie).toBeUndefined();
+  test('v6.38 : plus d’« Épeler à l’oral » ; toutes les questions s’écrivent', () => {
+    expect(Q.trouver('epeler')).toBeNull();
+    for (const t of Q.TYPES) expect(t.saisie).toBeTruthy();
+    expect(Q.FAMILLES.flatMap((f) => f.types)).not.toContain('epeler');
     expect(Q.trouver('ecrire').saisie).toBe('mot');
   });
 });
@@ -91,10 +93,13 @@ test('réponse illisible : un message demande de corriger, sans compter de faute
   expect(await page.evaluate(() => window.Aventura.partie.regles.etape)).toBe('repondre');
 });
 
-test('« Épeler à l’oral » sans micro (mode juge) : « Bonne / Mauvaise réponse »', async ({ page }) => {
-  await partieAvec(page, ['epeler']);
-  await expect(page.locator('#carte-saisie')).toBeHidden();
-  await expect(page.getByRole('button', { name: 'Bonne réponse' })).toBeVisible();
+test('v6.38 : « Épeler à l’oral » n’est plus proposée dans les questions', async ({ page }) => {
+  await rapide(page);
+  await page.goto('./');
+  await versReglages(page, 1);
+  await cocherJoueur(page, { types: [] });
+  await expect(page.locator('#types-questions input[value="epeler"]')).toHaveCount(0);
+  await expect(page.locator('#types-questions').getByText('Épeler', { exact: false })).toHaveCount(0);
 });
 
 // ---------- v6.17 : lettre manquante, mot mélangé, nombre de voyelles / consonnes, combien de fois ----------

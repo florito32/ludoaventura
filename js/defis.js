@@ -43,8 +43,8 @@
   var ORTHO = {
     facile: { mots: [1], types: ['nombre', 'voyelles', 'consonnes', 'syllabes', 'nb-voyelles', 'nb-consonnes'], combien: 3 },
     moyen: { mots: [2], types: ['syllabes', 'combien-lettre', 'manquante', 'melange', 'genre', 'muettes', 'nb-consonnes'], combien: 3 },
-    difficile: { mots: [2, 3], types: ['ecrire', 'melange', 'manquante', 'pluriel', 'muettes', 'genre', 'epeler'], combien: 3 },
-    expert: { mots: [3], types: ['ecrire', 'melange', 'pluriel', 'muettes', 'epeler', 'manquante'], combien: 3 }
+    difficile: { mots: [2, 3], types: ['ecrire', 'melange', 'manquante', 'pluriel', 'muettes', 'genre'], combien: 3 },
+    expert: { mots: [3], types: ['ecrire', 'melange', 'pluriel', 'muettes', 'manquante'], combien: 3 }
   };
 
   // ---------- Hasard tiré de la date ----------
@@ -75,8 +75,7 @@
 
   // ---------- Le défi ----------
   // choix = { type: 'solo' | 'equipe', matiere: 'maths' | 'francais', niveau, joueurs (équipe : 2 à 4) } ;
-  // jour = « 2026-11-10 » ; options.typesDisponibles = questions d'orthographe jouables sur l'appareil
-  // (« Épeler à l'oral » demande la reconnaissance vocale).
+  // jour = « 2026-11-10 » ; options.typesDisponibles = questions d'orthographe jouables sur l'appareil.
   function generer(jour, choix, options) {
     options = options || {};
     var type = choix.type === 'equipe' ? 'equipe' : 'solo';

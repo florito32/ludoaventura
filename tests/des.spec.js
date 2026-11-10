@@ -1,7 +1,7 @@
 // Dés : faces conformes aux règles, lancer à l'écran.
 const { test, expect } = require('@playwright/test');
 const Des = require('../js/des.js');
-const { lancerPartie, rapide, lancerLeDe } = require('./aide');
+const { repondre, lancerPartie, rapide, lancerLeDe } = require('./aide');
 
 test.describe('règles des dés', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
@@ -27,10 +27,11 @@ test('bonne réponse → dé FORT (4 à 6 points), mauvaise → dé FAIBLE (1 à
   await rapide(page, { pause: 1500 }); // le message « Léa coupe … » reste affiché assez longtemps pour être lu par le test
   await lancerPartie(page);
   let total = 0;
-  for (const [reponse, min, max] of [['Bonne réponse', 4, 6], ['Mauvaise réponse', 1, 3]]) {
+  for (const [juste, min, max] of [[true, 4, 6], [false, 1, 3]]) {
     await page.getByRole('button', { name: 'Question suivante' }).click();
-    await page.getByRole('button', { name: reponse }).click();
-    await lancerLeDe(page);
+    await repondre(page, juste);
+    if (juste) await lancerLeDe(page);
+    else await page.getByRole('button', { name: 'J’ai compris' }).click(); // « J'ai compris » lance le dé FAIBLE
     await expect(page.locator('#tour-consigne')).toContainText(/ coupe \d troncs? !/); // Viking : des troncs, pas des points
     const pts = Number(await page.locator('#points').textContent());
     expect(pts - total).toBeGreaterThanOrEqual(min);
@@ -41,11 +42,11 @@ test('bonne réponse → dé FORT (4 à 6 points), mauvaise → dé FAIBLE (1 à
 });
 
 test('le dé roule sur le plateau puis montre, face visible, les points gagnés', async ({ page }) => {
-  await page.addInitScript(() => { window.AVENTURA_PAUSE = 80; window.AVENTURA_DUREE_DE = 700; window.AVENTURA_AUTO_DE = 600000; window.AVENTURA_JUGE = true; });
+  await page.addInitScript(() => { window.AVENTURA_PAUSE = 80; window.AVENTURA_DUREE_DE = 700; window.AVENTURA_AUTO_DE = 600000; });
   page.__rapide = true; // garder la durée réelle du roulé
   await lancerPartie(page);
   await page.getByRole('button', { name: 'Question suivante' }).click();
-  await page.getByRole('button', { name: 'Bonne réponse' }).click();
+  await repondre(page, true);
   await lancerLeDe(page);
   const zone = page.locator('#de-plateau');
   await expect(zone).toBeVisible();
@@ -73,7 +74,7 @@ test('le dé roule sur le plateau puis montre, face visible, les points gagnés'
 test('v4.4 : les coins du dé restent arrondis (les faces de derrière ne dépassent pas)', async ({ page }) => {
   await lancerPartie(page);
   await page.getByRole('button', { name: 'Question suivante' }).click();
-  await page.getByRole('button', { name: 'Bonne réponse' }).click();
+  await repondre(page, true);
   await lancerLeDe(page);
   const faces = page.locator('#de3d .face');
   await expect(faces).toHaveCount(6);
@@ -85,10 +86,11 @@ test('v4.4 : les coins du dé restent arrondis (les faces de derrière ne dépas
 
 test('v5.1 : les points du dé sont noirs, sur le dé FORT comme sur le dé FAIBLE', async ({ page }) => {
   await lancerPartie(page);
-  for (const reponse of ['Bonne réponse', 'Mauvaise réponse']) {
+  for (const juste of [true, false]) {
     await page.getByRole('button', { name: 'Question suivante' }).click();
-    await page.getByRole('button', { name: reponse }).click();
-    await lancerLeDe(page);
+    await repondre(page, juste);
+    if (juste) await lancerLeDe(page);
+    else await page.getByRole('button', { name: 'J’ai compris' }).click(); // « J'ai compris » lance le dé FAIBLE
     const couleurs = await page.locator('#de3d .face i').evaluateAll((p) => [...new Set(p.map((x) => getComputedStyle(x).backgroundColor))]);
     expect(couleurs).toEqual(['rgb(0, 0, 0)']);
     await page.getByRole('button', { name: 'Question suivante' }).waitFor();

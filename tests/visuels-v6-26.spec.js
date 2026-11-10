@@ -3,7 +3,7 @@
 // - le dé et son « +N » ne cachent plus le message écrit sur le plateau (ni l'encadré des points) ;
 // - sur téléphone, la case de réponse (et son contour de focus) et « Valider » restent dans le cadre de la carte.
 const { test, expect } = require('@playwright/test');
-const { rapide, versReglages, conjugaison, cocherJoueur, lancer, lancerLeDe } = require('./aide');
+const { repondre, rapide, versReglages, conjugaison, cocherJoueur, lancer, lancerLeDe } = require('./aide');
 
 // Deux rectangles se chevauchent-ils ? (1 px de tolérance)
 function chevauche(a, b) {
@@ -27,7 +27,7 @@ test('le dé et ses points ne cachent ni le message ni l\'encadré des points', 
   await cocherJoueur(page);
   await lancer(page);
   await page.getByRole('button', { name: 'Question suivante' }).click();
-  await page.getByRole('button', { name: 'Bonne réponse' }).click();
+  await repondre(page, true);
   await lancerLeDe(page);
   await expect(page.locator('#bandeau')).toContainText('en route vers le lac');
   // Le dé glisse en 0,3 s : on attend qu'il soit dégagé.

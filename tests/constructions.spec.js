@@ -2,7 +2,7 @@
 const { test, expect } = require('@playwright/test');
 const K = require('../js/constructions.js');
 const A = require('../js/aventures.js');
-const { lancerPartie, lancerLeDe } = require('./aide');
+const { repondre, lancerPartie, lancerLeDe } = require('./aide');
 
 test.describe('règles de la construction', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
@@ -57,7 +57,7 @@ test('la pyramide se construit avec les points et est complète à l\'objectif @
 test('la construction suit les points gagnés pendant la partie', async ({ page }) => {
   await lancerPartie(page, { joueurs: 1, aventure: 'Viking' }); // objectif 15
   await page.getByRole('button', { name: 'Question suivante' }).click();
-  await page.getByRole('button', { name: 'Bonne réponse' }).click();
+  await repondre(page, true);
   await lancerLeDe(page);
   const pts = Number(await page.locator('#points').textContent());
   await expect(page.locator('#construction .etape.vue')).toHaveCount(K.etapesVisibles('viking', pts, 15));

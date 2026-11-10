@@ -1,6 +1,6 @@
 // Déplacement des personnages : ils suivent la route d'une croix à l'autre (pas en ligne droite), en 1,5 s.
 const { test, expect } = require('@playwright/test');
-const { lancerPartie, attendreJoueur, lancerLeDe } = require('./aide');
+const { repondre, lancerPartie, attendreJoueur, lancerLeDe } = require('./aide');
 
 // Distance (en % de la largeur du plateau) d'un point à une ligne brisée.
 function distanceTrajet(p, pts, rapport) {
@@ -70,7 +70,7 @@ test('au tour suivant, le personnage suit la route du pont jusqu\'au marais', as
   await lancerPartie(page, { joueurs: 1 });
   for (let t = 0; t < 2; t++) {
     await page.getByRole('button', { name: 'Question suivante' }).click();
-    await page.getByRole('button', { name: 'Bonne réponse' }).click();
+    await repondre(page, true);
     await lancerLeDe(page);
     await attendreJoueur(page, 'Léa');
   }
@@ -121,7 +121,7 @@ test('le personnage se tourne dans le sens de la marche (vers la gauche entre le
   await expect(pion).not.toHaveClass(/gauche/); // DÉPART → prairie : il part vers la droite
   for (let t = 0; t < 3; t++) {
     await page.getByRole('button', { name: 'Question suivante' }).click();
-    await page.getByRole('button', { name: 'Bonne réponse' }).click();
+    await repondre(page, true);
     await lancerLeDe(page);
     await attendreJoueur(page, 'Léa');
   }

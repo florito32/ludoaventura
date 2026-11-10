@@ -3,7 +3,7 @@
 // v6.8 (ligne 86 du backlog) : sur TOUS les écrans (ordinateur, paysage compris), jamais de défilement,
 // et chaque bouton du tour de jeu est entièrement à l'écran.
 const { test, expect } = require('@playwright/test');
-const { rapide, versReglages, valider, maths, conjugaison, cocherJoueur, lancer } = require('./aide');
+const { repondre, rapide, versReglages, valider, maths, conjugaison, cocherJoueur, lancer } = require('./aide');
 
 // Rien ne dépasse : ni la page, ni l'encadré du tour de jeu (rien de caché qu'il faudrait faire défiler).
 async function tient(page, quand) {
@@ -67,14 +67,12 @@ test('calcul faux (niveau Expert) : correction et « J\'ai compris » à l\'écr
   await expect(page.getByRole('button', { name: 'J’ai compris' })).toBeInViewport();
 });
 
-test('orthographe : carte, « Voir la réponse » et « Mauvaise réponse » sans défiler', async ({ page }) => {
+test('orthographe : carte, case de réponse et mauvaise réponse sans défiler', async ({ page }) => {
   await partie(page, (p) => cocherJoueur(p));
   await page.getByRole('button', { name: 'Question suivante' }).click();
   await tient(page, 'carte');
-  await expect(page.getByRole('button', { name: 'Mauvaise réponse' })).toBeInViewport();
-  await page.getByRole('button', { name: 'Voir la réponse' }).click();
-  await tient(page, 'réponse');
-  await page.getByRole('button', { name: 'Mauvaise réponse' }).click();
-  await tient(page, 'après « Mauvaise réponse »');
+  await expect(page.getByRole('button', { name: 'OK', exact: true })).toBeInViewport();
+  await repondre(page, false);
+  await tient(page, 'après une mauvaise réponse');
   await expect(page.getByRole('button', { name: 'J’ai compris' })).toBeInViewport();
 });

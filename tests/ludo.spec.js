@@ -101,9 +101,9 @@ test('didacticiel : préparation et premier tour, flèche et bulle à chaque ét
   await flecheSur(page, '#tour-actions .btn');
   await bulleSansBouton(page);
   await page.getByRole('button', { name: 'Question suivante' }).click();
-  await expect(texte(page)).toContainText('Bonne réponse');
+  await expect(texte(page)).toContainText('écris ta réponse');
   await bulleSansBouton(page);
-  await page.getByRole('button', { name: 'Mauvaise réponse' }).click();
+  await A.repondre(page, false);
   await expect(texte(page)).toContainText('J’ai compris');
   await page.getByRole('button', { name: 'J’ai compris' }).click();
 

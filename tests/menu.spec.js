@@ -1,11 +1,11 @@
 // Menu de la partie (v6.22, demande du 04/11/2026) : une icône près du plateau ouvre, au milieu de l'écran,
 // « Redémarrer partie », « Modifier les choix » et « Retour à l'accueil ».
 const { test, expect } = require('@playwright/test');
-const { lancerPartie, lancerLeDe, attendreJoueur, valider, cocherJoueur } = require('./aide');
+const { repondre, lancerPartie, lancerLeDe, attendreJoueur, valider, cocherJoueur } = require('./aide');
 
 async function jouerUnTour(page) {
   await page.getByRole('button', { name: 'Question suivante' }).click();
-  await page.getByRole('button', { name: 'Bonne réponse' }).click();
+  await repondre(page, true);
   await lancerLeDe(page);
 }
 const menu = (page) => page.locator('#menu-partie');

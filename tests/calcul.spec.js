@@ -274,11 +274,11 @@ test('un joueur en mathématiques, l\'autre en orthographe ; « Mêmes réglages
   await page.getByLabel('Ta réponse').fill(res);
   await page.getByRole('button', { name: 'OK', exact: true }).click();
   await lancerLeDe(page);
-  // Joueur 2 : carte d'orthographe, avec le maître du jeu.
+  // Joueur 2 : carte d'orthographe (« Nombre de lettres ») : il écrit aussi sa réponse.
   await page.locator('#tour-nom').filter({ hasText: 'Tom' }).waitFor();
   await page.getByRole('button', { name: 'Question suivante' }).click();
-  await expect(page.locator('#carte-saisie')).toBeHidden();
-  await expect(page.getByRole('button', { name: 'Bonne réponse' })).toBeVisible();
+  await expect(page.locator('#carte-consigne')).toHaveText('Combien de lettres y a-t-il dans le mot :');
+  await expect(page.locator('#carte-saisie')).toBeVisible();
 
   // Mêmes réglages : la matière et les réglages de calcul sont copiés (nouvelle partie dans l'onglet).
   await ouvrirNeuf(page);

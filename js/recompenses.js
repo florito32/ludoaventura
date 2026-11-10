@@ -265,7 +265,7 @@
   try { var cd = JSON.parse(localStorage.getItem(CLE_CHOIX) || 'null'); if (cd) for (var kc in choixDefi) if (cd[kc] !== undefined) choixDefi[kc] = cd[kc]; } catch (e) { /* */ }
   function garderChoix() { try { localStorage.setItem(CLE_CHOIX, JSON.stringify(choixDefi)); } catch (e) { /* */ } }
   function typesDisponibles() {
-    return window.Questions.TYPES.filter(function (t) { return !t.oral || (window.Parole && window.Parole.disponible()); }).map(function (t) { return t.id; });
+    return window.Questions.TYPES.map(function (t) { return t.id; });
   }
   function radios(nom, legende, liste, valeur) {
     return '<fieldset class="defi-choix"><legend>' + legende + '</legend><div class="packs">' + liste.map(function (o) {

@@ -99,7 +99,7 @@
       if (!mat && !p.francais[p.actif]) return { cle: cle + '-a', cible: $('matieres'),
         texte: nom + ', choisis ta matière : Mathématiques ou Français. Les questions de tes cartes viendront de là.' };
       if (!mat) return { cle: cle + '-b', cible: $('francais'),
-        texte: 'En français, choisis Orthographe (des mots à épeler, découper…) ou Conjugaison (des verbes à conjuguer).' };
+        texte: 'En français, choisis Orthographe (des mots à écrire, compter, découper…) ou Conjugaison (des verbes à conjuguer).' };
       if (mat === 'maths') return { cle: cle + '-c', choix: $('niveau-maths'), cible: valider,
         texte: 'Choisis ton niveau : Facile, ce sont les tables ; plus c’est dur, plus les nombres sont grands. Puis le nombre de signes par calcul, et « Valider ».' };
       return { cle: cle + '-d', cible: valider, texte: 'C’est noté ! Touche « Valider » pour régler tes questions.' };
@@ -130,7 +130,7 @@
       return { cle: cle + '-b', choix: $('niveau-conj'), cible: valider, texte: 'Choisis ton niveau : plus il est haut, plus les verbes sont rares.' + fin };
     }
     if (vide('types-questions')) return { cle: cle + '-b', cible: $('types-questions'),
-      texte: 'Choisis les questions qu’on peut te poser : épeler le mot, compter ses lettres, ses syllabes…' };
+      texte: 'Choisis les questions qu’on peut te poser : écrire le mot, compter ses lettres, ses syllabes…' };
     return { cle: cle + '-c', cible: valider, texte: 'Bravo, tes cartes sont prêtes !' + fin };
   }
 
@@ -152,11 +152,6 @@
     if (r.etape === 'repondre' && saisie) {
       return { cle: cle, cible: $('reponse-joueur'),
         texte: j.nom + ', écris ta réponse dans la case, puis touche « OK ». « Écouter » lit la question à voix haute.' };
-    }
-    // Épeler à l'oral (v6.28) : le joueur parle, le jeu écoute et corrige.
-    if (r.etape === 'repondre' && c && c.question && c.question.oral && !c.juge && !window.AVENTURA_JUGE) {
-      return { cle: cle, cible: $('tour-actions').querySelector('button'),
-        texte: j.nom + ', écoute le mot (« Écouter »), puis touche « Parler » et dis ses lettres une par une. Si le micro se trompe, corrige les lettres dans la case, puis « OK ».' };
     }
     if (r.etape === 'repondre') {
       return { cle: cle, cible: $('tour-actions'),

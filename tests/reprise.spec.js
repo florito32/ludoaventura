@@ -1,11 +1,11 @@
 // La partie continue après un rafraîchissement, un changement de page ou une mise en veille ;
 // elle ne repart de l'accueil que si l'onglet est fermé (stockage de session, demande du 02/11/2026).
 const { test, expect } = require('@playwright/test');
-const { lancerPartie, attendreJoueur, rapide, lancerLeDe, versReglages, cocherJoueur, valider, orthographe } = require('./aide');
+const { repondre, lancerPartie, attendreJoueur, rapide, lancerLeDe, versReglages, cocherJoueur, valider, orthographe } = require('./aide');
 
 async function unTour(page) {
   await page.getByRole('button', { name: 'Question suivante' }).click();
-  await page.getByRole('button', { name: 'Bonne réponse' }).click();
+  await repondre(page, true);
   await lancerLeDe(page);
 }
 
@@ -39,13 +39,13 @@ test('rafraîchir pendant une carte : la même carte reste affichée, avec la r�
   await expect(page.locator('#carte-piochee')).toBeVisible();
   await expect(page.locator('#carte-titre')).toHaveText(titre);
   await expect(page.locator('#carte-consigne')).toHaveText(consigne);
-  await expect(page.getByRole('button', { name: 'Bonne réponse' })).toBeVisible();
+  await expect(page.locator('#reponse-joueur')).toBeVisible();
 });
 
 test('rafraîchir après « Bonne réponse » : le dé FORT se lance et les points ne sont comptés qu\'une fois', async ({ page }) => {
   await lancerPartie(page, { joueurs: 2 });
   await page.getByRole('button', { name: 'Question suivante' }).click();
-  await page.getByRole('button', { name: 'Bonne réponse' }).click();
+  await repondre(page, true);
   await page.reload();
   await expect(page.locator('#points')).toHaveText('0');
   await lancerLeDe(page);
