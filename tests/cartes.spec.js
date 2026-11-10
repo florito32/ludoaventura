@@ -291,3 +291,51 @@ test('étape 3 : choix entourés sans case à cocher, colorés quand ils sont ch
   await page.locator('#packs .pack').first().click();
   await expect(page.locator('#packs input').first()).not.toBeChecked();
 });
+
+// v6.40 (demande du 10/11/2026) : après « Écouter », un 2e bouton « Phrase d'exemple » lit une courte phrase avec le mot.
+test('v6.40 : « Phrase d’exemple » apparaît après « Écouter » et lit la phrase du mot', async ({ page }) => {
+  await voixEspion(page);
+  await preparer(page, 1, { packs: ['animaux'] });
+  await seulement(page, ['Nombre de syllabes']);
+  await lancer(page);
+  await page.getByRole('button', { name: 'Question suivante' }).click();
+  const phrase = page.getByRole('button', { name: 'Écouter une phrase d’exemple' });
+  await expect(phrase).toBeHidden();
+  await page.getByRole('button', { name: 'Écouter' }).click();
+  await expect(phrase).toBeVisible();
+  await expect(phrase).toBeInViewport();
+  await phrase.click();
+  const mot = await page.evaluate(() => window.Aventura.partie.carte.mot);
+  const P = require('../js/phrases.js');
+  const lu = await page.evaluate(() => window.__lu.map((u) => u.text));
+  expect(lu[lu.length - 1]).toBe(P[mot]);
+  // Rafraîchir la page garde le bouton ; la carte suivante le cache jusqu'au prochain « Écouter ».
+  await page.reload();
+  await expect(phrase).toBeVisible();
+  await page.getByLabel('Ta réponse').fill('99');
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
+  await page.getByRole('button', { name: 'J’ai compris' }).click();
+  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await expect(phrase).toBeHidden();
+});
+
+test('v6.40 : pas de phrase quand elle donnerait la réponse (mot mélangé, le ou la, pluriel déjà écrit, dictée)', async ({ page }) => {
+  test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit');
+  await page.goto('./');
+  const r = await page.evaluate(() => {
+    const Q = window.Questions, V = window.Voix;
+    const carte = (id, mot) => ({ mot, question: Q.trouver(id) });
+    return {
+      syllabes: V.phraseExemple(carte('syllabes', 'CHEVAL')),
+      melange: V.phraseExemple(carte('melange', 'CHEVAL')),
+      genre: V.phraseExemple(carte('genre', 'CHEVAL')),
+      ecrire: V.phraseExemple(carte('ecrire', 'CHEVAL')),
+      plurielDonne: V.phraseExemple(carte('pluriel', 'UNITÉ')),
+      pluriel: V.phraseExemple(carte('pluriel', 'CHEVAL')),
+      calcul: V.phraseExemple({ type: 'calcul' })
+    };
+  });
+  expect(r.syllabes).toBeTruthy();
+  expect(r.pluriel).toBeTruthy();
+  for (const k of ['melange', 'genre', 'ecrire', 'plurielDonne', 'calcul']) expect(r[k], k).toBeNull();
+});
