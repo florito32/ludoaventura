@@ -105,6 +105,8 @@
     if (id !== 'ecran-accueil') quitter = false;
     if (id !== 'ecran-accueil') armerRetour(navigator.userActivation ? navigator.userActivation.isActive : true);
     document.querySelectorAll('.ecran').forEach(function (s) { s.hidden = s.id !== id; });
+    // Écran affiché : js/recompenses.js remplit les écrans des étoiles et met l'accueil à jour (v6.36).
+    document.dispatchEvent(new CustomEvent('aventura-ecran', { detail: id }));
     var titre = $(id).querySelector('h1, h2');
     if (titre) { titre.setAttribute('tabindex', '-1'); titre.focus({ preventScroll: true }); }
     window.scrollTo(0, 0);
@@ -717,6 +719,8 @@
     }
     partie.objectif = A.objectif(av, partie.nbJoueurs);
     partie.regles = R.nouvellePartie(partie.nbJoueurs, partie.objectif);
+    // Identifiant unique : une partie gagnée ne rapporte ses étoiles qu'une fois (js/etoiles.js, v6.36).
+    partie.regles.id = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
     partie.carte = null;
     partie.etapesVues = 0;
     preparerPlateau(true);
@@ -1631,6 +1635,11 @@
     $('fin-texte').textContent = 'L’équipe a ' + av.objet.participe + ' ' + A.quantite(av, r.points) + ', il en fallait ' + r.objectif + '. ' +
       (ok ? 'Bravo, vous avez tous réussi l’aventure ' + av.nom + ' !' : 'Vous ferez mieux la prochaine fois !');
     $('fin').className = 'fin ' + (ok ? 'gagne' : 'perdu');
+    // Étoiles gagnées (v6.36) : toute aventure gagnée rapporte ce que l'équipe a récolté (doublé pour un défi du jour).
+    if (window.Recompenses) {
+      window.Recompenses.finDePartie({ regles: r, aventure: av, gagnee: ok, defi: partie.defi ? partie.defi.type : null });
+      sauver();
+    }
     $('fin').showModal();
   }
   $('btn-rejouer').addEventListener('click', function () { $('fin').close(); lancerPartie(); });
@@ -1640,6 +1649,7 @@
   // sessionStorage : « survit aux rechargements et restaurations de la page ; fermer l'onglet efface les données »
   // (MDN, Window.sessionStorage). Les objets (aventure, aventuriers, questions) sont enregistrés par leur identifiant.
   var CLE = 'ludoaventura-partie';
+  var PAGES_ACCUEIL = ['ecran-etoiles', 'ecran-progression', 'ecran-defi']; // écrans ouverts depuis l'accueil (v6.36)
   var pretASauver = false; // pas de sauvegarde pendant la construction initiale de la page
 
   function carteVersDonnees(c) {
@@ -1681,7 +1691,8 @@
   function reprendre() {
     var d;
     try { d = JSON.parse(sessionStorage.getItem(CLE) || 'null'); } catch (e) { d = null; }
-    if (!d || !d.ecran || d.ecran === 'ecran-accueil') return false;
+    // Écrans des étoiles (v6.36) : ils s'ouvrent depuis l'accueil, on y revient.
+    if (!d || !d.ecran || d.ecran === 'ecran-accueil' || PAGES_ACCUEIL.indexOf(d.ecran) >= 0) return false;
     try {
       // Préparation : nombre de joueurs, aventure, aventuriers et réglages des cartes.
       var nb = document.querySelector('input[name="nb"][value="' + d.nb + '"]');
@@ -1894,6 +1905,7 @@
     else if ($('fin').open) { /* fin de partie : on reste sur le résultat */ }
     else if (ecran === 'ecran-preparation') revenir();
     else if (ecran === 'ecran-plateau') ouvrirMenu();
+    else if (PAGES_ACCUEIL.indexOf(ecran) >= 0) { if ($('coffre').open) $('coffre').close(); else afficher('ecran-accueil'); }
     if ((partie.ecran || 'ecran-accueil') !== 'ecran-accueil') armerRetour(false);
   });
   ['btn-valider-nb', 'btn-valider-aventurier', 'btn-valider-reglages'].forEach(function (id) { $(id).addEventListener('click', valider); });
@@ -1936,7 +1948,7 @@
     }, { once: true });
   });
 
-  window.Aventura = { cases: CASES, route: ROUTE, trajet: trajet, decalages: DECALAGES, partie: partie, cartesDuJoueur: cartesDuJoueur, majConstruction: majConstruction,
+  window.Aventura = { afficher: afficher, cases: CASES, route: ROUTE, trajet: trajet, decalages: DECALAGES, partie: partie, cartesDuJoueur: cartesDuJoueur, majConstruction: majConstruction,
     // Tests : lancer le dé sans attendre le lancer automatique (il n'y a plus de bouton depuis v4.3).
     lancerDe: function () { lancerDe(partie.regles.de); } };
 })();

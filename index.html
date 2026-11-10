@@ -41,11 +41,60 @@
 <body>
 <a class="skip" href="#contenu">Aller au contenu</a>
 
+<!-- Icônes dessinées pour les étoiles, les coffres, le défi du jour et la progression (v6.36).
+     Les coffres prennent leurs couleurs dans des variables CSS (.coffre-jour, .coffre-argent, .coffre-or). -->
+<svg class="sprite" aria-hidden="true" focusable="false" width="0" height="0">
+  <symbol id="i-etoile" viewBox="0 0 48 48">
+    <path d="M24 4.5l5.8 12.4 13.6 1.6-10 9.3 2.6 13.4L24 34.5l-12 6.7 2.6-13.4-10-9.3 13.6-1.6z" fill="#ffd23f" stroke="#3b2a1e" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M16.5 20.5l5-.6" stroke="#fff" stroke-width="2.6" stroke-linecap="round" opacity=".85"/>
+  </symbol>
+  <symbol id="i-coffre" viewBox="0 0 48 48">
+    <path d="M5.5 21h37v18.5a3.5 3.5 0 0 1-3.5 3.5H9a3.5 3.5 0 0 1-3.5-3.5z" fill="var(--bois, #a0612b)"/>
+    <path d="M5.5 21v-4.5C5.5 11 10 7 16 7h16c6 0 10.5 4 10.5 9.5V21z" fill="var(--bois-clair, #c98445)"/>
+    <path d="M14 7.4v35.6M34 7.4v35.6" stroke="var(--metal, #6b5440)" stroke-width="4"/>
+    <path d="M5.5 21h37v18.5a3.5 3.5 0 0 1-3.5 3.5H9a3.5 3.5 0 0 1-3.5-3.5zM5.5 21v-4.5C5.5 11 10 7 16 7h16c6 0 10.5 4 10.5 9.5V21" fill="none" stroke="#3b2a1e" stroke-width="3" stroke-linejoin="round"/>
+    <rect x="19.5" y="16.5" width="9" height="11" rx="2.2" fill="var(--serrure, #ffd23f)" stroke="#3b2a1e" stroke-width="2.5"/>
+    <circle cx="24" cy="21.4" r="1.6" fill="#3b2a1e"/>
+  </symbol>
+  <symbol id="i-defi" viewBox="0 0 48 48">
+    <circle cx="21" cy="27" r="17" fill="#fff" stroke="#3b2a1e" stroke-width="3"/>
+    <circle cx="21" cy="27" r="11.5" fill="#e3262a"/>
+    <circle cx="21" cy="27" r="6" fill="#fff"/>
+    <circle cx="21" cy="27" r="2.4" fill="#e3262a"/>
+    <path d="M21 27L40.5 7.5" stroke="#3b2a1e" stroke-width="3.2" stroke-linecap="round"/>
+    <path d="M36.5 4.5v7h7" fill="none" stroke="#3f7a46" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="i-progres" viewBox="0 0 48 48">
+    <rect x="5" y="9" width="38" height="34" rx="4" fill="#fff"/>
+    <path d="M9 9h30a4 4 0 0 1 4 4v5H5v-5a4 4 0 0 1 4-4z" fill="#e3262a"/>
+    <rect x="5" y="9" width="38" height="34" rx="4" fill="none" stroke="#3b2a1e" stroke-width="3"/>
+    <path d="M5 18h38M15 5v8M33 5v8" stroke="#3b2a1e" stroke-width="3" stroke-linecap="round"/>
+    <rect x="11" y="31" width="6" height="8" rx="1" fill="#3f7a46"/>
+    <rect x="21" y="26" width="6" height="13" rx="1" fill="#3f7a46"/>
+    <path d="M34 21.5l1.9 4 4.3.5-3.2 3 .8 4.3-3.8-2.1-3.8 2.1.8-4.3-3.2-3 4.3-.5z" fill="#ffd23f" stroke="#3b2a1e" stroke-width="1.6" stroke-linejoin="round"/>
+  </symbol>
+</svg>
+
 <main id="contenu" tabindex="-1">
 
   <!-- ÉCRAN 1 : accueil, composé comme la boîte du jeu (décor, arche, aventurier, herbes) -->
   <section class="ecran accueil" id="ecran-accueil" aria-labelledby="titre-accueil">
     <h1 id="titre-accueil" class="visually-hidden">Aventura</h1>
+    <!-- Barre des étoiles (v6.36, js/recompenses.js) : total, niveau avec sa jauge, et le coffre du jour. -->
+    <div class="accueil-haut">
+      <button type="button" class="pastille pastille-etoiles" id="btn-etoiles-haut">
+        <svg class="ico" aria-hidden="true"><use href="#i-etoile"/></svg>
+        <span class="pe-total" id="accueil-total">0</span><span class="visually-hidden"> étoiles,</span>
+        <span class="pe-niveau"><span id="accueil-niveau">Niveau 1</span><span class="mini-jauge" aria-hidden="true"><span id="accueil-jauge"></span></span></span>
+        <span class="visually-hidden" id="accueil-etoiles-aide"></span>
+      </button>
+      <button type="button" class="pastille pastille-coffre" id="btn-coffre-haut">
+        <svg class="ico coffre-jour" id="accueil-coffre-ico" aria-hidden="true"><use href="#i-coffre"/></svg>
+        <span id="accueil-coffre-texte">Coffre du jour</span>
+        <span class="badge" id="accueil-badge" hidden></span>
+        <span class="visually-hidden" id="accueil-coffre-aide"></span>
+      </button>
+    </div>
     <div class="scene">
       <img class="calque arche" src="img/arche.webp" alt="Arche de pierre sculptée portant le mot « Aventura »" width="1368" height="879">
       <img class="calque perso" src="img/perso.webp" alt="Ludo, ton guide, un aventurier au sac à dos" width="495" height="1065">
@@ -53,6 +102,12 @@
       <div class="accueil-actions">
         <p class="accroche">Un jeu éducatif d'aventure, à jouer en équipe</p>
         <button type="button" class="btn btn-principal" id="btn-commencer">Commencer l'aventure</button>
+        <!-- Raccourcis (v6.36) : défi du jour, étoiles gagnées, progression de la journée (js/recompenses.js). -->
+        <div class="raccourcis">
+          <button type="button" class="raccourci" id="btn-defi"><svg class="ico" aria-hidden="true"><use href="#i-defi"/></svg><span>Défi du jour</span><span class="badge" id="defi-badge" hidden></span></button>
+          <button type="button" class="raccourci" id="btn-etoiles"><svg class="ico" aria-hidden="true"><use href="#i-etoile"/></svg><span>Mes étoiles</span></button>
+          <button type="button" class="raccourci" id="btn-progression"><svg class="ico" aria-hidden="true"><use href="#i-progres"/></svg><span>Progression</span></button>
+        </div>
         <!-- Didacticiel : Ludo (l'aventurier de l'accueil) guide la préparation et le premier tour (js/ludo.js). -->
         <button type="button" class="btn btn-secondaire" id="btn-didacticiel">Didacticiel avec Ludo</button>
         <!-- Installer l'application (v6.24, js/pwa.js) : téléphone et tablette seulement, et seulement dans un navigateur
@@ -60,6 +115,32 @@
         <button type="button" class="btn-installer" id="btn-installer" hidden><span aria-hidden="true">📲</span> Installer l’application</button>
       </div>
     </div>
+  </section>
+
+  <!-- ÉCRANS des étoiles (v6.36, js/recompenses.js) : Mes étoiles, Progression du jour, Défi du jour. -->
+  <section class="ecran page" id="ecran-etoiles" aria-labelledby="titre-etoiles" hidden>
+    <header class="barre">
+      <button type="button" class="btn-retour" data-retour-accueil><span aria-hidden="true">←</span> Accueil</button>
+      <h2 id="titre-etoiles">Mes étoiles</h2>
+      <span class="barre-vide" aria-hidden="true"></span>
+    </header>
+    <div class="page-corps" id="etoiles-corps"></div>
+  </section>
+  <section class="ecran page" id="ecran-progression" aria-labelledby="titre-progression" hidden>
+    <header class="barre">
+      <button type="button" class="btn-retour" data-retour-accueil><span aria-hidden="true">←</span> Accueil</button>
+      <h2 id="titre-progression">Ma progression</h2>
+      <span class="barre-vide" aria-hidden="true"></span>
+    </header>
+    <div class="page-corps" id="progression-corps"></div>
+  </section>
+  <section class="ecran page" id="ecran-defi" aria-labelledby="titre-defi" hidden>
+    <header class="barre">
+      <button type="button" class="btn-retour" data-retour-accueil><span aria-hidden="true">←</span> Accueil</button>
+      <h2 id="titre-defi">Défi du jour</h2>
+      <span class="barre-vide" aria-hidden="true"></span>
+    </header>
+    <div class="page-corps" id="defi-corps"></div>
   </section>
 
   <!-- ÉCRAN 2 : préparation de la partie, en écrans successifs (un seul visible, sans défiler) :
@@ -334,6 +415,8 @@
   <p class="fin-icone" id="fin-icone" aria-hidden="true"></p>
   <h2 id="fin-titre"></h2>
   <p id="fin-texte"></p>
+  <!-- Étoiles gagnées avec la partie (v6.36) : remplies par js/recompenses.js. -->
+  <div class="fin-etoiles" id="fin-etoiles" hidden></div>
   <div class="fin-actions">
     <button type="button" class="btn btn-principal" id="btn-rejouer">Rejouer cette aventure</button>
     <button type="button" class="btn btn-secondaire" id="btn-nouvelle">Nouvelle partie</button>
@@ -356,6 +439,35 @@
       <button type="button" class="btn btn-principal" id="btn-confirmer-oui"></button>
       <button type="button" class="btn btn-secondaire" id="btn-confirmer-non">Non, continuer la partie</button>
     </div>
+  </div>
+</dialog>
+
+<!-- Ouverture d'un coffre (v6.36, js/recompenses.js) : le coffre tremble, s'ouvre, les étoiles s'envolent. -->
+<dialog class="fin coffre-fenetre" id="coffre" aria-labelledby="coffre-titre">
+  <h2 id="coffre-titre">Coffre du jour</h2>
+  <div class="coffre-scene" id="coffre-scene" aria-hidden="true">
+    <svg viewBox="0 0 120 110" class="coffre-grand coffre-jour" id="coffre-grand" aria-hidden="true">
+      <g class="coffre-eclat"><path d="M60 52L48 2h24zM60 52l38-34 6 18zM60 52L22 18l-6 18z" fill="#ffe680" opacity=".9"/></g>
+      <g class="coffre-corps">
+        <path d="M12 52h96v44a8 8 0 0 1-8 8H20a8 8 0 0 1-8-8z" fill="var(--bois)"/>
+        <path d="M36 52v52M84 52v52" stroke="var(--metal)" stroke-width="9"/>
+        <path d="M12 52h96v44a8 8 0 0 1-8 8H20a8 8 0 0 1-8-8z" fill="none" stroke="#3b2a1e" stroke-width="5" stroke-linejoin="round"/>
+        <rect x="50" y="52" width="20" height="18" rx="4" fill="var(--serrure)" stroke="#3b2a1e" stroke-width="4"/>
+      </g>
+      <g class="coffre-couvercle">
+        <path d="M12 52V42c0-14 11-24 26-24h44c15 0 26 10 26 24v10z" fill="var(--bois-clair)"/>
+        <path d="M36 18.5V52M84 18.5V52" stroke="var(--metal)" stroke-width="9"/>
+        <path d="M12 52V42c0-14 11-24 26-24h44c15 0 26 10 26 24v10z" fill="none" stroke="#3b2a1e" stroke-width="5" stroke-linejoin="round"/>
+        <rect x="50" y="40" width="20" height="16" rx="4" fill="var(--serrure)" stroke="#3b2a1e" stroke-width="4"/>
+      </g>
+    </svg>
+    <span class="coffre-volees" id="coffre-volees"></span>
+  </div>
+  <p class="coffre-gain" id="coffre-gain" role="status" aria-live="polite"></p>
+  <div class="fin-actions">
+    <button type="button" class="btn btn-principal" id="btn-coffre-ouvrir">Ouvrir le coffre</button>
+    <button type="button" class="btn btn-principal" id="btn-coffre-suivant" hidden>Coffre suivant</button>
+    <button type="button" class="btn btn-principal" id="btn-coffre-fermer" hidden>Super !</button>
   </div>
 </dialog>
 
@@ -385,6 +497,8 @@
 <script src="js/parole.js"></script>
 <script src="js/constructions.js"></script>
 <script src="js/regles.js"></script>
+<script src="js/etoiles.js"></script>
+<script src="js/recompenses.js"></script>
 <script src="js/figurines.js"></script>
 <script src="js/plateau.js"></script>
 <script src="js/ludo.js"></script>

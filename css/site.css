@@ -1118,3 +1118,147 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
   #types-questions { gap: 4px; }
   .reglages-joueur #reglages-ortho .pack span { font-size: clamp(.7rem, calc(var(--h) * .42), .95rem); }
 }
+
+/* ---------- Étoiles, coffres et progression (v6.36) ---------- */
+.sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+.ico { width: 1.6em; height: 1.6em; flex: none; display: inline-block; vertical-align: middle; }
+/* Couleurs des coffres (icône #i-coffre et grand coffre de la fenêtre) : bois, argent, or. */
+.coffre-jour, .coffre-coffre-jour { --bois: #a0612b; --bois-clair: #c98445; --metal: #6b5440; --serrure: #ffd23f; }
+.coffre-argent, .coffre-coffre-argent { --bois: #8f9ba6; --bois-clair: #c9d2da; --metal: #56616b; --serrure: #ffffff; }
+.coffre-or, .coffre-coffre-or { --bois: #d99a12; --bois-clair: #ffc93c; --metal: #8d5f00; --serrure: #fff3b0; }
+
+/* Accueil : barre en haut (étoiles + niveau, coffre). */
+.accueil { position: relative; }
+.accueil-haut {
+  position: absolute; z-index: 2; top: calc(8px + env(safe-area-inset-top)); left: 8px; right: 8px;
+  display: flex; justify-content: space-between; gap: 8px; pointer-events: none;
+}
+.pastille {
+  pointer-events: auto; position: relative; display: inline-flex; align-items: center; gap: 6px;
+  font: inherit; font-weight: 800; color: var(--encre); cursor: pointer; min-height: 48px; padding: 4px 12px 4px 6px;
+  background: var(--parchemin); border: 3px solid var(--encre); border-radius: 99px; box-shadow: 0 3px 0 rgb(0 0 0 / .3);
+}
+.pastille .ico { width: 34px; height: 34px; }
+.pe-total { font: 800 1.35rem/1 "Rockwell", "Roboto Slab", Georgia, serif; min-width: 1.2ch; }
+.pe-niveau { display: flex; flex-direction: column; gap: 3px; font-size: .78rem; line-height: 1; text-align: left; white-space: nowrap; }
+.mini-jauge { display: block; width: 64px; height: 8px; background: #fff; border: 2px solid var(--encre); border-radius: 99px; overflow: hidden; }
+.mini-jauge span { display: block; height: 100%; width: 0; background: #f2b705; }
+.pastille-coffre { font-size: .85rem; white-space: nowrap; }
+.badge {
+  position: absolute; top: -8px; right: -6px; min-width: 24px; height: 24px; padding: 0 6px; border-radius: 99px;
+  background: var(--rouge); color: #fff; font: 800 .85rem/20px system-ui, sans-serif; border: 2px solid #fff; text-align: center;
+}
+.pastille-coffre.a-ouvrir .ico { animation: coffre-appel 1.6s ease-in-out infinite; transform-origin: 50% 90%; }
+@keyframes coffre-appel { 0%, 70%, 100% { transform: none; } 75% { transform: rotate(-9deg) scale(1.08); } 85% { transform: rotate(9deg) scale(1.08); } 92% { transform: rotate(-4deg); } }
+
+/* Accueil : 3 raccourcis sous « Commencer l'aventure ». */
+.raccourcis { display: flex; gap: 6px; }
+.raccourcis > * { flex: 1 1 0; min-width: 0; }
+.raccourci {
+  position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  font: inherit; font-weight: 700; font-size: clamp(.68rem, 2.2vw, .85rem); line-height: 1.1; color: var(--encre); cursor: pointer;
+  min-height: 56px; padding: 5px 2px; background: var(--parchemin); border: 2px solid var(--encre); border-radius: 12px;
+  box-shadow: 0 3px 0 var(--encre);
+}
+.raccourci .ico { width: 28px; height: 28px; }
+.raccourci:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--encre); }
+.raccourci .badge { top: -9px; right: -5px; }
+@media (max-height: 560px) {
+  .raccourci { min-height: 44px; flex-direction: row; gap: 4px; padding: 2px 4px; font-size: .7rem; }
+  .raccourci .ico { width: 22px; height: 22px; }
+  .accueil-actions { gap: 7px; }
+  .pastille { min-height: 44px; padding-block: 2px; }
+  .pastille .ico { width: 28px; height: 28px; }
+}
+/* Téléphones peu hauts (ex. 360 × 640) : raccourcis sur une ligne, icône à gauche du texte. */
+@media (max-aspect-ratio: 4/5) and (max-height: 700px) {
+  .raccourci { min-height: 44px; flex-direction: row; gap: 3px; padding: 2px 3px; font-size: .7rem; text-align: left; }
+  .raccourci .ico { width: 20px; height: 20px; }
+}
+@media (max-width: 360px) { .pastille-coffre span:not(.badge) { display: none; } .pastille-coffre { padding-right: 6px; } }
+
+/* Écrans « Mes étoiles », « Ma progression », « Défi du jour ». */
+.page { width: 100%; max-width: 640px; margin: 0 auto; padding: 8px 12px 16px; }
+.page-corps { display: grid; gap: 12px; }
+.carte-page {
+  background: var(--parchemin); border: 3px solid var(--encre); border-radius: var(--radius);
+  padding: 14px 16px; box-shadow: 0 3px 0 rgb(0 0 0 / .25);
+}
+.carte-page h3 { font-size: 1.15rem; margin-bottom: 10px; }
+.carte-page .petit { margin: 6px 0 0; font-size: .92rem; color: var(--encre-douce); }
+.resume-etoiles { text-align: center; }
+.ico-geant { width: 76px; height: 76px; }
+.gros-total { margin: 4px 0; font-size: 1.15rem; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.gros-total strong { font: 800 2.4rem/1 "Rockwell", "Roboto Slab", Georgia, serif; color: var(--rouge-texte); }
+.niveau-titre { margin: 8px 0 0; font: 800 1.3rem/1.2 "Rockwell", "Roboto Slab", Georgia, serif; }
+.jauge-etoiles { height: 16px; margin: 8px 0 0; }
+.jauge-etoiles span { display: block; height: 100%; background: #f2b705; }
+.chemin-coffres, .journal, .taches-jour, .regles-etoiles { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.chemin-coffres li, .journal li, .taches-jour li {
+  display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: #fff; border: 2px solid var(--parchemin-bord); border-radius: 12px;
+}
+.chemin-coffres li:not(.atteint) .ico { opacity: .55; filter: grayscale(.4); }
+.chemin-coffres .ico, .taches-jour .ico, .journal .ico { width: 36px; height: 36px; }
+.palier { display: flex; flex-direction: column; flex: 1; line-height: 1.2; }
+.palier span { font-size: .85rem; color: var(--encre-douce); }
+.etat { font-size: .88rem; font-weight: 700; color: var(--encre-douce); text-align: right; }
+.etat.fait { color: #1f7a3a; }
+.btn-petit {
+  font: inherit; font-weight: 800; cursor: pointer; min-height: 44px; padding: 6px 16px; border-radius: 10px;
+  border: 2px solid var(--encre); background: var(--rouge); color: #fff; box-shadow: 0 3px 0 var(--encre); margin-left: auto;
+}
+.btn-petit:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--encre); }
+.j-texte { flex: 1; display: flex; flex-direction: column; line-height: 1.25; }
+.j-texte small { color: var(--encre-douce); }
+.j-gain { white-space: nowrap; color: #1f7a3a; }
+.regles-etoiles li { display: flex; gap: 10px; align-items: flex-start; line-height: 1.35; font-size: .95rem; }
+.regles-etoiles .ico { width: 30px; height: 30px; }
+.taches-jour .t-nom { flex: 1; font-weight: 700; }
+.taches-jour li.fait { background: #eef7ef; border-color: #9ccaa5; }
+.taches-jour .etat { margin-left: auto; }
+.histo { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; height: 150px; align-items: end; }
+.histo li { height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 3px; }
+.h-barre { width: 70%; min-height: 3px; background: var(--vert); border: 2px solid var(--encre); border-radius: 6px 6px 2px 2px; }
+.histo .aujourdhui .h-barre { background: #f2b705; }
+.h-n { font-weight: 800; font-size: .85rem; }
+.h-jour { font-size: .78rem; color: var(--encre-douce); }
+.histo .aujourdhui .h-jour { font-weight: 800; color: var(--encre); }
+.prochain { display: flex; align-items: center; gap: 10px; margin: 0 0 6px; }
+.prochain .ico { width: 36px; height: 36px; }
+
+/* Fenêtre d'ouverture d'un coffre. */
+.coffre-fenetre { width: min(380px, calc(100vw - 32px)); }
+.coffre-scene { position: relative; display: block; margin: 34px auto 0; padding: 0; border: 0; background: none; cursor: pointer; width: 190px; max-width: 60vw; }
+.coffre-scene.ouvert { cursor: default; }
+.coffre-grand { display: block; width: 100%; height: auto; overflow: visible; }
+.coffre-couvercle { transform-box: fill-box; transform-origin: 50% 100%; transition: transform .45s cubic-bezier(.3, 1.6, .5, 1); }
+.coffre-eclat { opacity: 0; transform-box: fill-box; transform-origin: 50% 100%; transition: opacity .3s, transform .5s; transform: scale(.4); }
+.coffre-scene.tremble .coffre-grand { animation: tremble .12s linear infinite; }
+@keyframes tremble { 0% { transform: rotate(-3deg); } 50% { transform: rotate(3deg) translateY(-2px); } 100% { transform: rotate(-3deg); } }
+.coffre-scene.ouvert .coffre-couvercle { transform: translateY(-12px) rotate(-14deg); }
+.coffre-scene.ouvert .coffre-eclat { opacity: 1; transform: none; }
+.coffre-volees { position: absolute; left: 50%; top: 48%; width: 0; height: 0; pointer-events: none; }
+.coffre-volees span { position: absolute; left: -14px; top: -14px; width: 28px; height: 28px; opacity: 0;
+  animation: envol 1.1s ease-out var(--d) forwards; transform: rotate(var(--a)); }
+.coffre-volees span .ico { transform: rotate(calc(-1 * var(--a))); }
+.coffre-volees .ico { width: 28px; height: 28px; }
+@keyframes envol { 0% { opacity: 0; transform: rotate(var(--a)) translateY(0); } 15% { opacity: 1; } 100% { opacity: 0; transform: rotate(var(--a)) translateY(-130px); } }
+.coffre-gain { min-height: 3em; margin: 10px 0 0; font-size: 1.05rem; }
+.coffre-gain strong { display: block; font: 800 1.8rem/1.2 "Rockwell", "Roboto Slab", Georgia, serif; color: var(--rouge-texte); }
+.gain-niveau { display: block; font-weight: 800; color: #1f7a3a; }
+@media (prefers-reduced-motion: reduce) {
+  .pastille-coffre.a-ouvrir .ico, .coffre-scene.tremble .coffre-grand, .coffre-volees span { animation: none; }
+  .coffre-volees span { opacity: 1; }
+  .coffre-couvercle, .coffre-eclat { transition: none; }
+}
+
+/* Fin de partie : étoiles gagnées. */
+.fin-etoiles { margin-top: 10px; padding: 10px; background: #fff; border: 2px solid var(--parchemin-bord); border-radius: 12px; }
+.fin-etoiles p { margin: 4px 0; }
+.fin-gain { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 1.5rem; }
+.fin-gain strong { font-family: "Rockwell", "Roboto Slab", Georgia, serif; color: var(--rouge-texte); }
+.ico-gain { width: 40px; height: 40px; }
+.fin-bonus { font-weight: 800; color: #1f7a3a; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.fin-niveau { font-weight: 800; }
+.fin-etoiles .petit { font-size: .9rem; color: var(--encre-douce); }
+.btn-fin-coffre { display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; min-height: 48px; padding: 6px 16px; }
