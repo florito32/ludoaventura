@@ -1314,7 +1314,10 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .defi-choix legend { font-weight: 800; margin-bottom: 4px; padding: 0; }
 .defi-valider { margin-top: 6px; }
 /* Partie rapide (v6.43). */
-.rapide-matieres .btn-tout { margin-top: 8px; min-height: 36px; }
+/* v6.45 : « Tout » / « Aucune » juste à côté du mot « Matières ». */
+.titre-choix { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+.titre-choix .legende { font-weight: 800; }
+.rapide-matieres .btn-tout { min-height: 32px; }
 #btn-lancer-rapide { width: 100%; margin-top: 10px; }
 .defi-valider .btn { width: 100%; margin-top: 10px; }
 .defi-valider .btn:disabled { opacity: .55; cursor: not-allowed; box-shadow: none; }

@@ -74,6 +74,34 @@
   function trier(t) { return t.slice().sort(function (a, b) { return a < b ? -1 : a > b ? 1 : 0; }); }
   function trierN(t) { return t.slice().sort(function (a, b) { return a - b; }); }
 
+  // ---------- Réglages des questions d'un niveau ----------
+  // matiere : 'maths', 'conjugaison' ou 'orthographe' ; r : générateur de hasard ; dispo : questions d'orthographe
+  // jouables (facultatif). Renvoie { maths } , { conj } ou { packs, types, mots }.
+  // Sert au défi du jour (hasard tiré de la date) et à la partie rapide (v6.45, Math.random à chaque carte).
+  function reglages(matiere, niveau, r, dispo) {
+    var d = {};
+    if (matiere === 'maths') {
+      var m = MATHS[niveau];
+      var signes = trier(prendre(['plus', 'moins', 'fois', 'divise'], entre(m.signes[0], m.signes[1], r), r));
+      var regl = { niveau: niveau, signes: signes, nbSignes: m.nbSignes.slice(), nombres: [], dizaines: [], centaines: [], milliers: [] };
+      Object.keys(m.groupes).forEach(function (g) { regl[g] = trierN(prendre(VALEURS[g], m.groupes[g], r)); });
+      d.maths = regl;
+    } else if (matiere === 'conjugaison') {
+      var c = CONJ[niveau];
+      var temps = prendre(c.temps, c.combien, r);
+      var modes = [];
+      temps.forEach(function (t) { var md = t.split('.')[0]; if (modes.indexOf(md) < 0) modes.push(md); });
+      d.conj = { modes: modes, temps: temps, groupes: c.groupes.slice(), niveau: niveau };
+    } else {
+      var o = ORTHO[niveau];
+      var types = o.types.filter(function (t) { return !dispo || dispo.indexOf(t) >= 0; });
+      d.packs = trier(prendre(PACKS, 3, r));
+      d.types = prendre(types, o.combien, r);
+      d.mots = o.mots.slice();
+    }
+    return d;
+  }
+
   // ---------- Le défi ----------
   // choix = { type: 'solo' | 'equipe', matiere: 'maths' | 'francais', niveau, joueurs (équipe : 2 à 4) } ;
   // jour = « 2026-11-10 » ; options.typesDisponibles = questions d'orthographe jouables sur l'appareil.
@@ -95,30 +123,12 @@
     var d = { jour: jour, type: type, niveau: niveau, matiere: matiere, choixMatiere: choix.matiere === 'maths' ? 'maths' : 'francais',
       aventure: aventure.id, aventuriers: aventuriers, joueurs: nb };
 
-    if (matiere === 'maths') {
-      var m = MATHS[niveau];
-      var signes = trier(prendre(['plus', 'moins', 'fois', 'divise'], entre(m.signes[0], m.signes[1], r), r));
-      var reglages = { niveau: niveau, signes: signes, nbSignes: m.nbSignes.slice(), nombres: [], dizaines: [], centaines: [], milliers: [] };
-      Object.keys(m.groupes).forEach(function (g) { reglages[g] = trierN(prendre(VALEURS[g], m.groupes[g], r)); });
-      d.maths = reglages;
-    } else if (matiere === 'conjugaison') {
-      var c = CONJ[niveau];
-      var temps = prendre(c.temps, c.combien, r);
-      var modes = [];
-      temps.forEach(function (t) { var md = t.split('.')[0]; if (modes.indexOf(md) < 0) modes.push(md); });
-      d.conj = { modes: modes, temps: temps, groupes: c.groupes.slice(), niveau: niveau };
-    } else {
-      var o = ORTHO[niveau];
-      var dispo = options.typesDisponibles;
-      var types = o.types.filter(function (t) { return !dispo || dispo.indexOf(t) >= 0; });
-      d.packs = trier(prendre(PACKS, 3, r));
-      d.types = prendre(types, o.combien, r);
-      d.mots = o.mots.slice();
-    }
+    var reg = reglages(matiere, niveau, r, options.typesDisponibles);
+    for (var k in reg) d[k] = reg[k];
     return d;
   }
 
-  var api = { NIVEAUX: NIVEAUX, PACKS: PACKS, ORTHO: ORTHO, generer: generer, hasard: hasard };
+  var api = { NIVEAUX: NIVEAUX, PACKS: PACKS, ORTHO: ORTHO, DIFFICULTE_AVENTURE: DIFFICULTE_AVENTURE, generer: generer, reglages: reglages, hasard: hasard };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else racine.Defis = api;
 })(this);
