@@ -68,7 +68,7 @@ test('mathématiques : signes sur une ligne, unités, dizaines et centaines en l
 });
 
 
-test('orthographe : packs puis questions, chacun en grille régulière qui remplit l\'écran, sans défiler', async ({ page }) => {
+test('orthographe : thèmes puis questions, chacun en grille régulière qui remplit l\'écran, sans défiler', async ({ page }) => {
   await rapide(page);
   await page.goto('./');
   await versReglages(page, 1);
@@ -76,11 +76,13 @@ test('orthographe : packs puis questions, chacun en grille régulière qui rempl
   // Aucun texte ne déborde de son bouton.
   const deborde = (sel) => page.locator(sel + ' .pack span').evaluateAll((l) => l.some((e) => e.offsetHeight > 0 && (e.scrollWidth > e.clientWidth + 1 || e.scrollHeight > e.clientHeight + 1)));
   const egaux = (l) => { for (const b of l) { expect(Math.round(b[2])).toBe(Math.round(l[0][2])); expect(Math.round(b[3])).toBe(Math.round(l[0][3])); } };
-  // Écran des packs (v6.16) : 19 packs, 3 ou 5 par ligne selon la forme de l'écran.
+  // Écran des thèmes (v6.39) : 17 thèmes en 4 familles, 3 ou 5 par ligne selon la forme de l'écran.
   const p = await boites(page, '#packs');
-  expect(p).toHaveLength(19);
+  expect(p).toHaveLength(17);
   egaux(p);
-  expect([3, 5]).toContain(p.filter((b) => b[1] === p[0][1]).length);
+  expect([3, 5]).toContain(await page.locator('#packs .famille').nth(1).locator('.pack').evaluateAll((l) => {
+    const y = l[0].getBoundingClientRect().top; return l.filter((e) => Math.abs(e.getBoundingClientRect().top - y) < 2).length;
+  }));
   expect(await deborde('#ortho-packs')).toBe(false);
   await remplit(page, '#ortho-packs', 0.55);
   await page.locator('#packs label', { hasText: 'Animaux' }).click();

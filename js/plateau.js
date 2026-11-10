@@ -47,9 +47,11 @@
   var A = window.Aventures;
   var P = window.Aventuriers;
   var C = window.Cartes;
-  // Packs proposés aux joueurs : le pack « Lettres » n'est plus proposé (demande du 03/11/2026) ;
-  // ses cartes restent dans js/cartes.js (généré depuis l'Excel) mais ne sont jamais piochées.
-  var PACKS = C.PACKS.filter(function (p) { return p.id !== 'lettres'; });
+  // Thèmes proposés aux joueurs (« packs » jusqu'à la v6.38), dans l'ordre de leurs familles (C.FAMILLES, v6.39).
+  // « Lettres » (03/11/2026), « Mots simples » et « Mots compliqués » (10/11/2026) ne sont plus proposés :
+  // leurs cartes restent dans js/cartes.js (généré depuis l'Excel) mais ne sont jamais piochées.
+  function trouverPack(id) { return C.PACKS.filter(function (p) { return p.id === id; })[0]; }
+  var PACKS = [].concat.apply([], C.FAMILLES.map(function (f) { return f.themes; })).map(trouverPack);
   var TOUS_PACKS = PACKS.map(function (p) { return p.id; });
   var Q = window.Questions;
   // « Épeler à l'oral » n'existe plus (demande du 10/11/2026) : toutes les questions s'écrivent.
@@ -173,7 +175,26 @@
       .map(function (i) { return i.value; });
   }
 
-  // Matière, réglages de calcul, packs et questions du joueur actif.
+  // Une famille encadrée de cases à cocher (questions v6.33, thèmes v6.39) : son icône, son nom, son bouton « Tout ».
+  // f = { id, nom, icone } ; liste = [{ id, nom, court }] ; nom = nom des cases (« pack » ou « type »).
+  function famille(f, liste, nom) {
+    var boite = document.createElement('div');
+    boite.className = 'famille';
+    boite.setAttribute('role', 'group');
+    boite.setAttribute('aria-labelledby', 'famille-' + f.id);
+    boite.innerHTML = '<div class="famille-tete"><p class="famille-nom" id="famille-' + f.id + '"><span aria-hidden="true">' + f.icone + '</span> ' + f.nom + '</p>' +
+      '<button type="button" class="btn-tout btn-tout-famille" data-famille="' + f.id + '"></button></div><div class="packs"></div>';
+    var grille = boite.querySelector('.packs');
+    liste.forEach(function (t) {
+      var l = document.createElement('label');
+      l.className = 'pack';
+      l.innerHTML = '<input type="checkbox" name="' + nom + '" value="' + t.id + '" aria-label="' + t.nom + '"><span>' + (t.court || t.nom) + '</span>';
+      grille.appendChild(l);
+    });
+    return boite;
+  }
+
+  // Matière, réglages de calcul, thèmes et questions du joueur actif.
   function construireReglages() {
     // Matière : Mathématiques ou Français ; Français → Orthographe.
     $('matieres').addEventListener('change', function () {
@@ -262,12 +283,10 @@
       });
     });
 
+    // Thèmes (v6.39, choix de l'utilisateur du 10/11/2026) : rangés en 4 familles encadrées, comme les questions.
     var box = $('packs');
-    PACKS.forEach(function (p) {
-      var l = document.createElement('label');
-      l.className = 'pack';
-      l.innerHTML = '<input type="checkbox" name="pack" value="' + p.id + '"><span>' + p.nom + '</span>';
-      box.appendChild(l);
+    C.FAMILLES.forEach(function (f) {
+      box.appendChild(famille(f, f.themes.map(trouverPack).map(function (p) { return { id: p.id, nom: p.nom }; }), 'pack'));
     });
     box.addEventListener('change', function () {
       var j = partie.actif;
@@ -282,33 +301,20 @@
     // v6.33 : rangées en 3 familles encadrées (Q.FAMILLES), chacune avec son icône et son bouton « Tout ».
     var types = $('types-questions');
     Q.FAMILLES.forEach(function (f) {
-      var liste = f.types.map(Q.trouver);
-      if (!liste.length) return;
-      var boite = document.createElement('div');
-      boite.className = 'famille';
-      boite.setAttribute('role', 'group');
-      boite.setAttribute('aria-labelledby', 'famille-' + f.id);
-      boite.innerHTML = '<div class="famille-tete"><p class="famille-nom" id="famille-' + f.id + '"><span aria-hidden="true">' + f.icone + '</span> ' + f.nom + '</p>' +
-        '<button type="button" class="btn-tout btn-tout-famille" data-famille="' + f.id + '"></button></div><div class="packs"></div>';
-      var grille = boite.querySelector('.packs');
-      liste.forEach(function (t) {
-        var l = document.createElement('label');
-        l.className = 'pack';
-        l.innerHTML = '<input type="checkbox" name="type" value="' + t.id + '" aria-label="' + t.nom + '"><span>' + (t.court || t.nom) + '</span>';
-        grille.appendChild(l);
-      });
-      types.appendChild(boite);
+      types.appendChild(famille(f, f.types.map(Q.trouver).map(function (t) { return { id: t.id, nom: t.nom, court: t.court }; }), 'type'));
     });
-    // « Tout » d'une famille : coche (ou décoche) toutes ses questions, sans toucher aux autres familles.
-    types.addEventListener('click', function (e) {
-      var b = e.target.closest('.btn-tout-famille');
-      if (!b) return;
-      var j = partie.actif, ids = Array.prototype.map.call(b.closest('.famille').querySelectorAll('input'), function (i) { return i.value; });
-      var plein = ids.every(function (id) { return partie.types[j].indexOf(id) >= 0; });
-      var reste = partie.types[j].filter(function (id) { return ids.indexOf(id) < 0; });
-      partie.types[j] = plein ? reste : reste.concat(ids);
-      $('packs-alerte').textContent = '';
-      majAventuriers();
+    // « Tout » d'une famille : coche (ou décoche) tous ses thèmes ou toutes ses questions, sans toucher aux autres familles.
+    [[box, 'packs'], [types, 'types']].forEach(function (z) {
+      z[0].addEventListener('click', function (e) {
+        var b = e.target.closest('.btn-tout-famille');
+        if (!b) return;
+        var j = partie.actif, cle = z[1], ids = Array.prototype.map.call(b.closest('.famille').querySelectorAll('input'), function (i) { return i.value; });
+        var plein = ids.every(function (id) { return partie[cle][j].indexOf(id) >= 0; });
+        var reste = partie[cle][j].filter(function (id) { return ids.indexOf(id) < 0; });
+        partie[cle][j] = plein ? reste : reste.concat(ids);
+        $('packs-alerte').textContent = '';
+        majAventuriers();
+      });
     });
     types.addEventListener('change', function () {
       var coches = Array.prototype.filter.call(types.querySelectorAll('input'), function (i) { return i.checked; })
@@ -317,7 +323,7 @@
       partie.types[partie.actif] = coches;
       majAventuriers();
     });
-    // « Tout sélectionner » / « Tout désélectionner » des packs et des questions d'orthographe (v6.27, demande du 09/11/2026).
+    // « Tout sélectionner » / « Tout désélectionner » des thèmes et des questions d'orthographe (v6.27, demande du 09/11/2026).
     document.querySelectorAll('.btn-tout[data-liste]').forEach(function (b) {
       b.addEventListener('click', function () {
         var cle = b.dataset.liste === 'packs' ? 'packs' : 'types', j = partie.actif;
@@ -388,7 +394,7 @@
     nombre: ['choisir au moins un nombre.', 'nombres'],
     nbSignes: ['choisir le nombre de signes par calcul.', 'nb-signes'],
     table: ['choisir au moins une table.', 'nombres'],
-    pack: ['choisir au moins un pack.', 'packs'],
+    pack: ['choisir au moins un thème.', 'packs'],
     type: ['choisir au moins un type de question.', 'types-questions']
   };
 
@@ -584,11 +590,12 @@
       var plein = partie[b.dataset.liste === 'packs' ? 'packs' : 'types'][partie.actif].length === n;
       b.innerHTML = plein ? '<span class="long">Tout désélectionner</span><span class="court">Aucun</span>'
         : '<span class="long">Tout sélectionner</span><span class="court">Tout</span>';
-      b.setAttribute('aria-label', (plein ? 'Tout désélectionner : ' : 'Tout sélectionner : ') + (b.dataset.liste === 'packs' ? 'packs' : 'questions'));
+      b.setAttribute('aria-label', (plein ? 'Tout désélectionner : ' : 'Tout sélectionner : ') + (b.dataset.liste === 'packs' ? 'thèmes' : 'questions'));
     });
     document.querySelectorAll('.btn-tout-famille').forEach(function (b) {
       var boite = b.closest('.famille'), ids = Array.prototype.map.call(boite.querySelectorAll('input'), function (i) { return i.value; });
-      var plein = ids.every(function (id) { return partie.types[partie.actif].indexOf(id) >= 0; });
+      var cle = boite.closest('#packs') ? 'packs' : 'types';
+      var plein = ids.every(function (id) { return partie[cle][partie.actif].indexOf(id) >= 0; });
       b.textContent = plein ? 'Aucun' : 'Tout';
       b.setAttribute('aria-label', (plein ? 'Tout désélectionner : ' : 'Tout sélectionner : ') + boite.querySelector('.famille-nom').textContent.replace(/^\S+\s/, ''));
     });
@@ -603,7 +610,7 @@
     var NOMS_MATIERES = { maths: 'Mathématiques', orthographe: 'Orthographe', conjugaison: 'Conjugaison' };
     var sousTitre = surMatiere ? 'quelle matière ?' : NOMS_MATIERES[mat] +
       (mat === 'conjugaison' ? (ecran === 'modes' ? ', les temps' : ', les verbes') : '') +
-      (mat === 'orthographe' ? (ecran === 'packs' ? ', les packs' : ', les questions') : '');
+      (mat === 'orthographe' ? (ecran === 'packs' ? ', les thèmes' : ', les questions') : '');
     $('reglages-titre').innerHTML = '<img src="' + actif.image + '" alt="" width="200" height="220">' +
       actif.nom + ' (Joueur ' + (partie.actif + 1) + ') : ' + sousTitre;
     $('btn-memes-reglages').hidden = nb < 2 || ecran !== 'reglages';
@@ -619,12 +626,15 @@
     return t;
   }
 
-  // Toutes les cartes que le joueur i peut piocher : ses packs, les 3 niveaux mêlés
+  // Toutes les cartes que le joueur i peut piocher : ses thèmes, les 3 niveaux mêlés
   // (choix de l'utilisateur le 03/11/2026 : plus de choix du niveau).
+  // Partie sauvegardée avant la v6.39 avec seulement des thèmes retirés (« Mots simples »…) : tous les thèmes.
   function cartesDuJoueur(i) {
     var liste = [];
+    var siens = partie.packs[i].filter(function (id) { return TOUS_PACKS.indexOf(id) >= 0; });
+    if (!siens.length) siens = TOUS_PACKS;
     PACKS.forEach(function (p) {
-      if (partie.packs[i].indexOf(p.id) === -1) return;
+      if (siens.indexOf(p.id) === -1) return;
       Object.keys(p.niveaux).forEach(function (niveau) {
         if (partie.mots[i] && partie.mots[i].indexOf(Number(niveau)) === -1) return; // défi du jour : niveau des mots imposé
         p.niveaux[niveau].forEach(function (mot) {

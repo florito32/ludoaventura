@@ -83,7 +83,7 @@ test('rafraîchir la préparation garde l\'écran et les choix (joueurs, joueur 
   await page.goto('./');
   await versReglages(page, 3);
   await orthographe(page);
-  await page.getByRole('checkbox', { name: 'Temps', exact: true }).check();
+  await page.getByRole('checkbox', { name: 'Jours et mois', exact: true }).check();
   await valider(page); // écran des questions (v6.16)
   await page.getByRole('checkbox', { name: 'Nombre de syllabes', exact: true }).check();
   await valider(page); // joueur 2
@@ -93,8 +93,8 @@ test('rafraîchir la préparation garde l\'écran et les choix (joueurs, joueur 
   await page.getByRole('button', { name: /Retour/ }).click();
   await expect(page.getByRole('checkbox', { name: 'Nombre de syllabes', exact: true })).toBeChecked();
   await page.getByRole('button', { name: /Retour/ }).click();
-  await expect(page.getByRole('checkbox', { name: 'Temps', exact: true })).toBeChecked();
-  await expect(page.getByRole('checkbox', { name: 'Numérique', exact: true })).not.toBeChecked();
+  await expect(page.getByRole('checkbox', { name: 'Jours et mois', exact: true })).toBeChecked();
+  await expect(page.getByRole('checkbox', { name: 'Nombres', exact: true })).not.toBeChecked();
   // On est revenu sur les packs du joueur 1 : il valide deux fois (packs, questions), puis les joueurs 2 et 3.
   await valider(page);
   await valider(page);
