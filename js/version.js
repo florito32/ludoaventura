@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.43';
+  var VERSION = '6.44';
 
   var HISTORY = [
+    { v: '6.44', date: '2026-11-10', changes: [
+      "Accueil : l'encadré « Un jeu éducatif d'aventure, à jouer en équipe » est retiré ; le bouton devient « Partie rapide solo », en bleu.",
+      "Ma progression : l'encadré « Coffres de niveau » est retiré (il est déjà dans « Mes étoiles »)."
+    ] },
     { v: '6.43', date: '2026-11-10', changes: [
       "Nouveau : la Partie rapide ! Depuis l'accueil, choisis le nombre de joueurs et les matières (Maths, Français ou les deux), puis « Lancer la partie » : l'aventure et les aventuriers sont tirés au hasard.",
       "En partie rapide, chaque question est tirée au hasard dans les matières choisies, tous niveaux, tous thèmes de mots, tous les temps de conjugaison."

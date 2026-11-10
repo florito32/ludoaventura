@@ -217,22 +217,7 @@
     }
     h += '<p class="petit">Un jour sans venir et la série repart de zéro.</p></section>';
 
-    // Coffres de niveau à ouvrir et prochain coffre.
-    var nv = compte.niveau();
-    var aOuvrir = compte.coffresAOuvrir().filter(function (c) { return c.type !== 'jour' && c.type !== 'mega'; });
-    h += '<section class="carte-page"><h3>Coffres de niveau</h3>';
-    if (aOuvrir.length) {
-      h += '<ul class="taches-jour">';
-      aOuvrir.forEach(function (c) {
-        h += '<li>' + ico('i-coffre', 'coffre-' + c.type) + '<span class="t-nom">' + nomCoffre(c) + '</span>' +
-          '<button type="button" class="btn-petit" data-ouvrir="' + c.type + ':' + c.cle + '">Ouvrir</button></li>';
-      });
-      h += '</ul>';
-    }
-    var p = E.prochainCoffre(nv.niveau);
-    h += '<p class="prochain">' + ico('i-coffre', 'coffre-' + E.coffreDuNiveau(p)) + '<span>Prochain : <strong>' + NOMS_COFFRES[E.coffreDuNiveau(p)].toLowerCase() +
-      '</strong> au niveau ' + p + ', encore ' + etoiles(E.seuil(p) - e.total) + '.</span></p>' +
-      '<p class="petit">Niveau ' + nv.niveau + '</p>' + jauge(nv, 'Vers le niveau ' + (nv.niveau + 1)) + '</section>';
+    // v6.44 : l'encadré « Coffres de niveau » est retiré (il est déjà dans « Mes étoiles », bouton de l'étoile).
     $('progression-corps').innerHTML = h;
   }
 

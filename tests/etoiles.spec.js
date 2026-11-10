@@ -190,6 +190,9 @@ test('écrans « Mes étoiles » et « Ma progression » : niveau, coffres de ni
   await expect(page.locator('.serie-cases li')).toHaveCount(5);
   await expect(page.locator('.serie-cases li.fait')).toHaveCount(1);
   await expect(page.locator('.taches-jour').first()).toContainText('Coffre du jour');
+  // v6.44 : plus d'encadré « Coffres de niveau » dans Ma progression (il est dans Mes étoiles).
+  await expect(page.locator('#progression-corps')).not.toContainText('Coffres de niveau');
+  await expect(page.locator('#progression-corps .prochain')).toHaveCount(0);
   // La touche « précédent » du téléphone revient à l'accueil.
   await page.goBack();
   await expect(page.locator('#btn-commencer')).toBeVisible();
