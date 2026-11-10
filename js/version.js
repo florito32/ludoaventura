@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.42';
+  var VERSION = '6.43';
 
   var HISTORY = [
+    { v: '6.43', date: '2026-11-10', changes: [
+      "Nouveau : la Partie rapide ! Depuis l'accueil, choisis le nombre de joueurs et les matières (Maths, Français ou les deux), puis « Lancer la partie » : l'aventure et les aventuriers sont tirés au hasard.",
+      "En partie rapide, chaque question est tirée au hasard dans les matières choisies, tous niveaux, tous thèmes de mots, tous les temps de conjugaison."
+    ] },
     { v: '6.42', date: '2026-11-10', changes: [
       "Mes étoiles : la page est plus courte. « Comment gagner des étoiles ? » est maintenant un petit bouton qui ouvre l'explication, et la liste des dernières étoiles gagnées est retirée."
     ] },
