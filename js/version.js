@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.46';
+  var VERSION = '6.47';
 
   var HISTORY = [
+    { v: '6.47', date: '2026-11-10', changes: [
+      "Défi du jour : un défi quitté avant la fin (retour à l'accueil, redémarrage, jeu fermé…) ne rapporte plus rien ce jour-là, même rejoué et gagné. On peut toujours y jouer. Une partie perdue jusqu'au bout se retente normalement."
+    ] },
     { v: '6.46', date: '2026-11-10', changes: [
       "Un coffre simple (10 à 25 étoiles) à chaque nouveau niveau ; aux niveaux 5, 10, 15… le gros coffre (argent ou or) le remplace.",
       "Nouveau : les pierres précieuses ! Une partie gagnée en rapporte parfois une (1 chance sur 3), et chaque coffre en contient : 1 (coffre du jour, coffre simple), 2 (argent), 3 (or), 5 (méga coffre). Leur nombre s'affiche sous tes étoiles."

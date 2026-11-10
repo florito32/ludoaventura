@@ -126,3 +126,74 @@ test('défi en équipe : nombre de joueurs choisi, aventuriers tirés, plateau �
   await page.getByRole('button', { name: 'Modifier les choix' }).click();
   expect(await page.evaluate(() => window.Aventura.partie.defi)).toBeNull();
 });
+
+// v6.47 (demande du 10/11/2026, backlog ligne 219) : un défi quitté avant la fin ne rapporte plus rien ce jour-là.
+test.describe('défi quitté : logique', () => {
+  test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
+  const E = require('../js/etoiles.js');
+  function memoire() { const m = {}; return { getItem: (k) => (k in m ? m[k] : null), setItem: (k, v) => { m[k] = String(v); } }; }
+  test('commencer un autre défi, en relancer un, ou fermer le jeu = quitté ; perdu jusqu’au bout = on peut retenter', () => {
+    let maintenant = new Date(2026, 10, 10, 10);
+    const s = memoire(), c = new E.Compte(s, () => maintenant);
+    // Perdu jusqu'au bout : pas quitté, on retente avec récompense.
+    c.commencerDefi('solo', 'a');
+    expect(c.recompenserPartie('a', 10, false, 'solo', 'x').gain).toBeNull();
+    expect(c.defiQuitte('solo')).toBe(false);
+    c.commencerDefi('solo', 'b');
+    expect(c.recompenserPartie('b', 10, true, 'solo', 'x', () => 0.9)).toMatchObject({ base: 10, bonus: 10 });
+    // Défi en équipe commencé puis relancé (redémarrer, ou retour à l'accueil puis relancer) : quitté.
+    c.commencerDefi('equipe', 'c');
+    c.commencerDefi('equipe', 'd');
+    expect(c.defiQuitte('equipe')).toBe(true);
+    expect(c.defiAFaire('equipe')).toBe(false);
+    expect(c.recompenserPartie('d', 30, true, 'equipe', 'x', () => 0)).toMatchObject({ base: 0, gemmes: 0, quitte: true });
+    expect(c.etat.total).toBe(20);
+    expect(c.etat.gemmes).toBe(0);
+    // Le défi solo (déjà réussi) reste jouable ; le lendemain, tout est de nouveau possible.
+    maintenant = new Date(2026, 10, 11, 9);
+    const c2 = new E.Compte(s, () => maintenant);
+    expect(c2.defiQuitte('equipe')).toBe(false);
+    // Jeu fermé pendant un défi : à la réouverture, la partie affichée n'est pas ce défi → quitté.
+    c2.commencerDefi('solo', 'e');
+    c2.verifierDefis(null, null);
+    expect(c2.defiQuitte('solo')).toBe(true);
+    // Rechargement de la page sur le même défi : pas quitté.
+    c2.commencerDefi('equipe', 'f');
+    c2.verifierDefis('equipe', 'f');
+    expect(c2.defiQuitte('equipe')).toBe(false);
+    // Un défi en cours d'hier n'empêche rien aujourd'hui.
+    c2.etat.defisEnCours.equipe = { jour: '2026-11-10', id: 'z' };
+    c2.commencerDefi('equipe', 'g');
+    expect(c2.defiQuitte('equipe')).toBe(false);
+  });
+});
+
+test('défi quitté avant la fin (retour à l’accueil) : on peut le rejouer mais il ne rapporte plus rien aujourd’hui', async ({ page }) => {
+  test.skip(test.info().project.name === 'tablette', 'trois formats suffisent');
+  await rapide(page);
+  await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); } catch (e) { /* */ } });
+  await page.goto('./');
+  await page.locator('#btn-defi').click();
+  await page.locator('label:has(input[name="defi-matiere"][value="maths"])').click();
+  await page.locator('label:has(input[name="defi-niveau"][value="facile"])').click();
+  await page.getByRole('button', { name: 'Valider' }).click();
+  await expect(page.getByRole('heading', { name: 'Défi solo du jour' })).toBeVisible();
+  // Menu → Retour à l'accueil : l'avertissement le dit.
+  await page.getByRole('button', { name: 'Menu' }).click();
+  await page.getByRole('button', { name: 'Retour à l’accueil' }).click();
+  await expect(page.locator('#menu-confirmer-texte')).toContainText('ne pourra plus rien te rapporter aujourd’hui');
+  await page.getByRole('button', { name: 'Oui, arrêter la partie' }).click();
+  await expect(page.locator('#btn-commencer')).toBeVisible();
+  // Le défi solo ne compte plus dans les défis à faire.
+  await expect(page.locator('#defi-badge')).toHaveText('1');
+  await page.locator('#btn-defi').click();
+  await expect(page.locator('.defi-type').first()).toContainText('Quitté aujourd’hui');
+  await expect(page.locator('.defi-recompense')).toContainText('ne rapporte plus rien');
+  // On peut toujours y jouer ; gagné, il ne rapporte ni étoiles ni pierres.
+  await page.getByRole('button', { name: 'Valider' }).click();
+  await gagner(page);
+  await expect(page.locator('#fin-titre')).toHaveText('Aventure réussie !');
+  await expect(page.locator('#fin-etoiles')).toContainText('Tu as quitté ce défi avant la fin');
+  await expect(page.locator('#fin-etoiles')).not.toContainText('+');
+  expect(await page.evaluate(() => [window.Recompenses.compte.etat.total, window.Recompenses.compte.etat.gemmes])).toEqual([0, 0]);
+});

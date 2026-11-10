@@ -10,6 +10,9 @@
 //    le remplace aux niveaux 5, 10, 15… Les niveaux atteints avant la v6.46 ne donnent pas de coffre simple ;
 //  - pierres précieuses (v6.46) : 1 chance sur 3 d'en gagner une par partie gagnée (aventure, partie rapide, défi) ;
 //    chaque coffre ouvert en donne : coffre du jour et coffre simple 1, argent 2, or 3, méga coffre 5 ;
+//  - défi quitté (v6.47, demande du 10/11/2026) : un défi du jour arrêté avant la fin (retour à l'accueil, autre
+//    partie, redémarrage, jeu fermé) ne rapporte plus rien ce jour-là (ni étoiles, ni pierres), même s'il est
+//    retenté et gagné ensuite. On peut toujours y jouer. Une partie perdue jusqu'au bout se retente avec récompense ;
 //  - méga coffre (v6.38, demande du 10/11/2026) : 100 à 200 ⭐ chaque fois que le joueur vient 5 jours d'affilée
 //    (5e, 10e, 15e… jour de suite ; un jour manqué remet la série à 0). Il reste à ouvrir tant qu'il ne l'est pas.
 // Tout est gardé sur l'appareil (localStorage : reste après fermeture du navigateur, contrairement à la partie
@@ -63,7 +66,9 @@
     // visites : jours où le jeu a été ouvert ; coffresMega : { jour où la série a atteint 5, 10… : étoiles (null = pas encore ouvert) }.
     // gemmes : pierres précieuses (v6.46) ; simplesDepuis : niveau au passage à la v6.46 (les coffres simples
     // commencent au niveau suivant, pour ne pas en offrir des dizaines d'un coup aux joueurs déjà avancés).
-    return { v: 1, total: 0, journal: [], parJour: {}, coffresJour: {}, coffresNiveau: {}, coffresMega: {}, visites: [], defis: {}, parties: [], gemmes: 0, simplesDepuis: null };
+    return { v: 1, total: 0, journal: [], parJour: {}, coffresJour: {}, coffresNiveau: {}, coffresMega: {}, visites: [], defis: {}, parties: [], gemmes: 0, simplesDepuis: null,
+      // defisEnCours : { solo: { jour, id } } défi commencé et pas encore fini ; defisQuittes : { jour: { solo: true } } (v6.47).
+      defisEnCours: {}, defisQuittes: {} };
   }
   // stockage : objet avec getItem / setItem (localStorage dans la page, une imitation dans les tests).
   function Compte(stockage, maintenant) {
@@ -192,6 +197,9 @@
     if (e.parties.indexOf(id) >= 0) return null;
     e.parties.unshift(id);
     if (e.parties.length > 50) e.parties.length = 50;
+    // Défi fini (gagné ou perdu) : il n'est plus en cours. Quitté plus tôt aujourd'hui : aucune récompense (v6.47).
+    if (defi && e.defisEnCours[defi] && e.defisEnCours[defi].id === id) delete e.defisEnCours[defi];
+    if (defi && this.defiQuitte(defi)) { this.ecrire(); return { base: 0, bonus: 0, gain: null, gemmes: 0, quitte: true }; }
     if (!gagnee) { this.ecrire(); return { base: 0, bonus: 0, gain: null, gemmes: 0 }; }
     var j = this.aujourdhui();
     var base = unites, bonus = 0, dejaFait = false;
@@ -205,6 +213,39 @@
     var gemmes = (hasard || Math.random)() < CHANCE_GEMME ? this.gagnerGemmes(1) : 0;
     return { base: base, bonus: bonus, defiDejaFait: dejaFait, gain: gain, gemmes: gemmes };
   };
+  // ---------- Défi quitté (v6.47) ----------
+  // Un défi commence (id : identifiant de la partie). Si un autre défi du même type était encore en cours
+  // aujourd'hui, il a été quitté avant la fin.
+  Compte.prototype.commencerDefi = function (defi, id) {
+    var e = this.etat, j = this.aujourdhui(), c = e.defisEnCours[defi];
+    if (c && c.jour === j && c.id !== id) this.marquerQuitte(defi);
+    e.defisEnCours[defi] = { jour: j, id: id };
+    this.ecrire();
+  };
+  // Le défi en cours (s'il y en a un) a été quitté : plus de récompense pour ce défi aujourd'hui.
+  Compte.prototype.marquerQuitte = function (defi) {
+    var e = this.etat, j = this.aujourdhui(), c = e.defisEnCours[defi];
+    delete e.defisEnCours[defi];
+    if (c && c.jour !== j) { this.ecrire(); return; } // défi d'un autre jour : rien à bloquer aujourd'hui
+    e.defisQuittes[j] = e.defisQuittes[j] || {};
+    e.defisQuittes[j][defi] = true;
+    // Ménage : seulement aujourd'hui.
+    Object.keys(e.defisQuittes).forEach(function (k) { if (k !== j) delete e.defisQuittes[k]; });
+    this.ecrire();
+  };
+  // Défis en cours qui ne sont pas la partie affichée (type, id) : quittés (jeu fermé, retour à l'accueil…).
+  Compte.prototype.verifierDefis = function (defi, id) {
+    var e = this.etat, self = this;
+    Object.keys(e.defisEnCours).forEach(function (t) {
+      if (t === defi && e.defisEnCours[t].id === id) return;
+      self.marquerQuitte(t);
+    });
+  };
+  // Vrai si ce défi a été quitté aujourd'hui.
+  Compte.prototype.defiQuitte = function (defi) { var q = this.etat.defisQuittes[this.aujourdhui()]; return !!(q && q[defi]); };
+  // Défi encore à faire aujourd'hui : ni réussi, ni quitté.
+  Compte.prototype.defiAFaire = function (defi) { return this.defiDuJour(defi) === undefined && !this.defiQuitte(defi); };
+
   // Étoiles gagnées avec ce défi aujourd'hui (undefined s'il n'est pas encore réussi).
   Compte.prototype.defiDuJour = function (defi) { var d = this.etat.defis[this.aujourdhui()]; return d ? d[defi] : undefined; };
 

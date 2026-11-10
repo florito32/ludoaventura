@@ -744,6 +744,12 @@
     partie.regles = R.nouvellePartie(partie.nbJoueurs, partie.objectif);
     // Identifiant unique : une partie gagnée ne rapporte ses étoiles qu'une fois (js/etoiles.js, v6.36).
     partie.regles.id = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+    // Défi quitté (v6.47) : commencer une partie alors qu'un défi n'était pas fini, c'est quitter ce défi
+    // (plus de récompense pour lui aujourd'hui). Puis on note le défi qui commence.
+    if (window.Recompenses) {
+      window.Recompenses.compte.verifierDefis(null);
+      if (partie.defi) window.Recompenses.compte.commencerDefi(partie.defi.type, partie.regles.id);
+    }
     partie.carte = null;
     partie.etapesVues = 0;
     preparerPlateau(true);
@@ -1813,8 +1819,11 @@
   $('btn-menu-fermer').addEventListener('click', fermerMenu);
   // Un toucher à côté de la boîte (sur le fond sombre) referme aussi le menu.
   $('menu-partie').addEventListener('click', function (e) { if (e.target === $('menu-partie')) fermerMenu(); });
+  // Défi du jour en cours (v6.47) : quitter ou redémarrer, c'est abandonner les récompenses du défi pour aujourd'hui.
+  var AVERTIR_DEFI = ' Attention : ce défi ne pourra plus rien te rapporter aujourd’hui (ni étoiles, ni pierres), même si tu le rejoues.';
+  function avertirDefi() { return partie.defi && partie.regles && partie.regles.etape !== 'fin' ? AVERTIR_DEFI : ''; }
   $('btn-redemarrer').addEventListener('click', function () {
-    demanderConfirmation('Redémarrer ?', 'La partie en cours sera perdue : on recommence avec les mêmes joueurs et la même aventure.',
+    demanderConfirmation('Redémarrer ?', 'La partie en cours sera perdue : on recommence avec les mêmes joueurs et la même aventure.' + avertirDefi(),
       'Oui, redémarrer', function () { fermerMenu(); lancerPartie(); });
   });
   $('btn-confirmer-oui').addEventListener('click', function () { var a = aConfirmer; montrerChoix(); if (a) a(); });
@@ -1824,12 +1833,13 @@
     annulerMinuteurs();
     partie.modif = true;
     // Changer les réglages d'un défi en fait une partie libre (v6.37, hypothèse à valider) : on garde ceux du défi.
+    if (partie.defi && window.Recompenses) window.Recompenses.compte.marquerQuitte(partie.defi.type); // défi quitté (v6.47)
     if (partie.defi) { partie.defi = null; partie.avantDefi = null; partie.mots = [null, null, null, null]; }
     if (partie.rapide) { partie.rapide = null; partie.avantDefi = null; } // idem pour une partie rapide (v6.43) : partie libre, réglages « tout coché »
     preparer(1);
   });
   $('btn-accueil').addEventListener('click', function () {
-    demanderConfirmation('Retour à l’accueil ?', 'La partie en cours sera arrêtée et tous les choix effacés.', 'Oui, arrêter la partie', retourAccueil);
+    demanderConfirmation('Retour à l’accueil ?', 'La partie en cours sera arrêtée et tous les choix effacés.' + avertirDefi(), 'Oui, arrêter la partie', retourAccueil);
   });
   function retourAccueil() {
     fermerMenu();
@@ -1901,6 +1911,12 @@
   reprendre();
   pretASauver = true;
   sauver();
+  // Défi quitté (v6.47) : un défi noté « en cours » qui n'est pas la partie reprise a été arrêté
+  // (retour à l'accueil, jeu fermé…) : plus de récompense pour ce défi aujourd'hui.
+  if (window.Recompenses) {
+    window.Recompenses.compte.verifierDefis(partie.defi && partie.regles ? partie.defi.type : null, partie.regles ? partie.regles.id : null);
+    window.Recompenses.majTout();
+  }
 
   // Préchargement discret des deux plateaux (jour et soir) pendant que l'accueil est affiché (v6.26).
   // Les images restent référencées : une fois la page ouverte, le plateau s'affiche même si le
