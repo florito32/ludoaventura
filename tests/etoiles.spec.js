@@ -62,6 +62,40 @@ test.describe('logique des étoiles', () => {
     expect(c.etat.total).toBe(18 + 40 + 20 + 44);
     expect(c.derniersJours(7).map((j) => j.n)).toEqual([0, 0, 0, 0, 0, 0, 122]);
   });
+
+  test('méga coffre (v6.38) : 100 à 200 étoiles chaque fois que le joueur vient 5 jours d\'affilée', () => {
+    let maintenant = new Date(2026, 10, 1, 10);
+    const lendemain = () => { maintenant = new Date(maintenant.getFullYear(), maintenant.getMonth(), maintenant.getDate() + 1, 10); };
+    const s = memoire(), c = new E.Compte(s, () => maintenant);
+    const megas = () => c.coffresAOuvrir().filter((x) => x.type === 'mega');
+    for (let j = 1; j <= 4; j++) { expect(c.visite()).toBe(false); expect(c.serie()).toBe(j); lendemain(); }
+    expect(c.visite()).toBe(true); // 5e jour d'affilée
+    expect(c.visite()).toBe(false); // revenir le même jour ne redonne rien
+    expect(megas()).toEqual([{ type: 'mega', cle: '2026-11-05' }]);
+    // Pas ouvert le jour même : il reste à ouvrir le lendemain (et la série continue).
+    lendemain(); c.visite();
+    expect(c.serie()).toBe(6);
+    expect(c.versMega()).toMatchObject({ dans: 1, reste: 4 });
+    const g = c.ouvrir(megas()[0], () => 0.999);
+    expect(g.n).toBe(200);
+    expect(c.ouvrir({ type: 'mega', cle: '2026-11-05' })).toBeNull();
+    expect(megas()).toEqual([]);
+    expect(c.etat.journal[0]).toMatchObject({ type: 'coffre-mega', n: 200 });
+    // Un jour manqué : la série repart de zéro.
+    lendemain(); lendemain(); c.visite();
+    expect(c.serie()).toBe(1);
+    // 10e jour d'affilée : un nouveau méga coffre (gain minimum 100).
+    for (let j = 2; j <= 10; j++) { lendemain(); c.visite(); }
+    expect(c.serie()).toBe(10);
+    expect(megas()).toHaveLength(2);
+    expect(c.ouvrir(megas()[0], () => 0).n).toBe(100);
+    // Données d'avant la v6.38 (sans visites) : les jours de coffre du jour comptent dans la série.
+    const s2 = memoire();
+    s2.setItem(E.CLE, JSON.stringify({ v: 1, total: 40, journal: [], parJour: {}, coffresJour: { '2026-11-06': 5, '2026-11-07': 6, '2026-11-08': 7, '2026-11-09': 8 }, coffresNiveau: {}, defis: {}, parties: [] }));
+    const c2 = new E.Compte(s2, LE_10);
+    expect(c2.visite()).toBe(true);
+    expect(c2.serie()).toBe(5);
+  });
 });
 
 // L'accueil sans la bulle de présentation de Ludo (premier démarrage déjà passé).
@@ -78,9 +112,16 @@ test('accueil : étoiles, niveau et coffre du jour ; le coffre s\'ouvre une fois
   const total = page.locator('#accueil-total');
   await expect(total).toHaveText('0');
   await expect(page.locator('#accueil-niveau')).toHaveText('Niveau 1');
-  for (const id of ['#btn-etoiles-haut', '#btn-coffre-haut', '#btn-etoiles', '#btn-progression', '#btn-commencer']) {
+  for (const id of ['#btn-etoiles-haut', '#btn-defi', '#btn-coffre-haut', '#btn-commencer']) {
     await expect(page.locator(id)).toBeInViewport({ ratio: 1 });
   }
+  // v6.38 : plus de raccourcis « Mes étoiles » ni « Progrès » (doublons des boutons du haut).
+  await expect(page.locator('#btn-etoiles, #btn-progression, .raccourcis')).toHaveCount(0);
+  // Les 3 boutons du haut sur une seule ligne, sans se chevaucher ni déborder.
+  const boites = await page.evaluate(() => ['btn-etoiles-haut', 'btn-defi', 'btn-coffre-haut'].map((id) => document.getElementById(id).getBoundingClientRect().toJSON()));
+  expect(boites[0].right).toBeLessThanOrEqual(boites[1].left + 1);
+  expect(boites[1].right).toBeLessThanOrEqual(boites[2].left + 1);
+  expect(Math.abs(boites[0].top - boites[1].top)).toBeLessThan(30);
   await expect(page.locator('#accueil-badge')).toHaveText('1');
   await page.locator('#btn-coffre-haut').click();
   const coffre = page.getByRole('dialog', { name: 'Coffre du jour' });
@@ -89,6 +130,10 @@ test('accueil : étoiles, niveau et coffre du jour ; le coffre s\'ouvre une fois
   await expect(page.locator('#coffre-gain')).toContainText(/\+\d+ étoiles !/);
   const n = Number((await page.locator('#coffre-gain strong').textContent()).match(/\d+/)[0]);
   expect(n).toBeGreaterThanOrEqual(5); expect(n).toBeLessThanOrEqual(20);
+  // v6.38 : le coffre s'ouvre par devant (le couvercle ouvert apparaît derrière) et les étoiles sortent de l'intérieur.
+  await expect(page.locator('#coffre-scene')).toHaveClass(/ouvert/);
+  expect(await page.locator('#coffre-volees span').count()).toBeGreaterThanOrEqual(5);
+  await expect.poll(() => page.evaluate(() => getComputedStyle(document.querySelector('.couvercle-ouvert')).transform)).toBe('matrix(1, 0, 0, 1, 0, 0)');
   await coffre.getByRole('button', { name: 'Super !' }).click();
   await expect(coffre).toBeHidden();
   await expect(total).toHaveText(String(n));
@@ -101,12 +146,12 @@ test('accueil : étoiles, niveau et coffre du jour ; le coffre s\'ouvre une fois
   await expect(p2.locator('#accueil-badge')).toBeHidden();
 });
 
-test('écrans « Mes étoiles » et « Ma progression » : niveau, coffres de niveau, 7 derniers jours ; retour à l\'accueil', async ({ page }) => {
+test('écrans « Mes étoiles » et « Ma progression » : niveau, coffres de niveau, série vers le méga coffre ; retour à l\'accueil', async ({ page }) => {
   const auj = await page.evaluate(() => 0).then(() => { const d = new Date(); const z = (x) => (x < 10 ? '0' : '') + x; return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate()); });
   await accueil(page, { v: 1, total: 265, journal: [{ quand: new Date().toISOString(), jour: auj, type: 'partie', n: 18, texte: 'Aventure réussie · Viking' }], parJour: { [auj]: 18 }, coffresJour: {}, coffresNiveau: {}, defis: {}, parties: [] });
   await expect(page.locator('#accueil-niveau')).toHaveText('Niveau 6');
   await expect(page.locator('#accueil-badge')).toHaveText('2'); // coffre du jour + coffre d'argent du niveau 5
-  await page.locator('#btn-etoiles').click();
+  await page.locator('#btn-etoiles-haut').click();
   await expect(page.getByRole('heading', { name: 'Mes étoiles' })).toBeVisible();
   await expect(page.locator('#etoiles-total')).toHaveText('265');
   await expect(page.locator('.chemin-coffres li').first()).toContainText('Niveau 5');
@@ -122,10 +167,19 @@ test('écrans « Mes étoiles » et « Ma progression » : niveau, coffres de ni
   await expect(page.locator('#etoiles-total')).toHaveText(String(265 + n));
   await expect(page.locator('.chemin-coffres li').first()).toContainText('Ouvert');
   await page.getByRole('button', { name: 'Accueil' }).click();
-  await page.locator('#btn-progression').click();
+  // Le bouton du coffre ouvre le coffre du jour ; une fois ouvert, il mène à « Ma progression ».
+  await page.locator('#btn-coffre-haut').click();
+  await page.getByRole('dialog', { name: 'Coffre du jour' }).getByRole('button', { name: 'Ouvrir le coffre' }).click();
+  const nj = Number((await page.locator('#coffre-gain strong').textContent()).match(/\d+/)[0]);
+  await page.getByRole('button', { name: 'Super !' }).click();
+  await page.locator('#btn-coffre-haut').click();
   await expect(page.getByRole('heading', { name: 'Ma progression' })).toBeVisible();
-  await expect(page.locator('#progression-jour')).toHaveText('+' + (18 + n));
-  await expect(page.locator('.histo li')).toHaveCount(7);
+  await expect(page.locator('#progression-jour')).toHaveText('+' + (18 + n + nj));
+  // v6.38 : plus les 7 derniers jours ; la série de jours d'affilée vers le méga coffre à la place.
+  await expect(page.locator('.histo')).toHaveCount(0);
+  await expect(page.locator('#serie-jours')).toHaveText('1 jour');
+  await expect(page.locator('.serie-cases li')).toHaveCount(5);
+  await expect(page.locator('.serie-cases li.fait')).toHaveCount(1);
   await expect(page.locator('.taches-jour').first()).toContainText('Coffre du jour');
   // La touche « précédent » du téléphone revient à l'accueil.
   await page.goBack();

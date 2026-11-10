@@ -4,9 +4,15 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.40';
+  var VERSION = '6.41';
 
   var HISTORY = [
+    { v: '6.41', date: '2026-11-10', changes: [
+      "Accueil : le bouton « Défi du jour » est en haut de l'écran, entre les étoiles et le coffre ; les boutons « Mes étoiles » et « Progrès » sont retirés (le bouton des étoiles et celui du coffre mènent aux mêmes pages).",
+      "Défi du jour : on choisit seulement la matière et le niveau, puis « Valider » ; l'aventure reste une surprise jusqu'au plateau.",
+      "Nouveau : le méga coffre (100 à 200 étoiles) chaque fois que tu viens 5 jours d'affilée. « Ma progression » montre ta série de jours à la place des 7 derniers jours.",
+      "Coffres redessinés (planches, ferrures, serrure) : ils s'ouvrent par devant et les étoiles sortent du coffre."
+    ] },
     { v: '6.40', date: '2026-11-10', changes: [
       "Orthographe : après « 🔊 Écouter », un bouton « 💬 Phrase d'exemple » apparaît : il lit une courte phrase avec le mot (pas pour « Mot mélangé » ni « Le ou la ? », où la phrase donnerait la réponse)."
     ] },
