@@ -1233,8 +1233,15 @@
   }
 
   // Affiche la carte piochée : la question tirée et le mot caché (ou la lettre affichée), avec la lecture vocale.
+  // « Phrase d'exemple » (v6.40) : seulement après « Écouter », et si la carte a une phrase qui ne donne pas la réponse.
+  function majPhrase() {
+    var c = partie.carte;
+    $('btn-phrase').hidden = !(c && c.ecoutee && window.Voix.disponible() && window.Voix.phraseExemple(c));
+  }
+
   function montrerCarte(j) {
     var c = partie.carte;
+    majPhrase();
     var box = $('carte-piochee');
     box.hidden = false;
     box.className = 'carte-piochee joueur-' + j.couleur;
@@ -1323,7 +1330,15 @@
       ecouter.disabled = true;
       ecouter.title = 'La lecture à voix haute n\u2019est pas disponible sur cet appareil';
     }
-    ecouter.addEventListener('click', function () { window.Voix.lire(window.Voix.texteCarte(partie.carte)); });
+    ecouter.addEventListener('click', function () {
+      window.Voix.lire(window.Voix.texteCarte(partie.carte));
+      // v6.40 : une fois la carte écoutée, « Phrase d'exemple » apparaît à côté (si la carte en a une).
+      if (partie.carte && !partie.carte.ecoutee) { partie.carte.ecoutee = true; majPhrase(); sauver(); ajusterTour(); }
+    });
+    $('btn-phrase').addEventListener('click', function () {
+      var ph = window.Voix.phraseExemple(partie.carte);
+      if (ph) window.Voix.lire(ph);
+    });
   }
 
   // ---------- Tour de jeu sur téléphone (v6.2) ----------

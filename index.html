@@ -374,9 +374,11 @@
           <div class="carte-piochee" id="carte-piochee" hidden>
             <div class="carte-entete">
               <p class="carte-titre" id="carte-titre"></p>
-              <!-- « Écouter » puis, juste dessous, « Voir le mot » (une aide : le mot seul), chacun avec son icône (v5.0). -->
+              <!-- « Écouter » puis, juste dessous, « Voir le mot » (une aide : le mot seul), chacun avec son icône (v5.0).
+                   v6.40 : après « Écouter », « Phrase d'exemple » lit une courte phrase avec le mot (js/phrases.js). -->
               <div class="carte-outils">
                 <button type="button" class="btn-ecouter" id="btn-ecouter"><span aria-hidden="true">🔊</span> Écouter</button>
+                <button type="button" class="btn-ecouter" id="btn-phrase" aria-label="Écouter une phrase d’exemple" hidden><span aria-hidden="true">💬</span> <span class="long">Phrase d’exemple</span><span class="court">Phrase</span></button>
                 <button type="button" class="btn-ecouter" id="btn-voir-mot" aria-controls="carte-mot" aria-expanded="false"><span aria-hidden="true">👁️</span> <span class="btn-libelle">Voir le mot</span></button>
               </div>
             </div>

@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.39';
+  var VERSION = '6.40';
 
   var HISTORY = [
+    { v: '6.40', date: '2026-11-10', changes: [
+      "Orthographe : après « 🔊 Écouter », un bouton « 💬 Phrase d'exemple » apparaît : il lit une courte phrase avec le mot (pas pour « Mot mélangé » ni « Le ou la ? », où la phrase donnerait la réponse)."
+    ] },
     { v: '6.39', date: '2026-11-10', changes: [
       "Orthographe : les « packs » s'appellent maintenant des « thèmes », rangés en 4 familles encadrées avec chacune son bouton « Tout » : Nature et animaux, Tous les jours, En ville, Le monde, le temps, les nombres.",
       "« Mots simples » et « Mots compliqués » ne sont plus proposés ; « Temps » devient « Jours et mois » et « Numérique » devient « Nombres »."

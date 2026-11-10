@@ -733,6 +733,13 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 .carte-outils { flex: none; display: flex; flex-direction: column; gap: 6px; }
 .carte-outils .btn-ecouter { white-space: nowrap; }
 .carte-outils [hidden] { display: none; }
+#btn-phrase .court { display: none; }
+/* Carte étroite (panneau à droite du plateau sur ordinateur) : « 💬 Phrase » au lieu de « Phrase d'exemple » (v6.40). */
+.carte-piochee { container-type: inline-size; }
+@container (max-width: 420px) {
+  #btn-phrase .long { display: none; }
+  #btn-phrase .court { display: inline; }
+}
 .carte-consigne { margin-top: 8px !important; font-weight: 600; }
 .carte-mot {
   margin: 6px 0 !important; text-align: center; font: 800 clamp(1.5rem, 6vw, 2.1rem)/1.2 "Rockwell", "Roboto Slab", Georgia, serif;
@@ -967,6 +974,8 @@ body:has(#ecran-plateau:not([hidden])) .pied { padding-block: 2px calc(2px + env
   .plateau-ecran .btn-retour { min-height: 32px; }
   .table.tour-monte .panneau { width: min(100%, 640px); }
   .tour .carte-outils { flex-direction: row; } /* « Écouter » et « Voir le mot » côte à côte */
+  .tour #btn-phrase .long { display: none; } /* « 💬 Phrase » : tient sur la même ligne (v6.40) */
+  .tour #btn-phrase .court { display: inline; }
   .tour .carte-outils .btn-ecouter { min-height: 36px; padding: 2px 10px; }
   .tour .carte-mot { margin: 2px 0 !important; font-size: clamp(1.4rem, 7vh, 2rem); }
   .tour .carte-consigne { margin-top: 2px !important; }

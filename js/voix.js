@@ -45,5 +45,18 @@
     return consigne + ' ' + mot + '.';
   }
 
-  racine.Voix = { disponible: disponible, lire: lire, texteCarte: texteCarte };
+  // Phrase d'exemple d'une carte d'orthographe (v6.40, demande du 10/11/2026), proposée après « Écouter ».
+  // Pas de phrase quand elle donnerait la réponse : Mot mélangé (le mot), Le ou la ? (l'article devant le mot),
+  // Au pluriel si la phrase contient déjà le pluriel ; ni pour la dictée, qui la lit déjà.
+  function phraseExemple(carte) {
+    var q = carte && carte.question, P = racine.Phrases;
+    if (!q || !P || carte.lettre || q.voixSansMot || q.dictee || q.id === 'genre') return null;
+    var phrase = P[carte.mot];
+    if (!phrase) return null;
+    var info = racine.Cartes && racine.Cartes.INFOS[carte.mot];
+    if (q.id === 'pluriel' && info && info.pluriel && phrase.toLocaleUpperCase('fr-FR').indexOf(info.pluriel) >= 0) return null;
+    return phrase;
+  }
+
+  racine.Voix = { disponible: disponible, lire: lire, texteCarte: texteCarte, phraseExemple: phraseExemple };
 })(this);
