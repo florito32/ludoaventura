@@ -18,10 +18,54 @@ test.describe('logique des étoiles', () => {
     expect(E.niveau(100)).toMatchObject({ niveau: 3, dans: 30, besoin: 50, reste: 20 });
   });
 
-  test('coffre d\'argent tous les 5 niveaux, coffre d\'or tous les 10', () => {
-    expect([4, 5, 10, 15, 20, 25].map(E.coffreDuNiveau)).toEqual([null, 'argent', 'or', 'argent', 'or', 'argent']);
-    expect(E.prochainCoffre(1)).toBe(5);
-    expect(E.prochainCoffre(5)).toBe(10);
+  test('coffre simple à chaque niveau (v6.46), argent tous les 5 niveaux, or tous les 10', () => {
+    expect([1, 2, 4, 5, 6, 10, 15, 20, 25].map(E.coffreDuNiveau)).toEqual([null, 'simple', 'simple', 'argent', 'simple', 'or', 'argent', 'or', 'argent']);
+    expect(E.prochainCoffre(1)).toBe(2);
+    expect(E.prochainCoffre(5)).toBe(6);
+    expect(E.prochainGrosCoffre(1)).toBe(5);
+    expect(E.prochainGrosCoffre(5)).toBe(10);
+  });
+
+  test('coffre simple : 10 à 25 étoiles et 1 pierre ; gros coffres : 2 (argent), 3 (or) ; seulement pour les niveaux atteints après la v6.46', () => {
+    const c = new E.Compte(memoire(), LE_10);
+    expect(c.etat.simplesDepuis).toBe(1);
+    const j = c.ouvrir(c.coffresAOuvrir()[0], () => 0);
+    expect(j.gemmes).toBe(1);
+    c.gagner(E.seuil(3) - 5, 'partie', 'test'); // niveau 3
+    expect(c.coffresAOuvrir()).toEqual([{ type: 'simple', niveau: 2, cle: '2' }, { type: 'simple', niveau: 3, cle: '3' }]);
+    expect(c.ouvrir(c.coffresAOuvrir()[0], () => 0)).toMatchObject({ n: 10, gemmes: 1, coffre: 'simple' });
+    expect(c.ouvrir(c.coffresAOuvrir()[0], () => 0.9999)).toMatchObject({ n: 25, gemmes: 1 });
+    expect(c.etat.gemmes).toBe(3);
+    // Joueur déjà au niveau 12 avant la v6.46 : pas de coffres simples pour les niveaux passés, seulement les suivants.
+    const s = memoire();
+    s.setItem(E.CLE, JSON.stringify({ v: 1, total: E.seuil(12), coffresNiveau: { 5: 40, 10: 100 } }));
+    const v = new E.Compte(s, LE_10);
+    expect(v.etat.simplesDepuis).toBe(12);
+    expect(v.coffresAOuvrir().filter((x) => x.niveau)).toEqual([]);
+    // simplesDepuis forcé plus haut : le passage de niveau n'annonce pas de coffre simple déjà exclu.
+    const w = new E.Compte(memoire(), LE_10); w.etat.simplesDepuis = 20;
+    expect(w.gagner(E.seuil(4), 'partie', 'test').coffres).toEqual([]);
+    v.gagner(E.seuil(13) - E.seuil(12), 'partie', 'test');
+    expect(v.coffresAOuvrir().filter((x) => x.niveau)).toEqual([{ type: 'simple', niveau: 13, cle: '13' }]);
+    v.gagner(E.seuil(15) - E.seuil(13), 'partie', 'test');
+    const l = v.coffresAOuvrir().filter((x) => x.niveau);
+    expect(l.map((x) => x.type)).toEqual(['simple', 'simple', 'argent']);
+    v.ouvrir(l[0]); v.ouvrir(l[1]);
+    expect(v.ouvrir(l[2]).gemmes).toBe(2);
+    expect(v.etat.gemmes).toBe(4);
+    // Relu plus tard : le point de départ des coffres simples est gardé.
+    expect(new E.Compte(s, LE_10).etat.simplesDepuis).toBe(12);
+  });
+
+  test('pierres précieuses : 1 chance sur 3 par partie gagnée, rien si perdue', () => {
+    const c = new E.Compte(memoire(), LE_10);
+    expect(c.recompenserPartie('a', 10, true, null, 'x', () => 0.1).gemmes).toBe(1);
+    expect(c.recompenserPartie('b', 10, true, null, 'x', () => 0.5).gemmes).toBe(0);
+    expect(c.recompenserPartie('c', 10, false, null, 'x', () => 0).gemmes).toBe(0);
+    expect(c.recompenserPartie('d', 10, true, 'solo', 'x', () => 0.2).gemmes).toBe(1);
+    expect(c.etat.gemmes).toBe(2);
+    expect(E.CHANCE_GEMME).toBeCloseTo(1 / 3);
+    expect(E.GEMMES).toEqual({ jour: 1, simple: 1, argent: 2, or: 3, mega: 5 });
   });
 
   test('coffre du jour : 5 à 20 étoiles, une fois par jour, de nouveau le lendemain', () => {
@@ -41,12 +85,12 @@ test.describe('logique des étoiles', () => {
     const c = new E.Compte(memoire(), LE_10);
     c.ouvrir(c.coffresAOuvrir()[0], () => 0);
     const g = c.gagner(E.seuil(10) - 5, 'partie', 'test');
-    expect(g.coffres).toEqual([5, 10]);
-    const niveaux = c.coffresAOuvrir();
+    expect(g.coffres).toEqual([2, 3, 4, 5, 6, 7, 8, 9, 10]); // v6.46 : un coffre simple à chaque autre niveau
+    const niveaux = c.coffresAOuvrir().filter((x) => x.type !== 'simple');
     expect(niveaux).toEqual([{ type: 'argent', niveau: 5, cle: '5' }, { type: 'or', niveau: 10, cle: '10' }]);
     expect(c.ouvrir(niveaux[0], () => 0).n).toBe(30);
-    expect(c.ouvrir(niveaux[1], () => 0.9999).n).toBe(150);
-    expect(c.coffresAOuvrir()).toEqual([]);
+    expect(c.ouvrir(niveaux[1], () => 0.9999)).toMatchObject({ n: 150, gemmes: 3 });
+    expect(c.coffresAOuvrir().every((x) => x.type === 'simple')).toBe(true);
   });
 
   test('partie gagnée : 1 étoile par unité, une seule fois ; perdue : rien ; défi : doublé une fois par jour', () => {
@@ -78,6 +122,7 @@ test.describe('logique des étoiles', () => {
     expect(c.versMega()).toMatchObject({ dans: 1, reste: 4 });
     const g = c.ouvrir(megas()[0], () => 0.999);
     expect(g.n).toBe(200);
+    expect(g.gemmes).toBe(5); // v6.46 : 5 pierres précieuses dans le méga coffre
     expect(c.ouvrir({ type: 'mega', cle: '2026-11-05' })).toBeNull();
     expect(megas()).toEqual([]);
     expect(c.etat.journal[0]).toMatchObject({ type: 'coffre-mega', n: 200 });
@@ -148,7 +193,8 @@ test('accueil : étoiles, niveau et coffre du jour ; le coffre s\'ouvre une fois
 
 test('écrans « Mes étoiles » et « Ma progression » : niveau, coffres de niveau, série vers le méga coffre ; retour à l\'accueil', async ({ page }) => {
   const auj = await page.evaluate(() => 0).then(() => { const d = new Date(); const z = (x) => (x < 10 ? '0' : '') + x; return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate()); });
-  await accueil(page, { v: 1, total: 265, journal: [{ quand: new Date().toISOString(), jour: auj, type: 'partie', n: 18, texte: 'Aventure réussie · Viking' }], parJour: { [auj]: 18 }, coffresJour: {}, coffresNiveau: {}, defis: {}, parties: [] });
+  // simplesDepuis : 99 → pas de coffre simple (v6.46) si le coffre du jour fait passer le niveau 7 (test déterministe).
+  await accueil(page, { v: 1, total: 265, journal: [{ quand: new Date().toISOString(), jour: auj, type: 'partie', n: 18, texte: 'Aventure réussie · Viking' }], parJour: { [auj]: 18 }, coffresJour: {}, coffresNiveau: {}, defis: {}, parties: [], simplesDepuis: 99 });
   await expect(page.locator('#accueil-niveau')).toHaveText('Niveau 6');
   await expect(page.locator('#accueil-badge')).toHaveText('2'); // coffre du jour + coffre d'argent du niveau 5
   await page.locator('#btn-etoiles-haut').click();
@@ -235,4 +281,40 @@ test('fin de partie : passer le niveau 5 propose d\'ouvrir le coffre d\'argent',
   await page.getByRole('button', { name: 'Ouvrir le coffre d’argent' }).click();
   await page.getByRole('dialog', { name: /Coffre d’argent/ }).getByRole('button', { name: 'Ouvrir le coffre' }).click();
   await expect(page.locator('#coffre-gain')).toContainText(/\+\d+ étoiles/);
+});
+
+// v6.46 (demande du 10/11/2026, backlog lignes 216 à 218) : coffre simple à chaque niveau et pierres précieuses.
+test('coffre simple au passage de niveau et pierres précieuses : accueil, ouverture, Mes étoiles', async ({ page }) => {
+  const auj = (() => { const d = new Date(); const z = (x) => (x < 10 ? '0' : '') + x; return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate()); })();
+  // Niveau 3 atteint après la v6.46 (coffres simples depuis le niveau 1), coffre du jour déjà ouvert, 4 pierres.
+  await accueil(page, { v: 1, total: E.seuil(3), gemmes: 4, simplesDepuis: 1, coffresJour: { [auj]: 10 }, coffresNiveau: {}, parJour: {}, journal: [], defis: {}, parties: [] });
+  await expect(page.locator('#accueil-gemmes')).toHaveText('4');
+  await expect(page.locator('#btn-etoiles-haut')).toContainText('pierres précieuses');
+  // La pastille des étoiles tient dans la barre (pas de débordement horizontal).
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  const barre = await page.evaluate(() => { const b = document.querySelector('.accueil-haut').getBoundingClientRect(); return [...document.querySelectorAll('.accueil-haut .pastille')].every((p) => { const r = p.getBoundingClientRect(); return r.left >= b.left - 1 && r.right <= b.right + 1 && r.height < 80; }); });
+  expect(barre).toBe(true);
+  await expect(page.locator('#accueil-badge')).toHaveText('2'); // coffres simples des niveaux 2 et 3
+  await page.locator('#btn-coffre-haut').click();
+  const d = page.getByRole('dialog', { name: /Coffre simple/ });
+  await expect(d).toBeVisible();
+  await d.getByRole('button', { name: 'Ouvrir le coffre' }).click();
+  const n = Number((await page.locator('#coffre-gain strong').textContent()).match(/\d+/)[0]);
+  expect(n).toBeGreaterThanOrEqual(10); expect(n).toBeLessThanOrEqual(25);
+  await expect(page.locator('#coffre-gain')).toContainText('+1 pierre précieuse');
+  await page.getByRole('button', { name: 'Coffre suivant' }).click();
+  await d.getByRole('button', { name: 'Ouvrir le coffre' }).click();
+  await expect(page.locator('#coffre-gain')).toContainText('+1 pierre précieuse');
+  await page.getByRole('button', { name: 'Super !' }).click();
+  await expect(page.locator('#accueil-gemmes')).toHaveText('6');
+  // Mes étoiles : nombre de pierres et chemin des coffres (simple à chaque niveau, gros coffre au niveau 5).
+  await page.locator('#btn-etoiles-haut').click();
+  await expect(page.locator('#etoiles-gemmes')).toHaveText('6');
+  await expect(page.locator('.chemin-coffres li')).toHaveCount(4);
+  await expect(page.locator('.chemin-coffres li').first()).toContainText('Ouvert');
+  await expect(page.locator('.chemin-coffres')).toContainText('Coffre simple');
+  await expect(page.locator('.chemin-coffres')).toContainText('Coffre d’argent');
+  await page.getByRole('button', { name: 'Comment gagner des étoiles ?' }).click();
+  await expect(page.getByRole('dialog', { name: 'Comment gagner des étoiles ?' })).toContainText('Pierres précieuses');
+  await expect(page.getByRole('dialog', { name: 'Comment gagner des étoiles ?' })).toContainText('coffre simple');
 });

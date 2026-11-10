@@ -23,7 +23,8 @@
   function etoiles(n) { return n + ' étoile' + (n > 1 ? 's' : ''); }
   function ico(id, classe) { return '<svg class="ico ' + (classe || '') + '" aria-hidden="true"><use href="#' + id + '"/></svg>'; }
   function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  var NOMS_COFFRES = { jour: 'Coffre du jour', argent: 'Coffre d’argent', or: 'Coffre d’or', mega: 'Méga coffre' };
+  var NOMS_COFFRES = { jour: 'Coffre du jour', simple: 'Coffre simple', argent: 'Coffre d’argent', or: 'Coffre d’or', mega: 'Méga coffre' };
+  function gemmes(n) { return n + ' pierre' + (n > 1 ? 's' : '') + ' précieuse' + (n > 1 ? 's' : ''); }
   function nomCoffre(c) { return NOMS_COFFRES[c.type] + (c.niveau ? ' · niveau ' + c.niveau : c.type === 'mega' ? ' · ' + E.SERIE_MEGA + ' jours d’affilée' : ''); }
   function jours(n) { return n + ' jour' + (n > 1 ? 's' : ''); }
   var JOURS = ['dim.', 'lun.', 'mar.', 'mer.', 'jeu.', 'ven.', 'sam.'];
@@ -53,6 +54,7 @@
       $('defi-aide').textContent = reste ? ' à faire' : ' : tous réussis';
     }
     $('accueil-total').textContent = total;
+    $('accueil-gemmes').textContent = compte.etat.gemmes || 0; // pierres précieuses (v6.46)
     $('accueil-niveau').textContent = 'Niveau ' + nv.niveau;
     $('accueil-jauge').style.width = Math.round(100 * nv.dans / nv.besoin) + '%';
     // Texte lu par les lecteurs d'écran : ajouté au texte visible (pas d'aria-label, qui doit reprendre le texte visible, WCAG 2.5.3).
@@ -118,6 +120,7 @@
       }
       $('coffre-volees').innerHTML = vol;
       $('coffre-gain').innerHTML = '<strong>+' + etoiles(g.n) + ' !</strong>' +
+        (g.gemmes ? '<span class="gain-gemmes">' + ico('i-gemme') + ' +' + gemmes(g.gemmes) + '</span>' : '') +
         (g.apres > g.avant ? '<span class="gain-niveau">Niveau ' + g.apres + ' atteint !</span>' : '');
       // Le coffre a fait passer un niveau qui donne un coffre : il s'ajoute à la suite.
       g.coffres.forEach(function (L) { file.push({ type: E.coffreDuNiveau(L), niveau: L, cle: String(L) }); });
@@ -145,23 +148,34 @@
     var nv = compte.niveau(), e = compte.etat, h = '';
     h += '<section class="carte-page resume-etoiles">' + ico('i-etoile', 'ico-geant') +
       '<p class="gros-total"><strong id="etoiles-total">' + e.total + '</strong> ' + (e.total > 1 ? 'étoiles' : 'étoile') + '</p>' +
+      '<p class="total-gemmes">' + ico('i-gemme') + ' <strong id="etoiles-gemmes">' + (e.gemmes || 0) + '</strong> ' + ((e.gemmes || 0) > 1 ? 'pierres précieuses' : 'pierre précieuse') + '</p>' +
       '<p class="niveau-titre">Niveau ' + nv.niveau + '</p>' + jauge(nv, 'Vers le niveau ' + (nv.niveau + 1)) +
       '<p class="petit">Encore <strong>' + etoiles(nv.reste) + '</strong> pour le niveau ' + (nv.niveau + 1) + '</p>' +
       // v6.42 : l'explication s'ouvre dans une fenêtre au lieu d'allonger la page.
       '<button type="button" class="btn-comment" id="btn-comment-gagner" aria-haspopup="dialog" aria-controls="comment-gagner"><span class="rond" aria-hidden="true">?</span> Comment gagner des étoiles ?</button></section>';
 
-    // Coffres de niveau : 4 paliers.
-    // Départ : le premier coffre atteint mais pas ouvert, sinon le dernier coffre atteint (« Ouvert »), sinon le niveau 5.
-    var L = Math.max(5, nv.niveau - nv.niveau % 5);
-    for (var a = 5; a <= nv.niveau; a += 5) if (e.coffresNiveau[a] === undefined) { L = a; break; }
+    // Coffres de niveau : 4 paliers (v6.46 : un coffre simple à chaque niveau, un gros tous les 5).
+    // Départ : le premier coffre atteint mais pas ouvert, sinon le dernier coffre ouvert, sinon le niveau suivant.
+    function aCoffre(n) { var t = E.coffreDuNiveau(n); return !!t && !(t === 'simple' && n <= e.simplesDepuis); }
+    var enAttente = compte.coffresAOuvrir().filter(function (c) { return c.niveau; });
+    var L = nv.niveau + 1;
+    if (enAttente.length) L = enAttente[0].niveau;
+    else for (var a = nv.niveau; a >= 2; a--) if (aCoffre(a) && e.coffresNiveau[a] !== undefined) { L = a; break; }
+    var paliers = [];
+    for (; paliers.length < 4; L++) if (aCoffre(L)) paliers.push(L);
+    var gros = E.prochainGrosCoffre(nv.niveau);
     h += '<section class="carte-page"><h3>Coffres de niveau</h3><ol class="chemin-coffres">';
-    for (var k = 0; k < 4; k++, L += 5) {
+    paliers.forEach(function (L) {
       var type = E.coffreDuNiveau(L), etat;
       if (e.coffresNiveau[L] !== undefined) etat = '<span class="etat fait">Ouvert · +' + e.coffresNiveau[L] + ' ⭐</span>';
       else if (L <= nv.niveau) etat = '<button type="button" class="btn-petit" data-ouvrir="' + type + ':' + L + '">Ouvrir</button>';
       else etat = '<span class="etat">Dans ' + etoiles(E.seuil(L) - e.total) + '</span>';
       h += '<li class="' + (L <= nv.niveau ? 'atteint' : '') + '">' + ico('i-coffre', 'coffre-' + type) +
         '<span class="palier"><strong>Niveau ' + L + '</strong><span>' + NOMS_COFFRES[type] + '</span></span>' + etat + '</li>';
+    });
+    if (paliers.indexOf(gros) < 0) {
+      h += '</ol><p class="prochain">' + ico('i-coffre', 'coffre-' + E.coffreDuNiveau(gros)) + '<span>Prochain gros coffre : <strong>' +
+        NOMS_COFFRES[E.coffreDuNiveau(gros)].toLowerCase() + '</strong> au niveau ' + gros + ', encore ' + etoiles(E.seuil(gros) - e.total) + '.</span></p><ol hidden>';
     }
     h += '</ol></section>';
 
@@ -338,7 +352,7 @@
     if (!r.id) r.id = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
     var texte = (info.defi ? (info.defi === 'solo' ? 'Défi solo' : 'Défi en équipe') + ' réussi · ' : 'Aventure réussie · ') + av.nom;
     var res = compte.recompenserPartie(r.id, r.points, info.gagnee, info.defi, texte);
-    if (res) r.recompense = { base: res.base, bonus: res.bonus, deja: !!res.defiDejaFait, avant: res.gain ? res.gain.avant : 0, apres: res.gain ? res.gain.apres : 0 };
+    if (res) r.recompense = { base: res.base, bonus: res.bonus, deja: !!res.defiDejaFait, avant: res.gain ? res.gain.avant : 0, apres: res.gain ? res.gain.apres : 0, gemmes: res.gemmes || 0 };
     var rc = r.recompense || { base: 0, bonus: 0 };
     var h = '';
     if (info.gagnee) {
@@ -346,6 +360,7 @@
       if (rc.bonus) h += '<p class="fin-bonus">' + ico('i-defi') + ' Défi du jour réussi : étoiles doublées !</p>';
       else if (rc.deja) h += '<p class="petit">Défi déjà réussi aujourd’hui : étoiles normales.</p>';
       else h += '<p class="petit">Une étoile pour chaque ' + av.objet.un + ' (' + av.objet.titre.toLowerCase() + ' : ' + r.points + ').</p>';
+      if (rc.gemmes) h += '<p class="fin-gemmes">' + ico('i-gemme') + ' <strong>+' + gemmes(rc.gemmes) + ' !</strong></p>';
       if (rc.apres > rc.avant) h += '<p class="fin-niveau">Niveau ' + rc.apres + ' atteint !</p>';
     } else {
       h += '<p class="petit">' + (info.defi ? 'Défi manqué : tu peux réessayer autant de fois que tu veux !' : 'Gagne l’aventure pour gagner des étoiles.') + '</p>';
