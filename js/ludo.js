@@ -111,7 +111,7 @@
         texte: 'Dans chaque mode choisi, touche au moins un temps, puis « Valider ».' };
     }
     if (p.sousEtape === 'packs') {
-      if (vide('packs')) return { cle: cle + '-a', cible: $('packs'), texte: 'Choisis les packs de mots où tu vas piocher : animaux, pays, métiers… « Tout sélectionner » les prend tous.' };
+      if (vide('packs')) return { cle: cle + '-a', cible: $('packs'), texte: 'Choisis les thèmes de tes mots : animaux, pays, métiers… « Tout » prend toute une famille, « Tout sélectionner » prend tout.' };
       return { cle: cle + '-b', cible: valider, texte: 'Tu peux en prendre plusieurs. Puis « Valider » pour choisir tes questions.' };
     }
     // sousEtape 'reglages'

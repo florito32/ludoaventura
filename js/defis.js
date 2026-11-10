@@ -17,8 +17,9 @@
 
   var NIVEAUX = [{ id: 'facile', nom: 'Facile' }, { id: 'moyen', nom: 'Moyen' }, { id: 'difficile', nom: 'Difficile' }, { id: 'expert', nom: 'Expert' }];
   var DIFFICULTE_AVENTURE = { facile: 'facile', moyen: 'moyen', difficile: 'difficile', expert: 'difficile' };
-  // Packs d'orthographe proposés aux défis (le pack « Lettres » n'est plus joué depuis le 03/11/2026).
-  var PACKS = ['mots-simples', 'mots-compliques', 'temps', 'numerique', 'animaux', 'lieux', 'pays', 'villes', 'nature', 'meteo',
+  // Thèmes d'orthographe proposés aux défis (« Lettres » n'est plus joué depuis le 03/11/2026,
+  // « Mots simples » et « Mots compliqués » depuis le 10/11/2026).
+  var PACKS = ['temps', 'numerique', 'animaux', 'lieux', 'pays', 'villes', 'nature', 'meteo',
     'corps', 'aliments', 'maison', 'vetements', 'ecole', 'metiers', 'transports', 'couleurs', 'loisirs'];
 
   // Réglages possibles selon le niveau.

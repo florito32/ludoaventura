@@ -290,7 +290,7 @@
     }
     var C = window.Cartes, Q = window.Questions;
     var packs = d.packs.map(function (id) { return C.PACKS.filter(function (p) { return p.id === id; })[0].nom; });
-    return 'Orthographe, mots de niveau ' + liste(d.mots.map(String)) + ' : packs ' + liste(packs.map(function (n) { return '« ' + n + ' »'; })) + ' ; questions « ' +
+    return 'Orthographe, mots de niveau ' + liste(d.mots.map(String)) + ' : thèmes ' + liste(packs.map(function (n) { return '« ' + n + ' »'; })) + ' ; questions « ' +
       d.types.map(function (id) { return Q.trouver(id).nom; }).join(' », « ') + ' ».';
   }
   var defiAffiche = null;

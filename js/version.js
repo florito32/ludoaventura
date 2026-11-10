@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.38';
+  var VERSION = '6.39';
 
   var HISTORY = [
+    { v: '6.39', date: '2026-11-10', changes: [
+      "Orthographe : les « packs » s'appellent maintenant des « thèmes », rangés en 4 familles encadrées avec chacune son bouton « Tout » : Nature et animaux, Tous les jours, En ville, Le monde, le temps, les nombres.",
+      "« Mots simples » et « Mots compliqués » ne sont plus proposés ; « Temps » devient « Jours et mois » et « Numérique » devient « Nombres »."
+    ] },
     { v: '6.38', date: '2026-11-10', changes: [
       "Orthographe : la question « Épeler à l'oral » est retirée. Toutes les questions s'écrivent dans la case de réponse."
     ] },

@@ -14,8 +14,8 @@ SOURCE = RACINE / 'outils' / 'donnees' / 'carte francais.xlsx'
 NOMS = {
     'pack mots simples': 'Mots simples',
     'pack mots compliqués': 'Mots compliqués',
-    'pack temps': 'Temps',
-    'pack numerique': 'Numérique',
+    'pack temps': 'Jours et mois',  # « Temps » jusqu'à la v6.38 (choix de l'utilisateur, 10/11/2026)
+    'pack numerique': 'Nombres',     # « Numérique » jusqu'à la v6.38
     'pack lettres': 'Lettres',
     # 15 packs ajoutés le 04/11/2026 (idées acceptées par l'utilisateur)
     'pack animaux': 'Animaux', 'pack lieux': 'Lieux et constructions', 'pack pays': 'Pays', 'pack villes': 'Villes',
@@ -23,6 +23,16 @@ NOMS = {
     'pack maison': 'Dans la maison', 'pack vetements': 'Vêtements', 'pack ecole': 'L’école', 'pack metiers': 'Métiers',
     'pack transports': 'Transports', 'pack couleurs': 'Couleurs et formes', 'pack loisirs': 'Sports et musique',
 }
+
+# Thèmes proposés aux joueurs, rangés en familles (choix de l'utilisateur du 10/11/2026, proposition A).
+# Les feuilles absentes de ces familles ne sont plus proposées : « Lettres » (03/11/2026),
+# « Mots simples » et « Mots compliqués » (10/11/2026) ; leurs mots restent dans le fichier.
+FAMILLES = [
+    {'id': 'nature', 'nom': 'Nature et animaux', 'icone': '🌿', 'themes': ['animaux', 'nature', 'meteo']},
+    {'id': 'quotidien', 'nom': 'Tous les jours', 'icone': '🏠', 'themes': ['corps', 'aliments', 'maison', 'vetements', 'couleurs']},
+    {'id': 'ville', 'nom': 'En ville', 'icone': '🏙️', 'themes': ['lieux', 'ecole', 'metiers', 'transports', 'loisirs']},
+    {'id': 'monde', 'nom': 'Le monde, le temps, les nombres', 'icone': '🌍', 'themes': ['pays', 'villes', 'temps', 'numerique']},
+]
 
 CORRECTIONS = {
     'APRES': 'APRÈS', 'TOT': 'TÔT', 'PRES': 'PRÈS', 'TRES': 'TRÈS', 'A': 'À',
@@ -328,6 +338,9 @@ for p_ in packs:
         for m_ in mots_:
             if not (p_['id'] == 'lettres' and n_ == '1'):
                 INFOS[m_] = infos(m_)
+inconnus = [t for f in FAMILLES for t in f['themes'] if t not in [p['id'] for p in packs]]
+if inconnus:
+    raise SystemExit('Thèmes de FAMILLES absents des feuilles : ' + ', '.join(inconnus))
 inconnus = [k for k in GENRES if k not in INFOS]
 if inconnus:
     raise SystemExit('Mots de GENRES absents des cartes : ' + ', '.join(inconnus))
@@ -343,10 +356,12 @@ js = """// Cartes JEU d'Aventura — GÉNÉRÉ par outils/cartes.py depuis « ca
   // Pour chaque mot : syllabes écrites, positions des lettres muettes (null = question non posée), nombre de lettres,
   // genre (m / f, null = pas un nom), pluriel (null = question non posée), elision (on dit « l' » devant le mot).
   var INFOS = %s;
-  if (typeof module !== 'undefined' && module.exports) module.exports = { PACKS: PACKS, INFOS: INFOS };
-  else racine.Cartes = { PACKS: PACKS, INFOS: INFOS };
+  // Thèmes proposés aux joueurs, rangés en familles (v6.39) ; les autres packs ne sont plus proposés.
+  var FAMILLES = %s;
+  if (typeof module !== 'undefined' && module.exports) module.exports = { PACKS: PACKS, INFOS: INFOS, FAMILLES: FAMILLES };
+  else racine.Cartes = { PACKS: PACKS, INFOS: INFOS, FAMILLES: FAMILLES };
 })(this);
-""" % (json.dumps(packs, ensure_ascii=False, indent=2), json.dumps(INFOS, ensure_ascii=False))
+""" % (json.dumps(packs, ensure_ascii=False, indent=2), json.dumps(INFOS, ensure_ascii=False), json.dumps(FAMILLES, ensure_ascii=False, indent=2))
 (RACINE / 'js' / 'cartes.js').write_text(js, encoding='utf-8')
 for p in packs:
     print(p['id'], p['nom'], {k: len(v) for k, v in p['niveaux'].items()})

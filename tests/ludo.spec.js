@@ -78,11 +78,11 @@ test('didacticiel : préparation et premier tour, flèche et bulle à chaque ét
   await page.locator('#francais input[value="orthographe"]').check();
   await A.valider(page);
 
-  await expect(texte(page)).toContainText('packs');
+  await expect(texte(page)).toContainText('thèmes');
   await flecheSur(page, '#packs');
   // v6.27 : la bulle ne cache jamais « Tout sélectionner » (sur téléphone carré, elle couvre une partie des packs).
   await expect(texte(page)).toContainText('Tout sélectionner');
-  await page.locator('#ortho-packs .btn-tout').click();
+  await page.locator('#ortho-packs .btn-tout[data-liste]').click();
   await flecheSur(page, '#btn-valider-reglages');
   await A.valider(page); // v6.16 : écran des questions
   await expect(texte(page)).toContainText('questions');

@@ -384,17 +384,19 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 }
 
 /* Orthographe (v6.16) : deux écrans.
-   Packs (19) : en largeur 5 par ligne (4 lignes), en hauteur 3 par ligne (7 lignes).
-   Questions : voir plus bas (familles, v6.33). */
-#ortho-packs { --rangs: 4; --cols: 5; --larg: min(100cqi, 1100px); }
-#ortho-packs .packs { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+   Thèmes (17, v6.39) : 4 familles encadrées (3, 5, 5 et 4 thèmes) ; en largeur 5 par ligne (4 lignes de boutons
+   + 4 têtes de famille), en hauteur 3 par ligne (7 lignes). Questions : voir plus bas (familles, v6.33). */
+#ortho-packs { --rangs: 4; --cols: 5; --larg: min(100cqi, 1100px);
+  --h: clamp(26px, calc((100cqh - 11.5rem) / var(--rangs) - 1.8cqh), 96px); }
+#packs { display: flex; flex-direction: column; gap: clamp(4px, 1.2cqh, 12px); }
+#ortho-packs .famille .packs { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(4px, 1cqh, 10px) clamp(5px, 1.4cqi, 12px); }
 /* Questions (v6.33, choix de l'utilisateur, test A/B) : 3 familles encadrées, 3 boutons par ligne
    (5 lignes de boutons + 3 têtes de famille : d'où les 9 rem retirés de la hauteur). */
 #reglages-ortho { --rangs: 5; --cols: 3; --larg: min(100cqi, 820px);
   --h: clamp(26px, calc((100cqh - 9.5rem) / var(--rangs) - 1.6cqh), 96px); }
 #types-questions { display: flex; flex-direction: column; gap: clamp(4px, 1.2cqh, 12px); }
 #reglages-ortho .famille .packs { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(4px, 1cqh, 10px) clamp(5px, 1.4cqi, 12px); }
-#reglages-ortho .famille { border: 2px solid var(--parchemin-bord); background: #fffaf0; border-radius: 12px; padding: clamp(3px, 1cqh, 10px) clamp(5px, 1.2cqi, 12px); }
+#reglages-ortho .famille, #ortho-packs .famille { border: 2px solid var(--parchemin-bord); background: #fffaf0; border-radius: 12px; padding: clamp(3px, 1cqh, 10px) clamp(5px, 1.2cqi, 12px); }
 .famille-tete { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: clamp(2px, .8cqh, 8px); }
 .famille-nom { margin: 0; font-weight: 800; font-size: clamp(.8rem, 2.8cqh, 1.1rem); color: var(--encre-douce); }
 .reglages-joueur .btn-tout-famille { min-height: 24px; padding: 0 12px; font-size: .8rem; }
@@ -407,8 +409,8 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 }
 #ortho-packs .pack, #reglages-ortho .pack { display: flex; } /* sinon un nom sur 3 lignes décale son bouton vers le bas (alignement sur la ligne de base) */
 @container (max-aspect-ratio: 1/1) {
-  #ortho-packs { --rangs: 7; --cols: 3; }
-  #ortho-packs .packs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #ortho-packs { --rangs: 7; --cols: 3; --h: clamp(26px, calc((100cqh - 15rem) / var(--rangs) - 1.4cqh), 96px); }
+  #ortho-packs .famille .packs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 /* Conjugaison, écran des temps (v6.6) : chaque mode choisi est un cadre qui entoure SES temps,
@@ -1099,9 +1101,20 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
   #ortho-packs .btn-tout .court, #reglages-ortho .btn-tout .court { display: inline; }
 }
 
-/* Questions d'orthographe sur écran peu haut (téléphone carré, paysage) : le nom de la famille et son « Tout »
-   passent à gauche des boutons, pour gagner les 3 lignes de titres (v6.33). */
+/* Questions et thèmes d'orthographe sur écran peu haut (téléphone carré, paysage) : le nom de la famille et son « Tout »
+   passent à gauche des boutons, pour gagner les lignes de titres (v6.33, thèmes v6.39). */
 @container (max-height: 420px) {
+  /* Thèmes : 5 boutons par ligne, il faut toute la largeur : le nom de la famille reste au-dessus, en petit. */
+  #ortho-packs { --h: clamp(24px, calc((100cqh - 9.8rem) / var(--rangs) - 1cqh), 60px); gap: 3px; }
+  #ortho-packs .famille { padding: 1px 5px 3px; border-radius: 9px; }
+  #ortho-packs .famille-tete { margin: 0 0 1px; }
+  #ortho-packs .famille-nom { font-size: .72rem; line-height: 1.1; }
+  /* « Tout » de la famille : 20 px de haut, seul sur sa ligne (exception d'espacement du critère WCAG 2.2 2.5.8). */
+  .reglages-joueur #ortho-packs .btn-tout-famille { min-height: 20px; padding: 0 10px; font-size: .7rem; line-height: 1; }
+  #ortho-packs .famille .packs { gap: 3px 5px; }
+  #ortho-packs .reglage-tete { margin-bottom: 2px; }
+  #packs { gap: 4px; }
+  .reglages-joueur #ortho-packs .pack span { font-size: clamp(.66rem, calc(var(--h) * .32), .95rem); line-height: 1; padding: 1px 2px; hyphens: manual; }
   #reglages-ortho { --h: clamp(24px, calc((100cqh - 6.4rem) / var(--rangs) - 1.2cqh), 60px); }
   #reglages-ortho .famille { display: grid; grid-template-columns: 6.2rem 1fr; align-items: center; gap: 6px; padding: 3px 6px; }
   #reglages-ortho .famille-tete { flex-direction: column; align-items: flex-start; gap: 2px; margin: 0; }
