@@ -43,6 +43,12 @@
   // ---------- Accueil ----------
   function majAccueil() {
     var nv = compte.niveau(), total = compte.etat.total;
+    if (window.Defis) {
+      var reste = ['solo', 'equipe'].filter(function (t) { return compte.defiDuJour(t) === undefined; }).length;
+      $('defi-badge').textContent = reste;
+      $('defi-badge').hidden = !reste;
+      $('defi-aide').textContent = reste ? ' à faire' : ' : tous réussis';
+    }
     $('accueil-total').textContent = total;
     $('accueil-niveau').textContent = 'Niveau ' + nv.niveau;
     $('accueil-jauge').style.width = Math.round(100 * nv.dans / nv.besoin) + '%';
@@ -250,6 +256,97 @@
   $('etoiles-corps').addEventListener('click', surClicPage);
   $('progression-corps').addEventListener('click', surClicPage);
 
+  // ---------- Écran « Défi du jour » (v6.37) ----------
+  // Le joueur choisit : solo ou en équipe, la matière, le niveau (et le nombre de joueurs en équipe) ;
+  // js/defis.js tire tout le reste d'après la date. Les derniers choix sont gardés sur l'appareil.
+  var D = window.Defis;
+  var CLE_CHOIX = 'ludoaventura-defi-choix';
+  var choixDefi = { type: 'solo', matiere: null, niveau: 'facile', joueurs: 2 };
+  try { var cd = JSON.parse(localStorage.getItem(CLE_CHOIX) || 'null'); if (cd) for (var kc in choixDefi) if (cd[kc] !== undefined) choixDefi[kc] = cd[kc]; } catch (e) { /* */ }
+  function garderChoix() { try { localStorage.setItem(CLE_CHOIX, JSON.stringify(choixDefi)); } catch (e) { /* */ } }
+  function typesDisponibles() {
+    return window.Questions.TYPES.filter(function (t) { return !t.oral || (window.Parole && window.Parole.disponible()); }).map(function (t) { return t.id; });
+  }
+  function radios(nom, legende, liste, valeur) {
+    return '<fieldset class="defi-choix"><legend>' + legende + '</legend><div class="packs">' + liste.map(function (o) {
+      return '<label class="pack"><input type="radio" name="' + nom + '" value="' + o[0] + '"' + (String(valeur) === String(o[0]) ? ' checked' : '') + '><span>' + o[1] + '</span></label>';
+    }).join('') + '</div></fieldset>';
+  }
+  function liste(t) { return t.length > 1 ? t.slice(0, -1).join(', ') + ' et ' + t[t.length - 1] : t[0]; }
+  // Ce que demandent les cartes du défi, en une ou deux phrases.
+  function resumeCartes(d) {
+    var nvNom = D.NIVEAUX.filter(function (n) { return n.id === d.niveau; })[0].nom;
+    if (d.matiere === 'maths') {
+      var K = window.Calcul, m = d.maths;
+      var signes = m.signes.map(function (id) { return K.SIGNES.filter(function (x) { return x.id === id; })[0].symbole; });
+      var t = 'Calcul, niveau ' + nvNom + ' : signes ' + liste(signes) + ', ' + liste(m.nbSignes.map(String)) + ' signe' + (Math.max.apply(null, m.nbSignes) > 1 ? 's' : '') + ' par calcul';
+      if (d.niveau === 'facile') t += ', tables de ' + liste(m.nombres.map(String));
+      return t + '.';
+    }
+    if (d.matiere === 'conjugaison') {
+      var V = window.Conjugaison;
+      return 'Conjugaison, niveau ' + nvNom + ' : ' + liste(d.conj.temps.map(function (t) { return V.temps(t).complet.toLowerCase(); })) +
+        ', verbes du ' + liste(d.conj.groupes.map(function (g) { return g === 1 ? '1er' : g + 'e'; })) + ' groupe' + (d.conj.groupes.length > 1 ? 's' : '') + '.';
+    }
+    var C = window.Cartes, Q = window.Questions;
+    var packs = d.packs.map(function (id) { return C.PACKS.filter(function (p) { return p.id === id; })[0].nom; });
+    return 'Orthographe, mots de niveau ' + liste(d.mots.map(String)) + ' : packs ' + liste(packs.map(function (n) { return '« ' + n + ' »'; })) + ' ; questions « ' +
+      d.types.map(function (id) { return Q.trouver(id).nom; }).join(' », « ') + ' ».';
+  }
+  var defiAffiche = null;
+  function pageDefi() {
+    var h = '<section class="carte-page"><fieldset class="defi-types"><legend class="visually-hidden">Quel défi ?</legend>';
+    ['solo', 'equipe'].forEach(function (t) {
+      var g = compte.defiDuJour(t);
+      h += '<label class="defi-type"><input type="radio" name="defi-type" value="' + t + '"' + (choixDefi.type === t ? ' checked' : '') + '>' +
+        '<span>' + ico('i-defi') + '<strong>' + (t === 'solo' ? 'Défi solo' : 'Défi en équipe') + '</strong>' +
+        '<small class="' + (g !== undefined ? 'fait' : '') + '">' + (g !== undefined ? '✔ Réussi · +' + g + ' ⭐' : 'À faire') + '</small></span></label>';
+    });
+    h += '</fieldset>';
+    h += radios('defi-matiere', 'Matière', [['maths', 'Maths'], ['francais', 'Français']], choixDefi.matiere);
+    h += radios('defi-niveau', 'Niveau', D.NIVEAUX.map(function (n) { return [n.id, n.nom]; }), choixDefi.niveau);
+    if (choixDefi.type === 'equipe') h += radios('defi-joueurs', 'Joueurs', [[2, '2'], [3, '3'], [4, '4']], choixDefi.joueurs);
+    h += '</section><section class="carte-page defi-apercu" aria-live="polite">';
+    defiAffiche = null;
+    if (!choixDefi.matiere) {
+      h += '<p class="petit">Choisis la matière : je prépare le défi du jour (aventure, aventurier' + (choixDefi.type === 'equipe' ? 's' : '') + ' et questions).</p>';
+    } else {
+      var d = D.generer(compte.aujourdhui(), choixDefi, { typesDisponibles: typesDisponibles() });
+      defiAffiche = d;
+      var av = window.Aventures.trouver(d.aventure), obj = window.Aventures.objectif(av, d.joueurs);
+      var g = compte.defiDuJour(d.type);
+      h += '<div class="defi-aventure"><img src="' + av.image + '" alt="" width="233" height="274"><div><h3>Aventure ' + esc(av.nom) + '</h3>' +
+        '<p>Objectif : <strong>' + obj + ' ' + esc(av.unite) + '</strong></p></div></div>' +
+        '<ul class="defi-aventuriers">' + d.aventuriers.map(function (id) {
+          var a = window.Aventuriers.trouver(id);
+          return '<li><img src="' + a.image + '" alt="" width="200" height="220"><span>' + esc(a.nom) + '</span></li>';
+        }).join('') + '</ul>' +
+        '<p class="defi-cartes">' + esc(resumeCartes(d)) + '</p>' +
+        (g !== undefined ? '<p class="defi-recompense fait">✔ Défi déjà réussi aujourd’hui (+' + g + ' ⭐). Tu peux rejouer : étoiles normales.</p>'
+          : '<p class="defi-recompense">' + ico('i-etoile') + '<span>Gagne l’aventure : tes étoiles sont <strong>doublées</strong> !</span></p>') +
+        '<button type="button" class="btn btn-principal" id="btn-lancer-defi">Lancer le défi</button>';
+    }
+    h += '</section>';
+    $('defi-corps').innerHTML = h;
+  }
+  if (D) {
+    $('defi-corps').addEventListener('change', function (e) {
+      var n = e.target.name;
+      if (n === 'defi-type') choixDefi.type = e.target.value;
+      if (n === 'defi-matiere') choixDefi.matiere = e.target.value;
+      if (n === 'defi-niveau') choixDefi.niveau = e.target.value;
+      if (n === 'defi-joueurs') choixDefi.joueurs = Number(e.target.value);
+      garderChoix();
+      pageDefi();
+      var el = $('defi-corps').querySelector('input[name="' + n + '"][value="' + e.target.value + '"]');
+      if (el) el.focus({ preventScroll: true });
+    });
+    $('defi-corps').addEventListener('click', function (e) {
+      if (e.target.closest('#btn-lancer-defi') && defiAffiche) window.Aventura.lancerDefi(defiAffiche);
+    });
+    D.ouvrir = function (type) { if (type) { choixDefi.type = type; garderChoix(); } aller('ecran-defi'); };
+  }
+
   // ---------- Navigation ----------
   function aller(id) { window.Aventura.afficher(id); }
   $('btn-etoiles').addEventListener('click', function () { aller('ecran-etoiles'); });
@@ -264,6 +361,7 @@
   });
   // Le bouton « Défi du jour » n'apparaît que lorsque les défis existent (js/defis.js).
   $('btn-defi').hidden = !window.Defis;
+  $('btn-defi').addEventListener('click', function () { aller('ecran-defi'); });
 
   // Écran affiché (js/plateau.js → afficher) : on remplit l'écran des étoiles ou de la progression.
   function majTout() {
@@ -271,6 +369,7 @@
     var ecran = window.Aventura && window.Aventura.partie.ecran;
     if (ecran === 'ecran-etoiles') pageEtoiles();
     if (ecran === 'ecran-progression') pageProgression();
+    if (ecran === 'ecran-defi' && window.Defis) pageDefi();
   }
   document.addEventListener('aventura-ecran', majTout);
   // Retour sur l'application (autre jour, autre onglet) : coffre du jour et compteurs à jour.

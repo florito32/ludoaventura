@@ -1164,15 +1164,15 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .raccourci:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--encre); }
 .raccourci .badge { top: -9px; right: -5px; }
 @media (max-height: 560px) {
-  .raccourci { min-height: 44px; flex-direction: row; gap: 4px; padding: 2px 4px; font-size: .7rem; }
-  .raccourci .ico { width: 22px; height: 22px; }
+  .raccourci { min-height: 44px; gap: 0; padding: 2px 1px; font-size: .62rem; line-height: 1.05; }
+  .raccourci .ico { width: 18px; height: 18px; }
   .accueil-actions { gap: 7px; }
   .pastille { min-height: 44px; padding-block: 2px; }
   .pastille .ico { width: 28px; height: 28px; }
 }
 /* Téléphones peu hauts (ex. 360 × 640) : raccourcis sur une ligne, icône à gauche du texte. */
 @media (max-aspect-ratio: 4/5) and (max-height: 700px) {
-  .raccourci { min-height: 44px; flex-direction: row; gap: 3px; padding: 2px 3px; font-size: .7rem; text-align: left; }
+  .raccourci { min-height: 48px; gap: 1px; padding: 3px 1px; font-size: .66rem; }
   .raccourci .ico { width: 20px; height: 20px; }
 }
 @media (max-width: 360px) { .pastille-coffre span:not(.badge) { display: none; } .pastille-coffre { padding-right: 6px; } }
@@ -1262,3 +1262,29 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .fin-niveau { font-weight: 800; }
 .fin-etoiles .petit { font-size: .9rem; color: var(--encre-douce); }
 .btn-fin-coffre { display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; min-height: 48px; padding: 6px 16px; }
+
+/* ---------- Défi du jour (v6.37) ---------- */
+.defi-types { border: 0; margin: 0 0 6px; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.defi-type { position: relative; }
+.defi-type input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.defi-type > span {
+  display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 6px; min-height: 92px; cursor: pointer; text-align: center;
+  background: #fff; border: 3px solid var(--parchemin-bord); border-radius: 14px;
+}
+.defi-type .ico { width: 34px; height: 34px; }
+.defi-type small { font-weight: 700; color: var(--encre-douce); }
+.defi-type small.fait { color: #1f7a3a; }
+.defi-type input:checked + span { border-color: var(--encre); background: #fff7d6; box-shadow: 0 3px 0 var(--encre); }
+.defi-type input:focus-visible + span { outline: 3px solid var(--rouge); outline-offset: 3px; }
+.defi-choix { border: 0; margin: 8px 0 0; padding: 0; }
+.defi-choix legend { font-weight: 800; margin-bottom: 4px; padding: 0; }
+.defi-apercu .btn { width: 100%; margin-top: 10px; }
+.defi-aventure { display: flex; gap: 12px; align-items: center; }
+.defi-aventure img { width: 76px; height: auto; flex: none; }
+.defi-aventure p { margin: 4px 0 0; }
+.defi-aventuriers { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.defi-aventuriers li { display: flex; align-items: center; gap: 6px; font-weight: 700; background: #fff; border: 2px solid var(--parchemin-bord); border-radius: 99px; padding: 2px 12px 2px 2px; }
+.defi-aventuriers img { width: 38px; height: 38px; object-fit: cover; object-position: top; border-radius: 50%; }
+.defi-cartes { margin: 10px 0 0; line-height: 1.4; }
+.defi-recompense { margin: 10px 0 0; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+.defi-recompense.fait { color: #1f7a3a; }
