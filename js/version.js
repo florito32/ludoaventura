@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.37';
+  var VERSION = '6.38';
 
   var HISTORY = [
+    { v: '6.38', date: '2026-11-10', changes: [
+      "Orthographe : la question « Épeler à l'oral » est retirée. Toutes les questions s'écrivent dans la case de réponse."
+    ] },
     { v: '6.37', date: '2026-11-10', changes: [
       "Nouveau : le Défi du jour ! Chaque jour, un défi solo et un défi en équipe : tu choisis la matière (Maths ou Français) et le niveau (et le nombre de joueurs en équipe), le jeu choisit l'aventure, les aventuriers et les questions.",
       "Défi gagné : les étoiles de la partie sont doublées (une fois par jour pour chaque défi). Perdu : réessaie autant de fois que tu veux.",

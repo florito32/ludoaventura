@@ -2,10 +2,8 @@
 // Va de l'accueil au plateau : nombre de joueurs et aventure au choix.
 // Les tests raccourcissent la pause entre deux joueurs (2,2 s en vrai) et repoussent le lancer
 // automatique du dé (1,6 s en vrai) pour pouvoir lancer le dé (lancerLeDe) sans course.
-// « Épeler à l'oral » (v6.28) : par défaut les tests jugent avec « Bonne / Mauvaise réponse » (window.AVENTURA_JUGE,
-// le mode utilisé quand le micro ne marche pas) ; les tests de la voix passent { juge: false } (tests/epeler-oral.spec.js).
-async function rapide(page, { autoDe = 600000, pause = 80, juge = true } = {}) {
-  await page.addInitScript(([a, p, j]) => { window.AVENTURA_PAUSE = p; window.AVENTURA_DUREE_DE = 0; window.AVENTURA_AUTO_DE = a; window.AVENTURA_JUGE = j; }, [autoDe, pause, juge]);
+async function rapide(page, { autoDe = 600000, pause = 80 } = {}) {
+  await page.addInitScript(([a, p]) => { window.AVENTURA_PAUSE = p; window.AVENTURA_DUREE_DE = 0; window.AVENTURA_AUTO_DE = a; }, [autoDe, pause]);
   page.__rapide = true;
 }
 
@@ -27,17 +25,33 @@ async function matiere(page, valeur) {
 }
 // Français → Orthographe, puis coche tous les packs et toutes les questions du joueur affiché.
 async function orthographe(page) { await matiere(page, 'orthographe'); }
-// Depuis la v6.31, seule « Épeler à l'oral » (en mode juge, voir rapide()) se joue avec « Bonne / Mauvaise réponse » :
-// par défaut les tests cochent ces deux-là (les questions écrites ont leurs propres tests, avec { types }).
-// Depuis v6.16, l'orthographe a deux écrans : les packs (par défaut les 4 packs d'origine), « Valider », puis les questions.
-const PACKS_ORIGINE = ['mots-simples', 'mots-compliques', 'temps', 'numerique'];
-async function cocherJoueur(page, { packs = PACKS_ORIGINE, types = ['epeler'] } = {}) {
+// v6.38 : « Épeler à l'oral » n'existe plus, toutes les questions s'écrivent. Par défaut les tests cochent
+// « Nombre de lettres » et répondent avec repondre() (juste ou faux).
+// Depuis v6.16, l'orthographe a deux écrans : les thèmes, « Valider », puis les questions.
+const PACKS_ORIGINE = ['temps', 'numerique', 'animaux', 'corps'];
+async function cocherJoueur(page, { packs = PACKS_ORIGINE, types = ['nombre'] } = {}) {
   await orthographe(page);
   for (const p of packs) await page.locator('#packs input[value="' + p + '"]').check();
   await valider(page);
   await page.locator('#reglages-ortho').waitFor();
   for (const t of types) await page.locator('#types-questions input[value="' + t + '"]').check();
 }
+// Répond à la carte d'orthographe affichée : la bonne réponse (juste = true) ou une fausse, puis « OK ».
+// (Remplace les anciens boutons « Bonne réponse » / « Mauvaise réponse » d'« Épeler à l'oral ».)
+async function repondre(page, juste = true) {
+  await page.locator('#reponse-joueur').waitFor({ state: 'visible' });
+  const texte = await page.evaluate((j) => {
+    const c = window.Aventura.partie.carte, info = window.Cartes.INFOS[c.mot];
+    let a = c.question.attendu(c.mot, info, c.params);
+    if (typeof a === 'number') return String(j ? a : a + 7);
+    if (Array.isArray(a)) a = a.join(' ');
+    if (c.question.saisie === 'article') return j ? a : ({ le: 'la', la: 'le', un: 'une', une: 'un' })[a];
+    return j ? a : 'ZZZ';
+  }, juste);
+  await page.locator('#reponse-joueur').fill(texte);
+  await page.getByRole('button', { name: 'OK', exact: true }).click();
+}
+
 // Écran 3 : Mathématiques avec les signes, nombres et niveau donnés.
 // Depuis v5.9, le niveau se choisit sur l'écran de la matière ; au niveau Facile, les nombres sont des tables.
 async function maths(page, { signes = ['plus'], nombres = [2, 3], dizaines = [], centaines = [], milliers = [], niveau = 'facile', nbSignes = null } = {}) {
@@ -128,4 +142,4 @@ async function conjugaison(page, { temps = ['indicatif.present'], groupes = [1],
   await page.locator('#niveau-conj input[value="' + niveau + '"]').check();
 }
 
-module.exports = { valider, cocherJoueur, orthographe, maths, conjugaison, matiere, versReglages, lancer, lancerLeDe, lancerPartie, rapide, attendreJoueur, cocherTout, ouvrirNeuf };
+module.exports = { repondre, valider, cocherJoueur, orthographe, maths, conjugaison, matiere, versReglages, lancer, lancerLeDe, lancerPartie, rapide, attendreJoueur, cocherTout, ouvrirNeuf };

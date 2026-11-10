@@ -10,8 +10,8 @@ const possible = (id, mot) => Q.possibles(mot, C.INFOS[mot], [id]).length === 1;
 test.describe('réponses attendues', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
 
-  test('14 types de questions', () => {
-    expect(Q.TYPES.map((t) => t.nom)).toEqual(['Épeler à l’oral', 'Nombre de lettres', 'Nombre de syllabes', 'Consonnes', 'Voyelles', 'Lettres muettes', 'Réécrire le mot',
+  test('13 types de questions (plus d’« Épeler à l’oral » depuis la v6.38)', () => {
+    expect(Q.TYPES.map((t) => t.nom)).toEqual(['Nombre de lettres', 'Nombre de syllabes', 'Consonnes', 'Voyelles', 'Lettres muettes', 'Réécrire le mot',
       // v6.17 : questions acceptées le 04/11/2026
       'Lettre manquante', 'Mot mélangé', 'Nombre de voyelles', 'Nombre de consonnes', 'Combien de fois cette lettre\u00a0?',
       // v6.18
@@ -19,7 +19,6 @@ test.describe('réponses attendues', () => {
   });
 
   test('AVION', () => {
-    expect(rep('epeler', 'AVION')).toBe('A - V - I - O - N');
     expect(rep('nombre', 'AVION')).toBe('5 lettres');
     expect(rep('syllabes', 'AVION')).toBe('2 syllabes (A · VION)');
     expect(rep('consonnes', 'AVION')).toBe('V, N');
@@ -60,7 +59,7 @@ async function preparer(page, types) {
 
 test('le joueur choisit ses questions ; « Lettres muettes » seule → il les écrit, la correction les surligne @smoke', async ({ page }) => {
   await preparer(page, ['muettes']);
-  await expect(page.locator('#types-questions input')).toHaveCount(14);
+  await expect(page.locator('#types-questions input')).toHaveCount(13);
   await expect(page.getByRole('checkbox', { name: 'Première lettre', exact: true })).toHaveCount(0);
   expect(await page.evaluate(() => window.Aventura.partie.types[0])).toEqual(['muettes']);
   await lancer(page);

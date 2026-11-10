@@ -1099,13 +1099,6 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
   #ortho-packs .btn-tout .court, #reglages-ortho .btn-tout .court { display: inline; }
 }
 
-/* ---------- Épeler à l'oral (v6.28) ---------- */
-/* Lettres entendues pendant que le joueur parle : sobre, brun sur parchemin. */
-.carte-reponse.entendu { color: var(--encre); font-weight: 700; letter-spacing: .02em; }
-/* « J'ai fini » pendant l'écoute : un halo qui respire montre que le micro est ouvert. */
-.btn-parler.ecoute { animation: micro 1.2s ease-in-out infinite; }
-@keyframes micro { 50% { box-shadow: 0 0 0 8px rgb(227 38 42 / .25); } }
-@media (prefers-reduced-motion: reduce) { .btn-parler.ecoute { animation: none; outline: 3px solid var(--rouge); } }
 /* Questions d'orthographe sur écran peu haut (téléphone carré, paysage) : le nom de la famille et son « Tout »
    passent à gauche des boutons, pour gagner les 3 lignes de titres (v6.33). */
 @container (max-height: 420px) {
