@@ -4,9 +4,14 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.35';
+  var VERSION = '6.36';
 
   var HISTORY = [
+    { v: '6.36', date: '2026-11-10', changes: [
+      "Nouveau : les étoiles ⭐ ! Chaque aventure gagnée rapporte une étoile par tronc coupé, pierre taillée… récolté par l'équipe.",
+      "Un coffre du jour à ouvrir chaque jour (5 à 20 étoiles). Les étoiles font monter de niveau ; tous les 5 niveaux un coffre d'argent, tous les 10 niveaux un coffre d'or.",
+      "Accueil : le total d'étoiles, le niveau et le coffre en haut ; boutons « Mes étoiles » et « Progression » (la journée et les 7 derniers jours). Les étoiles sont gardées sur l'appareil."
+    ] },
     { v: '6.35', date: '2026-11-09', changes: [
       "Épeler à l'oral : plus d'essais. Si le micro se trompe de lettre, les lettres entendues s'affichent dans la case : corrige-les au clavier, puis touche « OK ». « Redire les lettres » recommence l'écoute."
     ] },

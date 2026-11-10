@@ -244,8 +244,13 @@
     } else {
       fleche.hidden = true;
     }
+    // Raccourcis de l'accueil (v6.36) : jamais cachés par la bulle. La barre des étoiles (en haut) compte moins que l'arche :
+    // la bulle de présentation (premier démarrage, 0 étoile) peut passer dessus sur les petits écrans.
+    document.querySelectorAll('.accueil-haut .pastille').forEach(function (el) {
+      if (el.getClientRects().length) zones.push({ r: el.getBoundingClientRect(), poids: 20 });
+    });
     // « Tout sélectionner » (v6.27) reste toujours visible : sur petit écran, c'est le moyen sûr de choisir sans que la bulle gêne.
-    var actions = '.accueil-actions .btn, .etape:not([hidden]) .etape-actions .btn, .etape:not([hidden]) .btn-tout, #tour-actions .btn, #carte-saisie, .barre .btn-retour, .version-badge';
+    var actions = '.accueil-actions .btn, .raccourci, .etape:not([hidden]) .etape-actions .btn, .etape:not([hidden]) .btn-tout, #tour-actions .btn, #carte-saisie, .barre .btn-retour, .version-badge';
     document.querySelectorAll(actions).forEach(function (el) {
       if (el.getClientRects().length) zones.push({ r: el.getBoundingClientRect(), poids: 1000 });
     });
