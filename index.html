@@ -104,9 +104,9 @@
         <button type="button" class="btn btn-principal" id="btn-commencer">Commencer l'aventure</button>
         <!-- Raccourcis (v6.36) : défi du jour, étoiles gagnées, progression de la journée (js/recompenses.js). -->
         <div class="raccourcis">
-          <button type="button" class="raccourci" id="btn-defi"><svg class="ico" aria-hidden="true"><use href="#i-defi"/></svg><span>Défi du jour</span><span class="badge" id="defi-badge" hidden></span></button>
+          <button type="button" class="raccourci" id="btn-defi"><svg class="ico" aria-hidden="true"><use href="#i-defi"/></svg><span>Défi du jour</span><span class="badge" id="defi-badge" hidden></span><span class="visually-hidden" id="defi-aide"></span></button>
           <button type="button" class="raccourci" id="btn-etoiles"><svg class="ico" aria-hidden="true"><use href="#i-etoile"/></svg><span>Mes étoiles</span></button>
-          <button type="button" class="raccourci" id="btn-progression"><svg class="ico" aria-hidden="true"><use href="#i-progres"/></svg><span>Progression</span></button>
+          <button type="button" class="raccourci" id="btn-progression"><svg class="ico" aria-hidden="true"><use href="#i-progres"/></svg><span>Progrès</span></button>
         </div>
         <!-- Didacticiel : Ludo (l'aventurier de l'accueil) guide la préparation et le premier tour (js/ludo.js). -->
         <button type="button" class="btn btn-secondaire" id="btn-didacticiel">Didacticiel avec Ludo</button>
@@ -498,6 +498,7 @@
 <script src="js/constructions.js"></script>
 <script src="js/regles.js"></script>
 <script src="js/etoiles.js"></script>
+<script src="js/defis.js"></script>
 <script src="js/recompenses.js"></script>
 <script src="js/figurines.js"></script>
 <script src="js/plateau.js"></script>

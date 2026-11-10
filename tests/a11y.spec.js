@@ -32,3 +32,27 @@ test('le lien « Aller au contenu » est le premier arrêt clavier', async ({ pa
   await page.keyboard.press('Tab');
   await expect(page.getByRole('link', { name: 'Aller au contenu' })).toBeFocused();
 });
+
+// v6.37 : écrans des étoiles, de la progression, du défi du jour et fenêtre du coffre.
+test('aucune violation WCAG A/AA : Mes étoiles, Progrès, Défi du jour, coffre', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); } catch (e) { /* */ } });
+  await page.goto('./');
+  await page.locator('#btn-etoiles').click();
+  await expect(page.getByRole('heading', { name: 'Mes étoiles' })).toBeVisible();
+  expect(await audit(page)).toEqual([]);
+  await page.getByRole('button', { name: 'Accueil' }).click();
+  await page.locator('#btn-progression').click();
+  await expect(page.getByRole('heading', { name: 'Ma progression' })).toBeVisible();
+  expect(await audit(page)).toEqual([]);
+  await page.getByRole('button', { name: 'Accueil' }).click();
+  await page.locator('#btn-defi').click();
+  await page.locator('label:has(input[name="defi-matiere"][value="maths"])').click();
+  await expect(page.getByRole('button', { name: 'Lancer le défi' })).toBeVisible();
+  expect(await audit(page)).toEqual([]);
+  await page.getByRole('button', { name: 'Accueil' }).click();
+  await page.locator('#btn-coffre-haut').click();
+  await page.getByRole('button', { name: 'Ouvrir le coffre' }).click();
+  await expect(page.getByRole('button', { name: 'Super !' })).toBeVisible();
+  expect(await audit(page)).toEqual([]);
+});
