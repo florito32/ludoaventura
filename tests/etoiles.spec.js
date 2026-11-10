@@ -155,7 +155,16 @@ test('écrans « Mes étoiles » et « Ma progression » : niveau, coffres de ni
   await expect(page.getByRole('heading', { name: 'Mes étoiles' })).toBeVisible();
   await expect(page.locator('#etoiles-total')).toHaveText('265');
   await expect(page.locator('.chemin-coffres li').first()).toContainText('Niveau 5');
-  await expect(page.locator('.journal')).toContainText('Aventure réussie · Viking');
+  // v6.42 : plus de liste « Dernières étoiles gagnées » ; l'explication s'ouvre avec un petit bouton.
+  await expect(page.locator('.journal')).toHaveCount(0);
+  await expect(page.locator('#etoiles-corps')).not.toContainText('Dernières étoiles');
+  await expect(page.locator('#etoiles-corps .regles-etoiles')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Comment gagner des étoiles ?' }).click();
+  const aide = page.getByRole('dialog', { name: 'Comment gagner des étoiles ?' });
+  await expect(aide).toBeVisible();
+  await expect(aide).toContainText('Coffre du jour');
+  await aide.getByRole('button', { name: 'J’ai compris' }).click();
+  await expect(aide).toBeHidden();
   const largeur = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
   expect(largeur).toBe(true);
   // Ouvrir le coffre d'argent depuis l'écran.

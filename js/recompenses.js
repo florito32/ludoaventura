@@ -141,18 +141,14 @@
   });
 
   // ---------- Écran « Mes étoiles » ----------
-  var TEXTES_JOURNAL = { 'coffre-jour': 'Coffre du jour', 'coffre-argent': 'Coffre d’argent', 'coffre-or': 'Coffre d’or', 'coffre-mega': 'Méga coffre' };
-  function iconeJournal(t) {
-    if (t.indexOf('coffre-') === 0) return ico('i-coffre', t);
-    if (t.indexOf('defi-') === 0) return ico('i-defi');
-    return ico('i-etoile');
-  }
   function pageEtoiles() {
     var nv = compte.niveau(), e = compte.etat, h = '';
     h += '<section class="carte-page resume-etoiles">' + ico('i-etoile', 'ico-geant') +
       '<p class="gros-total"><strong id="etoiles-total">' + e.total + '</strong> ' + (e.total > 1 ? 'étoiles' : 'étoile') + '</p>' +
       '<p class="niveau-titre">Niveau ' + nv.niveau + '</p>' + jauge(nv, 'Vers le niveau ' + (nv.niveau + 1)) +
-      '<p class="petit">Encore <strong>' + etoiles(nv.reste) + '</strong> pour le niveau ' + (nv.niveau + 1) + '</p></section>';
+      '<p class="petit">Encore <strong>' + etoiles(nv.reste) + '</strong> pour le niveau ' + (nv.niveau + 1) + '</p>' +
+      // v6.42 : l'explication s'ouvre dans une fenêtre au lieu d'allonger la page.
+      '<button type="button" class="btn-comment" id="btn-comment-gagner" aria-haspopup="dialog" aria-controls="comment-gagner"><span class="rond" aria-hidden="true">?</span> Comment gagner des étoiles ?</button></section>';
 
     // Coffres de niveau : 4 paliers.
     // Départ : le premier coffre atteint mais pas ouvert, sinon le dernier coffre atteint (« Ouvert »), sinon le niveau 5.
@@ -169,25 +165,6 @@
     }
     h += '</ol></section>';
 
-    h += '<section class="carte-page"><h3>Dernières étoiles gagnées</h3>';
-    if (!e.journal.length) h += '<p class="petit">Pas encore d’étoile : gagne une aventure ou ouvre le coffre du jour !</p>';
-    else {
-      h += '<ul class="journal">';
-      e.journal.slice(0, 8).forEach(function (j) {
-        h += '<li>' + iconeJournal(j.type) + '<span class="j-texte"><span>' + esc(j.texte || TEXTES_JOURNAL[j.type] || '') + '</span><small>' + quand(j.jour) +
-          '</small></span><strong class="j-gain">+' + j.n + ' <span aria-hidden="true">⭐</span><span class="visually-hidden">étoiles</span></strong></li>';
-      });
-      h += '</ul>';
-    }
-    h += '</section>';
-
-    h += '<section class="carte-page"><h3>Comment gagner des étoiles ?</h3><ul class="regles-etoiles">' +
-      '<li>' + ico('i-etoile') + '<span><strong>Aventure gagnée</strong> : 1 étoile par tronc coupé, pierre taillée… récolté par l’équipe.</span></li>' +
-      '<li>' + ico('i-defi') + '<span><strong>Défi du jour gagné</strong> : les étoiles de la partie sont doublées (une fois par jour).</span></li>' +
-      '<li>' + ico('i-coffre', 'coffre-jour') + '<span><strong>Coffre du jour</strong> : 5 à 20 étoiles, chaque jour où tu viens jouer.</span></li>' +
-      '<li>' + ico('i-coffre', 'coffre-mega') + '<span><strong>Méga coffre</strong> : 100 à 200 étoiles chaque fois que tu viens ' + E.SERIE_MEGA + ' jours d’affilée.</span></li>' +
-      '<li>' + ico('i-coffre', 'coffre-argent') + '<span><strong>Tous les 5 niveaux</strong> : un coffre d’argent (30 à 60 étoiles) ; tous les 10 niveaux, un coffre d’or (80 à 150 étoiles).</span></li>' +
-      '</ul></section>';
     $('etoiles-corps').innerHTML = h;
   }
 
@@ -272,6 +249,12 @@
     if (d && window.Defis) window.Defis.ouvrir(d.dataset.defi);
   }
   $('etoiles-corps').addEventListener('click', surClicPage);
+  // « Comment gagner des étoiles ? » (v6.42) : fenêtre ouverte à la demande.
+  $('etoiles-corps').addEventListener('click', function (ev) {
+    if (ev.target.closest('#btn-comment-gagner')) $('comment-gagner').showModal();
+  });
+  $('btn-comment-ok').addEventListener('click', function () { $('comment-gagner').close(); });
+  $('comment-gagner').addEventListener('click', function (ev) { if (ev.target === $('comment-gagner')) $('comment-gagner').close(); }); // toucher le fond ferme
   $('progression-corps').addEventListener('click', surClicPage);
 
   // ---------- Écran « Défi du jour » (v6.37) ----------

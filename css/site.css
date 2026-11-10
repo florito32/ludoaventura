@@ -1217,7 +1217,19 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .j-texte small { color: var(--encre-douce); }
 .j-gain { white-space: nowrap; color: #1f7a3a; }
 .regles-etoiles li { display: flex; gap: 10px; align-items: flex-start; line-height: 1.35; font-size: .95rem; }
-.regles-etoiles .ico { width: 30px; height: 30px; }
+.regles-etoiles .ico { width: 30px; height: 30px; flex: none; }
+/* Bouton « Comment gagner des étoiles ? » et sa fenêtre (v6.42). */
+.btn-comment {
+  font: inherit; font-weight: 700; font-size: .95rem; cursor: pointer; min-height: 44px; margin-top: 10px; padding: 6px 14px;
+  display: inline-flex; align-items: center; gap: 8px; background: #fff; color: var(--encre);
+  border: 2px solid var(--encre); border-radius: 999px; box-shadow: 0 3px 0 var(--encre);
+}
+.btn-comment:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--encre); }
+.btn-comment .rond {
+  display: inline-grid; place-items: center; width: 24px; height: 24px; border-radius: 50%;
+  background: var(--rouge); color: #fff; font-weight: 800; font-size: .9rem;
+}
+.comment-gagner .regles-etoiles { text-align: left; margin: 6px 0 4px; }
 .taches-jour .t-nom { flex: 1; font-weight: 700; }
 .taches-jour li.fait { background: #eef7ef; border-color: #9ccaa5; }
 .taches-jour .etat { margin-left: auto; }

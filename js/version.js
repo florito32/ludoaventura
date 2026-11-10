@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.41';
+  var VERSION = '6.42';
 
   var HISTORY = [
+    { v: '6.42', date: '2026-11-10', changes: [
+      "Mes étoiles : la page est plus courte. « Comment gagner des étoiles ? » est maintenant un petit bouton qui ouvre l'explication, et la liste des dernières étoiles gagnées est retirée."
+    ] },
     { v: '6.41', date: '2026-11-10', changes: [
       "Accueil : le bouton « Défi du jour » est en haut de l'écran, entre les étoiles et le coffre ; les boutons « Mes étoiles » et « Progrès » sont retirés (le bouton des étoiles et celui du coffre mènent aux mêmes pages).",
       "Défi du jour : on choisit seulement la matière et le niveau, puis « Valider » ; l'aventure reste une surprise jusqu'au plateau.",
