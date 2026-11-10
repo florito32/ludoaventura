@@ -49,12 +49,18 @@
     <path d="M16.5 20.5l5-.6" stroke="#fff" stroke-width="2.6" stroke-linecap="round" opacity=".85"/>
   </symbol>
   <symbol id="i-coffre" viewBox="0 0 48 48">
-    <path d="M5.5 21h37v18.5a3.5 3.5 0 0 1-3.5 3.5H9a3.5 3.5 0 0 1-3.5-3.5z" fill="var(--bois, #a0612b)"/>
-    <path d="M5.5 21v-4.5C5.5 11 10 7 16 7h16c6 0 10.5 4 10.5 9.5V21z" fill="var(--bois-clair, #c98445)"/>
-    <path d="M14 7.4v35.6M34 7.4v35.6" stroke="var(--metal, #6b5440)" stroke-width="4"/>
-    <path d="M5.5 21h37v18.5a3.5 3.5 0 0 1-3.5 3.5H9a3.5 3.5 0 0 1-3.5-3.5zM5.5 21v-4.5C5.5 11 10 7 16 7h16c6 0 10.5 4 10.5 9.5V21" fill="none" stroke="#3b2a1e" stroke-width="3" stroke-linejoin="round"/>
-    <rect x="19.5" y="16.5" width="9" height="11" rx="2.2" fill="var(--serrure, #ffd23f)" stroke="#3b2a1e" stroke-width="2.5"/>
-    <circle cx="24" cy="21.4" r="1.6" fill="#3b2a1e"/>
+    <!-- Coffre vu de face (v6.38) : couvercle bombé, planches, deux ferrures rivetées, serrure. -->
+    <path d="M5 24h38v16a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3z" fill="var(--bois, #a0612b)"/>
+    <path d="M6.5 33.5h35" stroke="var(--bois-fonce, #6e3f18)" stroke-width="1.8"/>
+    <path d="M5 24v-7C5 10.5 11 6 24 6s19 4.5 19 11v7z" fill="var(--bois-clair, #c98445)"/>
+    <path d="M5 20.5h38" stroke="var(--bois, #a0612b)" stroke-width="3.5"/>
+    <path d="M11 14c3-4 8-5.2 13-5.3" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".5"/>
+    <path d="M13.5 8.6V43M34.5 8.6V43" stroke="var(--metal, #6b5440)" stroke-width="3.6"/>
+    <circle cx="13.5" cy="29" r="1.1" fill="var(--metal-clair, #e9d9c4)"/><circle cx="34.5" cy="29" r="1.1" fill="var(--metal-clair, #e9d9c4)"/>
+    <circle cx="13.5" cy="38" r="1.1" fill="var(--metal-clair, #e9d9c4)"/><circle cx="34.5" cy="38" r="1.1" fill="var(--metal-clair, #e9d9c4)"/>
+    <path d="M5 24h38v16a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3zM5 24v-7C5 10.5 11 6 24 6s19 4.5 19 11v7" fill="none" stroke="#3b2a1e" stroke-width="2.8" stroke-linejoin="round"/>
+    <rect x="19" y="18.5" width="10" height="11.5" rx="2.4" fill="var(--serrure, #ffd23f)" stroke="#3b2a1e" stroke-width="2.4"/>
+    <path d="M24 22.3a1.6 1.6 0 0 1 .8 3l.4 2.2h-2.4l.4-2.2a1.6 1.6 0 0 1 .8-3z" fill="#3b2a1e"/>
   </symbol>
   <symbol id="i-defi" viewBox="0 0 48 48">
     <circle cx="21" cy="27" r="17" fill="#fff" stroke="#3b2a1e" stroke-width="3"/>
@@ -80,7 +86,7 @@
   <!-- ÉCRAN 1 : accueil, composé comme la boîte du jeu (décor, arche, aventurier, herbes) -->
   <section class="ecran accueil" id="ecran-accueil" aria-labelledby="titre-accueil">
     <h1 id="titre-accueil" class="visually-hidden">Aventura</h1>
-    <!-- Barre des étoiles (v6.36, js/recompenses.js) : total, niveau avec sa jauge, et le coffre du jour. -->
+    <!-- Barre du haut (v6.36, js/recompenses.js) : étoiles + niveau (→ Mes étoiles), défi du jour, coffre (→ ouvrir, ou Ma progression). -->
     <div class="accueil-haut">
       <button type="button" class="pastille pastille-etoiles" id="btn-etoiles-haut">
         <svg class="ico" aria-hidden="true"><use href="#i-etoile"/></svg>
@@ -88,6 +94,8 @@
         <span class="pe-niveau"><span id="accueil-niveau">Niveau 1</span><span class="mini-jauge" aria-hidden="true"><span id="accueil-jauge"></span></span></span>
         <span class="visually-hidden" id="accueil-etoiles-aide"></span>
       </button>
+      <!-- Défi du jour en haut de l'écran (v6.38, demande du 10/11/2026) ; pastille = défis restants. -->
+      <button type="button" class="pastille pastille-defi" id="btn-defi"><svg class="ico" aria-hidden="true"><use href="#i-defi"/></svg><span class="pd-texte">Défi <span>du jour</span></span><span class="badge" id="defi-badge" hidden></span><span class="visually-hidden" id="defi-aide"></span></button>
       <button type="button" class="pastille pastille-coffre" id="btn-coffre-haut">
         <svg class="ico coffre-jour" id="accueil-coffre-ico" aria-hidden="true"><use href="#i-coffre"/></svg>
         <span id="accueil-coffre-texte">Coffre du jour</span>
@@ -102,12 +110,6 @@
       <div class="accueil-actions">
         <p class="accroche">Un jeu éducatif d'aventure, à jouer en équipe</p>
         <button type="button" class="btn btn-principal" id="btn-commencer">Commencer l'aventure</button>
-        <!-- Raccourcis (v6.36) : défi du jour, étoiles gagnées, progression de la journée (js/recompenses.js). -->
-        <div class="raccourcis">
-          <button type="button" class="raccourci" id="btn-defi"><svg class="ico" aria-hidden="true"><use href="#i-defi"/></svg><span>Défi du jour</span><span class="badge" id="defi-badge" hidden></span><span class="visually-hidden" id="defi-aide"></span></button>
-          <button type="button" class="raccourci" id="btn-etoiles"><svg class="ico" aria-hidden="true"><use href="#i-etoile"/></svg><span>Mes étoiles</span></button>
-          <button type="button" class="raccourci" id="btn-progression"><svg class="ico" aria-hidden="true"><use href="#i-progres"/></svg><span>Progrès</span></button>
-        </div>
         <!-- Didacticiel : Ludo (l'aventurier de l'accueil) guide la préparation et le premier tour (js/ludo.js). -->
         <button type="button" class="btn btn-secondaire" id="btn-didacticiel">Didacticiel avec Ludo</button>
         <!-- Installer l'application (v6.24, js/pwa.js) : téléphone et tablette seulement, et seulement dans un navigateur
@@ -444,23 +446,72 @@
   </div>
 </dialog>
 
-<!-- Ouverture d'un coffre (v6.36, js/recompenses.js) : le coffre tremble, s'ouvre, les étoiles s'envolent. -->
+<!-- Ouverture d'un coffre (v6.36, redessiné en v6.38, js/recompenses.js) : le coffre tremble, s'ouvre par devant, les étoiles en sortent. -->
 <dialog class="fin coffre-fenetre" id="coffre" aria-labelledby="coffre-titre">
   <h2 id="coffre-titre">Coffre du jour</h2>
   <div class="coffre-scene" id="coffre-scene" aria-hidden="true">
-    <svg viewBox="0 0 120 110" class="coffre-grand coffre-jour" id="coffre-grand" aria-hidden="true">
-      <g class="coffre-eclat"><path d="M60 52L48 2h24zM60 52l38-34 6 18zM60 52L22 18l-6 18z" fill="#ffe680" opacity=".9"/></g>
-      <g class="coffre-corps">
-        <path d="M12 52h96v44a8 8 0 0 1-8 8H20a8 8 0 0 1-8-8z" fill="var(--bois)"/>
-        <path d="M36 52v52M84 52v52" stroke="var(--metal)" stroke-width="9"/>
-        <path d="M12 52h96v44a8 8 0 0 1-8 8H20a8 8 0 0 1-8-8z" fill="none" stroke="#3b2a1e" stroke-width="5" stroke-linejoin="round"/>
-        <rect x="50" y="52" width="20" height="18" rx="4" fill="var(--serrure)" stroke="#3b2a1e" stroke-width="4"/>
+    <!-- Coffre vu de face, un peu d'en haut (v6.38). Ouverture « par devant » : le couvercle fermé s'aplatit
+         vers la charnière (y = 60) puis le dessous du couvercle se relève derrière ; les étoiles sortent de l'intérieur.
+         Couleurs : variables CSS de .coffre-jour, .coffre-argent, .coffre-or, .coffre-mega. -->
+    <svg viewBox="0 0 160 150" class="coffre-grand coffre-jour" id="coffre-grand" aria-hidden="true">
+      <defs>
+        <radialGradient id="coffre-lueur" cx="50%" cy="60%" r="60%">
+          <stop offset="0" stop-color="#fff6c2"/><stop offset=".45" stop-color="#ffd23f"/><stop offset="1" stop-color="#ffd23f" stop-opacity="0"/>
+        </radialGradient>
+        <clipPath id="coffre-clip-couvercle"><path d="M20 72V52c0-21 20-32 60-32s60 11 60 32v20z"/></clipPath>
+        <clipPath id="coffre-clip-corps"><path d="M20 72h120v56a6 6 0 0 1-6 6H26a6 6 0 0 1-6-6z"/></clipPath>
+      </defs>
+      <ellipse cx="80" cy="138" rx="68" ry="7" fill="#000" opacity=".22"/>
+      <!-- Couvercle ouvert (on voit son dessous), caché tant que le coffre est fermé. -->
+      <g class="couvercle-ouvert">
+        <path d="M22 60l7-48c16-6 86-6 102 0l7 48z" fill="var(--bois-fonce)"/>
+        <path d="M25 44h110M27 28h106" stroke="#000" stroke-width="2.5" opacity=".2"/>
+        <path d="M52 60l2-50M108 60l-2-50" stroke="var(--metal)" stroke-width="9"/>
+        <path d="M22 60l7-48c16-6 86-6 102 0l7 48z" fill="none" stroke="#3b2a1e" stroke-width="4" stroke-linejoin="round"/>
       </g>
-      <g class="coffre-couvercle">
-        <path d="M12 52V42c0-14 11-24 26-24h44c15 0 26 10 26 24v10z" fill="var(--bois-clair)"/>
-        <path d="M36 18.5V52M84 18.5V52" stroke="var(--metal)" stroke-width="9"/>
-        <path d="M12 52V42c0-14 11-24 26-24h44c15 0 26 10 26 24v10z" fill="none" stroke="#3b2a1e" stroke-width="5" stroke-linejoin="round"/>
-        <rect x="50" y="40" width="20" height="16" rx="4" fill="var(--serrure)" stroke="#3b2a1e" stroke-width="4"/>
+      <!-- Intérieur : trésor qui brille. -->
+      <path d="M20 72l8-12h104l8 12z" fill="#2a1708" stroke="#3b2a1e" stroke-width="4" stroke-linejoin="round"/>
+      <g class="coffre-eclat">
+        <path d="M80 66L58 2h44zM80 66L18 18l14-12zM80 66l62-48-14-12zM80 66L4 50l4-14zM80 66l76-16-4-14z" fill="#ffe680" opacity=".75"/>
+      </g>
+      <ellipse class="coffre-tresor" cx="80" cy="67" rx="52" ry="9" fill="url(#coffre-lueur)"/>
+      <g class="coffre-tresor" fill="#ffd23f" stroke="#8d5f00" stroke-width="1.5">
+        <circle cx="56" cy="68" r="4.5"/><circle cx="66" cy="66" r="4.5"/><circle cx="96" cy="67" r="4.5"/><circle cx="106" cy="68.5" r="4.5"/>
+        <path d="M80 58l2.6 5.3 5.8.7-4.3 4 1.1 5.7L80 71l-5.2 2.7 1.1-5.7-4.3-4 5.8-.7z"/>
+      </g>
+      <!-- Corps : planches, ferrures rivetées, coins, poignées, serrure. -->
+      <g class="coffre-corps">
+        <path d="M14 90h6v18h-6z" fill="none" stroke="var(--metal)" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M146 90h-6v18h6z" fill="none" stroke="var(--metal)" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M20 72h120v56a6 6 0 0 1-6 6H26a6 6 0 0 1-6-6z" fill="var(--bois)"/>
+        <g clip-path="url(#coffre-clip-corps)">
+          <rect x="20" y="72" width="120" height="6" fill="var(--bois-clair)" opacity=".7"/>
+          <path d="M20 93h120M20 114h120" stroke="var(--bois-fonce)" stroke-width="3"/>
+          <path d="M30 84c10-2 20-1 26 0M98 102c12-2 22-1 30 1M34 124c8-1.5 16-1.5 22 0" fill="none" stroke="var(--bois-fonce)" stroke-width="1.6" stroke-linecap="round" opacity=".55"/>
+          <rect x="40" y="72" width="12" height="64" fill="var(--metal)"/><rect x="108" y="72" width="12" height="64" fill="var(--metal)"/>
+          <path d="M20 118v18h18v-7H27v-11zM140 118v18h-18v-7h11v-11z" fill="var(--metal)"/>
+        </g>
+        <g fill="var(--metal-clair)">
+          <circle cx="46" cy="82" r="2.2"/><circle cx="46" cy="104" r="2.2"/><circle cx="46" cy="126" r="2.2"/>
+          <circle cx="114" cy="82" r="2.2"/><circle cx="114" cy="104" r="2.2"/><circle cx="114" cy="126" r="2.2"/>
+        </g>
+        <path d="M20 72h120v56a6 6 0 0 1-6 6H26a6 6 0 0 1-6-6z" fill="none" stroke="#3b2a1e" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M66 72h28v22a6 6 0 0 1-6 6H72a6 6 0 0 1-6-6z" fill="var(--serrure)" stroke="#3b2a1e" stroke-width="3.5" stroke-linejoin="round"/>
+        <path d="M80 79.5a4 4 0 0 1 2 7.4l1.2 6.1h-6.4l1.2-6.1a4 4 0 0 1 2-7.4z" fill="#3b2a1e"/>
+      </g>
+      <!-- Couvercle fermé (bombé). -->
+      <g class="couvercle-ferme">
+        <path d="M20 72V52c0-21 20-32 60-32s60 11 60 32v20z" fill="var(--bois-clair)"/>
+        <g clip-path="url(#coffre-clip-couvercle)">
+          <path d="M20 62h120v10H20z" fill="var(--bois)"/>
+          <path d="M20 46c20-10 100-10 120 0M24 34c22-9 90-9 112 0" fill="none" stroke="var(--bois)" stroke-width="2.6"/>
+          <rect x="40" y="18" width="12" height="56" fill="var(--metal)"/><rect x="108" y="18" width="12" height="56" fill="var(--metal)"/>
+          <path d="M34 36c10-8 26-11 42-12" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".4"/>
+        </g>
+        <g fill="var(--metal-clair)"><circle cx="46" cy="40" r="2.2"/><circle cx="46" cy="58" r="2.2"/><circle cx="114" cy="40" r="2.2"/><circle cx="114" cy="58" r="2.2"/></g>
+        <path class="gemme" d="M80 27l9 9-9 11-9-11z" fill="#4fd1ff" stroke="#3b2a1e" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="M20 72V52c0-21 20-32 60-32s60 11 60 32v20z" fill="none" stroke="#3b2a1e" stroke-width="4" stroke-linejoin="round"/>
+        <path d="M70 58h20v14H70z" fill="var(--serrure)" stroke="#3b2a1e" stroke-width="3.5" stroke-linejoin="round"/>
       </g>
     </svg>
     <span class="coffre-volees" id="coffre-volees"></span>

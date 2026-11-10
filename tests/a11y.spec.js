@@ -34,25 +34,30 @@ test('le lien « Aller au contenu » est le premier arrêt clavier', async ({ pa
 });
 
 // v6.37 : écrans des étoiles, de la progression, du défi du jour et fenêtre du coffre.
-test('aucune violation WCAG A/AA : Mes étoiles, Progrès, Défi du jour, coffre', async ({ page }) => {
+test('aucune violation WCAG A/AA : accueil, Mes étoiles, Défi du jour, coffre, Ma progression', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); } catch (e) { /* */ } });
   await page.goto('./');
-  await page.locator('#btn-etoiles').click();
+  // v6.38 : l'accueil n'a plus que la barre du haut (étoiles, défi du jour, coffre).
+  expect(await audit(page)).toEqual([]);
+  await page.locator('#btn-etoiles-haut').click();
   await expect(page.getByRole('heading', { name: 'Mes étoiles' })).toBeVisible();
   expect(await audit(page)).toEqual([]);
   await page.getByRole('button', { name: 'Accueil' }).click();
-  await page.locator('#btn-progression').click();
-  await expect(page.getByRole('heading', { name: 'Ma progression' })).toBeVisible();
-  expect(await audit(page)).toEqual([]);
-  await page.getByRole('button', { name: 'Accueil' }).click();
   await page.locator('#btn-defi').click();
+  await expect(page.getByRole('button', { name: 'Valider' })).toBeDisabled();
+  expect(await audit(page)).toEqual([]);
   await page.locator('label:has(input[name="defi-matiere"][value="maths"])').click();
-  await expect(page.getByRole('button', { name: 'Lancer le défi' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Valider' })).toBeEnabled();
   expect(await audit(page)).toEqual([]);
   await page.getByRole('button', { name: 'Accueil' }).click();
   await page.locator('#btn-coffre-haut').click();
   await page.getByRole('button', { name: 'Ouvrir le coffre' }).click();
   await expect(page.getByRole('button', { name: 'Super !' })).toBeVisible();
+  expect(await audit(page)).toEqual([]);
+  await page.getByRole('button', { name: 'Super !' }).click();
+  // Coffre du jour ouvert : le bouton du coffre mène à « Ma progression ».
+  await page.locator('#btn-coffre-haut').click();
+  await expect(page.getByRole('heading', { name: 'Ma progression' })).toBeVisible();
   expect(await audit(page)).toEqual([]);
 });

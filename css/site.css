@@ -1138,11 +1138,15 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
 .ico { width: 1.6em; height: 1.6em; flex: none; display: inline-block; vertical-align: middle; }
 /* Couleurs des coffres (icône #i-coffre et grand coffre de la fenêtre) : bois, argent, or. */
-.coffre-jour, .coffre-coffre-jour { --bois: #a0612b; --bois-clair: #c98445; --metal: #6b5440; --serrure: #ffd23f; }
-.coffre-argent, .coffre-coffre-argent { --bois: #8f9ba6; --bois-clair: #c9d2da; --metal: #56616b; --serrure: #ffffff; }
-.coffre-or, .coffre-coffre-or { --bois: #d99a12; --bois-clair: #ffc93c; --metal: #8d5f00; --serrure: #fff3b0; }
+.coffre-jour, .coffre-coffre-jour { --bois: #a0612b; --bois-clair: #c98445; --bois-fonce: #6e3f18; --metal: #5a4636; --metal-clair: #e9d9c4; --serrure: #ffd23f; }
+.coffre-argent, .coffre-coffre-argent { --bois: #8f9ba6; --bois-clair: #c9d2da; --bois-fonce: #5f6b75; --metal: #4a545d; --metal-clair: #f4f7fa; --serrure: #ffffff; }
+.coffre-or, .coffre-coffre-or { --bois: #d99a12; --bois-clair: #ffc93c; --bois-fonce: #a36f00; --metal: #8d5f00; --metal-clair: #fff1b8; --serrure: #fff3b0; }
+/* Méga coffre (5 jours d'affilée, v6.38) : violet, ferrures dorées, pierre bleue sur le couvercle. */
+.coffre-mega, .coffre-coffre-mega { --bois: #6b3fa0; --bois-clair: #9b6fd6; --bois-fonce: #44246c; --metal: #d99a12; --metal-clair: #fff1b8; --serrure: #ffd23f; }
+.coffre-grand .gemme { display: none; }
+.coffre-grand.coffre-mega .gemme { display: inline; }
 
-/* Accueil : barre en haut (étoiles + niveau, coffre). */
+/* Accueil : barre en haut (étoiles + niveau, défi du jour, coffre). */
 .accueil { position: relative; }
 .accueil-haut {
   position: absolute; z-index: 2; top: calc(8px + env(safe-area-inset-top)); left: 8px; right: 8px;
@@ -1166,31 +1170,17 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .pastille-coffre.a-ouvrir .ico { animation: coffre-appel 1.6s ease-in-out infinite; transform-origin: 50% 90%; }
 @keyframes coffre-appel { 0%, 70%, 100% { transform: none; } 75% { transform: rotate(-9deg) scale(1.08); } 85% { transform: rotate(9deg) scale(1.08); } 92% { transform: rotate(-4deg); } }
 
-/* Accueil : 3 raccourcis sous « Commencer l'aventure ». */
-.raccourcis { display: flex; gap: 6px; }
-.raccourcis > * { flex: 1 1 0; min-width: 0; }
-.raccourci {
-  position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-  font: inherit; font-weight: 700; font-size: clamp(.68rem, 2.2vw, .85rem); line-height: 1.1; color: var(--encre); cursor: pointer;
-  min-height: 56px; padding: 5px 2px; background: var(--parchemin); border: 2px solid var(--encre); border-radius: 12px;
-  box-shadow: 0 3px 0 var(--encre);
-}
-.raccourci .ico { width: 28px; height: 28px; }
-.raccourci:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--encre); }
-.raccourci .badge { top: -9px; right: -5px; }
+/* Défi du jour en haut de l'écran (v6.38). Texte sur deux lignes pour tenir entre les étoiles et le coffre. */
+.pastille-defi { font-size: .85rem; line-height: 1.05; white-space: nowrap; padding-right: 14px; }
+.pd-texte { display: flex; flex-direction: column; text-align: left; }
+.pd-texte span { font-weight: 700; font-size: .78rem; }
 @media (max-height: 560px) {
-  .raccourci { min-height: 44px; gap: 0; padding: 2px 1px; font-size: .62rem; line-height: 1.05; }
-  .raccourci .ico { width: 18px; height: 18px; }
-  .accueil-actions { gap: 7px; }
   .pastille { min-height: 44px; padding-block: 2px; }
   .pastille .ico { width: 28px; height: 28px; }
 }
-/* Téléphones peu hauts (ex. 360 × 640) : raccourcis sur une ligne, icône à gauche du texte. */
-@media (max-aspect-ratio: 4/5) and (max-height: 700px) {
-  .raccourci { min-height: 48px; gap: 1px; padding: 3px 1px; font-size: .66rem; }
-  .raccourci .ico { width: 20px; height: 20px; }
-}
-@media (max-width: 360px) { .pastille-coffre span:not(.badge) { display: none; } .pastille-coffre { padding-right: 6px; } }
+/* Téléphones : le texte du coffre est caché (l'icône animée et la pastille du nombre de coffres restent). */
+@media (max-width: 440px) { .pastille-coffre span:not(.badge) { display: none; } .pastille-coffre { padding-right: 6px; } .accueil-haut { gap: 6px; } }
+@media (max-width: 380px) { .pe-niveau .mini-jauge { width: 48px; } }
 
 /* Écrans « Mes étoiles », « Ma progression », « Défi du jour ». */
 .page { width: 100%; max-width: 640px; margin: 0 auto; padding: 8px 12px 16px; }
@@ -1231,13 +1221,17 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .taches-jour .t-nom { flex: 1; font-weight: 700; }
 .taches-jour li.fait { background: #eef7ef; border-color: #9ccaa5; }
 .taches-jour .etat { margin-left: auto; }
-.histo { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; height: 150px; align-items: end; }
-.histo li { height: 100%; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 3px; }
-.h-barre { width: 70%; min-height: 3px; background: var(--vert); border: 2px solid var(--encre); border-radius: 6px 6px 2px 2px; }
-.histo .aujourdhui .h-barre { background: #f2b705; }
-.h-n { font-weight: 800; font-size: .85rem; }
-.h-jour { font-size: .78rem; color: var(--encre-douce); }
-.histo .aujourdhui .h-jour { font-weight: 800; color: var(--encre); }
+/* Série de jours d'affilée vers le méga coffre (v6.38) : 5 cases, cochées jusqu'au jour atteint. */
+.serie-mega { display: flex; align-items: center; gap: 12px; }
+.serie-mega > .ico { width: 52px; height: 52px; }
+.serie-cases { list-style: none; margin: 8px 0 0; padding: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.serie-cases li {
+  display: grid; place-items: center; min-height: 40px; border-radius: 10px; font-weight: 800; font-size: .9rem;
+  background: #fff; border: 2px dashed var(--parchemin-bord); color: var(--encre-douce);
+}
+.serie-cases li.fait { background: #f2b705; border: 2px solid var(--encre); color: var(--encre); }
+.serie-cases li.mega { border-color: #6b3fa0; }
+.serie-cases li.mega .ico { width: 28px; height: 28px; }
 .prochain { display: flex; align-items: center; gap: 10px; margin: 0 0 6px; }
 .prochain .ico { width: 36px; height: 36px; }
 
@@ -1246,25 +1240,38 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .coffre-scene { position: relative; display: block; margin: 34px auto 0; padding: 0; border: 0; background: none; cursor: pointer; width: 190px; max-width: 60vw; }
 .coffre-scene.ouvert { cursor: default; }
 .coffre-grand { display: block; width: 100%; height: auto; overflow: visible; }
-.coffre-couvercle { transform-box: fill-box; transform-origin: 50% 100%; transition: transform .45s cubic-bezier(.3, 1.6, .5, 1); }
-.coffre-eclat { opacity: 0; transform-box: fill-box; transform-origin: 50% 100%; transition: opacity .3s, transform .5s; transform: scale(.4); }
+/* Ouverture par devant (v6.38) : le couvercle fermé s'aplatit vers la charnière (y = 60 dans le dessin),
+   puis le dessous du couvercle se relève derrière ; lueur, trésor et étoiles sortent de l'intérieur. */
+.couvercle-ferme, .couvercle-ouvert { transform-box: view-box; transform-origin: 80px 60px; }
+.couvercle-ouvert { transform: scaleY(0); }
+.coffre-eclat, .coffre-tresor { opacity: 0; }
+.coffre-eclat { transform-box: view-box; transform-origin: 80px 66px; transform: scale(.3); transition: opacity .3s .25s, transform .6s .25s; }
 .coffre-scene.tremble .coffre-grand { animation: tremble .12s linear infinite; }
 @keyframes tremble { 0% { transform: rotate(-3deg); } 50% { transform: rotate(3deg) translateY(-2px); } 100% { transform: rotate(-3deg); } }
-.coffre-scene.ouvert .coffre-couvercle { transform: translateY(-12px) rotate(-14deg); }
+.coffre-scene.ouvert .couvercle-ferme { animation: couvercle-se-leve .2s ease-in forwards; }
+.coffre-scene.ouvert .couvercle-ouvert { animation: couvercle-derriere .35s cubic-bezier(.3, 1.6, .5, 1) .2s forwards; }
+.coffre-scene.ouvert .coffre-tresor { opacity: 1; transition: opacity .2s .15s; }
 .coffre-scene.ouvert .coffre-eclat { opacity: 1; transform: none; }
-.coffre-volees { position: absolute; left: 50%; top: 48%; width: 0; height: 0; pointer-events: none; }
+.coffre-scene.ouvert .coffre-grand { animation: coffre-saute .5s ease-out; }
+@keyframes couvercle-se-leve { to { transform: scaleY(0); } }
+@keyframes couvercle-derriere { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes coffre-saute { 0% { transform: none; } 30% { transform: translateY(-6px) scale(1.04, .97); } 60% { transform: scale(.98, 1.03); } 100% { transform: none; } }
+/* Les étoiles sortent par l'ouverture du coffre (à 44 % de la hauteur du dessin) et montent en éventail. */
+.coffre-volees { position: absolute; left: 50%; top: 44%; width: 0; height: 0; pointer-events: none; }
 .coffre-volees span { position: absolute; left: -14px; top: -14px; width: 28px; height: 28px; opacity: 0;
-  animation: envol 1.1s ease-out var(--d) forwards; transform: rotate(var(--a)); }
+  animation: envol 1.2s cubic-bezier(.2, .8, .3, 1) calc(.3s + var(--d)) forwards; transform: rotate(var(--a)); }
 .coffre-volees span .ico { transform: rotate(calc(-1 * var(--a))); }
 .coffre-volees .ico { width: 28px; height: 28px; }
-@keyframes envol { 0% { opacity: 0; transform: rotate(var(--a)) translateY(0); } 15% { opacity: 1; } 100% { opacity: 0; transform: rotate(var(--a)) translateY(-130px); } }
+@keyframes envol { 0% { opacity: 0; transform: rotate(var(--a)) translateY(0) scale(.4); } 15% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; transform: rotate(var(--a)) translateY(-140px) scale(1.1); } }
 .coffre-gain { min-height: 3em; margin: 10px 0 0; font-size: 1.05rem; }
 .coffre-gain strong { display: block; font: 800 1.8rem/1.2 "Rockwell", "Roboto Slab", Georgia, serif; color: var(--rouge-texte); }
 .gain-niveau { display: block; font-weight: 800; color: #1f7a3a; }
 @media (prefers-reduced-motion: reduce) {
-  .pastille-coffre.a-ouvrir .ico, .coffre-scene.tremble .coffre-grand, .coffre-volees span { animation: none; }
+  .pastille-coffre.a-ouvrir .ico, .coffre-scene.tremble .coffre-grand, .coffre-scene.ouvert .coffre-grand, .coffre-volees span { animation: none; }
   .coffre-volees span { opacity: 1; }
-  .coffre-couvercle, .coffre-eclat { transition: none; }
+  .coffre-scene.ouvert .couvercle-ferme { animation: none; transform: scaleY(0); }
+  .coffre-scene.ouvert .couvercle-ouvert { animation: none; transform: none; }
+  .coffre-eclat, .coffre-scene.ouvert .coffre-tresor { transition: none; }
 }
 
 /* Fin de partie : étoiles gagnées. */
@@ -1293,13 +1300,8 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .defi-type input:focus-visible + span { outline: 3px solid var(--rouge); outline-offset: 3px; }
 .defi-choix { border: 0; margin: 8px 0 0; padding: 0; }
 .defi-choix legend { font-weight: 800; margin-bottom: 4px; padding: 0; }
-.defi-apercu .btn { width: 100%; margin-top: 10px; }
-.defi-aventure { display: flex; gap: 12px; align-items: center; }
-.defi-aventure img { width: 76px; height: auto; flex: none; }
-.defi-aventure p { margin: 4px 0 0; }
-.defi-aventuriers { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
-.defi-aventuriers li { display: flex; align-items: center; gap: 6px; font-weight: 700; background: #fff; border: 2px solid var(--parchemin-bord); border-radius: 99px; padding: 2px 12px 2px 2px; }
-.defi-aventuriers img { width: 38px; height: 38px; object-fit: cover; object-position: top; border-radius: 50%; }
-.defi-cartes { margin: 10px 0 0; line-height: 1.4; }
+.defi-valider { margin-top: 6px; }
+.defi-valider .btn { width: 100%; margin-top: 10px; }
+.defi-valider .btn:disabled { opacity: .55; cursor: not-allowed; box-shadow: none; }
 .defi-recompense { margin: 10px 0 0; font-weight: 700; display: flex; align-items: center; gap: 6px; }
 .defi-recompense.fait { color: #1f7a3a; }

@@ -65,16 +65,20 @@ test('défi solo du jour : le joueur choisit seulement matière et niveau ; gagn
   await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); } catch (e) { /* */ } });
   await page.goto('./');
   await expect(page.locator('#defi-badge')).toHaveText('2');
+  // v6.38 : le défi du jour est en haut de l'écran.
+  const haut = await page.evaluate(() => document.getElementById('btn-defi').getBoundingClientRect().top);
+  expect(haut).toBeLessThan(80);
   await page.locator('#btn-defi').click();
   await expect(page.getByRole('heading', { name: 'Défi du jour' })).toBeVisible();
-  await expect(page.locator('#btn-lancer-defi')).toHaveCount(0); // pas de défi avant d'avoir choisi la matière
+  await expect(page.getByRole('button', { name: 'Valider' })).toBeDisabled(); // pas avant d'avoir choisi la matière
   await page.locator('label:has(input[name="defi-matiere"][value="maths"])').click();
   await page.locator('label:has(input[name="defi-niveau"][value="facile"])').click();
-  await expect(page.locator('.defi-aventure h3')).toContainText('Aventure');
-  await expect(page.locator('.defi-aventuriers li')).toHaveCount(1);
+  // v6.38 : l'aventure reste une surprise (ni aventure, ni aventurier, ni questions avant de valider).
+  await expect(page.locator('#ecran-defi img, .defi-aventure, .defi-aventuriers, .defi-cartes')).toHaveCount(0);
+  await expect(page.locator('#ecran-defi')).not.toContainText('Objectif');
   await expect(page.locator('.defi-recompense')).toContainText('doublées');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-  await page.getByRole('button', { name: 'Lancer le défi' }).click();
+  await page.getByRole('button', { name: 'Valider' }).click();
   await expect(page.getByRole('heading', { name: 'Défi solo du jour' })).toBeVisible();
   const p = await page.evaluate(() => ({ nb: window.Aventura.partie.nbJoueurs, m: window.Aventura.partie.matiere[0], defi: window.Aventura.partie.defi.type, niv: window.Aventura.partie.maths[0].niveau }));
   expect(p).toEqual({ nb: 1, m: 'maths', defi: 'solo', niv: 'facile' });
@@ -104,13 +108,12 @@ test('défi en équipe : nombre de joueurs choisi, aventuriers tirés, plateau �
   await page.locator('label:has(input[name="defi-matiere"][value="francais"])').click();
   await page.locator('label:has(input[name="defi-niveau"][value="difficile"])').click();
   await page.locator('label:has(input[name="defi-joueurs"][value="3"])').click();
-  await expect(page.locator('.defi-aventuriers li')).toHaveCount(3);
-  await expect(page.locator('.defi-cartes')).toContainText(/Orthographe|Conjugaison/);
+  await expect(page.locator('.defi-aventuriers, .defi-cartes')).toHaveCount(0);
   // Les choix sont gardés : on les retrouve en rouvrant l'écran.
   await page.getByRole('button', { name: 'Accueil' }).click();
   await page.locator('#btn-defi').click();
   await expect(page.locator('input[name="defi-joueurs"][value="3"]')).toBeChecked();
-  await page.getByRole('button', { name: 'Lancer le défi' }).click();
+  await page.getByRole('button', { name: 'Valider' }).click();
   await expect(page.getByRole('heading', { name: 'Défi en équipe du jour' })).toBeVisible();
   const p = await page.evaluate(() => ({ nb: window.Aventura.partie.nbJoueurs, defi: window.Aventura.partie.defi.type, m: window.Aventura.partie.matiere.slice(0, 3) }));
   expect(p.nb).toBe(3); expect(p.defi).toBe('equipe');
