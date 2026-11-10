@@ -46,8 +46,8 @@
     $('accueil-total').textContent = total;
     $('accueil-niveau').textContent = 'Niveau ' + nv.niveau;
     $('accueil-jauge').style.width = Math.round(100 * nv.dans / nv.besoin) + '%';
-    $('btn-etoiles-haut').setAttribute('aria-label', etoiles(total) + ', niveau ' + nv.niveau + ', encore ' + etoiles(nv.reste) +
-      ' pour le niveau ' + (nv.niveau + 1) + ' : voir mes étoiles');
+    // Texte lu par les lecteurs d'écran : ajouté au texte visible (pas d'aria-label, qui doit reprendre le texte visible, WCAG 2.5.3).
+    $('accueil-etoiles-aide').textContent = ', encore ' + etoiles(nv.reste) + ' pour le niveau ' + (nv.niveau + 1) + ' : voir mes étoiles';
     var aOuvrir = compte.coffresAOuvrir(), b = $('btn-coffre-haut');
     var icone = $('accueil-coffre-ico');
     if (aOuvrir.length) {
@@ -57,15 +57,14 @@
       $('accueil-badge').textContent = aOuvrir.length;
       $('accueil-badge').hidden = false;
       b.classList.add('a-ouvrir');
-      b.setAttribute('aria-label', (aOuvrir.length > 1 ? aOuvrir.length + ' coffres à ouvrir' : NOMS_COFFRES[aOuvrir[0].type] + ' à ouvrir') + ' : l’ouvrir');
+      $('accueil-coffre-aide').textContent = (aOuvrir.length > 1 ? ' à ouvrir' : ' : à ouvrir') + ', toucher pour l’ouvrir';
     } else {
       var prochain = E.prochainCoffre(nv.niveau);
       $('accueil-coffre-texte').textContent = 'Niveau ' + prochain;
       icone.setAttribute('class', 'ico coffre-' + E.coffreDuNiveau(prochain));
       $('accueil-badge').hidden = true;
       b.classList.remove('a-ouvrir');
-      b.setAttribute('aria-label', 'Coffre du jour déjà ouvert. Prochain coffre : ' + NOMS_COFFRES[E.coffreDuNiveau(prochain)].toLowerCase() +
-        ' au niveau ' + prochain + ' : voir ma progression');
+      $('accueil-coffre-aide').textContent = ' : prochain coffre (' + NOMS_COFFRES[E.coffreDuNiveau(prochain)].toLowerCase() + '), coffre du jour déjà ouvert. Voir ma progression';
     }
   }
 
