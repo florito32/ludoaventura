@@ -524,6 +524,21 @@
   </div>
 </dialog>
 
+<!-- « Comment gagner des étoiles ? » (v6.42) : ouvert depuis l'écran « Mes étoiles ». -->
+<dialog class="fin comment-gagner" id="comment-gagner" aria-labelledby="comment-gagner-titre">
+  <h2 id="comment-gagner-titre">Comment gagner des étoiles ?</h2>
+  <ul class="regles-etoiles">
+    <li><svg class="ico" aria-hidden="true"><use href="#i-etoile"/></svg><span><strong>Aventure gagnée</strong> : 1 étoile par tronc coupé, pierre taillée… récolté par l’équipe.</span></li>
+    <li><svg class="ico" aria-hidden="true"><use href="#i-defi"/></svg><span><strong>Défi du jour gagné</strong> : les étoiles de la partie sont doublées (une fois par jour).</span></li>
+    <li><svg class="ico coffre-jour" aria-hidden="true"><use href="#i-coffre"/></svg><span><strong>Coffre du jour</strong> : 5 à 20 étoiles, chaque jour où tu viens jouer.</span></li>
+    <li><svg class="ico coffre-mega" aria-hidden="true"><use href="#i-coffre"/></svg><span><strong>Méga coffre</strong> : 100 à 200 étoiles chaque fois que tu viens 5 jours d’affilée.</span></li>
+    <li><svg class="ico coffre-argent" aria-hidden="true"><use href="#i-coffre"/></svg><span><strong>Tous les 5 niveaux</strong> : un coffre d’argent (30 à 60 étoiles) ; tous les 10 niveaux, un coffre d’or (80 à 150 étoiles).</span></li>
+  </ul>
+  <div class="fin-actions">
+    <button type="button" class="btn btn-principal" id="btn-comment-ok">J’ai compris</button>
+  </div>
+</dialog>
+
 <!-- Installer l'application quand le navigateur ne propose pas sa propre fenêtre (iPhone, iPad, Firefox…). -->
 <dialog class="fin installer" id="installer" aria-labelledby="installer-titre">
   <p class="fin-icone" aria-hidden="true">📲</p>
