@@ -1313,6 +1313,9 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .defi-choix { border: 0; margin: 8px 0 0; padding: 0; }
 .defi-choix legend { font-weight: 800; margin-bottom: 4px; padding: 0; }
 .defi-valider { margin-top: 6px; }
+/* Partie rapide (v6.43). */
+.rapide-matieres .btn-tout { margin-top: 8px; min-height: 36px; }
+#btn-lancer-rapide { width: 100%; margin-top: 10px; }
 .defi-valider .btn { width: 100%; margin-top: 10px; }
 .defi-valider .btn:disabled { opacity: .55; cursor: not-allowed; box-shadow: none; }
 .defi-recompense { margin: 10px 0 0; font-weight: 700; display: flex; align-items: center; gap: 6px; }

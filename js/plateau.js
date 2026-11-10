@@ -100,7 +100,9 @@
     // Orthographe : niveaux de mots où le joueur pioche (null = les 3 niveaux mêlés). Seuls les défis du jour les fixent (v6.37).
     mots: [null, null, null, null],
     // Défi du jour en cours (v6.37, js/defis.js) : { type: 'solo' | 'equipe', jour, niveau, … } ou null pour une partie libre.
-    defi: null
+    defi: null,
+    // Partie rapide en cours (v6.43, js/rapide.js) : { matieres: ['maths', 'francais'] } ou null.
+    rapide: null
   };
 
   function afficher(id) {
@@ -649,16 +651,23 @@
   // une question parmi les types cochés par le joueur qui ont du sens pour ce mot.
   // Si aucun type coché ne convient à la carte, elle repart sous le tas et on en prend une autre.
   function piocherCarte(j) {
+    var mat = partie.matiere[j.index], mr = partie.maths[j.index], cr = partie.conj[j.index];
+    // Partie rapide (v6.43) : chaque carte tire sa matière parmi celles choisies, avec tous les réglages
+    // d'un niveau tiré au hasard (orthographe : tous les thèmes et toutes les questions, déjà dans le tas du joueur).
+    if (partie.rapide && window.Rapide) {
+      var t = window.Rapide.carte(partie.rapide.matieres);
+      mat = t.matiere; if (t.maths) mr = t.maths; if (t.conj) cr = t.conj;
+    }
     // Mathématiques : une formule tirée au hasard selon les réglages du joueur (pas de tas).
-    if (partie.matiere[j.index] === 'maths') {
-      var m = partie.maths[j.index], f = K.generer(m);
+    if (mat === 'maths') {
+      var m = mr, f = K.generer(m);
       f.type = 'calcul';
       f.packNom = 'Calcul · ' + K.niveau(m.niveau).nom + (f.table ? ' · table de ' + f.table : '');
       return f;
     }
     // Conjugaison : un verbe, un temps et un pronom tirés selon les réglages du joueur.
-    if (partie.matiere[j.index] === 'conjugaison') {
-      var cr = partie.conj[j.index], cj = V.generer(cr);
+    if (mat === 'conjugaison') {
+      var cj = V.generer(cr);
       cj.type = 'conjugaison';
       cj.packNom = 'Conjugaison · ' + V.NIVEAUX.filter(function (n) { return n.id === cr.niveau; })[0].nom;
       return cj;
@@ -759,7 +768,7 @@
     $('rouleau-img').alt = 'Aventure ' + av.nom;
     $('rouleau-nom').textContent = av.nom;
     // Défi du jour (v6.37) : le titre du plateau le rappelle.
-    $('titre-plateau').textContent = partie.defi ? (partie.defi.type === 'solo' ? 'Défi solo du jour' : 'Défi en équipe du jour') : 'Le plateau';
+    $('titre-plateau').textContent = partie.defi ? (partie.defi.type === 'solo' ? 'Défi solo du jour' : 'Défi en équipe du jour') : partie.rapide ? 'Partie rapide' : 'Le plateau';
     $('titre-points').textContent = av.objet.titre; // « Pierres taillées » plutôt que « Points de l'équipe »
     $('objectif').textContent = partie.objectif;
     $('objectif-texte').textContent = libelleObjectif(av, partie.nbJoueurs);
@@ -1507,7 +1516,8 @@
   // et reviennent après le défi (« Nouvelle partie »).
   function copie(x) { return JSON.parse(JSON.stringify(x)); }
   function lancerDefi(d) {
-    if (!partie.defi) {
+    partie.rapide = null;
+    if (!partie.defi && !partie.avantDefi) {
       partie.avantDefi = copie({ nb: nbChoisi(), aventure: (document.querySelector('input[name="aventure"]:checked') || {}).value,
         choix: partie.choix, matiere: partie.matiere, francais: partie.francais, maths: partie.maths, conj: partie.conj,
         packs: partie.packs, types: partie.types });
@@ -1532,14 +1542,46 @@
   }
   // Après un défi : réglages d'avant remis en place, mots de tous niveaux.
   function quitterDefi() {
-    if (!partie.defi && !partie.avantDefi) return;
+    if (!partie.defi && !partie.avantDefi && !partie.rapide) return;
     var a = partie.avantDefi;
+    partie.rapide = null;
     partie.defi = null; partie.avantDefi = null; partie.mots = [null, null, null, null];
     if (!a) return;
     var nb = document.querySelector('input[name="nb"][value="' + a.nb + '"]'); if (nb) nb.checked = true;
     var av = a.aventure && document.querySelector('input[name="aventure"][value="' + a.aventure + '"]'); if (av) av.checked = true;
     partie.choix = a.choix; partie.matiere = a.matiere; partie.francais = a.francais; partie.maths = a.maths; partie.conj = a.conj;
     partie.packs = a.packs; partie.types = a.types;
+  }
+
+  // ---------- Partie rapide (v6.43) ----------
+  // d : tirée par js/rapide.js (joueurs, matières, aventure, aventuriers). Comme pour un défi, on remplit la
+  // préparation (réglages « tout coché », gardés si le joueur passe par « Modifier les choix »), puis on lance.
+  // Les réglages d'avant sont gardés de côté et reviennent avec « Nouvelle partie ».
+  function lancerRapide(d) {
+    if (!partie.defi && !partie.avantDefi) {
+      partie.avantDefi = copie({ nb: nbChoisi(), aventure: (document.querySelector('input[name="aventure"]:checked') || {}).value,
+        choix: partie.choix, matiere: partie.matiere, francais: partie.francais, maths: partie.maths, conj: partie.conj,
+        packs: partie.packs, types: partie.types });
+    }
+    partie.defi = null;
+    document.querySelector('input[name="nb"][value="' + d.joueurs + '"]').checked = true;
+    document.querySelector('input[name="aventure"][value="' + d.aventure + '"]').checked = true;
+    var autres = P.LISTE.map(function (a) { return a.id; }).filter(function (id) { return d.aventuriers.indexOf(id) < 0; });
+    partie.choix = d.aventuriers.concat(autres).slice(0, 4);
+    var R2 = window.Rapide, premiere = d.matieres.indexOf('maths') >= 0 ? 'maths' : 'orthographe';
+    for (var i = 0; i < 4; i++) {
+      partie.matiere[i] = premiere;
+      partie.francais[i] = premiere !== 'maths';
+      partie.maths[i] = R2.mathsTout('moyen');
+      partie.conj[i] = R2.conjTout('moyen');
+      partie.packs[i] = TOUS_PACKS.slice();
+      partie.types[i] = TOUS_TYPES.slice();
+      partie.mots[i] = null;
+    }
+    partie.rapide = { matieres: d.matieres.slice() };
+    partie.etapePrepa = 4; partie.sousEtape = 'matiere'; partie.actif = 0;
+    majDetail(); majAventuriers();
+    lancerPartie();
   }
 
   // ---------- Fin de partie ----------
@@ -1565,7 +1607,7 @@
   // sessionStorage : « survit aux rechargements et restaurations de la page ; fermer l'onglet efface les données »
   // (MDN, Window.sessionStorage). Les objets (aventure, aventuriers, questions) sont enregistrés par leur identifiant.
   var CLE = 'ludoaventura-partie';
-  var PAGES_ACCUEIL = ['ecran-etoiles', 'ecran-progression', 'ecran-defi']; // écrans ouverts depuis l'accueil (v6.36)
+  var PAGES_ACCUEIL = ['ecran-etoiles', 'ecran-progression', 'ecran-defi', 'ecran-rapide']; // écrans ouverts depuis l'accueil (v6.36)
   var pretASauver = false; // pas de sauvegarde pendant la construction initiale de la page
 
   function carteVersDonnees(c) {
@@ -1592,7 +1634,7 @@
       choix: partie.choix, packs: partie.packs, types: partie.types, actif: partie.actif,
       matiere: partie.matiere, francais: partie.francais, maths: partie.maths, conj: partie.conj,
       etapePrepa: partie.etapePrepa, sousEtape: partie.sousEtape, modif: !!partie.modif,
-      mots: partie.mots, defi: partie.defi, avantDefi: partie.avantDefi || null
+      mots: partie.mots, defi: partie.defi, avantDefi: partie.avantDefi || null, rapide: partie.rapide
     };
     if (partie.regles && partie.joueurs.length) {
       d.jeu = {
@@ -1623,6 +1665,7 @@
       partie.mots = d.mots || partie.mots;
       partie.defi = d.jeu ? d.defi || null : null;
       partie.avantDefi = d.avantDefi || null;
+      partie.rapide = d.jeu ? d.rapide || null : null;
       if (d.matiere) {
         partie.matiere = d.matiere.map(function (m) { return MATIERES.indexOf(m) >= 0 ? m : null; });
         partie.francais = d.francais || partie.francais;
@@ -1772,6 +1815,7 @@
     partie.modif = true;
     // Changer les réglages d'un défi en fait une partie libre (v6.37, hypothèse à valider) : on garde ceux du défi.
     if (partie.defi) { partie.defi = null; partie.avantDefi = null; partie.mots = [null, null, null, null]; }
+    if (partie.rapide) { partie.rapide = null; partie.avantDefi = null; } // idem pour une partie rapide (v6.43) : partie libre, réglages « tout coché »
     preparer(1);
   });
   $('btn-accueil').addEventListener('click', function () {
@@ -1870,7 +1914,7 @@
     }, { once: true });
   });
 
-  window.Aventura = { afficher: afficher, lancerDefi: lancerDefi, cases: CASES, route: ROUTE, trajet: trajet, decalages: DECALAGES, partie: partie, cartesDuJoueur: cartesDuJoueur, majConstruction: majConstruction,
+  window.Aventura = { afficher: afficher, lancerDefi: lancerDefi, lancerRapide: lancerRapide, piocherCarte: piocherCarte, cases: CASES, route: ROUTE, trajet: trajet, decalages: DECALAGES, partie: partie, cartesDuJoueur: cartesDuJoueur, majConstruction: majConstruction,
     // Tests : lancer le dé sans attendre le lancer automatique (il n'y a plus de bouton depuis v4.3).
     lancerDe: function () { lancerDe(partie.regles.de); } };
 })();

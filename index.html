@@ -110,6 +110,8 @@
       <div class="accueil-actions">
         <p class="accroche">Un jeu éducatif d'aventure, à jouer en équipe</p>
         <button type="button" class="btn btn-principal" id="btn-commencer">Commencer l'aventure</button>
+        <!-- Partie rapide (v6.43, js/rapide.js) : joueurs + matières, le reste est tiré au hasard. -->
+        <button type="button" class="btn btn-secondaire" id="btn-rapide"><span aria-hidden="true">⚡</span> Partie rapide</button>
         <!-- Didacticiel : Ludo (l'aventurier de l'accueil) guide la préparation et le premier tour (js/ludo.js). -->
         <button type="button" class="btn btn-secondaire" id="btn-didacticiel">Didacticiel avec Ludo</button>
         <!-- Installer l'application (v6.24, js/pwa.js) : téléphone et tablette seulement, et seulement dans un navigateur
@@ -117,6 +119,16 @@
         <button type="button" class="btn-installer" id="btn-installer" hidden><span aria-hidden="true">📲</span> Installer l’application</button>
       </div>
     </div>
+  </section>
+
+  <!-- ÉCRAN Partie rapide (v6.43, js/rapide.js) -->
+  <section class="ecran page" id="ecran-rapide" aria-labelledby="titre-rapide" hidden>
+    <header class="barre">
+      <button type="button" class="btn-retour" data-retour-accueil><span aria-hidden="true">←</span> Accueil</button>
+      <h2 id="titre-rapide">Partie rapide</h2>
+      <span class="barre-vide" aria-hidden="true"></span>
+    </header>
+    <div class="page-corps" id="rapide-corps"></div>
   </section>
 
   <!-- ÉCRANS des étoiles (v6.36, js/recompenses.js) : Mes étoiles, Progression du jour, Défi du jour. -->
@@ -569,6 +581,7 @@
 <script src="js/recompenses.js"></script>
 <script src="js/figurines.js"></script>
 <script src="js/plateau.js"></script>
+<script src="js/rapide.js"></script>
 <script src="js/ludo.js"></script>
 <script src="js/version.js"></script>
 <script src="js/pwa.js"></script>

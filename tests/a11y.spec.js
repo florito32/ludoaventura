@@ -61,3 +61,23 @@ test('aucune violation WCAG A/AA : accueil, Mes étoiles, Défi du jour, coffre,
   await expect(page.getByRole('heading', { name: 'Ma progression' })).toBeVisible();
   expect(await audit(page)).toEqual([]);
 });
+
+// v6.42 et v6.43 : fenêtre « Comment gagner des étoiles ? », écran « Partie rapide » et son plateau.
+test('aucune violation WCAG A/AA : Comment gagner des étoiles, Partie rapide', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); window.AVENTURA_AUTO_DE = 600000; } catch (e) { /* */ } });
+  await page.goto('./');
+  await page.locator('#btn-etoiles-haut').click();
+  await page.getByRole('button', { name: 'Comment gagner des étoiles ?' }).click();
+  await expect(page.getByRole('dialog', { name: 'Comment gagner des étoiles ?' })).toBeVisible();
+  expect(await audit(page)).toEqual([]);
+  await page.getByRole('button', { name: 'J’ai compris' }).click();
+  await page.getByRole('button', { name: 'Accueil' }).click();
+  await page.getByRole('button', { name: 'Partie rapide' }).click();
+  await expect(page.getByRole('heading', { name: 'Partie rapide' })).toBeVisible();
+  expect(await audit(page)).toEqual([]);
+  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await expect(page.locator('#carte-piochee')).toBeVisible();
+  expect(await audit(page)).toEqual([]);
+});
