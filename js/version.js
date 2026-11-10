@@ -4,9 +4,14 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.44';
+  var VERSION = '6.45';
 
   var HISTORY = [
+    { v: '6.45', date: '2026-11-10', changes: [
+      "Partie rapide solo : on joue seul ; on choisit les matières et le niveau (Facile, Moyen, Difficile ou Expert), qui règle la difficulté des questions et de l'aventure.",
+      "Le bouton « Tout » / « Aucune » est maintenant à côté du mot « Matières ».",
+      "Fin d'une partie rapide : « Recommencer la partie » ou « Retour à l'accueil »."
+    ] },
     { v: '6.44', date: '2026-11-10', changes: [
       "Accueil : l'encadré « Un jeu éducatif d'aventure, à jouer en équipe » est retiré ; le bouton devient « Partie rapide solo », en bleu.",
       "Ma progression : l'encadré « Coffres de niveau » est retiré (il est déjà dans « Mes étoiles »)."

@@ -101,7 +101,7 @@
     mots: [null, null, null, null],
     // Défi du jour en cours (v6.37, js/defis.js) : { type: 'solo' | 'equipe', jour, niveau, … } ou null pour une partie libre.
     defi: null,
-    // Partie rapide en cours (v6.43, js/rapide.js) : { matieres: ['maths', 'francais'] } ou null.
+    // Partie rapide en cours (v6.43, js/rapide.js) : { matieres: ['maths', 'francais'], niveau: 'facile'… } ou null.
     rapide: null
   };
 
@@ -652,10 +652,10 @@
   // Si aucun type coché ne convient à la carte, elle repart sous le tas et on en prend une autre.
   function piocherCarte(j) {
     var mat = partie.matiere[j.index], mr = partie.maths[j.index], cr = partie.conj[j.index];
-    // Partie rapide (v6.43) : chaque carte tire sa matière parmi celles choisies, avec tous les réglages
-    // d'un niveau tiré au hasard (orthographe : tous les thèmes et toutes les questions, déjà dans le tas du joueur).
+    // Partie rapide (v6.43) : chaque carte tire sa matière parmi celles choisies, avec des réglages du niveau
+    // choisi (v6.45) tirés pour cette carte (orthographe : thèmes, mots et questions du niveau, déjà dans le tas du joueur).
     if (partie.rapide && window.Rapide) {
-      var t = window.Rapide.carte(partie.rapide.matieres);
+      var t = window.Rapide.carte(partie.rapide.matieres, partie.rapide.niveau);
       mat = t.matiere; if (t.maths) mr = t.maths; if (t.conj) cr = t.conj;
     }
     // Mathématiques : une formule tirée au hasard selon les réglages du joueur (pas de tas).
@@ -1569,16 +1569,19 @@
     var autres = P.LISTE.map(function (a) { return a.id; }).filter(function (id) { return d.aventuriers.indexOf(id) < 0; });
     partie.choix = d.aventuriers.concat(autres).slice(0, 4);
     var R2 = window.Rapide, premiere = d.matieres.indexOf('maths') >= 0 ? 'maths' : 'orthographe';
+    // v6.45 : orthographe = tous les thèmes, avec les mots et les questions du niveau choisi.
+    var o = R2.ortho(d.niveau, TOUS_TYPES);
     for (var i = 0; i < 4; i++) {
       partie.matiere[i] = premiere;
       partie.francais[i] = premiere !== 'maths';
       partie.maths[i] = R2.mathsTout('moyen');
       partie.conj[i] = R2.conjTout('moyen');
-      partie.packs[i] = TOUS_PACKS.slice();
-      partie.types[i] = TOUS_TYPES.slice();
-      partie.mots[i] = null;
+      partie.packs[i] = TOUS_PACKS.filter(function (p) { return o.packs.indexOf(p) >= 0; });
+      if (!partie.packs[i].length) partie.packs[i] = TOUS_PACKS.slice();
+      partie.types[i] = o.types.length ? o.types.slice() : TOUS_TYPES.slice();
+      partie.mots[i] = o.mots.slice();
     }
-    partie.rapide = { matieres: d.matieres.slice() };
+    partie.rapide = { matieres: d.matieres.slice(), niveau: d.niveau };
     partie.etapePrepa = 4; partie.sousEtape = 'matiere'; partie.actif = 0;
     majDetail(); majAventuriers();
     lancerPartie();
@@ -1593,6 +1596,9 @@
     $('fin-texte').textContent = 'L’équipe a ' + av.objet.participe + ' ' + A.quantite(av, r.points) + ', il en fallait ' + r.objectif + '. ' +
       (ok ? 'Bravo, vous avez tous réussi l’aventure ' + av.nom + ' !' : 'Vous ferez mieux la prochaine fois !');
     $('fin').className = 'fin ' + (ok ? 'gagne' : 'perdu');
+    // Fin d'une partie rapide (v6.45) : pas de retour aux choix, seulement « Recommencer la partie » ou « Retour à l'accueil ».
+    $('btn-rejouer').textContent = partie.rapide ? 'Recommencer la partie' : 'Rejouer cette aventure';
+    $('btn-nouvelle').textContent = partie.rapide ? 'Retour à l’accueil' : 'Nouvelle partie';
     // Étoiles gagnées (v6.36) : toute aventure gagnée rapporte ce que l'équipe a récolté (doublé pour un défi du jour).
     if (window.Recompenses) {
       window.Recompenses.finDePartie({ regles: r, aventure: av, gagnee: ok, defi: partie.defi ? partie.defi.type : null });
@@ -1601,7 +1607,11 @@
     $('fin').showModal();
   }
   $('btn-rejouer').addEventListener('click', function () { $('fin').close(); lancerPartie(); });
-  $('btn-nouvelle').addEventListener('click', function () { $('fin').close(); annulerMinuteurs(); partie.modif = false; quitterDefi(); preparer(1); });
+  $('btn-nouvelle').addEventListener('click', function () {
+    $('fin').close();
+    if (partie.rapide) { retourAccueil(); return; } // partie rapide (v6.45) : retour à l'accueil, la partie est effacée
+    annulerMinuteurs(); partie.modif = false; quitterDefi(); preparer(1);
+  });
 
   // ---------- Sauvegarde de la partie (stockage de session) ----------
   // sessionStorage : « survit aux rechargements et restaurations de la page ; fermer l'onglet efface les données »
