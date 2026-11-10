@@ -277,11 +277,11 @@
       // (à gauche, au centre, à droite) et on garde celle qui cache le moins.
       var perso = document.querySelector('.calque.perso').getBoundingClientRect();
       var arche = document.querySelector('.calque.arche').getBoundingClientRect();
-      var accroche = document.querySelector('.accroche').getBoundingClientRect();
       // Tête de Ludo sur l'illustration (img/perso.webp) : de 20 % à 72 % de la largeur, 27 % du haut.
       var tete = { left: perso.left + perso.width * 0.2, right: perso.left + perso.width * 0.72,
         top: perso.top, bottom: perso.top + perso.height * 0.27 };
-      zones.push({ r: tete, poids: 300 }, { r: arche, poids: 200 }, { r: accroche, poids: 100 });
+      // (v6.44 : l'encadré « Un jeu éducatif d'aventure… » est retiré ; les boutons restent protégés par « actions ».)
+      zones.push({ r: tete, poids: 300 }, { r: arche, poids: 200 });
       // Petits écrans : si le ciel manque, une bulle plus étroite peut se poser ailleurs (dans l'herbe, à côté de Ludo).
       [largeur, Math.min(250, largeur)].forEach(function (l, n) {
         if (n && l === largeur) return;
