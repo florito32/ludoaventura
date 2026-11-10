@@ -1139,6 +1139,7 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .ico { width: 1.6em; height: 1.6em; flex: none; display: inline-block; vertical-align: middle; }
 /* Couleurs des coffres (icône #i-coffre et grand coffre de la fenêtre) : bois, argent, or. */
 .coffre-jour, .coffre-coffre-jour { --bois: #a0612b; --bois-clair: #c98445; --bois-fonce: #6e3f18; --metal: #5a4636; --metal-clair: #e9d9c4; --serrure: #ffd23f; }
+.coffre-simple, .coffre-coffre-simple { --bois: #8a5a2b; --bois-clair: #b07a45; --bois-fonce: #5c3a17; --metal: #5a4636; --metal-clair: #d9c8b0; --serrure: #c9b28a; } /* coffre simple (v6.46) : bois brut */
 .coffre-argent, .coffre-coffre-argent { --bois: #8f9ba6; --bois-clair: #c9d2da; --bois-fonce: #5f6b75; --metal: #4a545d; --metal-clair: #f4f7fa; --serrure: #ffffff; }
 .coffre-or, .coffre-coffre-or { --bois: #d99a12; --bois-clair: #ffc93c; --bois-fonce: #a36f00; --metal: #8d5f00; --metal-clair: #fff1b8; --serrure: #fff3b0; }
 /* Méga coffre (5 jours d'affilée, v6.38) : violet, ferrures dorées, pierre bleue sur le couvercle. */
@@ -1162,6 +1163,16 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .pe-niveau { display: flex; flex-direction: column; gap: 3px; font-size: .78rem; line-height: 1; text-align: left; white-space: nowrap; }
 .mini-jauge { display: block; width: 64px; height: 8px; background: #fff; border: 2px solid var(--encre); border-radius: 99px; overflow: hidden; }
 .mini-jauge span { display: block; height: 100%; width: 0; background: #f2b705; }
+/* Pierres précieuses (v6.46) sous le total d'étoiles. */
+.pe-compteurs { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
+.pe-gemmes { display: inline-flex; align-items: center; gap: 1px; font: 800 .8rem/1 system-ui, sans-serif; color: #12687b; }
+.pastille .pe-gemmes .ico { width: 15px; height: 15px; }
+.total-gemmes { margin: 2px 0 0; display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: 700; }
+.total-gemmes .ico { width: 30px; height: 30px; }
+.total-gemmes strong { font: 800 1.5rem/1 "Rockwell", "Roboto Slab", Georgia, serif; color: #12687b; }
+.gain-gemmes, .fin-gemmes { display: flex; align-items: center; justify-content: center; gap: 4px; font-weight: 800; color: #12687b; }
+.gain-gemmes .ico, .fin-gemmes .ico { width: 26px; height: 26px; }
+.fin-gemmes { margin: 4px 0; }
 .pastille-coffre { font-size: .85rem; white-space: nowrap; }
 .badge {
   position: absolute; top: -8px; right: -6px; min-width: 24px; height: 24px; padding: 0 6px; border-radius: 99px;

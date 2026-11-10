@@ -62,6 +62,14 @@
     <rect x="19" y="18.5" width="10" height="11.5" rx="2.4" fill="var(--serrure, #ffd23f)" stroke="#3b2a1e" stroke-width="2.4"/>
     <path d="M24 22.3a1.6 1.6 0 0 1 .8 3l.4 2.2h-2.4l.4-2.2a1.6 1.6 0 0 1 .8-3z" fill="#3b2a1e"/>
   </symbol>
+  <!-- Pierre précieuse (v6.46) : gemme taillée turquoise. -->
+  <symbol id="i-gemme" viewBox="0 0 48 48">
+    <path d="M14 7h20l9 12-19 23L5 19z" fill="#2fb8d0"/>
+    <path d="M5 19h38L24 42z" fill="#1d8fa8"/>
+    <path d="M14 7l6 12h8l6-12z" fill="#7fe0ef"/>
+    <path d="M14 7h20l9 12-19 23L5 19zM5 19h38M14 7l6 12 4 23M34 7l-6 12-4 23" fill="none" stroke="#3b2a1e" stroke-width="2.6" stroke-linejoin="round"/>
+    <path d="M12 16l3-5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" opacity=".85"/>
+  </symbol>
   <symbol id="i-defi" viewBox="0 0 48 48">
     <circle cx="21" cy="27" r="17" fill="#fff" stroke="#3b2a1e" stroke-width="3"/>
     <circle cx="21" cy="27" r="11.5" fill="#e3262a"/>
@@ -90,7 +98,9 @@
     <div class="accueil-haut">
       <button type="button" class="pastille pastille-etoiles" id="btn-etoiles-haut">
         <svg class="ico" aria-hidden="true"><use href="#i-etoile"/></svg>
-        <span class="pe-total" id="accueil-total">0</span><span class="visually-hidden"> étoiles,</span>
+        <!-- Total d'étoiles et, dessous, pierres précieuses (v6.46) : empilés pour que la barre tienne sur téléphone. -->
+        <span class="pe-compteurs"><span class="pe-total"><span id="accueil-total">0</span><span class="visually-hidden"> étoiles,</span></span>
+        <span class="pe-gemmes"><svg class="ico" aria-hidden="true"><use href="#i-gemme"/></svg><span id="accueil-gemmes">0</span><span class="visually-hidden"> pierres précieuses,</span></span></span>
         <span class="pe-niveau"><span id="accueil-niveau">Niveau 1</span><span class="mini-jauge" aria-hidden="true"><span id="accueil-jauge"></span></span></span>
         <span class="visually-hidden" id="accueil-etoiles-aide"></span>
       </button>
@@ -543,7 +553,9 @@
     <li><svg class="ico" aria-hidden="true"><use href="#i-defi"/></svg><span><strong>Défi du jour gagné</strong> : les étoiles de la partie sont doublées (une fois par jour).</span></li>
     <li><svg class="ico coffre-jour" aria-hidden="true"><use href="#i-coffre"/></svg><span><strong>Coffre du jour</strong> : 5 à 20 étoiles, chaque jour où tu viens jouer.</span></li>
     <li><svg class="ico coffre-mega" aria-hidden="true"><use href="#i-coffre"/></svg><span><strong>Méga coffre</strong> : 100 à 200 étoiles chaque fois que tu viens 5 jours d’affilée.</span></li>
+    <li><svg class="ico coffre-simple" aria-hidden="true"><use href="#i-coffre"/></svg><span><strong>Chaque nouveau niveau</strong> : un coffre simple (10 à 25 étoiles).</span></li>
     <li><svg class="ico coffre-argent" aria-hidden="true"><use href="#i-coffre"/></svg><span><strong>Tous les 5 niveaux</strong> : un coffre d’argent (30 à 60 étoiles) ; tous les 10 niveaux, un coffre d’or (80 à 150 étoiles).</span></li>
+    <li><svg class="ico" aria-hidden="true"><use href="#i-gemme"/></svg><span><strong>Pierres précieuses</strong> : parfois une en gagnant une partie ; dans chaque coffre : 1 (jour, simple), 2 (argent), 3 (or), 5 (méga coffre).</span></li>
   </ul>
   <div class="fin-actions">
     <button type="button" class="btn btn-principal" id="btn-comment-ok">J’ai compris</button>

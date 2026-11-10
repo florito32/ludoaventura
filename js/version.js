@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.45';
+  var VERSION = '6.46';
 
   var HISTORY = [
+    { v: '6.46', date: '2026-11-10', changes: [
+      "Un coffre simple (10 à 25 étoiles) à chaque nouveau niveau ; aux niveaux 5, 10, 15… le gros coffre (argent ou or) le remplace.",
+      "Nouveau : les pierres précieuses ! Une partie gagnée en rapporte parfois une (1 chance sur 3), et chaque coffre en contient : 1 (coffre du jour, coffre simple), 2 (argent), 3 (or), 5 (méga coffre). Leur nombre s'affiche sous tes étoiles."
+    ] },
     { v: '6.45', date: '2026-11-10', changes: [
       "Partie rapide solo : on joue seul ; on choisit les matières et le niveau (Facile, Moyen, Difficile ou Expert), qui règle la difficulté des questions et de l'aventure.",
       "Le bouton « Tout » / « Aucune » est maintenant à côté du mot « Matières ».",
