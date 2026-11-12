@@ -312,7 +312,10 @@
     window.Geographie.FAMILLES.forEach(function (f) {
       var jeux = jeuxProposes('geographie').filter(function (j) { return j.famille === f.id; });
       if (!jeux.length) return;
-      var b = famille(f, jeux.map(function (j) { return { id: j.id, nom: j.nom, court: j.icone + '\u00a0' + (j.court || j.nom) }; }), 'jeu');
+      // v7.2 : tuile = icône + nom court, chacun dans sa propre balise (mise en page en CSS, sans couper les mots).
+      var b = famille(f, jeux.map(function (j) {
+        return { id: j.id, nom: j.nom, court: '<i class="pack-icone" aria-hidden="true">' + j.icone + '</i><b class="pack-nom">' + (j.court || j.nom) + '</b>' };
+      }), 'jeu');
       b.dataset.matiere = 'geographie';
       liste.appendChild(b);
     });
