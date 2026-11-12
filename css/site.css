@@ -93,15 +93,6 @@ main:focus { outline: none; }
   display: flex; flex-direction: column; align-items: stretch; gap: 10px; text-align: center;
 }
 .accueil-actions .btn { font-size: clamp(.95rem, 3vw, 1.2rem); padding-inline: 12px; }
-/* Installer l'application (v6.24) : action tertiaire, plus discrète que les deux boutons du jeu. */
-.btn-installer {
-  align-self: center; font: inherit; font-weight: 700; font-size: clamp(.85rem, 2.6vw, 1rem); cursor: pointer;
-  min-height: 44px; padding: 6px 16px; border-radius: 99px; color: #fff;
-  background: var(--vert-fonce); border: 2px solid #fff;
-}
-.btn-installer[hidden] { display: none; }
-@media (max-height: 560px) { .btn-installer { min-height: 36px; padding: 2px 10px; font-size: .8rem; white-space: nowrap; } }
-.installer p:not(.fin-icone) { line-height: 1.45; }
 
 /* Écrans en hauteur (téléphones, tablettes debout) : la scène occupe tout l'écran,
    l'arche est agrandie et l'aventurier (coupé à la taille sur l'illustration) sort par le bas. */

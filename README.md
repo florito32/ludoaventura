@@ -6,7 +6,7 @@
 
 - Version actuelle : visuel (accueil et plateau illustrés), sans questions pour l'instant
 - Illustrations : celles du jeu de société Aventura (`img/`)
-- Installable comme une application (iPhone, Android), jouable hors ligne
+- Se joue dans le navigateur (ordinateur, tablette, téléphone), sans installation
 - HTML, CSS et JavaScript sans dépendance ; tests Playwright (`npm test`)
 
 Comment on travaille : voir [CLAUDE.md](CLAUDE.md). Avancement : voir [BACKLOG.md](BACKLOG.md).

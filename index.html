@@ -12,27 +12,9 @@
   <meta property="og:url" content="https://florito32.github.io/ludoaventura/">
   <meta property="og:image" content="https://florito32.github.io/ludoaventura/icons/icon-512.png">
   <meta property="og:locale" content="fr_FR">
-  <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#3f7a46">
   <link rel="icon" href="icons/favicon.png" type="image/png">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-  <meta name="apple-mobile-web-app-title" content="Aventura">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-capable" content="yes">
-  <!-- iPhone : écran de lancement plein écran = capture de l'accueil (outils/ecrans-lancement.js).
-       Sur Android, le téléphone le fabrique lui-même (icône + background_color du manifeste). -->
-  <link rel="apple-touch-startup-image" href="icons/lancement/lancement-1320x2868.png" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="icons/lancement/lancement-1206x2622.png" media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="icons/lancement/lancement-1290x2796.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="icons/lancement/lancement-1179x2556.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="icons/lancement/lancement-1284x2778.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="icons/lancement/lancement-1170x2532.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="icons/lancement/lancement-1125x2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="icons/lancement/lancement-1242x2688.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="icons/lancement/lancement-828x1792.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="icons/lancement/lancement-1242x2208.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="icons/lancement/lancement-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
-  <link rel="apple-touch-startup-image" href="icons/lancement/lancement-640x1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
   <!-- Les illustrations de l'accueil sont chargées en priorité. -->
   <link rel="preload" as="image" href="img/fond.webp" type="image/webp">
   <link rel="preload" as="image" href="img/arche.webp" type="image/webp">
@@ -123,9 +105,6 @@
         <button type="button" class="btn btn-bleu" id="btn-rapide"><span aria-hidden="true">⚡</span> Partie rapide solo</button>
         <!-- Didacticiel : Ludo (l'aventurier de l'accueil) guide la préparation et le premier tour (js/ludo.js). -->
         <button type="button" class="btn btn-secondaire" id="btn-didacticiel">Didacticiel avec Ludo</button>
-        <!-- Installer l'application (v6.24, js/pwa.js) : téléphone et tablette seulement, et seulement dans un navigateur
-             (caché quand le jeu est déjà ouvert comme application installée). -->
-        <button type="button" class="btn-installer" id="btn-installer" hidden><span aria-hidden="true">📲</span> Installer l’application</button>
       </div>
     </div>
   </section>
@@ -562,16 +541,6 @@
   </div>
 </dialog>
 
-<!-- Installer l'application quand le navigateur ne propose pas sa propre fenêtre (iPhone, iPad, Firefox…). -->
-<dialog class="fin installer" id="installer" aria-labelledby="installer-titre">
-  <p class="fin-icone" aria-hidden="true">📲</p>
-  <h2 id="installer-titre">Installer Aventura</h2>
-  <p id="installer-texte"></p>
-  <div class="fin-actions">
-    <button type="button" class="btn btn-principal" id="btn-installer-ok">J’ai compris</button>
-  </div>
-</dialog>
-
 <footer class="pied">
   <p>Ludoaventura · Aventura <span data-version></span></p>
 </footer>
@@ -595,6 +564,6 @@
 <script src="js/rapide.js"></script>
 <script src="js/ludo.js"></script>
 <script src="js/version.js"></script>
-<script src="js/pwa.js"></script>
+<script src="js/navigateur.js"></script>
 </body>
 </html>

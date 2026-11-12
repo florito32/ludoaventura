@@ -6,8 +6,8 @@
 - Ludoaventura : version numérique du jeu de société éducatif **Aventura** (plateau, pions, dés FAIBLE / FORT, cartes AVENTURE et JEU). Matériel d'origine sur l'ordinateur de l'utilisateur : `C:\Users\fbore\Documents\Projets\09- Aventura\jeu numérique` (illustrations, plateau.pdf, Règles.docx).
 - Site en ligne : https://florito32.github.io/ludoaventura/
 - Dépôt distinct de `florito32/minijeux` (site de petits jeux, ancien nom « ludoaventura »).
-- Fichiers clés : `index.html` (écrans : accueil, plateau), `js/plateau.js` (cases du parcours en % de l'image, pions), `img/` (illustrations détourées en WebP), `js/version.js` (version + historique), `sw.js` (hors ligne / mises à jour).
-- À chaque mise en ligne : incrémenter `VERSION` dans `js/version.js` **et** `CACHE` dans `sw.js`.
+- Fichiers clés : `index.html` (écrans : accueil, plateau), `js/plateau.js` (cases du parcours en % de l'image, pions), `img/` (illustrations détourées en WebP), `js/version.js` (version + historique), `js/navigateur.js` + `sw.js` (nettoyage de l'ancienne copie hors ligne, ne pas réactiver).
+- À chaque mise en ligne : incrémenter `VERSION` dans `js/version.js`.
 
 ## Questions
 - Au moindre doute, poser la question **avant** de mettre en ligne (boîte de dialogue à choix, réponse recommandée en premier, une question à la fois).
@@ -22,7 +22,7 @@
 - Site web statique hébergé sur GitHub Pages.
 - HTML, CSS, JavaScript standards, minimum de dépendances, code sémantique, accessible, SEO, commenté.
 - Responsive : téléphones (y compris formats carrés), tablettes, ordinateurs.
-- PWA installable (iPhone, Android) avec mise à jour automatique : vérification au lancement, sinon à la première interaction.
+- **Pas d'application installable** (décision de l'utilisateur, 12/11/2026, v6.48) : le jeu se joue toujours dans le navigateur (ordinateur, tablette, iPhone, Android). Pas de manifeste, pas de bouton « Installer », pas de service worker ni de copie hors ligne. Cette décision remplace, pour ce projet, la préférence générale « PWA installable ».
 - Design sobre et efficace, couleurs simples, hiérarchie visuelle claire.
 
 ## Versions
