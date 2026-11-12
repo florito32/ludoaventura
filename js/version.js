@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '7.0';
+  var VERSION = '7.1';
 
   var HISTORY = [
+    { v: '7.1', date: '2026-11-12', changes: [
+      "Fin de partie : nouveau bouton « Retour à l’accueil », sous « Rejouer cette aventure » et « Nouvelle partie »."
+    ] },
     { v: '7.0', date: '2026-11-12', changes: [
       "Nouvelle matière : la Géographie, avec 4 niveaux (Facile, Moyen, Difficile, Expert) ; chaque niveau a son propre contenu.",
       "12 jeux au choix, rangés en 3 familles : France (numéros des départements, préfectures, régions, carte à toucher), Monde (capitales, drapeaux, pays voisins, monuments) et Nature (fleuves, montagnes, records de la Terre, climats et paysages).",

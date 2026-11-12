@@ -2079,6 +2079,7 @@
     // Fin d'une partie rapide (v6.45) : pas de retour aux choix, seulement « Recommencer la partie » ou « Retour à l'accueil ».
     $('btn-rejouer').textContent = partie.rapide ? 'Recommencer la partie' : 'Rejouer cette aventure';
     $('btn-nouvelle').textContent = partie.rapide ? 'Retour à l’accueil' : 'Nouvelle partie';
+    $('btn-fin-accueil').hidden = !!partie.rapide; // v7.1 : 3e bouton, sauf partie rapide (déjà « Retour à l'accueil »)
     // Étoiles gagnées (v6.36) : toute aventure gagnée rapporte ce que l'équipe a récolté (doublé pour un défi du jour).
     if (window.Recompenses) {
       window.Recompenses.finDePartie({ regles: r, aventure: av, gagnee: ok, defi: partie.defi ? partie.defi.type : null });
@@ -2092,6 +2093,8 @@
     if (partie.rapide) { retourAccueil(); return; } // partie rapide (v6.45) : retour à l'accueil, la partie est effacée
     annulerMinuteurs(); partie.modif = false; quitterDefi(); preparer(1);
   });
+  // v7.1 : la partie est finie, on revient à l'accueil sans confirmation (rien n'est perdu : étoiles déjà comptées).
+  $('btn-fin-accueil').addEventListener('click', function () { $('fin').close(); retourAccueil(); });
 
   // ---------- Sauvegarde de la partie (stockage de session) ----------
   // sessionStorage : « survit aux rechargements et restaurations de la page ; fermer l'onglet efface les données »
