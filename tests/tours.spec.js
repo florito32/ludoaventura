@@ -110,6 +110,25 @@ test('partie entière perdue : toutes les réponses mauvaises → aventure manqu
   await expect(page.locator('#prepa-progres')).toHaveText('Étape 1 sur 4'); // une nouvelle partie repart du nombre de joueurs
 });
 
+test('fin de partie (v7.1) : 3 boutons, dont « Retour à l’accueil » qui ramène à l’accueil sans confirmation', async ({ page }) => {
+  test.setTimeout(60_000);
+  await lancerPartie(page, { joueurs: 2, aventure: 'Viking' });
+  await jouerPartie(page, true);
+  const fin = page.getByRole('dialog');
+  await expect(fin).toBeVisible();
+  await expect(fin.getByRole('button', { name: /Rejouer|Nouvelle partie|Retour/ })).toHaveText(['Rejouer cette aventure', 'Nouvelle partie', 'Retour à l’accueil']);
+  // Les 3 boutons tiennent dans l'écran (pas de débordement).
+  const vp = page.viewportSize();
+  const b = await fin.getByRole('button', { name: 'Retour à l’accueil' }).boundingBox();
+  expect(b.x).toBeGreaterThanOrEqual(0);
+  expect(b.x + b.width).toBeLessThanOrEqual(vp.width + 1);
+  await fin.getByRole('button', { name: 'Retour à l’accueil' }).click();
+  await expect(page.locator('#ecran-accueil')).toBeVisible();
+  // La partie est effacée : la page repart d'un état neuf (1 joueur, aucune partie lancée).
+  expect(await page.evaluate(() => JSON.parse(sessionStorage.getItem('ludoaventura-partie') || '{}').nb || 1)).toBe(1);
+  await expect(page.getByRole('dialog')).toBeHidden();
+});
+
 test('animation de réponse : « Bravo ! » et confettis si bonne, « Oups ! » si mauvaise', async ({ page }) => {
   await lancerPartie(page, { joueurs: 2 });
   await page.getByRole('button', { name: 'Question suivante' }).click();
