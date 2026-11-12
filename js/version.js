@@ -4,9 +4,14 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.49';
+  var VERSION = '6.50';
 
   var HISTORY = [
+    { v: '6.50', date: '2026-11-12', changes: [
+      "Orthographe : 4 niveaux, Facile, Moyen, Difficile et Expert, à choisir sur l'écran de la matière, juste sous « Orthographe ».",
+      "272 nouveaux mots pour les niveaux Difficile et Expert, 16 par thème : rhinocéros, chauve-souris, cathédrale… puis ornithorynque, amphithéâtre, kinésithérapeute, parallélépipède…",
+      "Facile pioche les mots courts d'avant, Moyen les plus longs ; la partie rapide et les défis du jour utilisent aussi les nouveaux mots en Difficile et en Expert."
+    ] },
     { v: '6.49', date: '2026-11-12', changes: [
       "Conjugaison : le niveau (Facile, Moyen, Difficile, Expert) se choisit tout de suite, sur l'écran de la matière, avec quelques verbes en exemple.",
       "Conjugaison : les modes, les groupes de verbes et les temps se choisissent sur un seul écran. Il n'y a plus qu'une page de réglages avant la partie."

@@ -103,7 +103,7 @@ test('accueil → Partie rapide solo : matières (« Tout » / « Aucune » à c
   });
   expect(tirees).not.toContain('calcul');
   expect(tirees.some((t) => t.startsWith('conjugaison:'))).toBe(true);
-  for (const t of tirees.filter((x) => x.startsWith('ortho:'))) expect(['ortho:2', 'ortho:3']).toContain(t);
+  for (const t of tirees.filter((x) => x.startsWith('ortho:'))) expect(['ortho:4']).toContain(t); // v6.50 : Difficile = série 4
   await page.getByRole('button', { name: 'Question suivante' }).click();
   await expect(page.locator('#carte-piochee')).toBeVisible();
   // Recharger pendant la partie la reprend en partie rapide, avec son niveau.

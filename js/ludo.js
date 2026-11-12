@@ -104,6 +104,8 @@
         texte: 'Choisis ton niveau : Facile, ce sont les tables ; plus c’est dur, plus les nombres sont grands. Puis le nombre de signes par calcul, et « Valider ».' };
       if (mat === 'conjugaison') return { cle: cle + '-e', choix: $('niveau-conj'), cible: valider,
         texte: 'Choisis ton niveau : plus il est haut, plus les verbes sont rares ou pièges. Puis « Valider ».' };
+      if (mat === 'orthographe') return { cle: cle + '-f', choix: $('niveau-ortho'), cible: valider,
+        texte: 'Choisis ton niveau : plus il est haut, plus les mots sont longs, rares ou pièges. Puis « Valider » pour choisir tes thèmes.' };
       return { cle: cle + '-d', cible: valider, texte: 'C’est noté ! Touche « Valider » pour régler tes questions.' };
     }
     // Conjugaison (v6.49) : un seul écran pour les modes, les groupes et les temps.

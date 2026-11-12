@@ -36,18 +36,21 @@ async function preparer(page, joueurs = 1, options) {
 test.describe('données des cartes', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
 
-  test('20 packs (feuilles « pack » de l\'Excel), 3 niveaux chacun, 660 cartes', () => {
+  test('20 packs (feuilles « pack » de l\'Excel), 3 niveaux chacun + séries 4 et 5 des thèmes (v6.50), 932 cartes', () => {
     expect(C.PACKS.map((p) => p.nom)).toEqual(['Mots simples', 'Mots compliqués', 'Jours et mois', 'Nombres', 'Lettres',
       // 15 packs ajoutés le 04/11/2026 (v6.16), 8 mots par niveau
       'Animaux', 'Lieux et constructions', 'Pays', 'Villes', 'Paysages et nature', 'Météo et saisons', 'Le corps', 'Aliments',
       'Dans la maison', 'Vêtements', 'L’école', 'Métiers', 'Transports', 'Couleurs et formes', 'Sports et musique']);
     for (const p of C.PACKS.slice(5)) for (const n of ['1', '2', '3']) expect(p.niveaux[n], p.nom).toHaveLength(8);
     let total = 0;
+    const themes = C.FAMILLES.flatMap((f) => f.themes);
     for (const p of C.PACKS) {
-      expect(Object.keys(p.niveaux)).toEqual(['1', '2', '3']);
-      for (const n of ['1', '2', '3']) { expect(p.niveaux[n].length).toBeGreaterThan(0); total += p.niveaux[n].length; }
+      // v6.50 : les 17 thèmes proposés ont aussi les séries 4 (Difficile) et 5 (Expert).
+      const series = themes.includes(p.id) ? ['1', '2', '3', '4', '5'] : ['1', '2', '3'];
+      expect(Object.keys(p.niveaux)).toEqual(series);
+      for (const n of series) { expect(p.niveaux[n].length).toBeGreaterThan(0); total += p.niveaux[n].length; }
     }
-    expect(total).toBe(660);
+    expect(total).toBe(660 + 17 * 16);
   });
 
   test('v6.39 : 17 thèmes rangés en 4 familles (Nature et animaux, Tous les jours, En ville, Le monde…)', () => {
@@ -192,10 +195,10 @@ test('la carte piochée vient des packs du joueur, tous niveaux mêlés ; mot ca
 test('pack « Lettres » plus proposé : aucune carte lettre n\'est piochée, même avec tous les packs', async ({ page }) => {
   await preparer(page, 1);
   await lancer(page);
-  // Toutes les cartes que le joueur peut piocher : 4 packs × 3 niveaux, aucune du pack Lettres.
+  // Toutes les cartes que le joueur peut piocher : 4 packs × 2 séries (niveau Facile = séries 1 et 2, v6.50), aucune du pack Lettres.
   const packs = await page.evaluate(() => [...new Set(window.Aventura.cartesDuJoueur(0).map((c) => c.pack + ':' + c.niveau))]);
   expect(packs.filter((p) => p.startsWith('lettres'))).toEqual([]);
-  expect(packs).toHaveLength(12);
+  expect(packs).toHaveLength(8);
   await page.getByRole('button', { name: 'Question suivante' }).click();
   await expect(page.locator('#carte-consigne')).not.toHaveText('Quelle est cette lettre ?');
 });
