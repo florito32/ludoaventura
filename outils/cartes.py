@@ -332,6 +332,33 @@ for ws in wb.worksheets:
     ident = cle.replace('pack ', '').replace(' ', '-').replace('é', 'e')
     packs.append({'id': ident, 'nom': NOMS.get(cle, ws.title), 'niveaux': niveaux})
 
+# ---------- v6.50 : séries 4 (Difficile) et 5 (Expert), écrites dans outils/mots_niveaux.py ----------
+import sys
+sys.path.insert(0, str(RACINE / 'outils'))
+import mots_niveaux
+NOUVEAUX = mots_niveaux.lire()
+PHRASES_NOUVELLES = {}
+deja_vus = {m for p in packs for l in p['niveaux'].values() for m in l}
+for p in packs:
+    if p['id'] not in NOUVEAUX:
+        continue
+    for n, lignes in NOUVEAUX[p['id']].items():
+        p['niveaux'][n] = []
+        for mot, mu, genre, plur, phrase in lignes:
+            if mot in deja_vus:
+                raise SystemExit('Mot déjà présent dans les cartes : ' + mot)
+            deja_vus.add(mot)
+            p['niveaux'][n].append(mot)
+            MUETTES[mot] = None if mu == '-' else mu
+            if genre in ('m', 'f'):
+                GENRES[mot] = genre
+                PLURIELS[mot] = None if plur == '-' else (plur or mot + 'S')
+            PHRASES_NOUVELLES[mot] = phrase
+            if p['id'] == 'pays':
+                PAYS.add(mot)
+SYLLABES_CORRIGEES.update(mots_niveaux.SYLLABES)
+H_ASPIRE |= mots_niveaux.H_ASPIRE
+
 INFOS = {}
 for p_ in packs:
     for n_, mots_ in p_['niveaux'].items():
@@ -365,3 +392,14 @@ js = """// Cartes JEU d'Aventura — GÉNÉRÉ par outils/cartes.py depuis « ca
 (RACINE / 'js' / 'cartes.js').write_text(js, encoding='utf-8')
 for p in packs:
     print(p['id'], p['nom'], {k: len(v) for k, v in p['niveaux'].items()})
+
+# Phrases des séries 4 et 5 : bloc généré à la fin de js/phrases.js (entre les deux repères).
+DEBUT, FIN = '    // --- Séries 4 et 5 (GÉNÉRÉ par outils/cartes.py depuis outils/mots_niveaux.py) ---', '    // --- fin des séries 4 et 5 ---'
+chemin = RACINE / 'js' / 'phrases.js'
+texte = chemin.read_text(encoding='utf-8')
+if DEBUT in texte:
+    texte = texte[:texte.index(DEBUT)].rstrip().rstrip(',') + '\n  };' + texte[texte.index(FIN) + len(FIN):].split('};', 1)[1]
+bloc = ',\n'.join('    ' + json.dumps(m, ensure_ascii=False) + ': ' + json.dumps(ph, ensure_ascii=False) for m, ph in PHRASES_NOUVELLES.items())
+i = texte.index('\n  };')
+texte = texte[:i].rstrip() + ',\n' + DEBUT + '\n' + bloc + '\n' + FIN + texte[i:]
+chemin.write_text(texte, encoding='utf-8')

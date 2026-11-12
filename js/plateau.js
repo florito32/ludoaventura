@@ -66,6 +66,15 @@
     difficile: 'Difficile : les nombres de 1 à 999, jusqu’à 3 signes.',
     expert: 'Expert : les nombres de 1 à 9999, jusqu’à 4 signes.'
   };
+  // Aide sous le niveau d'orthographe (v6.50) : quelques mots du niveau (séries de js/cartes.js, voir js/defis.js → ORTHO).
+  var AIDES_ORTHO = {
+    facile: 'Facile : des mots courts et courants (chien, lapin, maison, pluie…).',
+    moyen: 'Moyen : des mots plus longs (crocodile, bibliothèque, hélicoptère…).',
+    difficile: 'Difficile : des mots pièges (rhinocéros, cathédrale, chauve-souris…).',
+    expert: 'Expert : des mots rares et très pièges (ornithorynque, amphithéâtre, kinésithérapeute…).'
+  };
+  // Séries de mots piochées à chaque niveau d'orthographe (v6.50) : les mêmes que la partie rapide et les défis.
+  function motsDuNiveau(niveau) { return (window.Defis.ORTHO[niveau] || window.Defis.ORTHO.facile).mots.slice(); }
   // Aide sous le niveau de conjugaison (v6.49) : quelques verbes du niveau (js/conjugaison.js).
   var AIDES_CONJ = {
     facile: 'Facile : les verbes de tous les jours (chanter, finir, être, avoir, faire…).',
@@ -105,8 +114,11 @@
     maths: [mathsVides(), mathsVides(), mathsVides(), mathsVides()],
     // Réglages de conjugaison de chaque joueur (v5.8) : temps (« mode.temps »), groupes 1 à 3, niveau.
     conj: [conjVide(), conjVide(), conjVide(), conjVide()],
-    // Orthographe : niveaux de mots où le joueur pioche (null = les 3 niveaux mêlés). Seuls les défis du jour les fixent (v6.37).
+    // Orthographe : séries de mots imposées par un défi du jour (v6.37) ou une partie rapide ; null = partie libre,
+    // où les séries viennent du niveau choisi par le joueur (orthoNiveau, v6.50).
     mots: [null, null, null, null],
+    // Niveau d'orthographe de chaque joueur (v6.50) : 'facile', 'moyen', 'difficile' ou 'expert'.
+    orthoNiveau: ['facile', 'facile', 'facile', 'facile'],
     // Défi du jour en cours (v6.37, js/defis.js) : { type: 'solo' | 'equipe', jour, niveau, … } ou null pour une partie libre.
     defi: null,
     // Partie rapide en cours (v6.43, js/rapide.js) : { matieres: ['maths', 'francais'], niveau: 'facile'… } ou null.
@@ -262,6 +274,12 @@
     });
     V.GROUPES.forEach(function (g) { choix($('groupes'), 'checkbox', 'groupe', g.id, g.nom.split(' ')[0], g.nom); }); // « 1er », « 2e », « 3e »
     V.NIVEAUX.forEach(function (nv) { choix($('niveau-conj'), 'radio', 'niveau-conj', nv.id, nv.nom); });
+    // Niveau d'orthographe (v6.50) : mêmes 4 niveaux, sur l'écran de la matière.
+    window.Defis.NIVEAUX.forEach(function (nv) { choix($('niveau-ortho'), 'radio', 'niveau-ortho', nv.id, nv.nom); });
+    $('niveau-ortho').addEventListener('change', function () {
+      partie.orthoNiveau[partie.actif] = valeursCochees($('niveau-ortho'))[0] || 'facile';
+      majAventuriers();
+    });
     ['modes-conj', 'temps-conj', 'groupes', 'niveau-conj'].forEach(function (id) {
       $(id).addEventListener('change', function () {
         var c = partie.conj[partie.actif];
@@ -355,6 +373,7 @@
         partie.francais[k] = partie.francais[a];
         partie.maths[k] = JSON.parse(JSON.stringify(partie.maths[a]));
         partie.conj[k] = JSON.parse(JSON.stringify(partie.conj[a]));
+        partie.orthoNiveau[k] = partie.orthoNiveau[a];
       }
       montrerEtape(4);
     });
@@ -562,6 +581,10 @@
     $('reglages-ortho').hidden = mat !== 'orthographe';
     var cc = partie.conj[a];
     $('reglage-niveau-conj').hidden = mat !== 'conjugaison';
+    var on = partie.orthoNiveau[a] || 'facile';
+    $('reglage-niveau-ortho').hidden = mat !== 'orthographe';
+    $('niveau-ortho').querySelectorAll('input').forEach(function (i) { i.checked = i.value === on; });
+    $('niveau-ortho-aide').textContent = AIDES_ORTHO[on];
     $('niveau-conj-aide').textContent = AIDES_CONJ[cc.niveau] || '';
     $('modes-conj').querySelectorAll('input').forEach(function (i) { i.checked = cc.modes.indexOf(i.value) >= 0; });
     $('temps-conj').querySelectorAll('.mode-ligne').forEach(function (l) { l.hidden = cc.modes.indexOf(l.dataset.mode) === -1; });
@@ -632,8 +655,8 @@
     return t;
   }
 
-  // Toutes les cartes que le joueur i peut piocher : ses thèmes, les 3 niveaux mêlés
-  // (choix de l'utilisateur le 03/11/2026 : plus de choix du niveau).
+  // Toutes les cartes que le joueur i peut piocher : ses thèmes, dans les séries de mots de son niveau
+  // (v6.50 : Facile = séries 1 et 2, Moyen = 3, Difficile = 4, Expert = 5 ; défi du jour et partie rapide imposent les leurs).
   // Partie sauvegardée avant la v6.39 avec seulement des thèmes retirés (« Mots simples »…) : tous les thèmes.
   function cartesDuJoueur(i) {
     var liste = [];
@@ -641,8 +664,9 @@
     if (!siens.length) siens = TOUS_PACKS;
     PACKS.forEach(function (p) {
       if (siens.indexOf(p.id) === -1) return;
+      var series = partie.mots[i] || motsDuNiveau(partie.orthoNiveau[i]);
       Object.keys(p.niveaux).forEach(function (niveau) {
-        if (partie.mots[i] && partie.mots[i].indexOf(Number(niveau)) === -1) return; // défi du jour : niveau des mots imposé
+        if (series.indexOf(Number(niveau)) === -1) return;
         p.niveaux[niveau].forEach(function (mot) {
           liste.push({ pack: p.id, packNom: p.nom, niveau: Number(niveau), mot: mot, lettre: p.id === 'lettres' && mot.length === 1 });
         });
@@ -1530,7 +1554,7 @@
     if (!partie.defi && !partie.avantDefi) {
       partie.avantDefi = copie({ nb: nbChoisi(), aventure: (document.querySelector('input[name="aventure"]:checked') || {}).value,
         choix: partie.choix, matiere: partie.matiere, francais: partie.francais, maths: partie.maths, conj: partie.conj,
-        packs: partie.packs, types: partie.types });
+        packs: partie.packs, types: partie.types, orthoNiveau: partie.orthoNiveau });
     }
     document.querySelector('input[name="nb"][value="' + d.joueurs + '"]').checked = true;
     document.querySelector('input[name="aventure"][value="' + d.aventure + '"]').checked = true;
@@ -1561,6 +1585,7 @@
     var av = a.aventure && document.querySelector('input[name="aventure"][value="' + a.aventure + '"]'); if (av) av.checked = true;
     partie.choix = a.choix; partie.matiere = a.matiere; partie.francais = a.francais; partie.maths = a.maths; partie.conj = a.conj;
     partie.packs = a.packs; partie.types = a.types;
+    if (a.orthoNiveau) partie.orthoNiveau = a.orthoNiveau;
   }
 
   // ---------- Partie rapide (v6.43) ----------
@@ -1571,7 +1596,7 @@
     if (!partie.defi && !partie.avantDefi) {
       partie.avantDefi = copie({ nb: nbChoisi(), aventure: (document.querySelector('input[name="aventure"]:checked') || {}).value,
         choix: partie.choix, matiere: partie.matiere, francais: partie.francais, maths: partie.maths, conj: partie.conj,
-        packs: partie.packs, types: partie.types });
+        packs: partie.packs, types: partie.types, orthoNiveau: partie.orthoNiveau });
     }
     partie.defi = null;
     document.querySelector('input[name="nb"][value="' + d.joueurs + '"]').checked = true;
@@ -1654,7 +1679,7 @@
       choix: partie.choix, packs: partie.packs, types: partie.types, actif: partie.actif,
       matiere: partie.matiere, francais: partie.francais, maths: partie.maths, conj: partie.conj,
       etapePrepa: partie.etapePrepa, sousEtape: partie.sousEtape, modif: !!partie.modif,
-      mots: partie.mots, defi: partie.defi, avantDefi: partie.avantDefi || null, rapide: partie.rapide
+      mots: partie.mots, orthoNiveau: partie.orthoNiveau, defi: partie.defi, avantDefi: partie.avantDefi || null, rapide: partie.rapide
     };
     if (partie.regles && partie.joueurs.length) {
       d.jeu = {
@@ -1683,6 +1708,8 @@
       partie.sousEtape = d.sousEtape || 'matiere';
       partie.modif = !!(d.modif && d.jeu); // « Modifier les choix » en cours : la partie attend d'être reprise
       partie.mots = d.mots || partie.mots;
+      // Sauvegarde d'avant la v6.50 : niveau d'orthographe Facile.
+      partie.orthoNiveau = (d.orthoNiveau || partie.orthoNiveau).map(function (n) { return window.Defis.ORTHO[n] ? n : 'facile'; });
       partie.defi = d.jeu ? d.defi || null : null;
       partie.avantDefi = d.avantDefi || null;
       partie.rapide = d.jeu ? d.rapide || null : null;

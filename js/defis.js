@@ -7,7 +7,8 @@
 //  - Aventure : prise parmi celles de la difficulté du niveau (Facile → aventure facile, Moyen → moyenne,
 //    Difficile et Expert → difficile), ce qui fixe l'objectif (js/aventures.js).
 //  - Français : le jour décide Orthographe ou Conjugaison (un jour sur deux environ, au hasard de la date).
-//  - Orthographe : le niveau choisit les mots (niveaux 1, 2, 3 du fichier des cartes) et les questions.
+//  - Orthographe : le niveau choisit les mots et les questions. Séries de mots (v6.50) : Facile = séries 1 et 2
+//    du fichier des cartes, Moyen = série 3, Difficile = série 4, Expert = série 5 (outils/mots_niveaux.py).
 // Module sans interface : utilisable dans la page (window.Defis) et dans les tests Node.
 (function (racine) {
   'use strict';
@@ -42,10 +43,10 @@
     expert: { temps: ['indicatif.passe-simple', 'indicatif.passe-anterieur', 'indicatif.futur-anterieur', 'conditionnel.passe', 'subjonctif.present', 'subjonctif.imparfait', 'subjonctif.passe', 'imperatif.passe'], combien: 3, groupes: [1, 2, 3] }
   };
   var ORTHO = {
-    facile: { mots: [1], types: ['nombre', 'voyelles', 'consonnes', 'syllabes', 'nb-voyelles', 'nb-consonnes'], combien: 3 },
-    moyen: { mots: [2], types: ['syllabes', 'combien-lettre', 'manquante', 'melange', 'genre', 'muettes', 'nb-consonnes'], combien: 3 },
-    difficile: { mots: [2, 3], types: ['ecrire', 'melange', 'manquante', 'pluriel', 'muettes', 'genre'], combien: 3 },
-    expert: { mots: [3], types: ['ecrire', 'melange', 'pluriel', 'muettes', 'manquante'], combien: 3 }
+    facile: { mots: [1, 2], types: ['nombre', 'voyelles', 'consonnes', 'syllabes', 'nb-voyelles', 'nb-consonnes'], combien: 3 },
+    moyen: { mots: [3], types: ['syllabes', 'combien-lettre', 'manquante', 'melange', 'genre', 'muettes', 'nb-consonnes'], combien: 3 },
+    difficile: { mots: [4], types: ['ecrire', 'melange', 'manquante', 'pluriel', 'muettes', 'genre'], combien: 3 },
+    expert: { mots: [5], types: ['ecrire', 'melange', 'pluriel', 'muettes', 'manquante'], combien: 3 }
   };
 
   // ---------- Hasard tiré de la date ----------
