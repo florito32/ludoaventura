@@ -187,7 +187,8 @@
   // regroupées selon la réponse attendue, 3 par ligne (Voyelles à côté de Consonnes,
   // Nombre de voyelles à côté de Nombre de consonnes).
   var FAMILLES = [
-    { id: 'ecrire-mot', nom: 'Écrire un mot', icone: '\u270f\ufe0f', types: ['ecrire', 'melange', 'manquante', 'genre', 'pluriel'] },
+    // v6.54 : « Le ou la ? » et « Au pluriel » passent en grammaire (js/grammaire.js), choix de l'utilisateur du 12/11/2026.
+    { id: 'ecrire-mot', nom: 'Écrire un mot', icone: '\u270f\ufe0f', types: ['ecrire', 'melange', 'manquante'] },
     { id: 'trouver', nom: 'Trouver des lettres', icone: '\ud83d\udd0d', types: ['voyelles', 'consonnes', 'muettes'] },
     { id: 'compter', nom: 'Compter', icone: '\ud83d\udd22', types: ['nb-voyelles', 'nb-consonnes', 'nombre', 'syllabes', 'combien-lettre'] }
   ];

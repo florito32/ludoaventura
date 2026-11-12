@@ -99,11 +99,13 @@
       if (!mat && !p.francais[p.actif]) return { cle: cle + '-a', cible: $('matieres'),
         texte: nom + ', choisis ta matière : Mathématiques ou Français. Les questions de tes cartes viendront de là.' };
       if (!mat) return { cle: cle + '-b', cible: $('francais'),
-        texte: 'En français, choisis Orthographe (des mots à écrire, compter, découper…) ou Conjugaison (des verbes à conjuguer).' };
+        texte: 'En français, choisis Orthographe (des mots à écrire, compter, découper…), Conjugaison (des verbes à conjuguer) ou Grammaire (des phrases à remettre en ordre, des contraires, des erreurs à trouver…).' };
       if (mat === 'maths') return { cle: cle + '-c', choix: $('niveau-maths'), cible: valider,
         texte: 'Choisis ton niveau : Facile, ce sont les tables ; plus c’est dur, plus les nombres sont grands. Puis le nombre de signes par calcul, et « Valider ».' };
       if (mat === 'conjugaison') return { cle: cle + '-e', choix: $('niveau-conj'), cible: valider,
         texte: 'Choisis ton niveau : plus il est haut, plus les verbes sont rares ou pièges. Puis « Valider ».' };
+      if (mat === 'grammaire') return { cle: cle + '-g', choix: $('niveau-gram'), cible: valider,
+        texte: 'Choisis ton niveau : plus il est haut, plus les phrases sont longues et les pièges nombreux. Puis « Valider » pour choisir tes jeux.' };
       if (mat === 'orthographe') return { cle: cle + '-f', choix: $('niveau-ortho'), cible: valider,
         texte: 'Choisis ton niveau : plus il est haut, plus les mots sont longs, rares ou pièges. Puis « Valider » pour choisir tes thèmes.' };
       return { cle: cle + '-d', cible: valider, texte: 'C’est noté ! Touche « Valider » pour régler tes questions.' };
@@ -131,6 +133,10 @@
           : 'Choisis tes nombres : des unités, des dizaines (30 = de 30 à 39)… Chaque calcul prendra un nombre de chaque groupe choisi.' };
       return { cle: cle + '-c', cible: valider, texte: 'Parfait !' + fin };
     }
+    if (mat === 'grammaire') {
+      if (vide('jeux-gram')) return { cle: cle + '-g', cible: $('jeux-gram'), texte: 'Choisis tes jeux de grammaire : une carte en tirera un au hasard. « Tout » les prend tous.' };
+      return { cle: cle + '-h', cible: valider, texte: 'Super, tes jeux de grammaire sont prêts !' + fin };
+    }
     if (vide('types-questions')) return { cle: cle + '-b', cible: $('types-questions'),
       texte: 'Choisis les questions qu’on peut te poser : écrire le mot, compter ses lettres, ses syllabes…' };
     return { cle: cle + '-c', cible: valider, texte: 'Bravo, tes cartes sont prêtes !' + fin };
@@ -154,6 +160,10 @@
     if (r.etape === 'repondre' && saisie) {
       return { cle: cle, cible: $('reponse-joueur'),
         texte: j.nom + ', écris ta réponse dans la case, puis touche « OK ». « Écouter » lit la question à voix haute.' };
+    }
+    if (r.etape === 'repondre' && c && c.type === 'grammaire') {
+      return { cle: cle, cible: $('carte-gram'),
+        texte: j.nom + ', touche ta réponse dans la carte : le jeu la corrige tout seul. « Écouter » lit la question à voix haute.' };
     }
     if (r.etape === 'repondre') {
       return { cle: cle, cible: $('tour-actions'),

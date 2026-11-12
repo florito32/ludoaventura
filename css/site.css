@@ -412,6 +412,17 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
   #ortho-packs .famille .packs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
+/* Grammaire (v6.54) : 8 jeux ; 4 par ligne en largeur (2 lignes), 2 par ligne en hauteur (4 lignes). */
+#reglages-gram { --rangs: 2; --cols: 4; --larg: min(100cqi, 900px);
+  --h: clamp(30px, calc((100cqh - 5.2rem) / var(--rangs) - 2cqh), 110px); }
+#jeux-gram { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+#reglages-gram .pack { display: flex; }
+.reglages-joueur #reglages-gram .pack span { border-radius: 18px; }
+@container (max-aspect-ratio: 1/1) {
+  #reglages-gram { --rangs: 4; --cols: 2; }
+  #jeux-gram { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 /* Conjugaison, écran des temps (v6.6) : chaque mode choisi est un cadre qui entoure SES temps,
    rangés en colonne (un temps sous l'autre), pour ne pas confondre les temps de deux modes.
    Écran plus large que haut : les cadres côte à côte ; sinon 2 colonnes, l'indicatif (8 temps) à gauche,
@@ -768,6 +779,59 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 }
 .btn-remettre { min-height: 44px; padding: 6px 16px; }
 .btn-remettre:disabled { opacity: .5; cursor: default; }
+/* ---------- Grammaire (v6.54) : boutons de réponse, mots en bulles, colonnes à relier ---------- */
+.carte-gram { margin: 10px 0 8px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.carte-gram[hidden] { display: none; }
+.gram-mot { margin: 0 !important; font: 800 clamp(1.5rem, 6vw, 2rem)/1.2 "Rockwell", "Roboto Slab", Georgia, serif; text-align: center; overflow-wrap: anywhere; }
+.gram-phrase { margin: 0 !important; font-size: 1.2rem; line-height: 1.7; text-align: center; }
+.gram-trou { display: inline-block; min-width: 3.2em; border-bottom: 3px solid var(--bleu); margin: 0 .2em; vertical-align: baseline; }
+.gram-trou.rempli { min-width: 0; padding: 0 .3em; border-radius: 6px; border: 2px solid currentColor; font-weight: 800; }
+.gram-trou.juste, .gram-ligne.juste .gram-bulle { color: #1f5a2f; }
+.gram-trou.fausse { color: var(--rouge-texte); }
+.gram-cible { background: var(--jaune); color: var(--encre); font-weight: 800; padding: 0 .25em; border-radius: 6px; box-shadow: 0 0 0 2px var(--encre); }
+.gram-choix { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; width: 100%; }
+.gram-bouton {
+  min-height: 48px; min-width: 88px; padding: 6px 14px; font: 700 1.1rem/1.2 system-ui, sans-serif; color: var(--encre); cursor: pointer;
+  background: #fff; border: 3px solid var(--encre); border-radius: 12px; box-shadow: 0 4px 0 var(--encre); touch-action: manipulation;
+}
+.gram-bouton:active:not(:disabled), .gram-bulle:active:not(:disabled), .gram-mot-relier:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 var(--encre); }
+.gram-bouton:disabled, .gram-bulle:disabled, .gram-mot-relier:disabled { cursor: default; }
+.gram-bouton.bonne, .gram-bulle.bonne { background: #e3f3e6; border-color: #1e7b45; color: #1f5a2f; box-shadow: 0 4px 0 #1e7b45; }
+.gram-bouton.fausse, .gram-bulle.fausse { background: #fbe6e6; border-color: var(--rouge-texte); color: var(--rouge-texte); box-shadow: 0 4px 0 var(--rouge-texte); }
+.gram-bulle.bonne { text-decoration: line-through; text-decoration-thickness: 2px; }
+/* Mots en bulles (Remettre la phrase, Trouve l'erreur). */
+.gram-bulles, .gram-ligne { width: 100%; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px 6px; }
+.gram-ligne { min-height: 52px; padding: 10px 4px 0; border-top: 2px dashed var(--parchemin-bord); }
+.gram-bulle {
+  min-height: 44px; padding: 4px 12px; font: 700 1.1rem/1.2 system-ui, sans-serif; color: var(--encre); cursor: pointer;
+  background: #fff; border: 3px solid var(--encre); border-radius: 99px; box-shadow: 0 3px 0 var(--encre); touch-action: manipulation;
+  overflow-wrap: anywhere; max-width: 100%;
+}
+.gram-bulle.trou { visibility: visible; color: transparent; background: none; border-style: dashed; border-color: var(--parchemin-bord); box-shadow: none; cursor: default; display: inline-flex; align-items: center; }
+.gram-bulle.posee { background: var(--parchemin); }
+span.gram-bulle.posee { display: inline-flex; align-items: center; cursor: default; }
+.gram-ligne.fausse .gram-bulle { border-color: var(--rouge-texte); color: var(--rouge-texte); }
+.gram-ligne.juste .gram-bulle { border-color: #1e7b45; }
+.gram-suivant { width: 56px; height: 44px; border: 3px solid var(--bleu); border-radius: 99px; box-shadow: 0 0 0 3px rgba(28, 52, 115, .25); }
+.gram-fin { font: 800 1.4rem/1 system-ui, sans-serif; align-self: flex-end; padding-bottom: 6px; }
+/* Relier les paires : deux colonnes, les traits dessinés entre elles (SVG). */
+.gram-relier { position: relative; width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) clamp(28px, 12%, 72px) minmax(0, 1fr); align-items: stretch; }
+.gram-col { display: flex; flex-direction: column; gap: 6px; }
+.gram-col:first-child { grid-column: 1; }
+.gram-col:last-child { grid-column: 3; }
+.gram-traits { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.gram-mot-relier {
+  position: relative; min-height: 40px; padding: 4px 8px; display: flex; align-items: center; justify-content: center; gap: 6px;
+  font: 700 1rem/1.15 system-ui, sans-serif; color: var(--encre); cursor: pointer; text-align: center;
+  background: #fff; border: 3px solid var(--encre); border-radius: 10px; box-shadow: 0 3px 0 var(--encre); touch-action: manipulation;
+}
+.gram-texte { min-width: 0; overflow-wrap: anywhere; }
+.gram-mot-relier.choisi { background: var(--jaune); box-shadow: 0 0 0 3px var(--bleu); }
+.gram-mot-relier.lie { border-color: var(--lien); box-shadow: 0 3px 0 var(--lien); }
+.gram-mot-relier.juste { background: #e3f3e6; }
+.gram-mot-relier.fausse { background: #fbe6e6; }
+.gram-num { flex: none; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--lien); color: #fff; font: 800 .8rem/1 system-ui, sans-serif; }
+.gram-relier.corrige .gram-num { display: none; }
 /* Réponse écrite par le joueur (calcul, v5.7) : la case et « Valider » sur une ligne. */
 .carte-saisie { margin: 4px 0 8px; }
 .carte-saisie label { display: block; font-weight: 700; margin-bottom: 4px; }

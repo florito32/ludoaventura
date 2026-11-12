@@ -81,3 +81,22 @@ test('aucune violation WCAG A/AA : Comment gagner des étoiles, Partie rapide', 
   await expect(page.locator('#carte-piochee')).toBeVisible();
   expect(await audit(page)).toEqual([]);
 });
+
+// v6.54 : grammaire — écran des jeux, cartes « Relier les paires » (liens en cours) et « Remettre la phrase ».
+test('aucune violation WCAG A/AA : réglages de grammaire, cartes Relier et Remettre la phrase', async ({ page }) => {
+  const { rapide, versReglages, grammaire, lancer } = require('./aide');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await rapide(page);
+  await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); } catch (e) { /* */ } });
+  await page.goto('./');
+  await versReglages(page, 1);
+  await grammaire(page, { jeux: ['relier'], niveau: 'expert' });
+  expect(await audit(page)).toEqual([]);
+  await lancer(page);
+  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.locator('.gram-relier').waitFor();
+  await page.locator('[data-cote="g"][data-i="0"]').click();
+  await page.locator('[data-cote="d"][data-i="0"]').click();
+  await page.locator('[data-cote="g"][data-i="1"]').click();
+  expect(await audit(page)).toEqual([]);
+});

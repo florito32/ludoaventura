@@ -4,9 +4,16 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.53';
+  var VERSION = '6.54';
 
   var HISTORY = [
+    { v: '6.54', date: '2026-11-12', changes: [
+      "Nouveau : la Grammaire, en français, à côté de l'orthographe et de la conjugaison. On choisit un niveau (Facile, Moyen, Difficile, Expert) puis ses petits jeux ; chaque carte en tire un au hasard.",
+      "Remettre la phrase : on touche les mots mélangés dans l'ordre pour refaire la phrase ; plus le niveau est haut, plus la phrase est longue (compléments, mais / car / donc, qui / que…).",
+      "Les contraires (3 choix), Trouve l'erreur (toucher le mot faux), Nature du mot (nom, verbe, adjectif…), Homophones (a / à, son / sont, c'est / s'est…).",
+      "Relier les paires : deux colonnes de 6 à 8 mots ; on touche un mot d'un côté puis de l'autre, une ligne de couleur les relie.",
+      "« Le ou la ? » et « Au pluriel » quittent l'orthographe pour la grammaire."
+    ] },
     { v: '6.53', date: '2026-11-12', changes: [
       "Nouveau lien « Mentions légales » en bas de page, vers la page du site ludo-aventura.fr (obligatoire pour un site public)."
     ] },

@@ -33,6 +33,7 @@
   // (en majuscules, certaines voix l'épellent comme un sigle). Les lettres seules ne sont pas dites.
   function texteCarte(carte) {
     if (carte.lettre) return 'Quelle est cette lettre ?';
+    if (carte.type === 'grammaire') return carte.oral; // v6.54 : texte préparé par js/grammaire.js (sans donner la réponse)
     if (carte.type === 'calcul' || carte.type === 'conjugaison') return carte.oral; // « Combien font 3 plus 4 multiplié par 2 ? »
     var mot = carte.mot.replace(/(\.\.\.|…)/g, ' ').replace(/\s+/g, ' ').trim().toLocaleLowerCase('fr-FR');
     var q = carte.question, Q = racine.Questions;
