@@ -55,6 +55,18 @@
     return p;
   }
 
+  // Qui suis-je ? (v7.0, choix de l'utilisateur) : pas de dé, les points de la carte s'ajoutent directement.
+  function gagner(p, points) {
+    verifier(p, 'repondre');
+    p.points += points;
+    p.dernierLancer = points;
+    p.de = null;
+    p.historique.push({ manche: p.manche, joueur: p.joueur, de: null, points: points });
+    var dernier = p.manche === NB_CROIX && p.joueur === p.nbJoueurs - 1;
+    p.etape = dernier ? 'fin' : 'suivant';
+    return p;
+  }
+
   function suivant(p) {
     verifier(p, 'suivant');
     p.joueur++;
@@ -70,7 +82,7 @@
 
   var api = {
     NB_CROIX: NB_CROIX, nouvellePartie: nouvellePartie,
-    piocher: piocher, repondre: repondre, lancer: lancer, suivant: suivant, reussie: reussie
+    piocher: piocher, repondre: repondre, lancer: lancer, gagner: gagner, suivant: suivant, reussie: reussie
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else racine.Regles = api;

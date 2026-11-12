@@ -1434,3 +1434,159 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .defi-valider .btn:disabled { opacity: .55; cursor: not-allowed; box-shadow: none; }
 .defi-recompense { margin: 10px 0 0; font-weight: 700; display: flex; align-items: center; gap: 6px; }
 .defi-recompense.fait { color: #1f7a3a; }
+
+/* ---------- Géographie et Histoire (v7.0, js/savoirs-carte.js) ---------- */
+.carte-savoir { margin: 8px 0; display: flex; flex-direction: column; gap: 8px; }
+.carte-savoir[hidden] { display: none; }
+.carte-savoir button:not(.btn) { font: inherit; color: var(--encre); }
+.carte-savoir button { cursor: pointer; touch-action: manipulation; }
+.carte-savoir button:disabled { cursor: default; }
+/* Réponses proposées (choix multiples, vrai ou faux, qui suis-je ?) : grands boutons, 2 par ligne si la place le permet. */
+.savoir-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); gap: 6px; }
+.btn-option {
+  min-height: 44px; padding: 6px 10px; border-radius: 10px; border: 3px solid var(--encre); background: #fff;
+  box-shadow: 0 3px 0 var(--encre); font-weight: 700 !important; overflow-wrap: anywhere; line-height: 1.2;
+}
+.btn-option:not(:disabled):active { transform: translateY(2px); box-shadow: 0 1px 0 var(--encre); }
+.btn-option.bonne { background: #d7f0dc; border-color: #1f5a2f; color: #1f5a2f; }
+.btn-option.fausse { background: #fbe0e0; border-color: var(--rouge-texte); color: var(--rouge-texte); text-decoration: line-through; }
+.btn-option:disabled:not(.bonne):not(.fausse) { opacity: .55; }
+.savoir-sujet { text-align: center; }
+.savoir-question { font-weight: 600; }
+.savoir-affirmation { text-align: center; font-size: 1.1rem; }
+.drapeau { display: inline-block; width: 64px; height: 48px; object-fit: cover; border: 1px solid #0003; border-radius: 3px; vertical-align: middle; background: #fff; }
+.drapeau.grand { width: 120px; height: 90px; }
+/* Relier : deux colonnes ; une pastille numérotée de couleur montre les paires reliées. */
+.relier { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.relier-col { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.relier-g, .relier-d {
+  display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 4px 8px; text-align: left; line-height: 1.15;
+  border: 2px solid var(--encre); border-radius: 10px; background: #fff; font-weight: 600 !important; overflow-wrap: anywhere;
+}
+.relier-texte { min-width: 0; flex: 1; }
+.relier-g.choisi { border-color: var(--bleu); box-shadow: 0 0 0 3px rgba(28, 52, 115, .3); background: #eef2ff; }
+.puce-lien {
+  flex: none; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+  font: 800 .85rem/1 system-ui, sans-serif; background: var(--encre); color: #fff;
+}
+.puce-lien.vide { background: transparent; border: 2px dashed var(--parchemin-bord); }
+.relie.lien-1 { --l: #c0392b; } .relie.lien-2 { --l: #1c3473; } .relie.lien-3 { --l: #1f6f3a; }
+.relie.lien-4 { --l: #8e44ad; } .relie.lien-5 { --l: #b35400; } .relie.lien-6 { --l: #006d77; }
+.relie { border-color: var(--l); background: color-mix(in srgb, var(--l) 10%, #fff); }
+.relie .puce-lien { background: var(--l); }
+.relier-g.bonne, .classer-ligne.bonne .classer-texte, .ordre-case.bonne { outline: 3px solid #1f5a2f; outline-offset: -1px; }
+.relier-g.fausse, .classer-ligne.fausse .classer-texte, .ordre-case.fausse { outline: 3px dashed var(--rouge-texte); outline-offset: -1px; }
+.relier.avec-images .relier-g { justify-content: flex-start; }
+.relier.avec-images .drapeau { width: 52px; height: 39px; }
+.btn-savoir-ok { align-self: center; min-height: 44px; min-width: 120px; }
+.btn-savoir-ok:disabled { opacity: .5; }
+.savoir-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
+.savoir-actions .btn { min-height: 44px; }
+.savoir-actions .btn:disabled { opacity: .5; }
+/* Remettre dans l'ordre : éléments à toucher, puis les cases numérotées du plus ancien au plus récent. */
+.ordre-pioche { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.ordre-el {
+  min-height: 44px; padding: 4px 10px; border: 3px solid var(--encre); border-radius: 10px; background: #fff;
+  box-shadow: 0 3px 0 var(--encre); font-weight: 700 !important; line-height: 1.15;
+}
+.ordre-el[data-pris] { visibility: hidden; }
+.ordre-sens { text-align: center; font-size: .85rem; color: var(--encre-douce); font-weight: 600; }
+.ordre-cases { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.ordre-case {
+  width: 100%; display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 4px 8px; text-align: left;
+  border: 2px solid var(--encre); border-radius: 10px; background: #fff; font-weight: 700 !important;
+}
+.ordre-case.vide { border-style: dashed; border-color: var(--encre-douce); background: var(--parchemin); }
+.ordre-num { flex: none; width: 24px; height: 24px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--encre); color: #fff; font-size: .85rem; }
+/* Classer : une ligne par élément, deux boutons (une colonne chacun). */
+.classer { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.classer-ligne { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.classer-texte { flex: 1 1 110px; font-weight: 700; padding: 2px 4px; border-radius: 6px; min-width: 0; overflow-wrap: anywhere; }
+.classer-choix { display: flex; gap: 4px; flex: 1 1 200px; }
+.btn-col {
+  flex: 1 1 0; min-width: 0; min-height: 44px; padding: 2px 6px; border: 2px solid var(--encre); border-radius: 10px; background: #fff;
+  font-size: .85rem !important; line-height: 1.1; overflow-wrap: anywhere;
+}
+.btn-col[aria-pressed="true"].col-0 { background: var(--bleu); border-color: var(--bleu); color: #fff; }
+.btn-col[aria-pressed="true"].col-1 { background: var(--encre-douce); border-color: var(--encre-douce); color: #fff; }
+/* Qui suis-je ? : les indices dévoilés, les points encore possibles. */
+.indices { margin: 0; padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.indices li { background: var(--parchemin); border-radius: 8px; padding: 4px 8px; }
+.indice-num { font-weight: 800; margin-right: 4px; }
+.indices-points { text-align: center; }
+.btn-indice { align-self: center; min-height: 44px; }
+
+/* Géographie et Histoire, écran des jeux (v7.0) : familles encadrées comme les thèmes d'orthographe.
+   Géographie : 11 jeux en 3 familles (3, 4 et 4) → 4 par ligne en largeur (3 lignes), 3 par ligne en hauteur (5 lignes). */
+#savoir-jeux { --rangs: 3; --cols: 4; --larg: min(100cqi, 1000px);
+  --h: clamp(26px, calc((100cqh - 10.5rem) / var(--rangs) - 1.8cqh), 96px); }
+#savoir-liste { display: flex; flex-direction: column; gap: clamp(4px, 1.2cqh, 12px); }
+#savoir-liste .famille[hidden] { display: none; }
+#savoir-jeux .famille .packs { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(4px, 1cqh, 10px) clamp(5px, 1.4cqi, 12px); }
+#savoir-jeux .famille { border: 2px solid var(--parchemin-bord); background: #fffaf0; border-radius: 12px; padding: clamp(3px, 1cqh, 10px) clamp(5px, 1.2cqi, 12px); }
+.reglages-joueur #savoir-jeux .pack span {
+  border-radius: 18px; font-size: clamp(.7rem, min(calc(var(--h) * .3), calc(var(--larg) / var(--cols) / 8)), 1.5rem);
+  line-height: 1.05; padding: 1px 4px; hyphens: auto;
+}
+#savoir-jeux .pack { display: flex; }
+#savoir-jeux .btn-tout .long { display: inline; }
+#savoir-jeux .btn-tout .court { display: none; }
+@container (max-aspect-ratio: 1/1) {
+  #savoir-jeux { --rangs: 5; --cols: 3; --h: clamp(26px, calc((100cqh - 13rem) / var(--rangs) - 1.4cqh), 96px); }
+  #savoir-jeux .famille .packs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@container (max-width: 330px) {
+  #savoir-jeux .btn-tout .long { display: none; }
+  #savoir-jeux .btn-tout .court { display: inline; }
+}
+@container (max-height: 420px) {
+  #savoir-jeux { --h: clamp(24px, calc((100cqh - 9.8rem) / var(--rangs) - 1cqh), 60px); gap: 3px; }
+  #savoir-jeux .famille { padding: 1px 5px 3px; border-radius: 9px; }
+  #savoir-jeux .famille-tete { margin: 0 0 1px; }
+  #savoir-jeux .famille-nom { font-size: .72rem; line-height: 1.1; }
+  .reglages-joueur #savoir-jeux .btn-tout-famille { min-height: 20px; padding: 0 10px; font-size: .7rem; line-height: 1; }
+  #savoir-jeux .famille .packs { gap: 3px 5px; }
+  #savoir-jeux .reglage-tete { margin-bottom: 2px; }
+  #savoir-liste { gap: 4px; }
+  .reglages-joueur #savoir-jeux .pack span { font-size: clamp(.66rem, calc(var(--h) * .34), .95rem); line-height: 1; padding: 1px 2px; }
+}
+/* Écrans peu hauts (téléphone carré, paysage) : cartes de géographie plus serrées, pour tout voir sans défiler. */
+@media (max-height: 600px) {
+  .carte-savoir { gap: 5px; margin: 4px 0; }
+  .relier-col, .relier { gap: 4px; }
+  .relier-g, .relier-d { min-height: 34px; padding: 2px 6px; font-size: .9rem; }
+  .relier.avec-images .drapeau { width: 40px; height: 30px; }
+  .puce-lien { width: 22px; height: 22px; font-size: .8rem; }
+  .btn-option { min-height: 38px; padding: 3px 8px; }
+  .btn-savoir-ok, .savoir-actions .btn, .btn-indice { min-height: 38px; }
+  .ordre-pioche { gap: 4px; }
+  .ordre-el { min-height: 34px; padding: 2px 8px; font-size: .9rem; }
+  .ordre-cases { gap: 3px; }
+  .ordre-case { min-height: 30px; padding: 1px 6px; font-size: .9rem; }
+  .ordre-num { width: 20px; height: 20px; }
+  .ordre-sens { font-size: .75rem; line-height: 1.1; }
+  .classer { gap: 3px; }
+  .btn-col { min-height: 34px; font-size: .8rem !important; }
+  .drapeau.grand { width: 96px; height: 72px; }
+  .indices li { padding: 2px 6px; font-size: .9rem; }
+}
+/* Si la carte ne tient pas dans l'encadré (6 paires sur un téléphone carré), elle défile dans l'encadré
+   et « OK » reste toujours visible en bas (comme les boutons du tour, v6.8). */
+.tour .carte-savoir .btn-savoir-ok, .tour .carte-savoir .savoir-actions { position: sticky; bottom: 2px; z-index: 2; }
+.tour .carte-savoir .savoir-actions { background: #fff; padding-block: 2px; }
+.tour .carte-savoir .btn-savoir-ok { box-shadow: 0 4px 0 var(--encre), 0 0 0 6px #fff; }
+/* OK pas encore possible : bouton plein (pas transparent, il peut passer par-dessus la carte qui défile). */
+.carte-savoir .btn-savoir-ok:disabled, .carte-savoir .savoir-actions .btn:disabled { opacity: 1; background: #e4d9c6; color: #5e4a3a; text-shadow: none; box-shadow: 0 0 0 6px #fff; }
+/* Crédits (v7.0) : bouton du pied de page qui ressemble au lien « Mentions légales ». */
+.pied-bouton { font: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; min-height: 24px; }
+.credits-liste { text-align: left; padding-left: 20px; margin: 12px 0; line-height: 1.4; }
+.credits-liste a { color: var(--bleu); }
+/* Toucher sur la carte (v7.1) : la carte prend la largeur de la carte à jouer, sans dépasser la moitié de l'écran en hauteur. */
+.carte-geo { display: flex; justify-content: center; }
+.carte-geo svg { width: 100%; max-height: min(52vh, 520px); height: auto; background: #cfe7f5; border: 2px solid var(--encre); border-radius: 8px; touch-action: manipulation; }
+.carte-geo .zone { fill: #f3ead2; stroke: var(--encre); stroke-width: 1; vector-effect: non-scaling-stroke; cursor: pointer; }
+.carte-geo .zone.cible:hover, .carte-geo .zone.cible:focus-visible { fill: var(--jaune); outline: none; }
+.carte-geo .zone:focus-visible { stroke-width: 3; }
+.carte-geo .zone.bonne { fill: #3aa55c; }
+.carte-geo .zone.fausse { fill: #e3262a; }
+@media (max-height: 600px) { .carte-geo svg { max-height: 46vh; } }

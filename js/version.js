@@ -4,9 +4,16 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.55';
+  var VERSION = '7.0';
 
   var HISTORY = [
+    { v: '7.0', date: '2026-11-12', changes: [
+      "Nouvelle matière : la Géographie, avec 4 niveaux (Facile, Moyen, Difficile, Expert) ; chaque niveau a son propre contenu.",
+      "12 jeux au choix, rangés en 3 familles : France (numéros des départements, préfectures, régions, carte à toucher), Monde (capitales, drapeaux, pays voisins, monuments) et Nature (fleuves, montagnes, records de la Terre, climats et paysages).",
+      "Plusieurs façons de répondre : relier deux colonnes, choisir la bonne réponse, écrire la réponse (Difficile et Expert, sans compter les accents), remettre dans l'ordre, vrai ou faux, classer en deux colonnes. Le jeu corrige tout seul et lance le bon dé.",
+      "Carte à toucher : Facile, les régions de France ; Moyen, les départements sur la carte de leur région ; Difficile, les pays d'Europe ; Expert, les pays d'Afrique, d'Asie et Océanie ou des Amériques. Seules les zones assez grandes pour un doigt sont demandées.",
+      "Nouveau lien « Crédits » en bas de page : drapeaux flag-icons (licence MIT), cartes de France IGN (Licence ouverte), cartes du monde Natural Earth (domaine public)."
+    ] },
     { v: '6.55', date: '2026-11-12', changes: [
       "Partie rapide solo et défi du jour : avec « Français », les cartes peuvent aussi être de la grammaire (au niveau choisi), en plus de l'orthographe et de la conjugaison."
     ] },
