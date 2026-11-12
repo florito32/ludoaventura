@@ -58,6 +58,32 @@ test.describe('contenu de géographie', () => {
 });
 
 // Va jusqu'au plateau avec 1 joueur en Géographie : niveau et jeux donnés.
+test('écran des jeux (v7.2) : tuiles icône + nom, aucun nom coupé ni débordant du contour', async ({ page }) => {
+  await rapide(page);
+  await ouvrirNeuf(page);
+  await versReglages(page, 1);
+  await page.locator('#matieres input[value="geographie"]').check();
+  await valider(page);
+  await page.locator('#savoir-jeux').waitFor();
+  await page.locator('#btn-tout-savoir').click(); // état « choisi » (fond foncé) : mêmes dimensions
+  const pb = await page.locator('#savoir-liste .pack > span').evaluateAll((els) => els.map((el) => {
+    const r = el.getBoundingClientRect(), n = el.querySelector('.pack-nom').getBoundingClientRect();
+    const i = el.querySelector('.pack-icone').getBoundingClientRect();
+    return {
+      nom: el.textContent, debord: el.scrollWidth > el.clientWidth + 1 || el.scrollHeight > el.clientHeight + 1,
+      dehors: n.left < r.left + 1 || n.right > r.right - 1 || n.top < r.top || n.bottom > r.bottom || i.left < r.left || i.right > r.right,
+      lignes: Math.round(n.height / parseFloat(getComputedStyle(el.querySelector('.pack-nom')).lineHeight)),
+    };
+  }));
+  expect(pb).toHaveLength(12);
+  for (const t of pb) {
+    expect(t.debord, t.nom).toBe(false);
+    expect(t.dehors, t.nom).toBe(false);
+    expect(t.lignes, t.nom).toBeLessThanOrEqual(1); // le nom tient sur une ligne : pas de mot coupé
+  }
+  await pasDeDebordement(page);
+});
+
 async function versGeo(page, { niveau = 'facile', jeux = ['g04'], hasard = null } = {}) {
   await rapide(page);
   await ouvrirNeuf(page);

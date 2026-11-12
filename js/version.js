@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '7.1';
+  var VERSION = '7.2';
 
   var HISTORY = [
+    { v: '7.2', date: '2026-11-12', changes: [
+      "Géographie, choix des jeux : chaque jeu est une tuile avec son icône et son nom, plus aucun mot coupé par le contour. Sur téléphone, 2 jeux par ligne ; sur ordinateur et tablette en largeur, une famille par ligne."
+    ] },
     { v: '7.1', date: '2026-11-12', changes: [
       "Fin de partie : nouveau bouton « Retour à l’accueil », sous « Rejouer cette aventure » et « Nouvelle partie »."
     ] },

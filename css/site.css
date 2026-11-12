@@ -1550,6 +1550,33 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
   #savoir-liste { gap: 4px; }
   .reglages-joueur #savoir-jeux .pack span { font-size: clamp(.66rem, calc(var(--h) * .34), .95rem); line-height: 1; padding: 1px 2px; }
 }
+/* v7.2 (demande du 12/11/2026 : les noms étaient coupés par le contour) : chaque jeu est une tuile aux coins
+   arrondis (plus une pilule), l'icône et le nom dans deux blocs séparés, le nom jamais coupé au milieu d'un mot.
+   En largeur : 4 tuiles par ligne (une famille = une ligne), icône au-dessus du nom.
+   En hauteur (téléphone) : 2 tuiles par ligne, icône à gauche du nom, sur une seule ligne. */
+#savoir-jeux { --rangs: 3; --cols: 4; }
+#savoir-jeux .famille .packs { grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); }
+.reglages-joueur #savoir-jeux .pack span {
+  flex-direction: column; gap: 2px; border-radius: 14px; padding: 4px 6px; hyphens: manual;
+  overflow-wrap: normal; word-break: normal; line-height: 1.1;
+  font-size: clamp(.8rem, min(calc(var(--h) * .22), calc(var(--larg) / var(--cols) / 9)), 1.3rem);
+}
+#savoir-jeux .pack-icone { font-style: normal; font-size: 1.5em; line-height: 1; }
+#savoir-jeux .pack-nom { font-weight: 700; margin: 0; font-size: 1em; white-space: nowrap; }
+@container (max-aspect-ratio: 1/1) {
+  #savoir-jeux { --rangs: 6; --cols: 2; --h: clamp(30px, calc((100cqh - 13rem) / var(--rangs) - 1.2cqh), 72px); }
+  #savoir-jeux .famille .packs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .reglages-joueur #savoir-jeux .pack span {
+    flex-direction: row; justify-content: flex-start; gap: 8px; padding: 2px 10px; text-align: left;
+    font-size: clamp(.8rem, min(calc(var(--h) * .36), calc(var(--larg) / 2 / 10)), 1.2rem);
+  }
+  #savoir-jeux .pack-icone { font-size: 1.35em; }
+}
+@container (max-height: 420px) {
+  #savoir-jeux { --h: clamp(26px, calc((100cqh - 9.8rem) / var(--rangs) - 1cqh), 60px); }
+  .reglages-joueur #savoir-jeux .pack span { font-size: clamp(.68rem, min(calc(var(--h) * .34), calc(var(--larg) / var(--cols) / 10)), .95rem); padding: 1px 6px; gap: 5px; flex-direction: row; justify-content: center; }
+  #savoir-jeux .pack-icone { font-size: 1.2em; }
+}
 /* Écrans peu hauts (téléphone carré, paysage) : cartes de géographie plus serrées, pour tout voir sans défiler. */
 @media (max-height: 600px) {
   .carte-savoir { gap: 5px; margin: 4px 0; }
