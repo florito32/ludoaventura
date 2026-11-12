@@ -66,12 +66,20 @@
     difficile: 'Difficile : les nombres de 1 à 999, jusqu’à 3 signes.',
     expert: 'Expert : les nombres de 1 à 9999, jusqu’à 4 signes.'
   };
+  // Aide sous le niveau de conjugaison (v6.49) : quelques verbes du niveau (js/conjugaison.js).
+  var AIDES_CONJ = {
+    facile: 'Facile : les verbes de tous les jours (chanter, finir, être, avoir, faire…).',
+    moyen: 'Moyen : des verbes un peu moins courants (manger, réussir, pouvoir, écrire…).',
+    difficile: 'Difficile : des verbes qui changent d’écriture (appeler, jeter, payer, recevoir…).',
+    expert: 'Expert : des verbes rares ou pièges (céder, acquérir, résoudre, moudre…).'
+  };
   function mathsVides() { return { signes: [], nbSignes: [1], nombres: [], dizaines: [], centaines: [], milliers: [], niveau: 'facile' }; }
   function conjVide() { return { modes: [], temps: [], groupes: [], niveau: 'facile' }; }
   // Écran de l'étape 3 où se règle chaque chose qui manque.
+  // Conjugaison (v6.49) : modes, groupes et temps sur le même écran ('modes'), le niveau sur l'écran de la matière.
   function ecranDe(m) {
     if (m === 'matiere' || m === 'francais') return 'matiere';
-    if (m === 'mode' || m === 'temps' || m === 'tempsMode') return 'modes';
+    if (m === 'mode' || m === 'temps' || m === 'tempsMode' || m === 'groupe') return 'modes';
     if (m === 'pack') return 'packs'; // orthographe : écran des packs (v6.16)
     return 'reglages';
   }
@@ -86,7 +94,7 @@
     nbJoueurs: 1, aventure: A.LISTE[0], joueurs: [], choix: ['lea', 'tom', 'nour', 'malo'], actif: 0, regles: null,
     etapePrepa: 1, // écran de la préparation affiché (1 à 4), voir montrerEtape
     // Étape 3 en deux écrans par joueur (v5.8, choix de l'utilisateur) : 'matiere' puis 'reglages'.
-    // Conjugaison (v6.0) : trois écrans, 'matiere' → 'modes' → 'reglages'.
+    // Conjugaison (v6.0) : 'matiere' (avec le niveau) → 'modes' (modes, groupes et temps, un seul écran depuis la v6.49).
     sousEtape: 'matiere',
     packs: [[], [], [], []], carte: null,
     types: [[], [], [], []], // types de questions cochés par chaque joueur
@@ -479,13 +487,7 @@
       montrerEtape(3);
       return;
     }
-    // Conjugaison, deuxième écran : modes et temps choisis, on passe aux groupes et au niveau.
-    if (n === 3 && partie.sousEtape === 'modes') {
-      if (ecranDe(manque(partie.actif)) === 'modes') { reglagesComplets(partie.actif); return; }
-      partie.sousEtape = 'reglages';
-      montrerEtape(3);
-      return;
-    }
+    // Conjugaison : l'écran des modes, groupes et temps est le dernier (v6.49) : on passe au joueur suivant.
     if (n === 3 && !reglagesComplets(partie.actif)) return;
     if (n === 2 || n === 3) partie.sousEtape = 'matiere'; // le joueur suivant commence par sa matière
     if ((n === 2 || n === 3) && partie.actif < nb - 1) { partie.actif++; montrerEtape(n); return; }
@@ -497,7 +499,7 @@
     var n = partie.etapePrepa, nb = nbChoisi();
     // Étape 3 : des réglages on revient à la matière ; de la matière, aux réglages du joueur précédent.
     if (n === 3 && partie.sousEtape === 'reglages') {
-      partie.sousEtape = { conjugaison: 'modes', orthographe: 'packs' }[partie.matiere[partie.actif]] || 'matiere';
+      partie.sousEtape = { orthographe: 'packs' }[partie.matiere[partie.actif]] || 'matiere';
       montrerEtape(3);
       return;
     }
@@ -558,8 +560,9 @@
     $('nb-signes').querySelectorAll('.pack').forEach(function (l) { l.hidden = Number(l.querySelector('input').value) > maxS; });
     $('reglage-nb-signes').hidden = mat !== 'maths';
     $('reglages-ortho').hidden = mat !== 'orthographe';
-    $('reglages-conj').hidden = mat !== 'conjugaison';
     var cc = partie.conj[a];
+    $('reglage-niveau-conj').hidden = mat !== 'conjugaison';
+    $('niveau-conj-aide').textContent = AIDES_CONJ[cc.niveau] || '';
     $('modes-conj').querySelectorAll('input').forEach(function (i) { i.checked = cc.modes.indexOf(i.value) >= 0; });
     $('temps-conj').querySelectorAll('.mode-ligne').forEach(function (l) { l.hidden = cc.modes.indexOf(l.dataset.mode) === -1; });
     $('temps-conj-vide').hidden = cc.modes.length > 0;
@@ -604,18 +607,19 @@
     // Étape 3 : écran de la matière ou écran de ses réglages.
     var ecran = partie.sousEtape, surMatiere = ecran === 'matiere';
     if (ecran === 'modes' && mat !== 'conjugaison') ecran = partie.sousEtape = 'reglages';
+    if (ecran === 'reglages' && mat === 'conjugaison') ecran = partie.sousEtape = 'modes'; // plus d'écran « réglages » en conjugaison (v6.49)
     if (ecran === 'packs' && mat !== 'orthographe') ecran = partie.sousEtape = 'reglages';
     $('choix-matiere').hidden = !surMatiere;
     $('conj-temps').hidden = ecran !== 'modes';
     $('ortho-packs').hidden = ecran !== 'packs';
-    if (ecran !== 'reglages') { $('reglages-maths').hidden = $('reglages-ortho').hidden = $('reglages-conj').hidden = true; }
+    if (ecran !== 'reglages') { $('reglages-maths').hidden = $('reglages-ortho').hidden = true; }
     var NOMS_MATIERES = { maths: 'Mathématiques', orthographe: 'Orthographe', conjugaison: 'Conjugaison' };
     var sousTitre = surMatiere ? 'quelle matière ?' : NOMS_MATIERES[mat] +
-      (mat === 'conjugaison' ? (ecran === 'modes' ? ', les temps' : ', les verbes') : '') +
+      (mat === 'conjugaison' ? ', les réglages' : '') +
       (mat === 'orthographe' ? (ecran === 'packs' ? ', les thèmes' : ', les questions') : '');
     $('reglages-titre').innerHTML = '<img src="' + actif.image + '" alt="" width="200" height="220">' +
       actif.nom + ' (Joueur ' + (partie.actif + 1) + ') : ' + sousTitre;
-    $('btn-memes-reglages').hidden = nb < 2 || ecran !== 'reglages';
+    $('btn-memes-reglages').hidden = nb < 2 || (ecran !== 'reglages' && ecran !== 'modes'); // dernier écran du joueur
     sauver();
   }
 

@@ -215,6 +215,14 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 .reglage-aide { margin: 0; font-size: .9rem; color: var(--encre-douce); text-align: center; }
 .choix-matiere .packs { justify-content: center; }
 .reglages-joueur .choix-matiere .pack span { min-height: 52px; padding: 6px 22px; font-size: 1.15rem; }
+/* v6.49 : écran peu haut (téléphone carré, paysage) — Français + Orthographe/Conjugaison + niveau doivent tenir :
+   chaque titre à gauche de ses choix, boutons plus bas. */
+@container (max-height: 420px) {
+  .reglages-joueur .reglage.choix-matiere { gap: 8px; }
+  .choix-matiere .reglage-ligne { flex-direction: row; justify-content: center; gap: 4px 8px; }
+  .reglages-joueur .choix-matiere .pack span { min-height: 38px; padding: 2px 14px; font-size: 1rem; }
+  .choix-matiere .reglage-aide { width: 100%; font-size: .8rem; }
+}
 .reglage-ligne { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
 .reglage-ligne .reglage-titre { margin: 0; }
 .nombres .pack span { min-width: 44px; justify-content: center; padding: 4px 8px; }
@@ -410,10 +418,10 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
    les autres modes empilés à droite. Les boutons grandissent avec la place libre. */
 #conj-temps { height: 100%; display: flex; flex-direction: column; gap: clamp(4px, 1.6cqh, 14px); }
 #conj-temps .reglage { margin: 0; }
-#conj-temps .reglage-ligne { justify-content: center; }
+#conj-temps .reglage-ligne { justify-content: center; flex-wrap: nowrap; }
 /* Écran étroit : sans le mot « Modes » (les cadres le disent) ; très étroit : les 4 modes en 2 × 2. */
 @container (max-width: 520px) {
-  #conj-temps .reglage-ligne > .reglage-titre { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  #modes-conj-titre { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 }
 @container (max-width: 400px) {
   #modes-conj { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px 6px; width: 100%; }
@@ -421,7 +429,7 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 }
 #conj-temps > .reglage:last-child { flex: 1; min-height: 0; display: flex; flex-direction: column; }
 #temps-conj {
-  --ht: clamp(24px, calc((100cqh - 7rem) / 8 - 1cqh), 64px);
+  --ht: clamp(24px, calc((100cqh - 10rem) / 8 - 1cqh), 64px); /* v6.49 : place pour la ligne des groupes */
   flex: 1; min-height: 0; display: grid; gap: clamp(6px, 1.6cqi, 16px); align-content: safe center;
   grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); grid-template-rows: auto;
 }
@@ -440,14 +448,14 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
   border-radius: 12px; font-size: clamp(.74rem, min(calc(var(--ht) * .4), 3.2cqi), 1.25rem);
 }
 @container (max-aspect-ratio: 1/1) {
-  #temps-conj { --ht: clamp(24px, calc((100cqh - 16rem) / 8 - 1cqh), 64px); grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-columns: auto; }
+  #temps-conj { --ht: clamp(24px, calc((100cqh - 19rem) / 8 - 1cqh), 64px); grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-columns: auto; }
   #temps-conj .mode-ligne[data-mode="indicatif"] { grid-column: 1; grid-row: 1 / span 3; }
   #temps-conj .pack span { font-size: clamp(.78rem, min(calc(var(--ht) * .42), 5cqi), 1.25rem); }
 }
 /* Écran très bas (téléphone en paysage, format carré) : dans leur cadre, les 8 temps de l'indicatif
    et les 4 du subjonctif passent sur deux colonnes (4 lignes au plus). */
 @container (max-height: 380px) and (min-aspect-ratio: 1/1) {
-  #temps-conj { --ht: clamp(24px, calc((100cqh - 9rem) / 4 - 1cqh), 48px); }
+  #temps-conj { --ht: clamp(24px, calc((100cqh - 12rem) / 4 - 1cqh), 48px); }
   #temps-conj .mode-ligne { grid-column: auto; }
   #temps-conj [data-mode="indicatif"] .packs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   /* Indicatif | Subjonctif | Conditionnel au-dessus de l'Impératif. */
@@ -464,17 +472,9 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
   #temps-conj [data-mode="subjonctif"] .packs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
-/* Conjugaison, groupes et niveau : les 3 groupes sur une ligne, les 4 niveaux sur une ligne (2 × 2 en hauteur). */
-#reglages-conj { --rangs: 2; --cols: 4; --larg: min(100cqi, 900px); }
-#reglages-conj .reglage { display: flex; flex-direction: column; align-items: stretch; gap: clamp(6px, 3cqh, 28px); }
-#reglages-conj .reglage-ligne { flex-direction: column; align-items: stretch; gap: clamp(4px, 1.2cqh, 10px); }
-.reglages-joueur #reglages-conj .pack span { border-radius: 18px; }
-#groupes { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-#niveau-conj { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-@container (max-aspect-ratio: 1/1) {
-  #reglages-conj { --rangs: 3; --cols: 2; }
-  #niveau-conj { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
+/* Conjugaison (v6.49) : les groupes de verbes sur l'écran des temps, à côté des modes ; le niveau sur l'écran de la matière. */
+#conj-temps .conj-haut { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: clamp(4px, 1.2cqh, 10px) clamp(14px, 3cqi, 32px); }
+#groupes .pack span { min-width: 3.2em; justify-content: center; }
 
 /* 4. Aventures : la grille au-dessus, le résumé de l'aventure choisie en dessous. */
 .etape-aventure { display: flex; flex-direction: column; gap: 8px; overflow: hidden; }

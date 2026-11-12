@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.48';
+  var VERSION = '6.49';
 
   var HISTORY = [
+    { v: '6.49', date: '2026-11-12', changes: [
+      "Conjugaison : le niveau (Facile, Moyen, Difficile, Expert) se choisit tout de suite, sur l'écran de la matière, avec quelques verbes en exemple.",
+      "Conjugaison : les modes, les groupes de verbes et les temps se choisissent sur un seul écran. Il n'y a plus qu'une page de réglages avant la partie."
+    ] },
     { v: '6.48', date: '2026-11-12', changes: [
       "Aventura se joue maintenant toujours dans le navigateur, sur ordinateur, tablette, iPhone et Android : ce n'est plus une application à installer. Le bouton « Installer l'application » est retiré.",
       "Le jeu ne garde plus de copie hors ligne : il faut une connexion Internet. Les appareils qui avaient installé l'application reçoivent toujours la dernière version."

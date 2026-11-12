@@ -131,15 +131,16 @@ async function attendreJoueur(page, nom) {
 }
 
 // Écran 3 : Français → Conjugaison avec les temps, groupes et niveau donnés.
+// v6.49 : le niveau se choisit sur l'écran de la matière ; modes, groupes et temps sur un seul écran ensuite.
 async function conjugaison(page, { temps = ['indicatif.present'], groupes = [1], niveau = 'facile' } = {}) {
-  // v6.0 : écran des modes et des temps, puis écran des groupes et du niveau.
-  await matiere(page, 'conjugaison');
-  for (const m of [...new Set(temps.map((t) => t.split('.')[0]))]) await page.locator('#modes-conj input[value="' + m + '"]').check();
-  for (const t of temps) await page.locator('#temps-conj input[value="' + t + '"]').check();
-  await valider(page);
-  await page.locator('#reglages-conj').waitFor();
-  for (const g of groupes) await page.locator('#groupes input[value="' + g + '"]').check();
+  await page.locator('#matieres input[value="francais"]').check();
+  await page.locator('#francais input[value="conjugaison"]').check();
   await page.locator('#niveau-conj input[value="' + niveau + '"]').check();
+  await valider(page);
+  await page.locator('#conj-temps').waitFor();
+  for (const m of [...new Set(temps.map((t) => t.split('.')[0]))]) await page.locator('#modes-conj input[value="' + m + '"]').check();
+  for (const g of groupes) await page.locator('#groupes input[value="' + g + '"]').check();
+  for (const t of temps) await page.locator('#temps-conj input[value="' + t + '"]').check();
 }
 
 module.exports = { repondre, valider, cocherJoueur, orthographe, maths, conjugaison, matiere, versReglages, lancer, lancerLeDe, lancerPartie, rapide, attendreJoueur, cocherTout, ouvrirNeuf };

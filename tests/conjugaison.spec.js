@@ -97,16 +97,29 @@ async function tient(page) {
   expect(r.corps).toBeLessThanOrEqual(1);
 }
 
-test('conjugaison en 3 écrans : matière → modes et leurs temps seulement → groupes et niveau ; tout tient sans défiler', async ({ page }) => {
+// v6.49 (demande du 12/11/2026) : le niveau sur l'écran de la matière, puis UN seul écran : modes, groupes et temps.
+test('conjugaison en 2 écrans : matière et niveau → modes, groupes et temps ; tout tient sans défiler', async ({ page }) => {
   await preparer(page);
   await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : quelle matière ?');
-  await matiere(page, 'conjugaison');
-  // Écran 2 : les 4 modes ; aucun temps tant qu'aucun mode n'est choisi.
-  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Conjugaison, les temps');
+  await expect(page.locator('#niveau-conj')).toBeHidden();
+  await page.locator('#matieres input[value="francais"]').check();
+  await page.locator('#francais input[value="conjugaison"]').check();
+  // Écran 1 : le niveau apparaît tout de suite sous Orthographe / Conjugaison, Facile coché, avec une aide.
+  await expect(page.locator('#niveau-conj input')).toHaveCount(4);
+  await expect(page.locator('#niveau-conj input[value="facile"]')).toBeChecked();
+  await expect(page.locator('#niveau-conj-aide')).toContainText('Facile');
+  await page.locator('#niveau-conj label', { hasText: 'Expert' }).click();
+  await expect(page.locator('#niveau-conj-aide')).toContainText('Expert');
+  await tient(page);
+  await valider(page);
+  // Écran 2 : les 4 modes et les 3 groupes ; aucun temps tant qu'aucun mode n'est choisi.
+  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Conjugaison, les réglages');
   await expect(page.locator('#modes-conj input')).toHaveCount(4);
+  await expect(page.locator('#groupes input')).toHaveCount(3);
+  await expect(page.locator('#groupes')).toBeVisible();
+  await expect(page.locator('#niveau-conj')).toBeHidden();
   await expect(page.locator('#temps-conj input:visible')).toHaveCount(0);
   await expect(page.locator('#temps-conj-vide')).toBeVisible();
-  await expect(page.locator('#groupes')).toBeHidden();
   await valider(page);
   await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir au moins un mode.');
   // Subjonctif : seulement ses 4 temps.
@@ -114,7 +127,7 @@ test('conjugaison en 3 écrans : matière → modes et leurs temps seulement →
   await expect(page.locator('#temps-conj input:visible')).toHaveCount(4);
   await expect(page.getByRole('checkbox', { name: 'Subjonctif imparfait' })).toBeVisible();
   await expect(page.getByRole('checkbox', { name: 'Indicatif présent' })).toBeHidden();
-  // Tous les modes : les 16 temps tiennent sans défiler.
+  // Tous les modes et tous les groupes : les 16 temps tiennent sans défiler.
   for (const m of ['Indicatif', 'Conditionnel', 'Impératif']) await page.locator('#modes-conj label', { hasText: m }).click();
   await expect(page.locator('#temps-conj input:visible')).toHaveCount(16);
   await tient(page);
@@ -128,25 +141,18 @@ test('conjugaison en 3 écrans : matière → modes et leurs temps seulement →
   // Un mode choisi sans temps bloque (v6.3) : on retire Subjonctif et Impératif.
   for (const m of ['Subjonctif', 'Impératif']) await page.locator('#modes-conj label', { hasText: m }).click();
   await valider(page);
-  // Écran 3 : groupes et niveau.
-  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Conjugaison, les verbes');
-  await expect(page.locator('#groupes input')).toHaveCount(3);
-  await expect(page.locator('#niveau-conj input')).toHaveCount(4);
-  await expect(page.locator('#modes-conj')).toBeHidden();
-  await tient(page);
-  await valider(page);
   await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir au moins un groupe de verbes.');
-  // Retour : écran des temps (choix gardés), puis la matière.
-  await page.getByRole('button', { name: /Retour/ }).click();
-  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Conjugaison, les temps');
-  await expect(page.getByRole('checkbox', { name: 'Indicatif futur simple' })).toBeChecked();
+  // Retour : la matière, niveau gardé ; Valider revient sur l'écran des temps, choix gardés.
   await page.getByRole('button', { name: /Retour/ }).click();
   await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : quelle matière ?');
+  await expect(page.locator('#niveau-conj input[value="expert"]')).toBeChecked();
   await valider(page);
-  await valider(page);
-  await page.locator('#groupes input[value="2"]').check();
+  await expect(page.getByRole('checkbox', { name: 'Indicatif futur simple' })).toBeChecked();
+  await page.locator('#groupes label', { hasText: '2e' }).click();
+  await tient(page);
   await valider(page);
   await expect(page.getByRole('button', { name: 'Lancer la partie' })).toBeVisible();
+  expect(await page.evaluate(() => window.Aventura.partie.conj[0])).toMatchObject({ groupes: [2], niveau: 'expert', temps: ['indicatif.futur'] });
 });
 
 // Bug v6.2 (ligne 84 du backlog) : Indicatif + Conditionnel choisis, un temps de l'indicatif seulement → ça passait.
@@ -156,13 +162,14 @@ test('chaque mode choisi doit avoir au moins un temps', async ({ page }) => {
   await page.locator('#modes-conj label', { hasText: 'Indicatif' }).click();
   await page.locator('#modes-conj label', { hasText: 'Conditionnel' }).click();
   await page.getByRole('checkbox', { name: 'Indicatif futur simple' }).check();
+  await page.locator('#groupes input[value="1"]').check();
   await valider(page);
   await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir au moins un temps du conditionnel.');
-  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Conjugaison, les temps');
+  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Conjugaison, les réglages');
   await expect(page.getByRole('checkbox', { name: 'Conditionnel présent' })).toBeFocused();
   await page.getByRole('checkbox', { name: 'Conditionnel passé' }).check();
   await valider(page);
-  await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Conjugaison, les verbes');
+  await expect(page.getByRole('button', { name: 'Lancer la partie' })).toBeVisible();
 });
 
 // Joue la carte affichée : bonne réponse ou réponse fausse.
