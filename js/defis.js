@@ -6,7 +6,8 @@
 // (hypothèse à valider), et rouvrir le jeu redonne le même défi.
 //  - Aventure : prise parmi celles de la difficulté du niveau (Facile → aventure facile, Moyen → moyenne,
 //    Difficile et Expert → difficile), ce qui fixe l'objectif (js/aventures.js).
-//  - Français : le jour décide Orthographe ou Conjugaison (un jour sur deux environ, au hasard de la date).
+//  - Français : le jour décide Orthographe, Conjugaison ou Grammaire (un jour sur trois environ chacune, v6.55).
+//  - Grammaire : 4 jeux du niveau tirés selon le jour (js/grammaire.js).
 //  - Orthographe : le niveau choisit les mots et les questions. Séries de mots (v6.50) : Facile = séries 1 et 2
 //    du fichier des cartes, Moyen = série 3, Difficile = série 4, Expert = série 5 (outils/mots_niveaux.py).
 // Module sans interface : utilisable dans la page (window.Defis) et dans les tests Node.
@@ -15,6 +16,7 @@
 
   var A = typeof module !== 'undefined' && module.exports ? require('./aventures.js') : racine.Aventures;
   var P = typeof module !== 'undefined' && module.exports ? require('./aventuriers.js') : racine.Aventuriers;
+  var G = typeof module !== 'undefined' && module.exports ? require('./grammaire.js') : racine.Grammaire;
 
   var NIVEAUX = [{ id: 'facile', nom: 'Facile' }, { id: 'moyen', nom: 'Moyen' }, { id: 'difficile', nom: 'Difficile' }, { id: 'expert', nom: 'Expert' }];
   var DIFFICULTE_AVENTURE = { facile: 'facile', moyen: 'moyen', difficile: 'difficile', expert: 'difficile' };
@@ -88,6 +90,9 @@
       var regl = { niveau: niveau, signes: signes, nbSignes: m.nbSignes.slice(), nombres: [], dizaines: [], centaines: [], milliers: [] };
       Object.keys(m.groupes).forEach(function (g) { regl[g] = trierN(prendre(VALEURS[g], m.groupes[g], r)); });
       d.maths = regl;
+    } else if (matiere === 'grammaire') {
+      // v6.55 : 4 jeux de grammaire au hasard, au niveau choisi.
+      d.gram = { niveau: niveau, jeux: prendre(G.JEUX.map(function (j) { return j.id; }), 4, r) };
     } else if (matiere === 'conjugaison') {
       var c = CONJ[niveau];
       var temps = prendre(c.temps, c.combien, r);
@@ -119,8 +124,9 @@
     var aventure = aventures[Math.floor(hasard(base + '|aventure|' + niveau)() * aventures.length)];
     var aventuriers = prendre(P.LISTE.map(function (p) { return p.id; }), nb, hasard(base + '|aventuriers'));
 
-    // Français : orthographe ou conjugaison, selon le jour.
-    var matiere = choix.matiere === 'maths' ? 'maths' : (hasard(base + '|francais')() < 0.5 ? 'orthographe' : 'conjugaison');
+    // Français : orthographe, conjugaison ou grammaire (v6.55), selon le jour.
+    var tf = hasard(base + '|francais')();
+    var matiere = choix.matiere === 'maths' ? 'maths' : (tf < 1 / 3 ? 'orthographe' : tf < 2 / 3 ? 'conjugaison' : 'grammaire');
     var r = hasard(base + '|' + matiere + '|' + niveau);
     var d = { jour: jour, type: type, niveau: niveau, matiere: matiere, choixMatiere: choix.matiere === 'maths' ? 'maths' : 'francais',
       aventure: aventure.id, aventuriers: aventuriers, joueurs: nb };

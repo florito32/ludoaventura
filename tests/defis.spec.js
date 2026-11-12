@@ -28,6 +28,7 @@ test.describe('tirage des défis', () => {
   });
 
   test('réglages complets pour chaque matière et niveau (un an de défis)', () => {
+    const vuesFr = new Set(); // v6.55 : orthographe, conjugaison et grammaire reviennent toutes
     for (let k = 0; k < 365; k++) {
       const j = new Date(Date.UTC(2026, 0, 1 + k)).toISOString().slice(0, 10);
       for (const niveau of ['facile', 'moyen', 'difficile', 'expert']) {
@@ -37,11 +38,14 @@ test.describe('tirage des défis', () => {
         expect(m.maths.nombres.length).toBeGreaterThan(0);
         if (niveau === 'expert') expect(m.maths.milliers).toEqual([1000]);
         const f = D.generer(j, { type: 'solo', matiere: 'francais', niveau }, { typesDisponibles: ['nombre', 'voyelles', 'consonnes', 'syllabes', 'nb-voyelles', 'nb-consonnes', 'combien-lettre', 'manquante', 'melange', 'genre', 'muettes', 'ecrire', 'pluriel'] });
-        expect(['orthographe', 'conjugaison']).toContain(f.matiere);
-        if (f.matiere === 'conjugaison') { expect(f.conj.temps.length).toBeGreaterThan(0); expect(f.conj.modes.length).toBeGreaterThan(0); }
+        expect(['orthographe', 'conjugaison', 'grammaire']).toContain(f.matiere);
+        vuesFr.add(f.matiere);
+        if (f.matiere === 'grammaire') { expect(f.gram.niveau).toBe(niveau); expect(f.gram.jeux).toHaveLength(4); }
+        else if (f.matiere === 'conjugaison') { expect(f.conj.temps.length).toBeGreaterThan(0); expect(f.conj.modes.length).toBeGreaterThan(0); }
         else { expect(f.packs).toHaveLength(3); expect(f.types.length).toBeGreaterThan(0); expect(f.types).not.toContain('epeler'); }
       }
     }
+    expect([...vuesFr].sort()).toEqual(['conjugaison', 'grammaire', 'orthographe']);
   });
 });
 
