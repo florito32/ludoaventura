@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '7.5';
+  var VERSION = '7.6';
 
   var HISTORY = [
+    { v: '7.6', date: '2026-11-12', changes: [
+      "Histoire : nouvelle période, la Préhistoire, avec 5 jeux et 4 niveaux — Nos ancêtres (frise, lieux de découverte, Qui suis-je ?), Paléolithique ou Néolithique ? (classer, vrai ou faux, ordre des périodes), Grottes ornées (Lascaux, Chauvet, Cosquer…), Outils et inventions, Mégalithes (menhirs, dolmens, Carnac, Stonehenge)."
+    ] },
     { v: '7.5', date: '2026-11-12', changes: [
       "Nouvelle matière : l’Histoire, avec 4 niveaux (Facile, Moyen, Difficile, Expert) ; chaque niveau a son propre contenu. Les jeux sont rangés par période.",
       "Première période : l’Antiquité et ses 12 jeux — dieux grecs et romains, dieux égyptiens, pharaons, héros et mythes, frise de Rome, la Gaule, monuments antiques, les 7 merveilles du monde, écritures anciennes, chiffres romains, vie quotidienne, Jeux olympiques antiques.",

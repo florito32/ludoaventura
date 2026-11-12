@@ -43,6 +43,17 @@ test.describe('contenu d\'histoire', () => {
     }
   });
 
+  test('Préhistoire (v7.6) : 5 jeux, chacun a du contenu à chaque niveau', () => {
+    const pre = S.jeuxDe('histoire').filter((j) => j.famille === 'pre');
+    expect(pre.map((j) => j.id)).toEqual(['p01', 'p02', 'p03', 'p04', 'p07']);
+    for (const j of pre) for (const n of NIVEAUX) expect(j.series.some((s) => S.utilisable(s, n)), j.id + ' ' + n).toBe(true);
+    // Une frise se range dans le bon ordre.
+    S.regler(() => 0.9);
+    const c = S.generer({ jeux: ['p01'], niveau: 'moyen' }, 'histoire');
+    S.regler();
+    if (c.format === 'F') expect(c.bonnes[0]).toContain('Toumaï');
+  });
+
   test('chiffres romains : conversions justes', () => {
     expect(H.romain(4)).toBe('IV');
     expect(H.romain(14)).toBe('XIV');
@@ -91,14 +102,17 @@ test('écran des réglages : la matière Histoire, son niveau, ses jeux rangés 
   await page.locator('#niveau-savoir label', { hasText: 'Moyen' }).click();
   await valider(page);
   await expect(page.locator('#reglages-titre')).toContainText('Histoire, les jeux');
-  // Seule l'Antiquité a ses jeux pour l'instant ; les familles de Géographie sont cachées.
-  await expect(page.locator('#savoir-liste .famille:not([hidden])')).toHaveCount(1);
-  await expect(page.locator('#savoir-liste .famille:not([hidden]) .famille-nom')).toContainText('Antiquité');
-  await expect(page.locator('#savoir-liste .famille:not([hidden]) input')).toHaveCount(12);
+  // Préhistoire (v7.6) puis Antiquité, dans l'ordre ; les familles de Géographie sont cachées.
+  const familles = page.locator('#savoir-liste .famille:not([hidden])');
+  await expect(familles).toHaveCount(2);
+  await expect(familles.nth(0).locator('.famille-nom')).toContainText('Préhistoire');
+  await expect(familles.nth(0).locator('input')).toHaveCount(5);
+  await expect(familles.nth(1).locator('.famille-nom')).toContainText('Antiquité');
+  await expect(familles.nth(1).locator('input')).toHaveCount(12);
   await valider(page);
   await expect(page.locator('#packs-alerte')).toContainText('au moins un jeu');
   // « Tout » de la période = toute la période choisie.
-  await page.locator('#savoir-liste .famille:not([hidden]) .btn-tout-famille').click();
+  await familles.nth(1).locator('.btn-tout-famille').click();
   const p = await page.evaluate(() => window.Aventura.partie.savoirs[0].histoire);
   expect(p.niveau).toBe('moyen');
   expect(p.jeux).toHaveLength(12);
@@ -110,7 +124,7 @@ test('écran des réglages : la matière Histoire, son niveau, ses jeux rangés 
       dehors: n.left < r.left + 1 || n.right > r.right - 1 || n.top < r.top || n.bottom > r.bottom,
       lignes: Math.round(n.height / parseFloat(getComputedStyle(el.querySelector('.pack-nom')).lineHeight)) };
   }));
-  expect(pb).toHaveLength(12);
+  expect(pb).toHaveLength(17);
   for (const x of pb) { expect(x.debord, x.nom).toBe(false); expect(x.dehors, x.nom).toBe(false); expect(x.lignes, x.nom).toBeLessThanOrEqual(1); }
   await pasDeDebordement(page);
   await valider(page);
