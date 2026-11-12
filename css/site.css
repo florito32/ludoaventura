@@ -230,6 +230,11 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
   .reglages-joueur .choix-matiere .pack span { min-height: 34px; padding: 1px 11px; font-size: .95rem; }
   .choix-matiere .packs { gap: 4px 6px; }
 }
+/* Histoire (4 matières) : sur un écran peu haut (téléphone carré), le titre « Matière » est masqué à l'œil
+   (le titre de l'écran dit déjà « quelle matière ? ») mais reste lu par les lecteurs d'écran. */
+@container (max-height: 420px) {
+  #matiere-titre { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+}
 .reglage-ligne { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
 .reglage-ligne .reglage-titre { margin: 0; }
 .nombres .pack span { min-width: 44px; justify-content: center; padding: 4px 8px; }

@@ -194,8 +194,9 @@ test('homophones : mauvais choix → correction, « J\'ai compris », dé FAIBLE
   await expect(page.locator('#carte-reponse')).toContainText('Ce n’est pas ça');
   await expect(page.locator('#carte-reponse')).toContainText(c.phrase.replace('_', c.bonne));
   await expect(page.locator('.gram-bouton.fausse')).toHaveText(faux);
-  await page.getByRole('button', { name: 'J’ai compris' }).click();
+  // Le dé FAIBLE est choisi dès la correction (lu avant « J'ai compris » : ensuite, le dé roule et peut changer d'état).
   expect(await de(page)).toBe('faible');
+  await page.getByRole('button', { name: 'J’ai compris' }).click();
 });
 
 test('nature du mot : le mot en couleur, les natures du niveau Moyen', async ({ page }) => {
