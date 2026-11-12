@@ -66,7 +66,7 @@ test('écran des jeux (v7.2) : tuiles icône + nom, aucun nom coupé ni déborda
   await valider(page);
   await page.locator('#savoir-jeux').waitFor();
   await page.locator('#btn-tout-savoir').click(); // état « choisi » (fond foncé) : mêmes dimensions
-  const pb = await page.locator('#savoir-liste .pack > span').evaluateAll((els) => els.map((el) => {
+  const pb = await page.locator('#savoir-liste .famille:not([hidden]) .pack > span').evaluateAll((els) => els.map((el) => {
     const r = el.getBoundingClientRect(), n = el.querySelector('.pack-nom').getBoundingClientRect();
     const i = el.querySelector('.pack-icone').getBoundingClientRect();
     return {
@@ -120,12 +120,12 @@ test('écran des réglages : la matière Géographie, son niveau, ses jeux en 3 
   await valider(page);
   await expect(page.locator('#reglages-titre')).toContainText('Géographie, les jeux');
   await expect(page.locator('#savoir-liste .famille:not([hidden])')).toHaveCount(3);
-  await expect(page.locator('#savoir-liste input')).toHaveCount(12);
+  await expect(page.locator('#savoir-liste .famille:not([hidden]) input')).toHaveCount(12);
   // Rien de choisi : « Valider » refuse.
   await valider(page);
   await expect(page.locator('#packs-alerte')).toContainText('au moins un jeu');
   await page.locator('#btn-tout-savoir').click();
-  for (const i of await page.locator('#savoir-liste input').all()) await expect(i).toBeChecked();
+  for (const i of await page.locator('#savoir-liste .famille:not([hidden]) input').all()) await expect(i).toBeChecked();
   const p = await page.evaluate(() => window.Aventura.partie.savoirs[0].geographie);
   expect(p.niveau).toBe('expert');
   expect(p.jeux).toHaveLength(12);

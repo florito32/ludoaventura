@@ -4,9 +4,14 @@
 (function () {
   'use strict';
 
-  var VERSION = '7.4';
+  var VERSION = '7.5';
 
   var HISTORY = [
+    { v: '7.5', date: '2026-11-12', changes: [
+      "Nouvelle matière : l’Histoire, avec 4 niveaux (Facile, Moyen, Difficile, Expert) ; chaque niveau a son propre contenu. Les jeux sont rangés par période.",
+      "Première période : l’Antiquité et ses 12 jeux — dieux grecs et romains, dieux égyptiens, pharaons, héros et mythes, frise de Rome, la Gaule, monuments antiques, les 7 merveilles du monde, écritures anciennes, chiffres romains, vie quotidienne, Jeux olympiques antiques.",
+      "Nouveau format « Qui suis-je ? » : des indices dévoilés un à un ; 6 points si l’on trouve au premier indice, puis de moins en moins, sans lancer de dé."
+    ] },
     { v: '7.4', date: '2026-11-12', changes: [
       "Carte à toucher : on peut zoomer sur la carte seule (pas la page) pour toucher plus précisément : en pinçant à deux doigts, avec la molette ou avec les boutons + et −. Un doigt glissé déplace la carte zoomée ; le bouton ⤢ remet toute la carte."
     ] },

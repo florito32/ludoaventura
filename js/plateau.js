@@ -318,15 +318,18 @@
       majAventuriers();
     });
     var liste = $('savoir-liste');
-    window.Geographie.FAMILLES.forEach(function (f) {
-      var jeux = jeuxProposes('geographie').filter(function (j) { return j.famille === f.id; });
-      if (!jeux.length) return;
-      // v7.2 : tuile = icône + nom court, chacun dans sa propre balise (mise en page en CSS, sans couper les mots).
-      var b = famille(f, jeux.map(function (j) {
-        return { id: j.id, nom: j.nom, court: '<i class="pack-icone" aria-hidden="true">' + j.icone + '</i><b class="pack-nom">' + (j.court || j.nom) + '</b>' };
-      }), 'jeu');
-      b.dataset.matiere = 'geographie';
-      liste.appendChild(b);
+    // Histoire : les familles sont les périodes ; « Tout » d'une période = choisir la période.
+    [['geographie', window.Geographie.FAMILLES], ['histoire', window.Histoire.FAMILLES]].forEach(function (m) {
+      m[1].forEach(function (f) {
+        var jeux = jeuxProposes(m[0]).filter(function (j) { return j.famille === f.id; });
+        if (!jeux.length) return;
+        // v7.2 : tuile = icône + nom court, chacun dans sa propre balise (mise en page en CSS, sans couper les mots).
+        var b = famille(f, jeux.map(function (j) {
+          return { id: j.id, nom: j.nom, court: '<i class="pack-icone" aria-hidden="true">' + j.icone + '</i><b class="pack-nom">' + (j.court || j.nom) + '</b>' };
+        }), 'jeu');
+        b.dataset.matiere = m[0];
+        liste.appendChild(b);
+      });
     });
     liste.addEventListener('change', function () {
       var r = reglageSavoir(partie.actif);
