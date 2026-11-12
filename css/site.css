@@ -1696,11 +1696,20 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .credits-liste { text-align: left; padding-left: 20px; margin: 12px 0; line-height: 1.4; }
 .credits-liste a { color: var(--bleu); }
 /* Toucher sur la carte (v7.1) : la carte prend la largeur de la carte à jouer, sans dépasser la moitié de l'écran en hauteur. */
-.carte-geo { display: flex; justify-content: center; }
-.carte-geo svg { width: 100%; max-height: min(52vh, 520px); height: auto; background: #cfe7f5; border: 2px solid var(--encre); border-radius: 8px; touch-action: manipulation; }
+.carte-geo { display: flex; justify-content: center; position: relative; }
+/* v7.2 : touch-action none → pincer sur la carte la zoome elle seule (pas la page) ; on fait défiler la page à côté. */
+.carte-geo svg { width: 100%; max-height: min(52vh, 520px); height: auto; background: #cfe7f5; border: 2px solid var(--encre); border-radius: 8px; touch-action: none; user-select: none; -webkit-user-select: none; }
+.carte-geo.zoomee svg { cursor: grab; }
+/* Boutons de zoom dans le coin de la carte : 44 px (taille de cible recommandée, WCAG 2.5.5). */
+.carte-zoom { position: absolute; top: 6px; right: 6px; display: flex; flex-direction: column; gap: 6px; }
+.carte-savoir .carte-zoom .btn-zoom { width: 44px; height: 44px; border-radius: 12px; border: 2px solid var(--encre); background: #fffaf0; color: var(--encre);
+  font: 800 1.5rem/1 system-ui, sans-serif; display: grid; place-items: center; padding: 0; box-shadow: 0 2px 0 var(--encre); }
+.carte-savoir .carte-zoom .btn-zoom[hidden] { display: none; }
+.carte-savoir .carte-zoom .btn-zoom:disabled { opacity: .4; box-shadow: none; }
+.btn-zoom:focus-visible { outline: 3px solid var(--rouge); outline-offset: 2px; }
 .carte-geo .zone { fill: #f3ead2; stroke: var(--encre); stroke-width: 1; vector-effect: non-scaling-stroke; cursor: pointer; }
 .carte-geo .zone.cible:hover, .carte-geo .zone.cible:focus-visible { fill: var(--jaune); outline: none; }
 .carte-geo .zone:focus-visible { stroke-width: 3; }
 .carte-geo .zone.bonne { fill: #3aa55c; }
 .carte-geo .zone.fausse { fill: #e3262a; }
-@media (max-height: 600px) { .carte-geo svg { max-height: 46vh; } }
+@media (max-height: 600px) { .carte-geo svg { max-height: 46vh; } .carte-savoir .carte-zoom .btn-zoom { width: 36px; height: 36px; font-size: 1.2rem; } .carte-zoom { gap: 4px; } }
