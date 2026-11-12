@@ -60,9 +60,12 @@
   var TOUS_TYPES = [].concat.apply([], Q.FAMILLES.map(function (f) { return f.types; }));
   var G = window.Grammaire;
   var TOUS_JEUX = G.JEUX.map(function (j) { return j.id; });
+  // Phonèmes (v7.3) : catégories de sons, sons et petits jeux (js/phonemes.js).
+  var PH = window.Phonemes;
+  var TOUS_JEUX_PH = PH.JEUX.map(function (j) { return j.id; });
   var K = window.Calcul;
   var V = window.Conjugaison;
-  var MATIERES = ['maths', 'orthographe', 'conjugaison', 'grammaire', 'geographie', 'histoire']; // matières jouables (Français → Orthographe, Conjugaison ou Grammaire ; Géographie, Histoire)
+  var MATIERES = ['maths', 'orthographe', 'conjugaison', 'grammaire', 'phonemes', 'geographie', 'histoire']; // matières jouables (Français → Orthographe, Conjugaison ou Grammaire ; Géographie, Histoire)
   // Géographie et Histoire (v7.0) : jeux et niveau de chaque joueur, pour chacune des deux matières (js/savoirs.js).
   var SV = window.Savoirs;
   var MATIERES_SAVOIR = ['geographie', 'histoire'];
@@ -107,12 +110,16 @@
   function conjVide() { return { modes: [], temps: [], groupes: [], niveau: 'facile' }; }
   // Grammaire (v6.54) : niveau et petits jeux, tous cochés au départ (hypothèse à valider).
   function gramVide() { return { niveau: 'facile', jeux: TOUS_JEUX.slice() }; }
+  // Phonèmes (v7.3) : pas de niveau ; catégories et sons à choisir (rien au départ, comme les temps),
+  // jeux tous cochés au départ (comme la grammaire).
+  function phonVide() { return { categories: [], sons: [], jeux: TOUS_JEUX_PH.slice() }; }
   // Écran de l'étape 3 où se règle chaque chose qui manque.
   // Conjugaison (v6.49) : modes, groupes et temps sur le même écran ('modes'), le niveau sur l'écran de la matière.
   function ecranDe(m) {
     if (m === 'matiere' || m === 'francais') return 'matiere';
     if (m === 'mode' || m === 'temps' || m === 'tempsMode' || m === 'groupe') return 'modes';
     if (m === 'pack') return 'packs'; // orthographe : écran des packs (v6.16)
+    if (m === 'categorie' || m === 'son' || m === 'sonCat') return 'sons'; // phonèmes (v7.3)
     return 'reglages';
   }
 
@@ -139,6 +146,8 @@
     conj: [conjVide(), conjVide(), conjVide(), conjVide()],
     // Réglages de grammaire de chaque joueur (v6.54) : { niveau, jeux }.
     gram: [gramVide(), gramVide(), gramVide(), gramVide()],
+    // Réglages de phonèmes de chaque joueur (v7.3) : { categories, sons, jeux }.
+    phon: [phonVide(), phonVide(), phonVide(), phonVide()],
     // Orthographe : séries de mots imposées par un défi du jour (v6.37) ou une partie rapide ; null = partie libre,
     // où les séries viennent du niveau choisi par le joueur (orthoNiveau, v6.50).
     mots: [null, null, null, null],
@@ -369,6 +378,65 @@
       $('packs-alerte').textContent = '';
       majAventuriers();
     });
+    // Phonèmes (v7.3) : les catégories en haut, puis un cadre par catégorie avec ses sons sur deux colonnes :
+    // « [p] pomme », les lettres du son en gras dans le mot d'exemple. Écran des jeux ensuite.
+    PH.CATEGORIES.forEach(function (c) { choix($('cats-phon'), 'checkbox', 'cat-phon', c.id, c.nom); });
+    PH.CATEGORIES.forEach(function (c) {
+      var cadre = document.createElement('div');
+      cadre.dataset.cat = c.id;
+      cadre.className = 'mode-ligne phon-cadre';
+      cadre.setAttribute('role', 'group');
+      cadre.setAttribute('aria-labelledby', 'phon-nom-' + c.id);
+      cadre.innerHTML = '<div class="phon-tete"><span class="mode-nom" id="phon-nom-' + c.id + '">' + c.nom + '</span>' +
+        '<button type="button" class="btn-tout btn-tout-famille" data-cat="' + c.id + '"></button></div>';
+      var box = document.createElement('div');
+      box.className = 'packs phon-sons';
+      c.sons.forEach(function (s) {
+        var e = PH.exemple(s.id);
+        // Nom lu : « Son p, comme dans pomme » (le symbole seul serait mal lu par les lecteurs d'écran).
+        choix(box, 'checkbox', 'son-phon', s.id,
+          '<b class="phon-api">[' + s.api + ']</b> <i class="phon-ex">' + e.avant + '<strong>' + e.son + '</strong>' + e.apres + '</i>',
+          'Son ' + s.api + ', comme dans ' + s.mot);
+      });
+      cadre.appendChild(box);
+      $('sons-phon').appendChild(cadre);
+    });
+    PH.JEUX.forEach(function (jx) { choix($('jeux-phon'), 'checkbox', 'jeu-phon', jx.id, jx.nom, jx.nom); });
+    ['cats-phon', 'sons-phon', 'jeux-phon'].forEach(function (id) {
+      $(id).addEventListener('change', function () {
+        var ph = partie.phon[partie.actif];
+        $('packs-alerte').textContent = '';
+        ph.categories = valeursCochees($('cats-phon'));
+        // Une catégorie retirée emporte ses sons.
+        ph.sons = valeursCochees($('sons-phon')).filter(function (s) { return ph.categories.indexOf(PH.SONS[s].categorie) >= 0; });
+        ph.jeux = valeursCochees($('jeux-phon'));
+        majAventuriers();
+      });
+    });
+    // « Tout sélectionner » : toutes les catégories et tous les sons (ou rien) ; « Tout » d'un cadre : ses sons.
+    $('btn-tout-sons').addEventListener('click', function () {
+      var ph = partie.phon[partie.actif], plein = ph.sons.length === PH.TOUS_SONS.length;
+      ph.categories = plein ? [] : PH.CATEGORIES.map(function (c) { return c.id; });
+      ph.sons = plein ? [] : PH.TOUS_SONS.slice();
+      $('packs-alerte').textContent = '';
+      majAventuriers();
+    });
+    $('sons-phon').addEventListener('click', function (e) {
+      var b = e.target.closest('.btn-tout-famille');
+      if (!b) return;
+      var ph = partie.phon[partie.actif], ids = PH.CATEGORIES.filter(function (c) { return c.id === b.dataset.cat; })[0].sons.map(function (s) { return s.id; });
+      var plein = ids.every(function (id) { return ph.sons.indexOf(id) >= 0; });
+      var reste = ph.sons.filter(function (id) { return ids.indexOf(id) < 0; });
+      ph.sons = plein ? reste : reste.concat(ids);
+      $('packs-alerte').textContent = '';
+      majAventuriers();
+    });
+    $('btn-tout-phon').addEventListener('click', function () {
+      var ph = partie.phon[partie.actif];
+      ph.jeux = ph.jeux.length === TOUS_JEUX_PH.length ? [] : TOUS_JEUX_PH.slice();
+      $('packs-alerte').textContent = '';
+      majAventuriers();
+    });
     ['modes-conj', 'temps-conj', 'groupes', 'niveau-conj'].forEach(function (id) {
       $(id).addEventListener('change', function () {
         var c = partie.conj[partie.actif];
@@ -464,6 +532,7 @@
         partie.conj[k] = JSON.parse(JSON.stringify(partie.conj[a]));
         partie.orthoNiveau[k] = partie.orthoNiveau[a];
         partie.gram[k] = JSON.parse(JSON.stringify(partie.gram[a]));
+        partie.phon[k] = JSON.parse(JSON.stringify(partie.phon[a]));
         partie.savoirs[k] = JSON.parse(JSON.stringify(partie.savoirs[a]));
       }
       montrerEtape(4);
@@ -501,6 +570,13 @@
       return null;
     }
     if (m === 'grammaire') return partie.gram[i].jeux.length ? null : 'jeu';
+    if (m === 'phonemes') {
+      var ph = partie.phon[i];
+      if (!ph.categories.length) return 'categorie';
+      if (!ph.sons.length) return 'son';
+      if (catSansSon(i)) return 'sonCat';
+      return ph.jeux.length ? null : 'jeuPh';
+    }
     if (!partie.packs[i].length) return 'pack';
     if (!partie.types[i].length) return 'type';
     return null;
@@ -513,10 +589,20 @@
     })[0];
     return id ? V.MODES.filter(function (m) { return m.id === id; })[0] : null;
   }
+  // Première catégorie de sons choisie par le joueur i sans aucun de ses sons (ou null).
+  function catSansSon(i) {
+    var ph = partie.phon[i];
+    return PH.CATEGORIES.filter(function (c) {
+      return ph.categories.indexOf(c.id) >= 0 && !c.sons.some(function (s) { return ph.sons.indexOf(s.id) >= 0; });
+    })[0] || null;
+  }
   // Message et endroit où mettre le focus pour chaque chose qui manque.
   var MANQUES = {
     matiere: ['choisir une matière.', 'matieres'],
-    francais: ['choisir Orthographe, Conjugaison ou Grammaire.', 'francais'],
+    francais: ['choisir Orthographe, Conjugaison, Grammaire ou Phonèmes.', 'francais'],
+    categorie: ['choisir au moins une catégorie de sons.', 'cats-phon'],
+    son: ['choisir au moins un son.', 'sons-phon'],
+    jeuPh: ['choisir au moins un jeu.', 'jeux-phon'],
     jeu: ['choisir au moins un jeu.', 'jeux-gram'],
     mode: ['choisir au moins un mode.', 'modes-conj'],
     temps: ['choisir au moins un temps.', 'temps-conj'],
@@ -542,6 +628,13 @@
       var md = modeSansTemps(i);
       alerte.textContent = nom + ' (Joueur ' + (i + 1) + ') doit choisir au moins un temps ' + md.oral + '.';
       $('temps-conj').querySelector('[data-mode="' + md.id + '"] input').focus({ preventScroll: true });
+      return false;
+    }
+    if (m === 'sonCat') {
+      // Une catégorie choisie sans aucun son : on la nomme et on va sur ses sons (v7.3).
+      var ct = catSansSon(i);
+      alerte.textContent = nom + ' (Joueur ' + (i + 1) + ') doit choisir au moins un son dans « ' + ct.nom + ' ».';
+      $('sons-phon').querySelector('[data-cat="' + ct.id + '"] input').focus({ preventScroll: true });
       return false;
     }
     alerte.textContent = nom + ' (Joueur ' + (i + 1) + ') doit ' + MANQUES[m][0];
@@ -598,13 +691,14 @@
     if (n === 3 && partie.sousEtape === 'matiere') {
       var m = manque(partie.actif);
       if (ecranDe(m) === 'matiere') { reglagesComplets(partie.actif); return; }
-      partie.sousEtape = { conjugaison: 'modes', orthographe: 'packs' }[partie.matiere[partie.actif]] || 'reglages';
+      partie.sousEtape = { conjugaison: 'modes', orthographe: 'packs', phonemes: 'sons' }[partie.matiere[partie.actif]] || 'reglages';
       montrerEtape(3);
       return;
     }
     // Orthographe, deuxième écran : les packs choisis, on passe aux questions.
-    if (n === 3 && partie.sousEtape === 'packs') {
-      if (ecranDe(manque(partie.actif)) === 'packs') { reglagesComplets(partie.actif); return; }
+    // Phonèmes (v7.3) : les sons choisis, on passe aux jeux.
+    if (n === 3 && (partie.sousEtape === 'packs' || partie.sousEtape === 'sons')) {
+      if (ecranDe(manque(partie.actif)) === partie.sousEtape) { reglagesComplets(partie.actif); return; }
       partie.sousEtape = 'reglages';
       montrerEtape(3);
       return;
@@ -621,11 +715,11 @@
     var n = partie.etapePrepa, nb = nbChoisi();
     // Étape 3 : des réglages on revient à la matière ; de la matière, aux réglages du joueur précédent.
     if (n === 3 && partie.sousEtape === 'reglages') {
-      partie.sousEtape = { orthographe: 'packs' }[partie.matiere[partie.actif]] || 'matiere';
+      partie.sousEtape = { orthographe: 'packs', phonemes: 'sons' }[partie.matiere[partie.actif]] || 'matiere';
       montrerEtape(3);
       return;
     }
-    if (n === 3 && (partie.sousEtape === 'modes' || partie.sousEtape === 'packs')) { partie.sousEtape = 'matiere'; montrerEtape(3); return; }
+    if (n === 3 && (partie.sousEtape === 'modes' || partie.sousEtape === 'packs' || partie.sousEtape === 'sons')) { partie.sousEtape = 'matiere'; montrerEtape(3); return; }
     if (n === 3 && partie.actif > 0) { partie.actif--; partie.sousEtape = 'reglages'; montrerEtape(3); return; }
     if (n === 4) partie.sousEtape = 'reglages';
     if (n === 1 && partie.modif) { if (verifierReglages()) reprendreApresModif(); return; }
@@ -664,7 +758,7 @@
     $('reglages-joueur').className = 'etape-corps reglages-joueur joueur-' + couleur;
     $('reglages-titre').className = 'legende-joueur joueur-' + couleur;
     // Matière choisie : seuls ses réglages s'affichent.
-    var a = partie.actif, mat = partie.matiere[a], fr = partie.francais[a] || mat === 'orthographe' || mat === 'conjugaison' || mat === 'grammaire';
+    var a = partie.actif, mat = partie.matiere[a], fr = partie.francais[a] || mat === 'orthographe' || mat === 'conjugaison' || mat === 'grammaire' || mat === 'phonemes';
     $('matieres').querySelectorAll('input').forEach(function (i) { i.checked = i.value === 'francais' ? !!fr : i.value === mat; });
     $('francais').querySelectorAll('input').forEach(function (i) { i.checked = i.value === mat; });
     $('reglage-francais').hidden = !fr;
@@ -683,6 +777,28 @@
     $('reglage-nb-signes').hidden = mat !== 'maths';
     $('reglages-ortho').hidden = mat !== 'orthographe';
     $('reglages-gram').hidden = mat !== 'grammaire';
+    $('reglages-phon').hidden = mat !== 'phonemes';
+    // Phonèmes (v7.3) : catégories, cadres des catégories choisies, sons et jeux cochés, boutons « Tout ».
+    var ph = partie.phon[a];
+    $('cats-phon').querySelectorAll('input').forEach(function (i) { i.checked = ph.categories.indexOf(i.value) >= 0; });
+    $('sons-phon').querySelectorAll('.phon-cadre').forEach(function (l) { l.hidden = ph.categories.indexOf(l.dataset.cat) < 0; });
+    $('sons-phon').dataset.nb = ph.categories.length;
+    $('sons-phon-vide').hidden = ph.categories.length > 0;
+    $('sons-phon').querySelectorAll('input').forEach(function (i) { i.checked = ph.sons.indexOf(i.value) >= 0; });
+    function libelleTout(b, plein, quoi) {
+      b.innerHTML = plein ? '<span class="long">Tout désélectionner</span><span class="court">Aucun</span>'
+        : '<span class="long">Tout sélectionner</span><span class="court">Tout</span>';
+      b.setAttribute('aria-label', (plein ? 'Tout désélectionner : ' : 'Tout sélectionner : ') + quoi);
+    }
+    libelleTout($('btn-tout-sons'), ph.sons.length === PH.TOUS_SONS.length, 'tous les sons');
+    libelleTout($('btn-tout-phon'), ph.jeux.length === TOUS_JEUX_PH.length, 'jeux de phonèmes');
+    $('sons-phon').querySelectorAll('.btn-tout-famille').forEach(function (b) {
+      var c = PH.CATEGORIES.filter(function (x) { return x.id === b.dataset.cat; })[0];
+      var plein = c.sons.every(function (s) { return ph.sons.indexOf(s.id) >= 0; });
+      b.textContent = plein ? 'Aucun' : 'Tout';
+      b.setAttribute('aria-label', (plein ? 'Tout désélectionner : ' : 'Tout sélectionner : ') + c.nom.toLowerCase());
+    });
+    $('jeux-phon').querySelectorAll('input').forEach(function (i) { i.checked = ph.jeux.indexOf(i.value) >= 0; });
     // Géographie et Histoire (v7.0) : niveau, puis les jeux de la matière (les familles des autres matières sont cachées).
     var rs = reglageSavoir(a);
     $('reglage-niveau-savoir').hidden = !rs;
@@ -766,14 +882,17 @@
     if (ecran === 'modes' && mat !== 'conjugaison') ecran = partie.sousEtape = 'reglages';
     if (ecran === 'reglages' && mat === 'conjugaison') ecran = partie.sousEtape = 'modes'; // plus d'écran « réglages » en conjugaison (v6.49)
     if (ecran === 'packs' && mat !== 'orthographe') ecran = partie.sousEtape = 'reglages';
+    if (ecran === 'sons' && mat !== 'phonemes') ecran = partie.sousEtape = 'reglages';
     $('choix-matiere').hidden = !surMatiere;
     $('conj-temps').hidden = ecran !== 'modes';
     $('ortho-packs').hidden = ecran !== 'packs';
-    if (ecran !== 'reglages') { $('reglages-maths').hidden = $('reglages-ortho').hidden = $('reglages-gram').hidden = $('savoir-jeux').hidden = true; }
-    var NOMS_MATIERES = { maths: 'Mathématiques', orthographe: 'Orthographe', conjugaison: 'Conjugaison', grammaire: 'Grammaire', geographie: 'Géographie', histoire: 'Histoire' };
+    $('phon-sons').hidden = ecran !== 'sons';
+    if (ecran !== 'reglages') { $('reglages-maths').hidden = $('reglages-ortho').hidden = $('reglages-gram').hidden = $('reglages-phon').hidden = $('savoir-jeux').hidden = true; }
+    var NOMS_MATIERES = { maths: 'Mathématiques', orthographe: 'Orthographe', conjugaison: 'Conjugaison', grammaire: 'Grammaire', phonemes: 'Phonèmes', geographie: 'Géographie', histoire: 'Histoire' };
     var sousTitre = surMatiere ? 'quelle matière ?' : NOMS_MATIERES[mat] +
       (mat === 'conjugaison' ? ', les réglages' : '') + (mat === 'grammaire' || estSavoir(mat) ? ', les jeux' : '') +
-      (mat === 'orthographe' ? (ecran === 'packs' ? ', les thèmes' : ', les questions') : '');
+      (mat === 'orthographe' ? (ecran === 'packs' ? ', les thèmes' : ', les questions') : '') +
+      (mat === 'phonemes' ? (ecran === 'sons' ? ', les sons' : ', les jeux') : '');
     $('reglages-titre').innerHTML = '<img src="' + actif.image + '" alt="" width="200" height="220">' +
       actif.nom + ' (Joueur ' + (partie.actif + 1) + ') : ' + sousTitre;
     $('btn-memes-reglages').hidden = nb < 2 || (ecran !== 'reglages' && ecran !== 'modes'); // dernier écran du joueur
@@ -840,6 +959,7 @@
       return cj;
     }
     if (mat === 'grammaire') return carteGrammaire(j, gr);
+    if (mat === 'phonemes') return cartePhonemes(j, partie.phon[j.index]);
     var choisis = partie.types[j.index];
     for (var essai = 0; essai < 400; essai++) {
       if (!j.tas.length) j.tas = melanger(cartesDuJoueur(j.index));
@@ -892,6 +1012,23 @@
     vus.push(c.cle); if (vus.length > 20) vus.shift();
     c.type = 'grammaire';
     c.packNom = titre + ' · ' + G.jeu(id).nom;
+    return c;
+  }
+
+  // ---------- Phonèmes (v7.3) ----------
+  // Un jeu tiré au hasard parmi ceux du joueur, sur un de ses sons ; les dernières cartes vues (phonVus)
+  // ne reviennent pas tout de suite. Si un jeu ne peut rien faire avec ces sons, un autre est tiré.
+  // La carte se joue comme une carte de grammaire (réponse touchée dans la carte, js/grammaire-carte.js).
+  function cartePhonemes(j, ph) {
+    var jeux = (ph.jeux || []).filter(function (id) { return TOUS_JEUX_PH.indexOf(id) >= 0; });
+    if (!jeux.length) jeux = TOUS_JEUX_PH;
+    var vus = j.phonVus || (j.phonVus = []);
+    var ordre = melanger(jeux.slice()), c = null;
+    for (var k = 0; k < ordre.length && !c; k++) c = PH.generer(ordre[k], ph.sons, Math.random, vus);
+    if (!c) c = PH.generer(ordre[0], PH.TOUS_SONS, Math.random, vus);
+    vus.push(c.cle); if (vus.length > 20) vus.shift();
+    c.type = 'grammaire';
+    c.packNom = 'Phonèmes · ' + PH.jeu(c.jeu).nom;
     return c;
   }
 
@@ -1329,6 +1466,8 @@
   function orthoSaisie(c) { return !!(c && c.question && c.question.saisie); }
   // Carte de grammaire (v6.54) : réponse touchée dans la carte (js/grammaire-carte.js), corrigée par le jeu.
   function estGram(c) { return !!(c && c.type === 'grammaire'); }
+  // Moteur d'une telle carte : la grammaire, ou les phonèmes (v7.3, même affichage, mêmes gestes).
+  function moduleGram(c) { return c && c.module === 'phonemes' ? PH : G; }
 
   function montrerGram(c) {
     $('carte-titre').textContent = c.packNom;
@@ -1345,9 +1484,10 @@
     if (c.reponseDonnee == null) { rep.hidden = true; rep.className = 'carte-reponse'; return; }
     rep.hidden = false;
     rep.className = 'carte-reponse ' + (c.juste ? 'juste' : 'fausse');
-    var sol = G.solution(c);
-    if (c.jeu === 'relier') {
-      rep.textContent = c.juste ? 'Bonne réponse ! Toutes les paires sont justes.' : 'Ce n\u2019est pas ça : ' + c.reponseDonnee + '. Les bonnes paires : ' + sol;
+    var sol = moduleGram(c).solution(c);
+    if (c.jeu === 'relier' || c.jeu === 'trier') {
+      rep.textContent = c.juste ? 'Bonne réponse ! ' + (c.jeu === 'trier' ? 'Tous les mots sont bien rangés.' : 'Toutes les paires sont justes.')
+        : 'Ce n\u2019est pas ça : ' + c.reponseDonnee + '. ' + (c.jeu === 'trier' ? 'Les bonnes colonnes : ' : 'Les bonnes paires : ') + sol;
     } else if (c.jeu === 'phrase') {
       rep.textContent = c.juste ? 'Bonne réponse ! ' + sol : 'Ce n\u2019est pas ça. La bonne phrase : ' + sol;
     } else {
@@ -1359,7 +1499,7 @@
     var r = partie.regles, c = partie.carte;
     if (!r || r.etape !== 'repondre' || !estGram(c) || c.reponseDonnee != null) return;
     c.reponseDonnee = texte;
-    c.juste = G.juste(c, reponse);
+    c.juste = moduleGram(c).juste(c, reponse);
     c.attente = !c.juste;
     c.choisi = null;
     montrerGram(c);
@@ -2130,7 +2270,7 @@
       choix: partie.choix, packs: partie.packs, types: partie.types, actif: partie.actif,
       matiere: partie.matiere, francais: partie.francais, maths: partie.maths, conj: partie.conj,
       etapePrepa: partie.etapePrepa, sousEtape: partie.sousEtape, modif: !!partie.modif,
-      mots: partie.mots, orthoNiveau: partie.orthoNiveau, gram: partie.gram, defi: partie.defi, avantDefi: partie.avantDefi || null, rapide: partie.rapide,
+      mots: partie.mots, orthoNiveau: partie.orthoNiveau, gram: partie.gram, phon: partie.phon, defi: partie.defi, avantDefi: partie.avantDefi || null, rapide: partie.rapide,
       savoirs: partie.savoirs
     };
     if (partie.regles && partie.joueurs.length) {
@@ -2165,6 +2305,13 @@
       // Grammaire (v6.54) : sauvegarde d'avant → tout coché, niveau Facile.
       if (d.gram) partie.gram = d.gram.map(function (g) {
         return { niveau: G.niveauValide(g && g.niveau), jeux: ((g && g.jeux) || []).filter(function (id) { return TOUS_JEUX.indexOf(id) >= 0; }) };
+      });
+      // Phonèmes (v7.3) : seuls les sons, catégories et jeux qui existent encore.
+      if (d.phon) partie.phon = d.phon.map(function (x) {
+        x = x || {};
+        return { categories: (x.categories || []).filter(function (id) { return PH.CATEGORIES.some(function (c) { return c.id === id; }); }),
+          sons: (x.sons || []).filter(function (id) { return PH.SONS[id]; }),
+          jeux: (x.jeux || []).filter(function (id) { return TOUS_JEUX_PH.indexOf(id) >= 0; }) };
       });
       partie.defi = d.jeu ? d.defi || null : null;
       partie.avantDefi = d.avantDefi || null;

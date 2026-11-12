@@ -4,9 +4,15 @@
 (function () {
   'use strict';
 
-  var VERSION = '7.2';
+  var VERSION = '7.3';
 
   var HISTORY = [
+    { v: '7.3', date: '2026-11-12', changes: [
+      "Nouveau en français : les Phonèmes, à côté de l'orthographe, de la conjugaison et de la grammaire (sans niveau).",
+      "Écran des sons, présenté comme celui des temps de conjugaison : on choisit Consonnes, Voyelles ou Semi-voyelles, puis les sons, rangés sur deux colonnes ; chaque son a son symbole entre crochets et un mot simple, lettres du son soulignées ([p] pomme, [ʃ] chat…). Bouton « Tout sélectionner ».",
+      "6 petits jeux au choix : Complète le mot (choisir la bonne écriture du son), Quel son ? (les lettres en couleur, 3 sons au choix), L'intrus (le mot qui n'a pas le son), Où est le son ? (au début, au milieu, à la fin), Relier son ↔ écriture, Trier les mots (deux sons proches, deux colonnes).",
+      "Le jeu corrige tout seul et lance le bon dé ; « Écouter » lit la carte (« le son du début de pomme »)."
+    ] },
     { v: '7.2', date: '2026-11-12', changes: [
       "Géographie, choix des jeux : chaque jeu est une tuile avec son icône et son nom, plus aucun mot coupé par le contour. Sur téléphone, 2 jeux par ligne ; sur ordinateur et tablette en largeur, une famille par ligne."
     ] },
