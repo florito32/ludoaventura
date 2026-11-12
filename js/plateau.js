@@ -55,10 +55,14 @@
   var TOUS_PACKS = PACKS.map(function (p) { return p.id; });
   var Q = window.Questions;
   // « Épeler à l'oral » n'existe plus (demande du 10/11/2026) : toutes les questions s'écrivent.
-  var TOUS_TYPES = Q.TYPES.map(function (t) { return t.id; });
+  // v6.54 : « Le ou la ? » et « Au pluriel » passent en grammaire (choix de l'utilisateur) : les questions
+  // d'orthographe sont celles des familles de l'écran des questions (js/questions.js → FAMILLES).
+  var TOUS_TYPES = [].concat.apply([], Q.FAMILLES.map(function (f) { return f.types; }));
+  var G = window.Grammaire;
+  var TOUS_JEUX = G.JEUX.map(function (j) { return j.id; });
   var K = window.Calcul;
   var V = window.Conjugaison;
-  var MATIERES = ['maths', 'orthographe', 'conjugaison']; // matières jouables (Français → Orthographe ou Conjugaison)
+  var MATIERES = ['maths', 'orthographe', 'conjugaison', 'grammaire']; // matières jouables (Français → Orthographe, Conjugaison ou Grammaire)
   // Aide sous le niveau de calcul (v6.14) : nombres possibles et nombre de signes maximum.
   var AIDES_NIVEAU = {
     facile: 'Facile : les tables de 1 à 10, 1 signe (2 × 8, 2 + 8, 16 ÷ 2…).',
@@ -84,6 +88,8 @@
   };
   function mathsVides() { return { signes: [], nbSignes: [1], nombres: [], dizaines: [], centaines: [], milliers: [], niveau: 'facile' }; }
   function conjVide() { return { modes: [], temps: [], groupes: [], niveau: 'facile' }; }
+  // Grammaire (v6.54) : niveau et petits jeux, tous cochés au départ (hypothèse à valider).
+  function gramVide() { return { niveau: 'facile', jeux: TOUS_JEUX.slice() }; }
   // Écran de l'étape 3 où se règle chaque chose qui manque.
   // Conjugaison (v6.49) : modes, groupes et temps sur le même écran ('modes'), le niveau sur l'écran de la matière.
   function ecranDe(m) {
@@ -114,6 +120,8 @@
     maths: [mathsVides(), mathsVides(), mathsVides(), mathsVides()],
     // Réglages de conjugaison de chaque joueur (v5.8) : temps (« mode.temps »), groupes 1 à 3, niveau.
     conj: [conjVide(), conjVide(), conjVide(), conjVide()],
+    // Réglages de grammaire de chaque joueur (v6.54) : { niveau, jeux }.
+    gram: [gramVide(), gramVide(), gramVide(), gramVide()],
     // Orthographe : séries de mots imposées par un défi du jour (v6.37) ou une partie rapide ; null = partie libre,
     // où les séries viennent du niveau choisi par le joueur (orthoNiveau, v6.50).
     mots: [null, null, null, null],
@@ -280,6 +288,24 @@
       partie.orthoNiveau[partie.actif] = valeursCochees($('niveau-ortho'))[0] || 'facile';
       majAventuriers();
     });
+    // Grammaire (v6.54) : niveau sur l'écran de la matière, jeux sur l'écran suivant (bouton « Tout » / « Aucun »).
+    G.NIVEAUX.forEach(function (nv) { choix($('niveau-gram'), 'radio', 'niveau-gram', nv.id, nv.nom); });
+    $('niveau-gram').addEventListener('change', function () {
+      partie.gram[partie.actif].niveau = valeursCochees($('niveau-gram'))[0] || 'facile';
+      majAventuriers();
+    });
+    G.JEUX.forEach(function (jx) { choix($('jeux-gram'), 'checkbox', 'jeu-gram', jx.id, jx.nom, jx.nom); });
+    $('jeux-gram').addEventListener('change', function () {
+      $('packs-alerte').textContent = '';
+      partie.gram[partie.actif].jeux = valeursCochees($('jeux-gram'));
+      majAventuriers();
+    });
+    $('btn-tout-gram').addEventListener('click', function () {
+      var g = partie.gram[partie.actif];
+      g.jeux = g.jeux.length === TOUS_JEUX.length ? [] : TOUS_JEUX.slice();
+      $('packs-alerte').textContent = '';
+      majAventuriers();
+    });
     ['modes-conj', 'temps-conj', 'groupes', 'niveau-conj'].forEach(function (id) {
       $(id).addEventListener('change', function () {
         var c = partie.conj[partie.actif];
@@ -374,6 +400,7 @@
         partie.maths[k] = JSON.parse(JSON.stringify(partie.maths[a]));
         partie.conj[k] = JSON.parse(JSON.stringify(partie.conj[a]));
         partie.orthoNiveau[k] = partie.orthoNiveau[a];
+        partie.gram[k] = JSON.parse(JSON.stringify(partie.gram[a]));
       }
       montrerEtape(4);
     });
@@ -400,6 +427,7 @@
       if (!partie.conj[i].groupes.length) return 'groupe';
       return null;
     }
+    if (m === 'grammaire') return partie.gram[i].jeux.length ? null : 'jeu';
     if (!partie.packs[i].length) return 'pack';
     if (!partie.types[i].length) return 'type';
     return null;
@@ -415,7 +443,8 @@
   // Message et endroit où mettre le focus pour chaque chose qui manque.
   var MANQUES = {
     matiere: ['choisir une matière.', 'matieres'],
-    francais: ['choisir Orthographe ou Conjugaison.', 'francais'],
+    francais: ['choisir Orthographe, Conjugaison ou Grammaire.', 'francais'],
+    jeu: ['choisir au moins un jeu.', 'jeux-gram'],
     mode: ['choisir au moins un mode.', 'modes-conj'],
     temps: ['choisir au moins un temps.', 'temps-conj'],
     groupe: ['choisir au moins un groupe de verbes.', 'groupes'],
@@ -579,6 +608,7 @@
     $('nb-signes').querySelectorAll('.pack').forEach(function (l) { l.hidden = Number(l.querySelector('input').value) > maxS; });
     $('reglage-nb-signes').hidden = mat !== 'maths';
     $('reglages-ortho').hidden = mat !== 'orthographe';
+    $('reglages-gram').hidden = mat !== 'grammaire';
     var cc = partie.conj[a];
     $('reglage-niveau-conj').hidden = mat !== 'conjugaison';
     var on = partie.orthoNiveau[a] || 'facile';
@@ -586,6 +616,16 @@
     $('niveau-ortho').querySelectorAll('input').forEach(function (i) { i.checked = i.value === on; });
     $('niveau-ortho-aide').textContent = AIDES_ORTHO[on];
     $('niveau-conj-aide').textContent = AIDES_CONJ[cc.niveau] || '';
+    // Grammaire (v6.54).
+    var gr = partie.gram[a];
+    $('reglage-niveau-gram').hidden = mat !== 'grammaire';
+    $('niveau-gram').querySelectorAll('input').forEach(function (i) { i.checked = i.value === gr.niveau; });
+    $('niveau-gram-aide').textContent = G.AIDES[gr.niveau] || '';
+    $('jeux-gram').querySelectorAll('input').forEach(function (i) { i.checked = gr.jeux.indexOf(i.value) >= 0; });
+    var pleinG = gr.jeux.length === TOUS_JEUX.length;
+    $('btn-tout-gram').innerHTML = pleinG ? '<span class="long">Tout désélectionner</span><span class="court">Aucun</span>'
+      : '<span class="long">Tout sélectionner</span><span class="court">Tout</span>';
+    $('btn-tout-gram').setAttribute('aria-label', (pleinG ? 'Tout désélectionner' : 'Tout sélectionner') + ' : jeux de grammaire');
     $('modes-conj').querySelectorAll('input').forEach(function (i) { i.checked = cc.modes.indexOf(i.value) >= 0; });
     $('temps-conj').querySelectorAll('.mode-ligne').forEach(function (l) { l.hidden = cc.modes.indexOf(l.dataset.mode) === -1; });
     $('temps-conj-vide').hidden = cc.modes.length > 0;
@@ -635,10 +675,10 @@
     $('choix-matiere').hidden = !surMatiere;
     $('conj-temps').hidden = ecran !== 'modes';
     $('ortho-packs').hidden = ecran !== 'packs';
-    if (ecran !== 'reglages') { $('reglages-maths').hidden = $('reglages-ortho').hidden = true; }
-    var NOMS_MATIERES = { maths: 'Mathématiques', orthographe: 'Orthographe', conjugaison: 'Conjugaison' };
+    if (ecran !== 'reglages') { $('reglages-maths').hidden = $('reglages-ortho').hidden = $('reglages-gram').hidden = true; }
+    var NOMS_MATIERES = { maths: 'Mathématiques', orthographe: 'Orthographe', conjugaison: 'Conjugaison', grammaire: 'Grammaire' };
     var sousTitre = surMatiere ? 'quelle matière ?' : NOMS_MATIERES[mat] +
-      (mat === 'conjugaison' ? ', les réglages' : '') +
+      (mat === 'conjugaison' ? ', les réglages' : '') + (mat === 'grammaire' ? ', les jeux' : '') +
       (mat === 'orthographe' ? (ecran === 'packs' ? ', les thèmes' : ', les questions') : '');
     $('reglages-titre').innerHTML = '<img src="' + actif.image + '" alt="" width="200" height="220">' +
       actif.nom + ' (Joueur ' + (partie.actif + 1) + ') : ' + sousTitre;
@@ -700,6 +740,7 @@
       cj.packNom = 'Conjugaison · ' + V.NIVEAUX.filter(function (n) { return n.id === cr.niveau; })[0].nom;
       return cj;
     }
+    if (mat === 'grammaire') return carteGrammaire(j, partie.gram[j.index]);
     var choisis = partie.types[j.index];
     for (var essai = 0; essai < 400; essai++) {
       if (!j.tas.length) j.tas = melanger(cartesDuJoueur(j.index));
@@ -716,6 +757,42 @@
     }
     c.question = Q.trouver('ecrire'); // filet de sécurité (ne devrait pas servir)
     c.params = null;
+    return c;
+  }
+
+  // ---------- Grammaire (v6.54) ----------
+  // Un jeu tiré au hasard parmi ceux du joueur. « Au pluriel » et « Le ou la ? » sont les questions
+  // d'orthographe (js/questions.js) posées sur un mot des séries du niveau, tous thèmes mêlés.
+  // Les dernières cartes vues (gramVus) ne reviennent pas tout de suite.
+  function niveauNom(n) { return (G.NIVEAUX.filter(function (x) { return x.id === n; })[0] || G.NIVEAUX[0]).nom; }
+  function motsGrammaire(niveau, questionId, mots) {
+    var series = mots || motsDuNiveau(niveau), q = Q.trouver(questionId), liste = [];
+    PACKS.forEach(function (p) {
+      Object.keys(p.niveaux).forEach(function (s) {
+        if (series.indexOf(Number(s)) === -1) return;
+        p.niveaux[s].forEach(function (m) { if (C.INFOS[m] && q.possible(m, C.INFOS[m]) && liste.indexOf(m) < 0) liste.push(m); });
+      });
+    });
+    return liste;
+  }
+  function carteGrammaire(j, g) {
+    var niveau = G.niveauValide(g.niveau);
+    var jeux = (g.jeux || []).filter(function (id) { return TOUS_JEUX.indexOf(id) >= 0; });
+    if (!jeux.length) jeux = TOUS_JEUX;
+    var id = jeux[Math.floor(Math.random() * jeux.length)];
+    var vus = j.gramVus || (j.gramVus = []);
+    var titre = 'Grammaire · ' + niveauNom(niveau);
+    if (G.jeu(id).mot) {
+      var mots = motsGrammaire(niveau, id, partie.mots[j.index]).filter(function (m) { return vus.indexOf(m) < 0; });
+      if (!mots.length) mots = motsGrammaire(niveau, id, partie.mots[j.index]);
+      var mot = mots[Math.floor(Math.random() * mots.length)];
+      vus.push(mot); if (vus.length > 20) vus.shift();
+      return { pack: 'grammaire', packNom: titre, mot: mot, question: Q.trouver(id), params: null };
+    }
+    var c = G.generer(id, niveau, Math.random, vus);
+    vus.push(c.cle); if (vus.length > 20) vus.shift();
+    c.type = 'grammaire';
+    c.packNom = titre + ' · ' + G.jeu(id).nom;
     return c;
   }
 
@@ -1017,6 +1094,9 @@
     } else if (r.etape === 'repondre' && aSaisir(partie.carte)) {
       // Calcul : le joueur écrit sa réponse dans la carte, le jeu la corrige (pas de maître du jeu).
       annoncer(j.nom + ' écrit sa réponse puis valide.');
+    } else if (r.etape === 'repondre' && estGram(partie.carte)) {
+      // Grammaire (v6.54) : le joueur touche sa réponse dans la carte, le jeu la corrige.
+      annoncer(j.nom + ' touche sa réponse dans la carte.');
     } else if (r.etape === 'repondre') {
       consigne.textContent = 'La réponse de ' + j.nom + ' est-elle bonne ?';
       bouton('Bonne réponse', 'btn-bonne', function () { R.repondre(r, true); reagir(true); rendre(); lancerApresReaction(); });
@@ -1136,6 +1216,48 @@
   // « Réécrire le mot » s'écrit aussi depuis la v6.31 (dictée).
   function aSaisir(c) { return !!(c && (c.type === 'calcul' || c.type === 'conjugaison' || (c.question && c.question.saisie))); }
   function orthoSaisie(c) { return !!(c && c.question && c.question.saisie); }
+  // Carte de grammaire (v6.54) : réponse touchée dans la carte (js/grammaire-carte.js), corrigée par le jeu.
+  function estGram(c) { return !!(c && c.type === 'grammaire'); }
+
+  function montrerGram(c) {
+    $('carte-titre').textContent = c.packNom;
+    $('carte-consigne').textContent = c.consigne;
+    $('carte-mot').hidden = true;
+    $('carte-boutons').hidden = true;
+    $('btn-voir-mot').hidden = true;
+    $('btn-tableau').hidden = true;
+    $('carte-tableau').hidden = true;
+    var boite = $('carte-gram');
+    boite.hidden = false;
+    window.GrammaireCarte.afficher(c);
+    var rep = $('carte-reponse');
+    if (c.reponseDonnee == null) { rep.hidden = true; rep.className = 'carte-reponse'; return; }
+    rep.hidden = false;
+    rep.className = 'carte-reponse ' + (c.juste ? 'juste' : 'fausse');
+    var sol = G.solution(c);
+    if (c.jeu === 'relier') {
+      rep.textContent = c.juste ? 'Bonne réponse ! Toutes les paires sont justes.' : 'Ce n\u2019est pas ça : ' + c.reponseDonnee + '. Les bonnes paires : ' + sol;
+    } else if (c.jeu === 'phrase') {
+      rep.textContent = c.juste ? 'Bonne réponse ! ' + sol : 'Ce n\u2019est pas ça. La bonne phrase : ' + sol;
+    } else {
+      rep.textContent = c.juste ? 'Bonne réponse ! ' + sol : 'Ce n\u2019est pas ça (tu as choisi « ' + c.reponseDonnee + ' »). ' + sol;
+    }
+  }
+  // Réponse touchée : le jeu corrige, puis le bon dé se lance (après « J'ai compris » si c'est faux).
+  function corrigerGram(reponse, texte) {
+    var r = partie.regles, c = partie.carte;
+    if (!r || r.etape !== 'repondre' || !estGram(c) || c.reponseDonnee != null) return;
+    c.reponseDonnee = texte;
+    c.juste = G.juste(c, reponse);
+    c.attente = !c.juste;
+    c.choisi = null;
+    montrerGram(c);
+    ajusterTour();
+    R.repondre(r, c.juste);
+    reagir(c.juste);
+    rendre();
+    lancerApresReaction();
+  }
 
   // Carte d'orthographe à écrire : la consigne, le mot caché (« Voir le mot » l'aide), la case de réponse ;
   // après validation, le mot (lettres muettes surlignées) et la correction.
@@ -1307,8 +1429,10 @@
     box.className = 'carte-piochee joueur-' + j.couleur;
     $('carte-saisie').hidden = true;
     $('carte-lettres').hidden = true;
+    $('carte-gram').hidden = true;
     $('carte-mot').hidden = false;
     $('reponse-joueur').setAttribute('autocapitalize', 'off');
+    if (estGram(c)) { montrerGram(c); return; }
     if (aSaisir(c) && !orthoSaisie(c)) {
       // Le titre de la carte = son thème seul, écrit gros (v6.27 : plus de « Carte n° … de … »).
       $('carte-titre').textContent = c.packNom;
@@ -1508,6 +1632,13 @@
       var b = e.target.closest('.lettre-case.pleine'); if (b) retirerLettre(Number(b.dataset.e));
     });
     $('btn-remettre').addEventListener('click', toutRemettre);
+    // Grammaire (v6.54) : les gestes sont dans js/grammaire-carte.js.
+    window.GrammaireCarte.brancher($('carte-gram'), {
+      carte: function () { return partie.carte; },
+      actif: function () { return !!(partie.regles && partie.regles.etape === 'repondre'); },
+      fini: corrigerGram,
+      sauver: sauver
+    });
     document.addEventListener('keydown', clavierLettres);
     $('btn-tableau').addEventListener('click', basculerTableau);
     $('btn-voir-mot').addEventListener('click', function () { if (partie.vue === 'mot') cacherMot(); else montrerMotSeul(); });
@@ -1698,7 +1829,7 @@
     if (!partie.defi && !partie.avantDefi) {
       partie.avantDefi = copie({ nb: nbChoisi(), aventure: (document.querySelector('input[name="aventure"]:checked') || {}).value,
         choix: partie.choix, matiere: partie.matiere, francais: partie.francais, maths: partie.maths, conj: partie.conj,
-        packs: partie.packs, types: partie.types, orthoNiveau: partie.orthoNiveau });
+        packs: partie.packs, types: partie.types, orthoNiveau: partie.orthoNiveau, gram: partie.gram });
     }
     document.querySelector('input[name="nb"][value="' + d.joueurs + '"]').checked = true;
     document.querySelector('input[name="aventure"][value="' + d.aventure + '"]').checked = true;
@@ -1730,6 +1861,7 @@
     partie.choix = a.choix; partie.matiere = a.matiere; partie.francais = a.francais; partie.maths = a.maths; partie.conj = a.conj;
     partie.packs = a.packs; partie.types = a.types;
     if (a.orthoNiveau) partie.orthoNiveau = a.orthoNiveau;
+    if (a.gram) partie.gram = a.gram;
   }
 
   // ---------- Partie rapide (v6.43) ----------
@@ -1740,7 +1872,7 @@
     if (!partie.defi && !partie.avantDefi) {
       partie.avantDefi = copie({ nb: nbChoisi(), aventure: (document.querySelector('input[name="aventure"]:checked') || {}).value,
         choix: partie.choix, matiere: partie.matiere, francais: partie.francais, maths: partie.maths, conj: partie.conj,
-        packs: partie.packs, types: partie.types, orthoNiveau: partie.orthoNiveau });
+        packs: partie.packs, types: partie.types, orthoNiveau: partie.orthoNiveau, gram: partie.gram });
     }
     partie.defi = null;
     document.querySelector('input[name="nb"][value="' + d.joueurs + '"]').checked = true;
@@ -1823,7 +1955,7 @@
       choix: partie.choix, packs: partie.packs, types: partie.types, actif: partie.actif,
       matiere: partie.matiere, francais: partie.francais, maths: partie.maths, conj: partie.conj,
       etapePrepa: partie.etapePrepa, sousEtape: partie.sousEtape, modif: !!partie.modif,
-      mots: partie.mots, orthoNiveau: partie.orthoNiveau, defi: partie.defi, avantDefi: partie.avantDefi || null, rapide: partie.rapide
+      mots: partie.mots, orthoNiveau: partie.orthoNiveau, gram: partie.gram, defi: partie.defi, avantDefi: partie.avantDefi || null, rapide: partie.rapide
     };
     if (partie.regles && partie.joueurs.length) {
       d.jeu = {
@@ -1854,6 +1986,10 @@
       partie.mots = d.mots || partie.mots;
       // Sauvegarde d'avant la v6.50 : niveau d'orthographe Facile.
       partie.orthoNiveau = (d.orthoNiveau || partie.orthoNiveau).map(function (n) { return window.Defis.ORTHO[n] ? n : 'facile'; });
+      // Grammaire (v6.54) : sauvegarde d'avant → tout coché, niveau Facile.
+      if (d.gram) partie.gram = d.gram.map(function (g) {
+        return { niveau: G.niveauValide(g && g.niveau), jeux: ((g && g.jeux) || []).filter(function (id) { return TOUS_JEUX.indexOf(id) >= 0; }) };
+      });
       partie.defi = d.jeu ? d.defi || null : null;
       partie.avantDefi = d.avantDefi || null;
       partie.rapide = d.jeu ? d.rapide || null : null;
@@ -1915,7 +2051,7 @@
     if ((r.etape === 'repondre' || r.etape === 'lancer') && partie.carte) {
       partie.vue = vue || 'cache'; // orthographe écrite : « Voir le mot » reste ouvert après un rechargement
       montrerCarte(j);
-      if (!partie.carte.lettre && !aSaisir(partie.carte)) {
+      if (!partie.carte.lettre && !aSaisir(partie.carte) && !estGram(partie.carte)) {
         if (vue === 'mot') montrerMotSeul(); else if (vue === 'reponse') montrerReponse();
       }
     } else $('carte-piochee').hidden = true;

@@ -137,7 +137,7 @@ test('packs et questions décochés au départ ; « Valider » demande au moins 
   await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir une matière.');
   await page.locator('#matieres input[value="francais"]').check();
   await valider(page);
-  await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir Orthographe ou Conjugaison.');
+  await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir Orthographe, Conjugaison ou Grammaire.');
   await page.locator('#francais input[value="orthographe"]').check();
   await valider(page); // écran des packs (v6.16)
   for (const c of await page.locator('#packs input, #types-questions input').all()) await expect(c).not.toBeChecked();
@@ -225,7 +225,7 @@ test('« Mêmes réglages pour tous » copie packs et questions, puis passe au c
   for (const k of [1, 2]) {
     expect(p.packs[k]).toEqual(p.packs[0]);
     expect(p.packs[k]).not.toContain('temps');
-    expect(p.types[k]).toHaveLength(12);
+    expect(p.types[k]).toHaveLength(10);
     expect(p.types[k]).not.toContain('syllabes');
   }
   // En revenant en arrière, le joueur 3 a bien ces réglages.
