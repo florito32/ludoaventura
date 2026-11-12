@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '7.6';
+  var VERSION = '7.7';
 
   var HISTORY = [
+    { v: '7.7', date: '2026-11-12', changes: [
+      "Histoire : nouvelle période, le Moyen Âge, avec 8 jeux et 4 niveaux — Rois de France, Le château fort, Chevaliers, Jeanne d’Arc et la guerre de Cent Ans, Frise du Moyen Âge, Roman ou gothique ?, Les Vikings, Seigneurs et paysans."
+    ] },
     { v: '7.6', date: '2026-11-12', changes: [
       "Histoire : nouvelle période, la Préhistoire, avec 5 jeux et 4 niveaux — Nos ancêtres (frise, lieux de découverte, Qui suis-je ?), Paléolithique ou Néolithique ? (classer, vrai ou faux, ordre des périodes), Grottes ornées (Lascaux, Chauvet, Cosquer…), Outils et inventions, Mégalithes (menhirs, dolmens, Carnac, Stonehenge)."
     ] },
