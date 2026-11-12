@@ -937,6 +937,10 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 
 /* ---------- Pied de page + version ---------- */
 .pied { text-align: center; color: #fff; font-size: .9rem; padding: 10px 16px calc(14px + env(safe-area-inset-bottom)); background: var(--vert); }
+/* Lien obligatoire vers les mentions légales (LCEN), commun au site ludo-aventura.fr. */
+.pied-lien { color: #fff; text-underline-offset: 2px; }
+/* Petits téléphones : le nom du jeu est déjà en haut de l'écran ; le retirer garde le pied sur une ligne. */
+@media (max-width: 440px) { .pied-marque, .pied-sep { display: none; } }
 .pied p { margin: 0; display: flex; gap: 8px; justify-content: center; align-items: center; flex-wrap: wrap; }
 .version-badge {
   font: inherit; font-size: .85rem; cursor: pointer; color: #fff;
