@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aventura — Jeux de géographie et d'histoire à choisir</title>
+<meta name="description" content="Propositions de petits jeux de géographie et d'histoire pour Aventura : garder ou non chaque jeu, puis copier ses choix.">
+<style>
+  /* Style « carnet d'explorateur » repris du jeu */
+  :root{--papier:#f6efe0;--carte:#fffaf0;--encre:#3b2a1a;--brun:#7a4b23;--doux:#6b5a48;--oui:#2f6b3a;--non:#9b2d20;--trait:#d8c7a6}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--papier);color:var(--encre);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  header{padding:20px 16px 8px;max-width:1100px;margin:auto}
+  h1{font-family:Georgia,serif;font-size:clamp(1.4rem,4vw,2rem);margin:0 0 6px}
+  h2{font-family:Georgia,serif;font-size:1.35rem;margin:28px 0 6px;border-bottom:2px solid var(--trait);padding-bottom:4px}
+  h3{font-family:Georgia,serif;font-size:1.1rem;margin:20px 0 6px}
+  p.intro{margin:4px 0;color:var(--doux)}
+  main{max-width:1100px;margin:auto;padding:0 16px 120px}
+  .grille{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:12px}
+  .jeu{background:var(--carte);border:2px solid var(--trait);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px;min-width:0}
+  .jeu[data-choix="oui"]{border-color:var(--oui);box-shadow:inset 0 0 0 2px var(--oui)}
+  .jeu[data-choix="non"]{opacity:.6}
+  .jeu h4{margin:0;font-size:1.02rem}
+  .jeu p{margin:0;overflow-wrap:anywhere}
+  .ex{font-size:.92rem;color:var(--doux)}
+  .niv{font-size:.88rem;margin:0;padding-left:18px}
+  .formats{display:flex;flex-wrap:wrap;gap:4px}
+  .formats span{font-size:.78rem;background:#efe2c8;border-radius:99px;padding:2px 8px}
+  .boutons{display:flex;gap:8px;margin-top:auto;padding-top:6px}
+  .boutons button{flex:1;min-height:44px;border-radius:10px;border:2px solid var(--brun);background:transparent;color:var(--encre);font:inherit;font-weight:600;cursor:pointer}
+  .boutons button[aria-pressed="true"].b-oui{background:var(--oui);border-color:var(--oui);color:#fff}
+  .boutons button[aria-pressed="true"].b-non{background:var(--non);border-color:var(--non);color:#fff}
+  .note{width:100%;min-height:40px;border:1px solid var(--trait);border-radius:8px;padding:6px 8px;font:inherit;font-size:.9rem;background:#fff}
+  .encadre{background:var(--carte);border-left:5px solid var(--brun);padding:10px 14px;border-radius:8px;margin:10px 0}
+  .encadre ul{margin:4px 0;padding-left:20px}
+  .sensible{font-size:.8rem;color:var(--non);font-weight:600}
+  footer.barre{position:fixed;left:0;right:0;bottom:0;background:var(--encre);color:#fff;padding:10px 16px calc(10px + env(safe-area-inset-bottom));display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+  footer.barre button{min-height:44px;border:0;border-radius:10px;padding:0 18px;font:inherit;font-weight:700;background:#f2c14e;color:var(--encre);cursor:pointer}
+  #compte{font-size:.92rem}
+  #version{background:none;border:1px solid #fff8;color:#fff;border-radius:8px;padding:4px 10px;font:inherit;font-size:.85rem;cursor:pointer;min-height:36px}
+  #historique{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;padding:16px}
+  #historique[open-panel]{display:flex}
+  #historique div{background:var(--carte);border-radius:12px;padding:16px;max-width:480px;width:100%}
+  :focus-visible{outline:3px solid #1f5fbf;outline-offset:2px}
+  .copie-ok{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--oui);color:#fff;padding:8px 14px;border-radius:10px;display:none}
+  textarea#secours{width:100%;min-height:160px;display:none;margin-top:10px}
+</style>
+</head>
+<body>
+<header>
+  <h1>🌍 Géographie et 📜 Histoire — les jeux à garder</h1>
+  <p class="intro">Pour chaque jeu, touche <strong>Oui</strong> ou <strong>Non</strong> (une note est possible). En bas, <strong>Copier mes choix</strong> puis colle le texte dans la discussion.</p>
+  <p class="intro">Objectif : environ 10 jeux en géographie et environ 10 jeux par période d'histoire. Chaque jeu a 4 niveaux : Facile, Moyen, Difficile, Expert.</p>
+</header>
+<main id="contenu"></main>
+
+<footer class="barre">
+  <span id="compte">0 jeu choisi</span>
+  <span style="display:flex;gap:8px;align-items:center">
+    <button id="version" type="button" aria-haspopup="dialog">v1.0</button>
+    <button id="copier" type="button">📋 Copier mes choix</button>
+  </span>
+</footer>
+<div class="copie-ok" role="status" id="ok">Choix copiés ✔</div>
+<div id="historique" role="dialog" aria-modal="true" aria-label="Historique des versions">
+  <div>
+    <h2 style="margin-top:0">Historique</h2>
+    <p><strong>v1.0</strong> (12/11/2026) — première proposition : formats de jeu, niveaux, 18 jeux de géographie, 7 périodes d'histoire et 80 jeux d'histoire.</p>
+    <button type="button" id="fermer" class="b-oui" style="min-height:44px;padding:0 16px">Fermer</button>
+  </div>
+</div>
+
+<script>
+/* ---------- Données : chaque proposition ---------- */
+// f = formats proposés : R = relier (gauche / droite), Q = choix multiples, O = question ouverte,
+// F = remettre dans l'ordre (frise), V = vrai ou faux, I = qui suis-je ? (indices), C = toucher sur une carte, K = classer en 2 colonnes
+const NOMS_FORMATS = {R:"Relier",Q:"Choix multiples",O:"Question ouverte",F:"Remettre dans l'ordre",V:"Vrai ou faux",I:"Qui suis-je ?",C:"Toucher sur la carte",K:"Classer"};
+
+const FORMATS = [
+  ["fR","🔗 Relier (gauche ↔ droite)","Ex. pays à gauche, capitales à droite : il faut tout relier. Demandé par toi.","R"],
+  ["fQ","🔘 Choix multiples","Une question, 3 à 6 réponses proposées. Demandé par toi.","Q"],
+  ["fO","✏️ Question ouverte","Le joueur écrit la réponse (accents tolérés aux niveaux Facile et Moyen ?). Demandé par toi.","O"],
+  ["fF","📏 Remettre dans l'ordre (frise)","Glisser 4 à 6 événements, du plus ancien au plus récent (ou fleuves du plus long au plus court…).","F"],
+  ["fV","✅ Vrai ou faux","Une affirmation, le joueur dit si elle est vraie ; la correction explique.","V"],
+  ["fI","🕵️ Qui suis-je ?","Des indices se dévoilent un par un : moins on en utilise, mieux c'est.","I"],
+  ["fC","📍 Toucher sur la carte","Une carte muette : toucher le département, le pays ou le fleuve demandé. Demande des cartes dessinées pour le jeu.","C"],
+  ["fK","🗂️ Classer en 2 colonnes","Ex. « Paléolithique ou Néolithique ? », « roman ou gothique ? ».","K"]
+];
+
+const NIVEAUX_GENERAUX = [
+  "<strong>Facile</strong> : 3 réponses proposées ou 3 paires à relier, les éléments les plus connus.",
+  "<strong>Moyen</strong> : 4 réponses ou 4 paires, éléments connus.",
+  "<strong>Difficile</strong> : 5 paires, éléments moins connus, questions ouvertes possibles.",
+  "<strong>Expert</strong> : 6 paires, tout le contenu, questions ouvertes sans aide."
+];
+
+// [id, titre, description, exemple, formats, niveaux (F/M/D/E) ou null = niveaux généraux, sensible?]
+const GEO = [
+ ["g01","🔢 Numéros des départements","Retrouver le numéro d'un département, ou l'inverse.","Ex. 33 → Gironde ; Finistère → 29","RQO",["10 départements très connus (75, 13, 69, 33…)","30 départements, ou une région au choix","les 96 départements de métropole","+ Corse (2A, 2B) et outre-mer (971 à 976)"]],
+ ["g02","🏛️ Préfectures","Relier chaque département à sa préfecture.","Ex. Gironde → Bordeaux ; Alpes-de-Haute-Provence → Digne-les-Bains","RQO",["préfectures qui sont de grandes villes","30 départements","les 96 de métropole","+ outre-mer, réponse écrite"]],
+ ["g03","🗺️ Régions et chefs-lieux","Les 13 régions de métropole et leurs chefs-lieux ; à quelle région appartient un département.","Ex. Occitanie → Toulouse ; Finistère → Bretagne","RQOC",["6 régions et leurs chefs-lieux","les 13 régions","département → région","+ les 5 régions d'outre-mer, réponse écrite"]],
+ ["g04","🏙️ Pays et capitales","Relier pays et capitales (ton exemple).","Ex. Italie → Rome ; Australie → Canberra (piège : pas Sydney)","RQO",["Europe, pays voisins de la France","toute l'Europe","le monde","capitales pièges (Canberra, Ottawa, Ankara…), réponse écrite"]],
+ ["g05","🚩 Drapeaux","Reconnaître le pays à partir de son drapeau (drapeaux dessinés pour le jeu, car les émojis drapeaux ne s'affichent pas sur Windows).","Ex. bleu-blanc-rouge vertical → France ; lequel est celui de l'Italie ?","RQO",["10 drapeaux très différents","Europe","monde","drapeaux qui se ressemblent (Tchad / Roumanie, Monaco / Indonésie…)"]],
+ ["g06","🌊 Fleuves","Dans quel pays coule un fleuve, quels pays il traverse, dans quelle mer il se jette (ta demande).","Ex. Danube → traverse 10 pays, se jette dans la mer Noire","RQOF",["les 5 grands fleuves de France et une ville traversée","grands fleuves d'Europe","fleuves du monde (Nil, Amazone, Mississippi…)","tous les pays traversés, source et embouchure"]],
+ ["g07","🧭 Pays voisins","Quels pays ont une frontière avec un pays donné.","Ex. pays qui touchent la France métropolitaine : Belgique, Luxembourg, Allemagne, Suisse, Italie, Monaco, Andorre, Espagne","QOKC",["voisins de la France","voisins des pays d'Europe","monde","trouver TOUS les voisins, réponse écrite"]],
+ ["g08","🌐 Continents et océans","Sur quel continent se trouve un pays ; quel océan borde une côte.","Ex. Égypte → Afrique ; le Brésil est bordé par l'océan Atlantique","RQKC",["les 6 continents et 5 océans","pays connus → continent","tous les pays","pays à cheval sur deux continents (Russie, Turquie…)"]],
+ ["g09","⛰️ Montagnes et sommets","Massifs, sommets et pays où ils se trouvent.","Ex. Mont Blanc → Alpes ; Everest → Himalaya, entre Népal et Chine","RQOF",["les massifs de France","sommets de France","grands sommets du monde","classer les sommets par altitude"]],
+ ["g10","📍 Carte à toucher","« Où se trouve… ? » : toucher la bonne zone sur une carte muette (départements, régions, pays).","Ex. touche la Bretagne ; touche le Japon","C",["régions de France","départements autour de chez soi","Europe","départements et pays du monde entier"]],
+ ["g11","🗼 Monuments du monde","Relier un monument à sa ville et son pays.","Ex. Colisée → Rome ; Taj Mahal → Agra (Inde)","RQOI",null],
+ ["g12","💶 Langues et monnaies","La langue et la monnaie de chaque pays.","Ex. Brésil → portugais, réal ; Suisse → 4 langues nationales, franc suisse","RQO",null],
+ ["g13","🏆 Records de la Terre","Le plus long, le plus haut, le plus grand…","Ex. plus grand pays → Russie ; plus grand désert chaud → Sahara","QVF",null],
+ ["g14","🏝️ Outre-mer et îles","Les territoires d'outre-mer, leur océan, leur numéro ; les grandes îles du monde.","Ex. La Réunion → océan Indien, 974 ; Guadeloupe → 971","RQOC",null],
+ ["g15","🏘️ Villes de France","Une grande ville → son département et sa région.","Ex. Lyon → Rhône (69), Auvergne-Rhône-Alpes","RQO",null],
+ ["g16","🧀 Spécialités des régions","Relier une spécialité (plat, fromage, fête) à sa région.","Ex. cassoulet → Occitanie ; crêpes → Bretagne","RQK",null],
+ ["g17","🌦️ Climats et paysages","Désert, toundra, forêt équatoriale, savane… où les trouve-t-on ?","Ex. la forêt amazonienne → climat équatorial, Amérique du Sud","RQKV",null],
+ ["g18","🧭 Lire une carte","Points cardinaux, légende, échelle — pour les plus jeunes.","Ex. Lille est au nord de Paris → vrai","QV",["nord, sud, est, ouest","nord-est, sud-ouest…","légende d'une carte","échelle : calculer une distance"]]
+];
+
+// Périodes : [id, nom, dates]
+const PERIODES = [
+ ["pre","🦣 Préhistoire","jusqu'à l'écriture, vers 3300 av. J.-C."],
+ ["ant","🏺 Antiquité","vers 3300 av. J.-C. → 476"],
+ ["mag","🏰 Moyen Âge","476 → 1492"],
+ ["ren","🎨 Renaissance","XVe et XVIe siècles"],
+ ["mod","👑 Temps modernes (Louis XIV, Lumières)","XVIIe et XVIIIe siècles"],
+ ["xix","🇫🇷 Révolution et XIXe siècle","1789 → 1914"],
+ ["xx","✈️ XXe siècle","1914 → 2000"]
+];
+
+const HIST = {
+ pre:[
+  ["p01","🧬 Nos ancêtres","Remettre dans l'ordre les espèces humaines.","Ex. Australopithèque (Lucy) → Homo habilis → Homo erectus → Néandertal → Homo sapiens","FRQ"],
+  ["p02","🌾 Paléolithique ou Néolithique ?","Classer : chasse et cueillette, nomades / agriculture, élevage, villages, poterie.","Ex. la poterie → Néolithique","KV"],
+  ["p03","🎨 Grottes ornées","Relier une grotte à son lieu et à ce qu'on y voit.","Ex. Lascaux → Dordogne ; Chauvet → Ardèche ; Cosquer → près de Marseille, entrée sous la mer","RQI"],
+  ["p04","🪓 Outils et inventions","Relier l'outil à son usage.","Ex. biface → couper, racler ; propulseur → lancer une sagaie plus loin ; aiguille à chas → coudre","RQ"],
+  ["p05","🦖 Vrai ou faux préhistorique","Idées reçues à corriger.","Ex. « Les hommes préhistoriques ont vu des dinosaures » → faux","V"],
+  ["p06","🐘 Animaux de la préhistoire","Mammouth, rhinocéros laineux, ours des cavernes, mégacéros…","Ex. quel animal avait une épaisse fourrure et des défenses recourbées ?","QIR"],
+  ["p07","🗿 Mégalithes","Menhir, dolmen, cromlech, et où les voir.","Ex. Carnac → Morbihan ; Stonehenge → Angleterre","RQK"],
+  ["p08","📖 Mots de la préhistoire","Relier le mot à sa définition.","Ex. nomade, sédentaire, silex, art pariétal, chasseur-cueilleur","RO"],
+  ["p09","⏳ Les grandes périodes","Remettre dans l'ordre : Paléolithique, Mésolithique, Néolithique, âge du bronze, âge du fer.","","FQ"],
+  ["p10","🕵️ Qui suis-je ?","Des indices pour trouver un personnage ou un objet.","Ex. « On m'a retrouvé dans un glacier des Alpes en 1991… » → Ötzi","I"],
+  ["p11","✍️ La fin de la préhistoire","Ce qui fait passer à l'histoire : l'écriture, vers 3300 av. J.-C., en Mésopotamie.","Ex. quelle invention marque la fin de la préhistoire ?","QV"]
+ ],
+ ant:[
+  ["a01","⚡ Dieux grecs et romains","Relier chaque dieu grec à son nom romain.","Ex. Zeus → Jupiter ; Poséidon → Neptune ; Athéna → Minerve","RQO"],
+  ["a02","𓂀 Dieux égyptiens","Relier le dieu à son rôle ou son animal.","Ex. Anubis → chacal, momification ; Horus → faucon ; Râ → soleil","RQI"],
+  ["a03","🔺 Pharaons","Khéops, Toutânkhamon, Ramsès II, Cléopâtre…","Ex. tombeau découvert en 1922 par Howard Carter → Toutânkhamon","RQI"],
+  ["a04","🦸 Héros et mythes","Relier le héros à son exploit.","Ex. Thésée → Minotaure ; Persée → Méduse ; Hercule → 12 travaux","RQI"],
+  ["a05","🏛️ Rome, de la fondation à la chute","Frise des grandes dates.","Ex. fondation légendaire 753 av. J.-C. → mort de César 44 av. J.-C. → Auguste empereur 27 av. J.-C. → fin de l'Empire d'Occident 476","FQ"],
+  ["a06","🛡️ La Gaule","Vercingétorix, Alésia, et le nom antique des villes.","Ex. Lutèce → Paris ; Lugdunum → Lyon ; Massalia → Marseille","RQOV"],
+  ["a07","🏟️ Monuments antiques","Relier le monument à son lieu.","Ex. Colisée → Rome ; Parthénon → Athènes ; pont du Gard → Gard","RQC"],
+  ["a08","🌟 Les 7 merveilles du monde","QCM et vrai ou faux.","Ex. laquelle existe encore ? → la pyramide de Khéops","QV"],
+  ["a09","🔣 Écritures anciennes","Hiéroglyphes, cunéiforme, alphabet grec.","Ex. hiéroglyphes → Égypte ; cunéiforme → Mésopotamie","RQ"],
+  ["a10","Ⅻ Chiffres romains","Lire et écrire des nombres en chiffres romains.","Ex. XIV → 14 ; 2026 → MMXXVI","OQ"],
+  ["a11","🏺 Vie quotidienne","Forum, thermes, gladiateur, toge, sénat, démocratie…","Ex. les thermes → bains publics","RQO"],
+  ["a12","🥇 Jeux olympiques antiques","Olympie, en l'honneur de Zeus.","Ex. « Les femmes mariées pouvaient concourir » → faux","VQ"]
+ ],
+ mag:[
+  ["m01","👑 Rois de France","Relier le roi à ce qu'il a fait.","Ex. Clovis → roi des Francs baptisé ; Charlemagne → empereur en 800 ; Hugues Capet → 987","RQIF"],
+  ["m02","🏰 Le château fort","Nommer les parties du château (sur un dessin).","Ex. donjon, pont-levis, douves, créneaux, mâchicoulis, herse","RQC"],
+  ["m03","⚔️ Chevaliers","Page, écuyer, adoubement, tournoi, armure…","Ex. la cérémonie où l'on devient chevalier → l'adoubement","RQO"],
+  ["m04","⛪ Les trois ordres","Classer : ceux qui prient, ceux qui combattent, ceux qui travaillent.","Ex. un moine → clergé","K"],
+  ["m05","🗡️ Jeanne d'Arc et la guerre de Cent Ans","1337–1453, Orléans, sacre de Charles VII à Reims.","Ex. ville délivrée par Jeanne d'Arc en 1429 → Orléans","QFIV"],
+  ["m06","📏 Frise du Moyen Âge","Remettre les dates clés dans l'ordre.","Ex. 476, 800, 987, 1066 (Hastings), 1096 (1re croisade), 1453, 1492","F"],
+  ["m07","🕍 Roman ou gothique ?","Classer les églises ; relier les monuments à leur ville.","Ex. Notre-Dame de Paris → gothique ; Mont-Saint-Michel, cité de Carcassonne","KRQ"],
+  ["m08","⛵ Les Vikings","Drakkar, Rollon, Normandie… (lien avec l'aventure Viking).","Ex. la Normandie est donnée aux Vikings de Rollon en 911","QVI"],
+  ["m09","🌾 Seigneurs et paysans","Fief, vassal, suzerain, serf, corvée, dîme.","Ex. travail gratuit dû au seigneur → la corvée","RO"],
+  ["m10","🛡️ Blasons","Les couleurs des blasons et leur nom.","Ex. gueules → rouge ; azur → bleu ; sinople → vert ; sable → noir","RQ"],
+  ["m11","🕵️ Personnages célèbres","Qui suis-je ? Aliénor d'Aquitaine, Du Guesclin, Marco Polo, Richard Cœur de Lion…","","I"],
+  ["m12","⚙️ Inventions du Moyen Âge","Moulin à vent, horloge mécanique, lunettes, boussole en Europe…","","QV"]
+ ],
+ ren:[
+  ["r01","🖼️ Artistes et œuvres","Relier l'artiste à son œuvre.","Ex. Léonard de Vinci → La Joconde ; Michel-Ange → plafond de la chapelle Sixtine ; Botticelli → La Naissance de Vénus","RQ"],
+  ["r02","🧭 Grandes découvertes","Relier l'explorateur à son voyage.","Ex. Colomb → Amérique, 1492 ; Vasco de Gama → route des Indes ; Magellan → premier tour du monde ; Cartier → Canada","RQIF"],
+  ["r03","🖨️ Inventions et sciences","Imprimerie de Gutenberg, Copernic et la Terre qui tourne autour du Soleil, machines de Léonard…","","QVI"],
+  ["r04","🏯 Châteaux de la Loire","Chambord, Chenonceau, Amboise, Blois…","Ex. Chambord → François Ier ; Léonard de Vinci est enterré à Amboise","RQC"],
+  ["r05","👑 Rois de la Renaissance","François Ier, Henri II, Catherine de Médicis, Henri IV.","Ex. Marignan, 1515 → François Ier ; édit de Nantes, 1598 → Henri IV","RQI"],
+  ["r06","✝️ Réforme et guerres de Religion","Luther, Calvin, catholiques et protestants, la Saint-Barthélemy.","Ex. Luther publie ses 95 thèses en 1517","QFV"],
+  ["r07","📏 Frise de la Renaissance","1492, 1515, 1517, 1534, 1539 (Villers-Cotterêts : le français dans les actes officiels), 1572, 1598.","","F"],
+  ["r08","📚 Humanistes et écrivains","Relier l'auteur à son œuvre.","Ex. Rabelais → Gargantua ; Montaigne → Essais ; Ronsard → poèmes","RQ"],
+  ["r09","📖 Mots de la Renaissance","Humanisme, mécène, perspective, fresque, conquistador…","","RO"],
+  ["r10","🌄 Aztèques, Mayas et Incas","Les empires d'Amérique et les conquistadors (lien avec les aventures Mayas et Incas).","Ex. Tenochtitlan → Aztèques, Cortés ; Cuzco → Incas, Pizarro","RQK"],
+  ["r11","🔎 Œuvre mystère","Une œuvre décrite par des indices : laquelle est-ce ?","","IQ"]
+ ],
+ mod:[
+  ["t01","☀️ Louis XIV, le Roi-Soleil","Le plus long règne de l'histoire de France (1643–1715).","Ex. combien de temps a régné Louis XIV ? → 72 ans","QIV"],
+  ["t02","🏛️ Versailles","Galerie des Glaces, jardins de Le Nôtre, vie de cour.","","QVC"],
+  ["t03","🎩 Rois et ministres","Relier le roi à son ministre.","Ex. Louis XIII → Richelieu ; Louis XIV → Colbert","RQ"],
+  ["t04","🎭 Écrivains classiques","Relier l'auteur à son œuvre.","Ex. Molière → Le Malade imaginaire ; La Fontaine → Fables ; Perrault → contes","RQO"],
+  ["t05","💡 Les Lumières","Voltaire, Rousseau, Montesquieu, Diderot et l'Encyclopédie.","Ex. séparation des pouvoirs → Montesquieu","RQI"],
+  ["t06","🔭 Savants","Galilée, Newton, Pascal, Lavoisier, frères Montgolfier.","Ex. premier vol en ballon à air chaud, 1783 → Montgolfier","RQI"],
+  ["t07","🗺️ Navigateurs","Bougainville, Cook, La Pérouse.","","RQ"],
+  ["t08","⛓️ Commerce triangulaire et esclavage","Le commerce triangulaire, le Code noir (1685), les abolitions (1794, 1848).","","QFV","sensible"],
+  ["t09","📏 Frise des Temps modernes","1610, 1643, 1685, 1715, 1751 (Encyclopédie), 1774…","","F"],
+  ["t10","👗 Vie à la cour","Courtisan, étiquette, monarchie absolue, privilèges.","","RO"],
+  ["t11","🇺🇸 Révolution américaine","1776, la Déclaration d'indépendance, La Fayette, Washington.","","QVI"]
+ ],
+ xix:[
+  ["x01","🏰 La Révolution française","Frise : États généraux, prise de la Bastille, Déclaration des droits de l'homme, République, mort de Louis XVI.","Ex. 14 juillet 1789 → prise de la Bastille ; 21 janvier 1793 → exécution de Louis XVI","FQ"],
+  ["x02","🇫🇷 Symboles de la République","Marianne, drapeau, Marseillaise, devise, 14 juillet.","Ex. auteur de La Marseillaise → Rouget de Lisle","RQV"],
+  ["x03","🎖️ Napoléon","Sacre, Austerlitz, Code civil, Waterloo, Sainte-Hélène.","Ex. Austerlitz → 1805 ; Waterloo → 1815","FQI"],
+  ["x04","📏 Les régimes politiques","Remettre dans l'ordre : Ire République, Consulat, Premier Empire, Restauration, monarchie de Juillet, IIe République, Second Empire, IIIe République.","","F"],
+  ["x05","🚂 Inventions de la révolution industrielle","Relier l'invention à son inventeur.","Ex. téléphone → Bell ; ampoule → Edison ; cinématographe → frères Lumière ; vaccin contre la rage → Pasteur","RQF"],
+  ["x06","📚 Écrivains du XIXe","Relier l'écrivain à son livre.","Ex. Victor Hugo → Les Misérables ; Jules Verne → Le Tour du monde en 80 jours ; Zola → Germinal","RQ"],
+  ["x07","🎨 Peintres impressionnistes","Monet, Renoir, Degas, Van Gogh.","Ex. Impression, soleil levant → Monet","RQI"],
+  ["x08","🗼 Monuments du XIXe","Tour Eiffel (1889), Arc de triomphe, statue de la Liberté (offerte par la France), Opéra Garnier.","","RQV"],
+  ["x09","⚖️ Grandes lois","Abolition de l'esclavage (1848, Schœlcher), école gratuite, laïque et obligatoire (Jules Ferry).","","QFV"],
+  ["x10","🏭 Mots du XIXe","Ouvrier, usine, exode rural, suffrage universel…","","RO"],
+  ["x11","🤠 Far West","Ruée vers l'or, chemin de fer transcontinental (lien avec l'aventure Far West).","Ex. ruée vers l'or en Californie → 1848","QVF"]
+ ],
+ xx:[
+  ["z01","🪖 Première Guerre mondiale","1914–1918, Verdun, les poilus, armistice du 11 novembre.","","QFV","sensible"],
+  ["z02","🕊️ Seconde Guerre mondiale","1939–1945, appel du 18 juin, débarquement du 6 juin 1944, 8 mai 1945.","","QFV","sensible"],
+  ["z03","🚀 Conquête spatiale","Spoutnik, Gagarine, Armstrong, Thomas Pesquet.","Ex. premier homme dans l'espace, 1961 → Gagarine ; premier pas sur la Lune, 1969 → Armstrong","RQF"],
+  ["z04","✈️ Inventions du XXe","Avion des frères Wright, pénicilline, télévision, Internet, téléphone portable.","Ex. pénicilline → Fleming, 1928","RQF"],
+  ["z05","🏛️ Présidents de la Ve République","Remettre dans l'ordre, de de Gaulle à aujourd'hui.","","FQI"],
+  ["z06","👩‍🔬 Femmes qui ont marqué l'histoire","Marie Curie, Simone Veil, le droit de vote des femmes (1944).","Ex. deux prix Nobel → Marie Curie","QIV"],
+  ["z07","🇪🇺 Construction européenne","Traité de Rome (1957), l'euro (pièces et billets en 2002).","","QFV"],
+  ["z08","✊ Grandes figures du monde","Gandhi, Martin Luther King, Rosa Parks, Nelson Mandela.","Ex. Afrique du Sud, fin de l'apartheid → Mandela","RIQ"],
+  ["z09","🧱 Le mur de Berlin","Guerre froide, construction (1961) et chute du mur (9 novembre 1989).","","QFV"],
+  ["z10","📼 Objets d'hier","« Ça servait à quoi ? » : disquette, cassette, Minitel, baladeur, téléphone à cadran.","","RQI"],
+  ["z11","📏 Frise du XXe siècle","Remettre les grands événements du siècle dans l'ordre.","","F"]
+ ]
+};
+
+/* ---------- État des choix (gardé dans le navigateur si possible) ---------- */
+let choix = {};
+try { choix = JSON.parse(localStorage.getItem("ludo-geo-histoire-v1") || "{}"); } catch (e) { choix = {}; }
+function sauver(){ try { localStorage.setItem("ludo-geo-histoire-v1", JSON.stringify(choix)); } catch (e) {} }
+
+/* ---------- Construction de la page ---------- */
+const main = document.getElementById("contenu");
+
+function carte(id, titre, desc, ex, formats, niveaux, sensible){
+  const el = document.createElement("article");
+  el.className = "jeu";
+  el.dataset.id = id;
+  const etat = choix[id] || {};
+  if (etat.c) el.dataset.choix = etat.c;
+  el.innerHTML =
+    `<h4>${titre}</h4><p>${desc}</p>` +
+    (ex ? `<p class="ex">${ex}</p>` : "") +
+    (sensible ? `<p class="sensible">Sujet sensible : niveaux Difficile et Expert seulement ?</p>` : "") +
+    (formats ? `<div class="formats">${[...formats].map(f => `<span>${NOMS_FORMATS[f]}</span>`).join("")}</div>` : "") +
+    (niveaux ? `<ul class="niv">${["Facile","Moyen","Difficile","Expert"].map((n,i)=>`<li><strong>${n}</strong> : ${niveaux[i]}</li>`).join("")}</ul>` : "") +
+    `<div class="boutons" role="group" aria-label="Garder ${titre.replace(/"/g,"")} ?">
+       <button type="button" class="b-oui" aria-pressed="${etat.c==="oui"}">Oui</button>
+       <button type="button" class="b-non" aria-pressed="${etat.c==="non"}">Non</button>
+     </div>
+     <label><span class="ex">Note (facultatif)</span><input class="note" type="text" value="${(etat.n||"").replace(/"/g,"&quot;")}"></label>`;
+  el.querySelector(".b-oui").onclick = () => definir(el, "oui");
+  el.querySelector(".b-non").onclick = () => definir(el, "non");
+  el.querySelector(".note").oninput = e => { choix[id] = {...(choix[id]||{}), n: e.target.value}; sauver(); };
+  return el;
+}
+
+function definir(el, valeur){
+  const id = el.dataset.id;
+  const actuel = (choix[id]||{}).c;
+  const nouveau = actuel === valeur ? undefined : valeur;   // retoucher = annuler
+  choix[id] = {...(choix[id]||{}), c: nouveau};
+  if (nouveau) el.dataset.choix = nouveau; else delete el.dataset.choix;
+  el.querySelector(".b-oui").setAttribute("aria-pressed", nouveau === "oui");
+  el.querySelector(".b-non").setAttribute("aria-pressed", nouveau === "non");
+  sauver(); compter();
+}
+
+function section(titre, html){
+  const h = document.createElement("h2"); h.textContent = titre; main.append(h);
+  if (html){ const d = document.createElement("div"); d.className = "encadre"; d.innerHTML = html; main.append(d); }
+}
+function grille(){ const g = document.createElement("div"); g.className = "grille"; main.append(g); return g; }
+
+// 1. Formats
+section("1. Les formats de jeu", "Tu as demandé <strong>Relier</strong>, <strong>Choix multiples</strong> et <strong>Question ouverte</strong> ; je propose aussi 5 autres formats. Chaque jeu ci-dessous indique les formats qui lui vont.");
+let g = grille();
+FORMATS.forEach(([id,t,d]) => g.append(carte(id,t,d,"","",null)));
+
+// 2. Niveaux
+section("2. Les niveaux (règle commune)", "<ul>" + NIVEAUX_GENERAUX.map(n=>`<li>${n}</li>`).join("") + "</ul>Quand un jeu a besoin de niveaux à lui (ex. départements), ils sont écrits sur sa carte.");
+g = grille();
+g.append(carte("niv","📶 Garder cette règle commune ?","Le nombre de réponses ou de paires augmente avec le niveau, et le contenu devient moins connu.","","",null));
+
+// 3. Géographie
+section("3. Géographie — 18 jeux proposés (objectif : environ 10)");
+g = grille();
+GEO.forEach(([id,t,d,ex,f,niv]) => g.append(carte(id,t,d,ex,f,niv)));
+
+// 4. Périodes
+section("4. Histoire — les périodes à proposer", "À la préparation, le joueur choisit une ou plusieurs périodes (comme les thèmes en orthographe).");
+g = grille();
+PERIODES.forEach(([id,t,dates]) => g.append(carte("per-"+id,t,dates,"","",null)));
+
+// 5. Jeux par période
+section("5. Histoire — les jeux de chaque période (objectif : environ 10 par période)");
+PERIODES.forEach(([id,t,dates]) => {
+  const h = document.createElement("h3"); h.textContent = `${t} (${dates}) — ${HIST[id].length} jeux`; main.append(h);
+  const gg = grille();
+  HIST[id].forEach(([jid,jt,jd,jex,jf,s]) => gg.append(carte(jid,jt,jd,jex,jf,null,s)));
+});
+
+/* ---------- Compteur et copie ---------- */
+function titreDe(id){
+  const el = document.querySelector(`[data-id="${id}"] h4`);
+  return el ? el.textContent : id;
+}
+function compter(){
+  const n = Object.values(choix).filter(v => v && v.c === "oui").length;
+  document.getElementById("compte").textContent = `${n} oui · ${Object.values(choix).filter(v=>v&&v.c==="non").length} non`;
+}
+function texteChoix(){
+  const lignes = ["Mes choix — Géographie et Histoire (v1.0)"];
+  document.querySelectorAll("h2, h3, .jeu").forEach(el => {
+    if (el.tagName === "H2" || el.tagName === "H3") { lignes.push("", el.textContent); return; }
+    const e = choix[el.dataset.id] || {};
+    const etat = e.c === "oui" ? "OUI" : e.c === "non" ? "NON" : "—";
+    lignes.push(`${etat} ${el.dataset.id} ${titreDe(el.dataset.id)}${e.n ? " — note : " + e.n : ""}`);
+  });
+  return lignes.join("\n");
+}
+document.getElementById("copier").onclick = async () => {
+  const t = texteChoix();
+  try { await navigator.clipboard.writeText(t); const ok = document.getElementById("ok"); ok.style.display="block"; setTimeout(()=>ok.style.display="none",1800); }
+  catch (e) { // secours : zone de texte à copier à la main
+    let z = document.getElementById("secours");
+    if (!z){ z = document.createElement("textarea"); z.id="secours"; z.setAttribute("aria-label","Mes choix à copier"); main.append(z); }
+    z.value = t; z.style.display = "block"; z.focus(); z.select();
+  }
+};
+const hist = document.getElementById("historique");
+document.getElementById("version").onclick = () => { hist.setAttribute("open-panel",""); document.getElementById("fermer").focus(); };
+document.getElementById("fermer").onclick = () => hist.removeAttribute("open-panel");
+hist.onclick = e => { if (e.target === hist) hist.removeAttribute("open-panel"); };
+document.addEventListener("keydown", e => { if (e.key === "Escape") hist.removeAttribute("open-panel"); });
+compter();
+</script>
+</body>
+</html>
