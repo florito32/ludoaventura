@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.50';
+  var VERSION = '6.51';
 
   var HISTORY = [
+    { v: '6.51', date: '2026-11-12', changes: [
+      "Orthographe, choix des questions sur téléphone : les noms des questions débordaient de leurs boutons quand l'écran est étroit ou le texte agrandi. Le nom de chaque famille passe au-dessus de ses boutons, qui reprennent toute la largeur, 3 par ligne."
+    ] },
     { v: '6.50', date: '2026-11-12', changes: [
       "Orthographe : 4 niveaux, Facile, Moyen, Difficile et Expert, à choisir sur l'écran de la matière, juste sous « Orthographe ».",
       "272 nouveaux mots pour les niveaux Difficile et Expert, 16 par thème : rhinocéros, chauve-souris, cathédrale… puis ornithorynque, amphithéâtre, kinésithérapeute, parallélépipède…",

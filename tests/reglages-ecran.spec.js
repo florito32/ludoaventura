@@ -149,3 +149,32 @@ test('conjugaison : groupes sur l\'écran des temps, niveau sur l\'écran de la 
   await page.locator('#groupes label', { hasText: '2e' }).click();
   expect(await page.evaluate(() => window.Aventura.partie.conj[0].groupes)).toEqual([2]);
 });
+
+// v6.51 (bug signalé sur téléphone) : en portrait étroit ET peu haut — téléphone 360 × 640, ou page agrandie par le
+// zoom / la taille du texte d'Android (≈ 316 × 590 à 130 %, 290 × 560 à 150 %) — les noms des questions débordaient
+// de leurs boutons (famille à gauche, boutons trop étroits). Ils doivent tenir, 3 par ligne, sans défiler.
+for (const [w, h] of [[360, 640], [316, 590], [290, 560]]) {
+  test(`orthographe : questions lisibles sur téléphone étroit ${w} × ${h} (zoom du texte)`, async ({ page }) => {
+    await page.setViewportSize({ width: w, height: h });
+    await rapide(page);
+    await page.goto('./');
+    await versReglages(page, 1);
+    await orthographe(page);
+    await page.locator('#packs label', { hasText: 'Animaux' }).click();
+    await page.getByRole('button', { name: 'Valider', exact: true }).click();
+    await page.locator('#reglages-ortho').waitFor();
+    const debordent = await page.locator('#types-questions .pack span').evaluateAll((l) => l.filter((e) => e.offsetHeight > 0
+      && (e.scrollWidth > e.clientWidth + 1 || e.scrollHeight > e.clientHeight + 1)).map((e) => e.textContent));
+    expect(debordent).toEqual([]);
+    const q = await boites(page, '#types-questions');
+    expect(q.filter((b) => b[1] === q[0][1]).length).toBe(3);
+    for (const b of q) expect(b[2]).toBeGreaterThan(60); // boutons assez larges pour leur nom
+    // Le nom de la famille est au-dessus des boutons, pas à côté.
+    const f = await page.locator('#types-questions .famille').first().evaluate((e) => {
+      const t = e.querySelector('.famille-nom').getBoundingClientRect(), b = e.querySelector('.pack').getBoundingClientRect();
+      return t.bottom <= b.top + 1;
+    });
+    expect(f).toBe(true);
+    await remplit(page, '#reglages-ortho', 0.5);
+  });
+}
