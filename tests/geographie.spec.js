@@ -94,7 +94,7 @@ test('écran des réglages : la matière Géographie, son niveau, ses jeux en 3 
   await valider(page);
   await expect(page.locator('#reglages-titre')).toContainText('Géographie, les jeux');
   await expect(page.locator('#savoir-liste .famille:not([hidden])')).toHaveCount(3);
-  await expect(page.locator('#savoir-liste input')).toHaveCount(11);
+  await expect(page.locator('#savoir-liste input')).toHaveCount(12);
   // Rien de choisi : « Valider » refuse.
   await valider(page);
   await expect(page.locator('#packs-alerte')).toContainText('au moins un jeu');
@@ -102,7 +102,7 @@ test('écran des réglages : la matière Géographie, son niveau, ses jeux en 3 
   for (const i of await page.locator('#savoir-liste input').all()) await expect(i).toBeChecked();
   const p = await page.evaluate(() => window.Aventura.partie.savoirs[0].geographie);
   expect(p.niveau).toBe('expert');
-  expect(p.jeux).toHaveLength(11);
+  expect(p.jeux).toHaveLength(12);
   await pasDeDebordement(page);
   await valider(page);
   await expect(page.getByRole('button', { name: 'Lancer la partie' })).toBeVisible();
@@ -202,4 +202,33 @@ test('classer : voisins de la France ou pas', async ({ page }) => {
   for (let i = 0; i < c.elements.length; i++) await page.locator('.btn-col[data-i="' + i + '"][data-col="' + c.bonnes[i] + '"]').click();
   await page.locator('.btn-savoir-ok').click();
   await expect(page.locator('#carte-reponse')).toHaveText('Bravo, tout est bien rangé !');
+});
+
+test('carte à toucher : toucher la bonne zone → dé FORT ; zones assez grandes pour un doigt', async ({ page }) => {
+  for (const [niveau, h] of [['facile', 0.3], ['expert', 0.6]]) {
+    await versGeo(page, { niveau, jeux: ['g10'], hasard: h });
+    const c = await piocher(page);
+    expect(c.format).toBe('C');
+    await pasDeDebordement(page);
+    const zone = page.locator('#carte-savoir [data-zone="' + c.bonne + '"]');
+    // La zone demandée mesure au moins 15 px de côté à l'écran.
+    const b = await zone.boundingBox();
+    expect(Math.min(b.width, b.height)).toBeGreaterThanOrEqual(15);
+    await zone.click({ position: { x: b.width / 2, y: b.height / 2 }, force: true }).catch(() => {});
+    if (!(await page.evaluate(() => window.Aventura.partie.carte.reponseDonnee))) await zone.dispatchEvent('click');
+    await expect(page.locator('#carte-reponse')).toContainText('Bravo');
+    expect(await page.evaluate(() => window.Aventura.partie.regles.de)).toBe('fort');
+  }
+});
+
+test('carte à toucher : chaque carte a au moins 2 zones à demander ; consigne nomme la zone', () => {
+  test.skip(test.info().project.name !== 'ordinateur', 'test de logique');
+  const CG = require('../js/cartes-geo.js');
+  for (const [id, carte] of Object.entries(CG.CARTES)) expect(carte.zones.filter((z) => z.cible).length, id).toBeGreaterThanOrEqual(2);
+  for (const n of ['regions', 'departements', 'europe', 'monde']) {
+    for (let k = 0; k < 50; k++) {
+      const d = CG.tirer(n);
+      expect(d.consigne).toContain(d.bonneNom);
+    }
+  }
 });

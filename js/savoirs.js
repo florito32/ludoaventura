@@ -76,7 +76,7 @@
       c.jeu = jeu.id;
       c.matiere = jeu.matiere;
       c.niveau = niveau;
-      c.packNom = jeu.nom + ' · ' + NOMS_FORMATS[c.format];
+      c.packNom = c.format === 'C' ? jeu.nom : jeu.nom + ' · ' + NOMS_FORMATS[c.format];
       return c;
     }
     return null;

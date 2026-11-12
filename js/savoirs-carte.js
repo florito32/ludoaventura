@@ -32,6 +32,7 @@
     else if (c.format === 'K') html = classer(c, fait);
     else if (c.format === 'I') html = indices(c, fait);
     else if (c.format === 'O') html = sujet(c);
+    else if (c.format === 'C') html = carteGeo(c, fait);
     box.innerHTML = html;
     box.hidden = !html; // question ouverte : rien ici, la case de réponse commune suffit
     brancher(c, box, rappels, fait);
@@ -136,8 +137,38 @@
     return h + options(c, c.options, fait, 'Qui suis-je ?');
   }
 
+  // Toucher sur la carte (v7.1) : la carte SVG de js/cartes-geo.js ; chaque zone se touche.
+  // Les zones assez grandes (« cibles ») se prennent aussi au clavier ; les petites restent touchables (réponse fausse).
+  function carteGeo(c, fait) {
+    var carte = racine.CartesGeo && racine.CartesGeo.CARTES[c.carte];
+    if (!carte) return '<p>Carte indisponible.</p>';
+    var zones = carte.zones.map(function (z) {
+      var cl = 'zone' + (z.cible ? ' cible' : '');
+      if (fait && z.id === c.bonne) cl += ' bonne';
+      else if (fait && z.id === c.touche) cl += ' fausse';
+      var acces = z.cible && !fait ? ' role="button" tabindex="0" aria-label="' + esc(z.nom) + '"' : ' aria-hidden="true"';
+      return '<path class="' + cl + '" data-zone="' + z.id + '" d="' + z.d + '"' + acces + '></path>';
+    }).join('');
+    return '<div class="carte-geo"><svg viewBox="' + carte.vb + '" role="group" aria-label="Carte : ' + esc(carte.titre) + '">' + zones + '</svg></div>';
+  }
+
   function brancher(c, box, rappels, fait) {
-    if (fait) return;
+    box.onkeydown = null;
+    if (fait) { box.onclick = null; return; }
+    if (c.format === 'C') {
+      var choisir = function (e) {
+        var z = e.target.closest && e.target.closest('[data-zone]');
+        if (!z) return;
+        if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        c.touche = z.getAttribute('data-zone');
+        c.reponseDonnee = c.touche;
+        rappels.repondu();
+      };
+      box.onclick = choisir;
+      box.onkeydown = choisir;
+      return;
+    }
     box.onclick = function (e) {
       var b = e.target.closest('button');
       if (!b || b.disabled) return;
@@ -198,6 +229,12 @@
     if (c.format === 'I') {
       if (ok) { var p = 7 - c.vus; return 'Bravo, c’est ' + c.bonne + ' ! Trouvé au ' + (c.vus === 1 ? '1er' : c.vus + 'e') + ' indice : ' + p + ' point' + (p > 1 ? 's' : '') + '.'; }
       return 'Ce n’est pas ça : c’était ' + c.bonne + '. Tu gagnes quand même 1 point.';
+    }
+    if (c.format === 'C') {
+      if (ok) return 'Bravo, c’est bien ' + c.bonneNom + ' !';
+      var carte = racine.CartesGeo && racine.CartesGeo.CARTES[c.carte];
+      var t = carte && carte.zones.filter(function (z) { return z.id === c.touche; })[0];
+      return 'Ce n’est pas ça' + (t && t.nom ? ' : tu as touché ' + t.nom : '') + '. ' + c.bonneNom + ' est en vert sur la carte.';
     }
     return ok ? 'Bonne réponse ! ' + c.bonne : 'Ce n’est pas ça. La bonne réponse : ' + c.bonne + '.';
   }

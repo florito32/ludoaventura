@@ -661,7 +661,7 @@
     $('reglages-joueur').className = 'etape-corps reglages-joueur joueur-' + couleur;
     $('reglages-titre').className = 'legende-joueur joueur-' + couleur;
     // Matière choisie : seuls ses réglages s'affichent.
-    var a = partie.actif, mat = partie.matiere[a], fr = partie.francais[a] || mat === 'orthographe' || mat === 'conjugaison';
+    var a = partie.actif, mat = partie.matiere[a], fr = partie.francais[a] || mat === 'orthographe' || mat === 'conjugaison' || mat === 'grammaire';
     $('matieres').querySelectorAll('input').forEach(function (i) { i.checked = i.value === 'francais' ? !!fr : i.value === mat; });
     $('francais').querySelectorAll('input').forEach(function (i) { i.checked = i.value === mat; });
     $('reglage-francais').hidden = !fr;
@@ -2124,8 +2124,7 @@
       choix: partie.choix, packs: partie.packs, types: partie.types, actif: partie.actif,
       matiere: partie.matiere, francais: partie.francais, maths: partie.maths, conj: partie.conj,
       etapePrepa: partie.etapePrepa, sousEtape: partie.sousEtape, modif: !!partie.modif,
-      mots: partie.mots, orthoNiveau: partie.orthoNiveau, gram: partie.gram, defi: partie.defi, avantDefi: partie.avantDefi || null, rapide: partie.rapide
-      mots: partie.mots, orthoNiveau: partie.orthoNiveau, defi: partie.defi, avantDefi: partie.avantDefi || null, rapide: partie.rapide,
+      mots: partie.mots, orthoNiveau: partie.orthoNiveau, gram: partie.gram, defi: partie.defi, avantDefi: partie.avantDefi || null, rapide: partie.rapide,
       savoirs: partie.savoirs
     };
     if (partie.regles && partie.joueurs.length) {

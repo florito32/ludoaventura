@@ -1581,3 +1581,12 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .pied-bouton { font: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; min-height: 24px; }
 .credits-liste { text-align: left; padding-left: 20px; margin: 12px 0; line-height: 1.4; }
 .credits-liste a { color: var(--bleu); }
+/* Toucher sur la carte (v7.1) : la carte prend la largeur de la carte à jouer, sans dépasser la moitié de l'écran en hauteur. */
+.carte-geo { display: flex; justify-content: center; }
+.carte-geo svg { width: 100%; max-height: min(52vh, 520px); height: auto; background: #cfe7f5; border: 2px solid var(--encre); border-radius: 8px; touch-action: manipulation; }
+.carte-geo .zone { fill: #f3ead2; stroke: var(--encre); stroke-width: 1; vector-effect: non-scaling-stroke; cursor: pointer; }
+.carte-geo .zone.cible:hover, .carte-geo .zone.cible:focus-visible { fill: var(--jaune); outline: none; }
+.carte-geo .zone:focus-visible { stroke-width: 3; }
+.carte-geo .zone.bonne { fill: #3aa55c; }
+.carte-geo .zone.fausse { fill: #e3262a; }
+@media (max-height: 600px) { .carte-geo svg { max-height: 46vh; } }
