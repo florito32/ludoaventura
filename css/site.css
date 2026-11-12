@@ -1125,6 +1125,19 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
   .reglages-joueur #reglages-ortho .pack span { font-size: clamp(.7rem, calc(var(--h) * .42), .95rem); }
 }
 
+/* Questions d'orthographe sur téléphone étroit ET peu haut (v6.51) : téléphone en portrait 360 × 640, ou page agrandie
+   par le zoom / la taille du texte d'Android. La famille à gauche des boutons ne laisse alors que ~25 px par bouton :
+   les noms débordaient. Ici le nom de la famille et son « Tout » restent au-dessus, sur une seule ligne compacte,
+   et les 3 boutons par ligne prennent toute la largeur. */
+@container (max-height: 420px) and (max-width: 399.98px) {
+  #reglages-ortho { --h: clamp(26px, calc((100cqh - 8.6rem) / var(--rangs) - 1cqh), 60px); }
+  #reglages-ortho .famille { display: block; padding: 2px 5px 4px; border-radius: 9px; }
+  #reglages-ortho .famille-tete { flex-direction: row; align-items: center; gap: 6px; margin: 0 0 2px; }
+  #reglages-ortho .famille-nom { font-size: .72rem; line-height: 1.1; }
+  .reglages-joueur #reglages-ortho .btn-tout-famille { min-height: 20px; padding: 0 10px; font-size: .7rem; line-height: 1; }
+  .reglages-joueur #reglages-ortho .pack span { font-size: clamp(.62rem, min(calc(var(--h) * .3), 3.4cqi), .85rem); line-height: 1.05; padding: 1px 2px; hyphens: manual; overflow-wrap: normal; }
+}
+
 /* ---------- Étoiles, coffres et progression (v6.36) ---------- */
 .sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
 .ico { width: 1.6em; height: 1.6em; flex: none; display: inline-block; vertical-align: middle; }
