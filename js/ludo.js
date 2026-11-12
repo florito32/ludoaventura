@@ -102,11 +102,15 @@
         texte: 'En français, choisis Orthographe (des mots à écrire, compter, découper…) ou Conjugaison (des verbes à conjuguer).' };
       if (mat === 'maths') return { cle: cle + '-c', choix: $('niveau-maths'), cible: valider,
         texte: 'Choisis ton niveau : Facile, ce sont les tables ; plus c’est dur, plus les nombres sont grands. Puis le nombre de signes par calcul, et « Valider ».' };
+      if (mat === 'conjugaison') return { cle: cle + '-e', choix: $('niveau-conj'), cible: valider,
+        texte: 'Choisis ton niveau : plus il est haut, plus les verbes sont rares ou pièges. Puis « Valider ».' };
       return { cle: cle + '-d', cible: valider, texte: 'C’est noté ! Touche « Valider » pour régler tes questions.' };
     }
+    // Conjugaison (v6.49) : un seul écran pour les modes, les groupes et les temps.
     if (p.sousEtape === 'modes') {
       if (vide('modes-conj')) return { cle: cle + '-a', cible: $('modes-conj'),
         texte: 'Choisis un ou plusieurs modes : indicatif, conditionnel, subjonctif, impératif.' };
+      if (vide('groupes')) return { cle: cle + '-c', cible: $('groupes'), texte: 'Choisis les groupes de verbes : 1er (chanter), 2e (finir), 3e (prendre…).' };
       return { cle: cle + '-b', cible: tempsManquant() || valider,
         texte: 'Dans chaque mode choisi, touche au moins un temps, puis « Valider ».' };
     }
@@ -124,10 +128,6 @@
         texte: mm.niveau === 'facile' ? 'Choisis les tables que tu veux réviser. « Tout » les choisit toutes d’un coup.'
           : 'Choisis tes nombres : des unités, des dizaines (30 = de 30 à 39)… Chaque calcul prendra un nombre de chaque groupe choisi.' };
       return { cle: cle + '-c', cible: valider, texte: 'Parfait !' + fin };
-    }
-    if (mat === 'conjugaison') {
-      if (vide('groupes')) return { cle: cle + '-a', cible: $('groupes'), texte: 'Choisis les groupes de verbes : 1er (chanter), 2e (finir), 3e (prendre…).' };
-      return { cle: cle + '-b', choix: $('niveau-conj'), cible: valider, texte: 'Choisis ton niveau : plus il est haut, plus les verbes sont rares.' + fin };
     }
     if (vide('types-questions')) return { cle: cle + '-b', cible: $('types-questions'),
       texte: 'Choisis les questions qu’on peut te poser : écrire le mot, compter ses lettres, ses syllabes…' };

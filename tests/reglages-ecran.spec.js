@@ -130,17 +130,22 @@ test('conjugaison : chaque mode est un cadre qui entoure ses propres temps, rang
   await remplit(page, '#temps-conj', 0.3);
 });
 
-test('conjugaison, groupes et niveau : en grand, sur toute la largeur, sans défiler', async ({ page }) => {
+// v6.49 : les groupes sont sur l'écran des temps (à côté des modes), le niveau sur l'écran de la matière.
+test('conjugaison : groupes sur l\'écran des temps, niveau sur l\'écran de la matière, sans défiler', async ({ page }) => {
   await rapide(page);
   await page.goto('./');
   await versReglages(page, 1);
-  await conjugaison(page, { groupes: [] });
-  const g = await boites(page, '#groupes'), n = await boites(page, '#niveau-conj');
+  await page.locator('#matieres input[value="francais"]').check();
+  await page.locator('#francais input[value="conjugaison"]').check();
+  const n = await boites(page, '#niveau-conj');
+  expect([1, 2]).toContain(new Set(n.map((b) => b[1])).size); // les 4 niveaux sur 1 ligne (2 × 2 au plus)
+  await conjugaison(page, { groupes: [], temps: ['indicatif.present', 'subjonctif.present', 'conditionnel.present', 'imperatif.present'] });
+  const g = await boites(page, '#groupes');
   expect(new Set(g.map((b) => b[1])).size).toBe(1); // les 3 groupes sur une ligne
-  expect([1, 2]).toContain(new Set(n.map((b) => b[1])).size); // les 4 niveaux sur 1 ligne (2 × 2 en hauteur)
-  const corps = await page.locator('#reglages-joueur').boundingBox();
-  expect(g[2][0] + g[2][2] - g[0][0]).toBeGreaterThan(corps.width * 0.6); // les groupes prennent la largeur
-  await remplit(page, '#reglages-conj', 0.4);
+  const pied = await page.locator('#btn-valider-reglages').boundingBox(), temps = await page.locator('#temps-conj').boundingBox();
+  expect(temps.y + temps.height).toBeLessThanOrEqual(pied.y + 1); // les temps ne passent pas sous le bouton
+  const deborde = await page.locator('#conj-temps .pack span').evaluateAll((l) => l.some((e) => e.scrollWidth > e.clientWidth + 1));
+  expect(deborde).toBe(false);
   await page.locator('#groupes label', { hasText: '2e' }).click();
   expect(await page.evaluate(() => window.Aventura.partie.conj[0].groupes)).toEqual([2]);
 });

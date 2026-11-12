@@ -211,6 +211,12 @@
             <div class="packs" id="niveau-maths" role="radiogroup" aria-labelledby="niveau-maths-titre" aria-describedby="niveau-maths-aide"></div>
             <p class="reglage-aide" id="niveau-maths-aide"></p>
           </div>
+          <!-- Conjugaison : le niveau se choisit aussi sur cet écran (v6.49, demande du 12/11/2026). -->
+          <div class="reglage-ligne" id="reglage-niveau-conj" hidden>
+            <p class="reglage-titre" id="niveau-conj-titre">Niveau</p>
+            <div class="packs" id="niveau-conj" role="radiogroup" aria-labelledby="niveau-conj-titre" aria-describedby="niveau-conj-aide"></div>
+            <p class="reglage-aide" id="niveau-conj-aide"></p>
+          </div>
           <!-- Nombre de signes par calcul (v6.14) : seuls les choix permis par le niveau apparaissent. -->
           <div class="reglage-ligne" id="reglage-nb-signes" hidden>
             <p class="reglage-titre" id="nb-signes-titre">Signes par calcul</p>
@@ -254,30 +260,23 @@
             </div>
           </div>
 
-          <!-- Conjugaison (v6.0) : deux écrans après la matière (js/conjugaison.js).
-               Écran « modes » : les modes (indicatif, conditionnel…), puis seulement les temps de ces modes.
-               Écran « réglages » : groupes de verbes et niveau. -->
+          <!-- Conjugaison (v6.0, un seul écran depuis la v6.49) après la matière et le niveau (js/conjugaison.js) :
+               les modes (indicatif, conditionnel…), les groupes de verbes, puis seulement les temps des modes choisis. -->
           <div class="reglages-matiere" id="conj-temps" hidden>
-            <div class="reglage reglage-ligne">
-              <p class="reglage-titre" id="modes-conj-titre">Modes</p>
-              <div class="packs" id="modes-conj" role="group" aria-labelledby="modes-conj-titre"></div>
+            <div class="reglage conj-haut">
+              <div class="reglage-ligne">
+                <p class="reglage-titre" id="modes-conj-titre">Modes</p>
+                <div class="packs" id="modes-conj" role="group" aria-labelledby="modes-conj-titre"></div>
+              </div>
+              <div class="reglage-ligne">
+                <p class="reglage-titre" id="groupes-titre">Groupes</p>
+                <div class="packs" id="groupes" role="group" aria-labelledby="groupes-titre"></div>
+              </div>
             </div>
             <div class="reglage">
               <p class="reglage-titre titre-temps" id="temps-conj-titre">Temps <span>(au moins un)</span></p>
               <p class="reglage-aide aide-gauche" id="temps-conj-vide">Choisis d’abord un mode.</p>
               <div class="temps-modes" id="temps-conj" role="group" aria-labelledby="temps-conj-titre"></div>
-            </div>
-          </div>
-          <div class="reglages-matiere reglages-remplir" id="reglages-conj" hidden>
-            <div class="reglage reglage-duo">
-              <div class="reglage-ligne">
-                <p class="reglage-titre" id="groupes-titre">Groupes</p>
-                <div class="packs" id="groupes" role="group" aria-labelledby="groupes-titre"></div>
-              </div>
-              <div class="reglage-ligne">
-                <p class="reglage-titre" id="niveau-conj-titre">Niveau</p>
-                <div class="packs" id="niveau-conj" role="radiogroup" aria-labelledby="niveau-conj-titre"></div>
-              </div>
             </div>
           </div>
 
