@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.51';
+  var VERSION = '6.52';
 
   var HISTORY = [
+    { v: '6.52', date: '2026-11-12', changes: [
+      "Mot mélangé : on n'écrit plus le mot. On touche les lettres mélangées : chacune va dans la case suivante du mot. Toucher une lettre placée la renvoie à sa place ; « ↺ Tout remettre » les renvoie toutes. Le mot complet est corrigé tout seul.",
+      "Sur ordinateur, on peut aussi taper les lettres au clavier (Retour arrière retire la dernière)."
+    ] },
     { v: '6.51', date: '2026-11-12', changes: [
       "Orthographe, choix des questions sur téléphone : les noms des questions débordaient de leurs boutons quand l'écran est étroit ou le texte agrandi. Le nom de chaque famille passe au-dessus de ses boutons, qui reprennent toute la largeur, 3 par ligne."
     ] },

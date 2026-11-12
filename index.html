@@ -391,6 +391,13 @@
             </div>
             <p class="carte-consigne" id="carte-consigne"></p>
             <p class="carte-mot" id="carte-mot"></p>
+            <!-- Mot mélangé (v6.52) : on touche les lettres mélangées (en haut) pour les placer dans l'ordre dans les cases (en bas).
+                 Toucher une lettre placée la renvoie à sa place ; « Tout remettre » les renvoie toutes. Le mot complet est corrigé tout seul. -->
+            <div class="carte-lettres" id="carte-lettres" hidden>
+              <div class="lettres-rangee" id="lettres-melangees" role="group" aria-label="Lettres mélangées"></div>
+              <div class="lettres-rangee lettres-reponse" id="lettres-reponse" role="group" aria-label="Cases du mot"></div>
+              <button type="button" class="btn btn-secondaire btn-remettre" id="btn-remettre"><span aria-hidden="true">↺</span> Tout remettre</button>
+            </div>
             <!-- Calcul (et conjugaison) : le joueur écrit sa réponse, le jeu la corrige (v5.7). -->
             <form class="carte-saisie" id="carte-saisie" novalidate hidden>
               <label for="reponse-joueur">Ta réponse</label>

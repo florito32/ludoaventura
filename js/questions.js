@@ -57,9 +57,10 @@
       montrer: function (mot, info, p) { return mot.slice(0, p.pos) + '_' + mot.slice(p.pos + 1); },
       attendu: function (mot, info, p) { return [mot[p.pos]]; },
       reponse: function (mot, info, p) { return mot[p.pos] + ' (' + mot + ')'; } },
-    // Mot mélangé : les lettres en désordre ; le joueur écrit le mot (mots d'un seul morceau, 4 lettres ou plus).
+    // Mot mélangé : les lettres en désordre (mots d'un seul morceau, 4 lettres ou plus).
+    // v6.52 : le joueur ne l'écrit plus, il touche les lettres pour les placer dans l'ordre (lettres: true, js/plateau.js).
     // La voix ne lit que la consigne : dire le mot donnerait la réponse.
-    { id: 'melange', nom: 'Mot mélangé', consigne: 'Remets les lettres dans l\u2019ordre :', saisie: 'mot', voixSansMot: true,
+    { id: 'melange', nom: 'Mot mélangé', consigne: 'Remets les lettres dans l\u2019ordre :', saisie: 'mot', voixSansMot: true, lettres: true,
       possible: function (mot) { return /^\p{L}+$/u.test(mot) && lettres(mot).length >= 4 && new Set(mot.split('')).size > 1; },
       preparer: function (mot) {
         var l = mot.split(''), m, essai = 0;
