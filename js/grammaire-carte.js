@@ -104,26 +104,26 @@
     var n = c.gauche.length;
     if (!Array.isArray(c.liens) || c.liens.length !== n) c.liens = c.gauche.map(function () { return null; });
     var choisi = c.choisi || null;
+    // Le lien est dit aux lecteurs d'écran par un texte caché après le mot (le nom du bouton commence par le texte visible, WCAG 2.5.3).
+    function cache(t) { return t ? '<span class="visually-hidden">' + echapper(t) + '</span>' : ''; }
     function numero(g) { return '<span class="gram-num" style="--lien:' + COULEURS[g] + '" aria-hidden="true">' + (g + 1) + '</span>'; }
     var gauche = c.gauche.map(function (m, g) {
       var d = c.liens[g], cl = 'gram-mot-relier', lie = d !== null;
       if (lie) cl += ' lie';
       if (fait && lie) cl += d === c.bonnes[g] ? ' juste' : ' fausse';
       if (choisi && choisi.cote === 'g' && choisi.i === g) cl += ' choisi';
-      var nom = m + (lie ? ', relié à ' + c.droite[d] : '');
       return '<button type="button" class="' + cl + '" data-cote="g" data-i="' + g + '" style="--lien:' + (lie ? COULEURS[g] : 'transparent') + '"' +
-        (fait ? ' disabled' : '') + ' aria-pressed="' + String(!!(choisi && choisi.cote === 'g' && choisi.i === g)) + '" aria-label="' + echapper(nom) + '">' +
-        '<span class="gram-texte">' + echapper(m) + '</span>' + (lie ? numero(g) : '') + '</button>';
+        (fait ? ' disabled' : '') + ' aria-pressed="' + String(!!(choisi && choisi.cote === 'g' && choisi.i === g)) + '">' +
+        '<span class="gram-texte">' + echapper(m) + '</span>' + cache(lie ? ', relié à ' + c.droite[d] : '') + (lie ? numero(g) : '') + '</button>';
     }).join('');
     var droite = c.droite.map(function (m, d) {
       var g = c.liens.indexOf(d), cl = 'gram-mot-relier', lie = g >= 0;
       if (lie) cl += ' lie';
       if (fait && lie) cl += d === c.bonnes[g] ? ' juste' : ' fausse';
       if (choisi && choisi.cote === 'd' && choisi.i === d) cl += ' choisi';
-      var nom = m + (lie ? ', relié à ' + c.gauche[g] : '');
       return '<button type="button" class="' + cl + '" data-cote="d" data-i="' + d + '" style="--lien:' + (lie ? COULEURS[g] : 'transparent') + '"' +
-        (fait ? ' disabled' : '') + ' aria-pressed="' + String(!!(choisi && choisi.cote === 'd' && choisi.i === d)) + '" aria-label="' + echapper(nom) + '">' +
-        (lie ? numero(g) : '') + '<span class="gram-texte">' + echapper(m) + '</span></button>';
+        (fait ? ' disabled' : '') + ' aria-pressed="' + String(!!(choisi && choisi.cote === 'd' && choisi.i === d)) + '">' +
+        (lie ? numero(g) : '') + '<span class="gram-texte">' + echapper(m) + '</span>' + cache(lie ? ', relié à ' + c.gauche[g] : '') + '</button>';
     }).join('');
     return '<div class="gram-relier' + (fait ? ' corrige' : '') + '" style="--n:' + n + '">' +
       '<div class="gram-col" role="group" aria-label="Colonne de gauche">' + gauche + '</div>' +
