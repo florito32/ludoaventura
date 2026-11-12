@@ -36,6 +36,7 @@
     box.innerHTML = html;
     box.hidden = !html; // question ouverte : rien ici, la case de réponse commune suffit
     brancher(c, box, rappels, fait);
+    if (c.format === 'C' && box.querySelector('.carte-geo')) zoomCarte(box.querySelector('.carte-geo'));
     // Phrase de correction sous la carte (même endroit que pour le calcul et l'orthographe).
     var rep = $('carte-reponse');
     if (fait && c.format !== 'O') {
@@ -149,7 +150,119 @@
       var acces = z.cible && !fait ? ' role="button" tabindex="0" aria-label="' + esc(z.nom) + '"' : ' aria-hidden="true"';
       return '<path class="' + cl + '" data-zone="' + z.id + '" d="' + z.d + '"' + acces + '></path>';
     }).join('');
-    return '<div class="carte-geo"><svg viewBox="' + carte.vb + '" role="group" aria-label="Carte : ' + esc(carte.titre) + '">' + zones + '</svg></div>';
+    // v7.2 : boutons de zoom (la carte seule grossit, pas la page) ; on peut aussi pincer à deux doigts ou tourner la molette.
+    var zoom = '<div class="carte-zoom" role="group" aria-label="Zoom de la carte">' +
+      '<button type="button" class="btn-zoom" data-zoom="plus" aria-label="Zoomer sur la carte"><span aria-hidden="true">+</span></button>' +
+      '<button type="button" class="btn-zoom" data-zoom="moins" aria-label="Dézoomer la carte" disabled><span aria-hidden="true">−</span></button>' +
+      '<button type="button" class="btn-zoom" data-zoom="tout" aria-label="Revoir toute la carte" hidden><span aria-hidden="true">⤢</span></button></div>';
+    return '<div class="carte-geo"><svg viewBox="' + carte.vb + '" role="group" aria-label="Carte : ' + esc(carte.titre) + '">' + zones + '</svg>' + zoom + '</div>';
+  }
+
+  // ---------- Zoom de la carte à toucher (v7.2) ----------
+  // On change le viewBox du SVG : seule la carte grossit, la page garde sa taille (touch-action: none sur la carte,
+  // donc le navigateur ne zoome pas la page quand on pince dessus). Pincer à deux doigts ou la molette : zoom autour
+  // des doigts / du pointeur ; un doigt glissé : déplace la carte zoomée. Un toucher sans glisser choisit une zone.
+  var ZOOM_MAX = 8, SEUIL = 8; // seuil en pixels : au-delà, c'est un glissé (pas un toucher)
+  function zoomCarte(geo) {
+    var svg = geo.querySelector('svg');
+    if (!svg) return;
+    var v0 = svg.getAttribute('viewBox').split(/\s+/).map(Number);
+    var v = v0.slice();
+    var doigts = {}, depart = null, bouge = false, ecart = 0, milieu = null;
+
+    function appliquer() {
+      var w = Math.min(v0[2], Math.max(v0[2] / ZOOM_MAX, v[2]));
+      var h = w * v0[3] / v0[2];
+      v[2] = w; v[3] = h;
+      v[0] = Math.min(v0[0] + v0[2] - w, Math.max(v0[0], v[0]));
+      v[1] = Math.min(v0[1] + v0[3] - h, Math.max(v0[1], v[1]));
+      svg.setAttribute('viewBox', v.map(function (n) { return Math.round(n * 100) / 100; }).join(' '));
+      var zoome = w < v0[2] - 0.01;
+      geo.classList.toggle('zoomee', zoome);
+      geo.querySelector('[data-zoom="moins"]').disabled = !zoome;
+      geo.querySelector('[data-zoom="plus"]').disabled = w <= v0[2] / ZOOM_MAX + 0.01;
+      geo.querySelector('[data-zoom="tout"]').hidden = !zoome;
+    }
+    // Point de l'écran → point de la carte (tient compte des bandes vides de preserveAspectRatio).
+    function versCarte(x, y) {
+      var m = svg.getScreenCTM();
+      if (!m) return { x: v[0] + v[2] / 2, y: v[1] + v[3] / 2 };
+      var p = svg.createSVGPoint(); p.x = x; p.y = y;
+      return p.matrixTransform(m.inverse());
+    }
+    // Zoom d'un facteur f autour du point (x, y) de l'écran : ce point reste sous le doigt.
+    function zoomer(f, x, y) {
+      var c = versCarte(x, y);
+      var w = Math.min(v0[2], Math.max(v0[2] / ZOOM_MAX, v[2] / f)), k = w / v[2];
+      v[0] = c.x - (c.x - v[0]) * k; v[1] = c.y - (c.y - v[1]) * k;
+      v[2] = w; v[3] *= k;
+      appliquer();
+    }
+    function deplacer(dx, dy) {
+      var m = svg.getScreenCTM(), a = m ? m.a : 1;
+      v[0] -= dx / a; v[1] -= dy / a;
+      appliquer();
+    }
+    function centreEcran() { var r = svg.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }
+
+    geo.querySelector('.carte-zoom').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-zoom]');
+      if (!b) return;
+      e.stopPropagation(); // ce n'est pas un toucher de zone
+      var c = centreEcran();
+      if (b.dataset.zoom === 'plus') zoomer(2, c[0], c[1]);
+      else if (b.dataset.zoom === 'moins') zoomer(0.5, c[0], c[1]);
+      else { v = v0.slice(); appliquer(); }
+    });
+    svg.addEventListener('wheel', function (e) {
+      e.preventDefault();
+      zoomer(e.deltaY < 0 ? 1.25 : 0.8, e.clientX, e.clientY);
+    }, { passive: false });
+
+    function liste() { return Object.keys(doigts).map(function (k) { return doigts[k]; }); }
+    function mesure() {
+      var d = liste();
+      if (d.length < 2) return;
+      ecart = Math.hypot(d[0].x - d[1].x, d[0].y - d[1].y);
+      milieu = { x: (d[0].x + d[1].x) / 2, y: (d[0].y + d[1].y) / 2 };
+    }
+    svg.addEventListener('pointerdown', function (e) {
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      if (!liste().length) { bouge = false; depart = { x: e.clientX, y: e.clientY }; }
+      doigts[e.pointerId] = { x: e.clientX, y: e.clientY };
+      if (liste().length >= 2) { bouge = true; mesure(); }
+    });
+    svg.addEventListener('pointermove', function (e) {
+      var d = doigts[e.pointerId];
+      if (!d) return;
+      var n = liste().length;
+      if (n >= 2) {
+        d.x = e.clientX; d.y = e.clientY;
+        var avant = ecart, m0 = milieu;
+        mesure();
+        if (avant > 0) zoomer(ecart / avant, m0.x, m0.y);
+        deplacer(milieu.x - m0.x, milieu.y - m0.y);
+        return;
+      }
+      if (!bouge && depart && Math.hypot(e.clientX - depart.x, e.clientY - depart.y) > SEUIL) {
+        bouge = true;
+        try { svg.setPointerCapture(e.pointerId); } catch (err) { /* rien */ }
+      }
+      if (bouge && geo.classList.contains('zoomee')) deplacer(e.clientX - d.x, e.clientY - d.y);
+      d.x = e.clientX; d.y = e.clientY;
+    });
+    function lever(e) {
+      delete doigts[e.pointerId];
+      mesure();
+    }
+    svg.addEventListener('pointerup', lever);
+    svg.addEventListener('pointercancel', lever);
+    // Après un glissé ou un pincement, le « clic » final n'est pas un choix de zone.
+    geo.addEventListener('click', function (e) {
+      if (bouge && !e.target.closest('.carte-zoom')) { e.stopPropagation(); e.preventDefault(); }
+      if (!liste().length) bouge = false;
+    }, true);
+    appliquer();
   }
 
   function brancher(c, box, rappels, fait) {

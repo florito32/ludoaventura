@@ -258,3 +258,61 @@ test('carte à toucher : chaque carte a au moins 2 zones à demander ; consigne 
     }
   }
 });
+
+// v7.2 (demande du 12/11/2026) : zoomer sur la carte seule, pour toucher plus précisément.
+test('carte à toucher (v7.2) : zoom de la carte seule (boutons, pincement, molette), glisser ne choisit pas, toucher choisit', async ({ page }, info) => {
+  await versGeo(page, { niveau: 'facile', jeux: ['g10'], hasard: 0.3 });
+  const c = await piocher(page);
+  expect(c.format).toBe('C');
+  const svg = page.locator('#carte-savoir .carte-geo svg');
+  const vb0 = await svg.getAttribute('viewBox');
+  const largeur = async () => Number((await svg.getAttribute('viewBox')).split(' ')[2]);
+  const w0 = await largeur();
+  // Au départ : « − » grisé, « Revoir toute la carte » caché.
+  await expect(page.getByRole('button', { name: 'Dézoomer la carte' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Revoir toute la carte' })).toBeHidden();
+  await page.getByRole('button', { name: 'Zoomer sur la carte' }).click();
+  expect(await largeur()).toBeCloseTo(w0 / 2, 0);
+  await expect(page.getByRole('button', { name: 'Revoir toute la carte' })).toBeVisible();
+  // La page, elle, n'est pas zoomée et ne déborde pas.
+  expect(await page.evaluate(() => (window.visualViewport ? window.visualViewport.scale : 1))).toBe(1);
+  await pasDeDebordement(page);
+  // Glisser la carte zoomée la déplace, sans choisir de zone.
+  const b = await svg.boundingBox();
+  const vbAvant = await svg.getAttribute('viewBox');
+  await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(b.x + b.width / 2 + 60, b.y + b.height / 2 + 40, { steps: 6 });
+  await page.mouse.up();
+  expect(await svg.getAttribute('viewBox')).not.toBe(vbAvant);
+  expect(await page.evaluate(() => window.Aventura.partie.carte.reponseDonnee)).toBeFalsy();
+  // Molette (ordinateur) : zoom autour du pointeur.
+  if (!info.project.use.isMobile) {
+    const w1 = await largeur();
+    await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2);
+    await page.mouse.wheel(0, -200);
+    await expect.poll(largeur).toBeLessThan(w1);
+  }
+  // Pincer à deux doigts (écrans tactiles) : la carte grossit, la page non.
+  if (info.project.use.hasTouch) {
+    await page.getByRole('button', { name: 'Revoir toute la carte' }).click();
+    expect(await svg.getAttribute('viewBox')).toBe(vb0);
+    const cdp = await page.context().newCDPSession(page);
+    const cx = b.x + b.width / 2, cy = b.y + b.height / 2;
+    const touche = (type, d) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: type === 'touchEnd' ? [] : [{ x: cx - d, y: cy, id: 1 }, { x: cx + d, y: cy, id: 2 }] });
+    await touche('touchStart', 20);
+    for (let d = 25; d <= 80; d += 5) await touche('touchMove', d);
+    await touche('touchEnd', 80);
+    await expect.poll(largeur).toBeLessThan(w0 / 2);
+    expect(await page.evaluate(() => (window.visualViewport ? window.visualViewport.scale : 1))).toBe(1);
+    expect(await page.evaluate(() => window.Aventura.partie.carte.reponseDonnee)).toBeFalsy();
+  }
+  // Toucher la bonne zone (zoomée) : réponse juste.
+  await page.getByRole('button', { name: 'Revoir toute la carte' }).click();
+  await page.getByRole('button', { name: 'Zoomer sur la carte' }).click();
+  const zone = page.locator('#carte-savoir [data-zone="' + c.bonne + '"]');
+  await zone.scrollIntoViewIfNeeded().catch(() => {});
+  await zone.dispatchEvent('click');
+  await expect(page.locator('#carte-reponse')).toContainText('Bravo');
+});
+

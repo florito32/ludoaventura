@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '7.3';
+  var VERSION = '7.4';
 
   var HISTORY = [
+    { v: '7.4', date: '2026-11-12', changes: [
+      "Carte à toucher : on peut zoomer sur la carte seule (pas la page) pour toucher plus précisément : en pinçant à deux doigts, avec la molette ou avec les boutons + et −. Un doigt glissé déplace la carte zoomée ; le bouton ⤢ remet toute la carte."
+    ] },
     { v: '7.3', date: '2026-11-12', changes: [
       "Nouveau en français : les Phonèmes, à côté de l'orthographe, de la conjugaison et de la grammaire (sans niveau).",
       "Écran des sons, présenté comme celui des temps de conjugaison : on choisit Consonnes, Voyelles ou Semi-voyelles, puis les sons, rangés sur deux colonnes ; chaque son a son symbole entre crochets et un mot simple, lettres du son soulignées ([p] pomme, [ʃ] chat…). Bouton « Tout sélectionner ».",
