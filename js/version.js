@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.47';
+  var VERSION = '6.48';
 
   var HISTORY = [
+    { v: '6.48', date: '2026-11-12', changes: [
+      "Aventura se joue maintenant toujours dans le navigateur, sur ordinateur, tablette, iPhone et Android : ce n'est plus une application à installer. Le bouton « Installer l'application » est retiré.",
+      "Le jeu ne garde plus de copie hors ligne : il faut une connexion Internet. Les appareils qui avaient installé l'application reçoivent toujours la dernière version."
+    ] },
     { v: '6.47', date: '2026-11-10', changes: [
       "Défi du jour : un défi quitté avant la fin (retour à l'accueil, redémarrage, jeu fermé…) ne rapporte plus rien ce jour-là, même rejoué et gagné. On peut toujours y jouer. Une partie perdue jusqu'au bout se retente normalement."
     ] },

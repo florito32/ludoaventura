@@ -1865,7 +1865,7 @@
   $('btn-prepa-retour').addEventListener('click', revenir);
 
   // ---------- Touche « précédent » du téléphone ou de la tablette (v6.23) ----------
-  // Sans rien faire, elle quitte la page (et ferme l'application installée). On garde donc une entrée
+  // Sans rien faire, elle quitte la page. On garde donc une entrée
   // « garde » dans l'historique (History API, pushState) : la touche la retire, l'évènement popstate arrive,
   // et on fait comme le bouton « ← Retour » : écran précédent de la préparation, ou menu sur le plateau.
   // Sur l'accueil, il n'y a pas d'écran précédent : la touche quitte normalement.
