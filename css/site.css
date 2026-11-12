@@ -223,6 +223,13 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
   .reglages-joueur .choix-matiere .pack span { min-height: 38px; padding: 2px 14px; font-size: 1rem; }
   .choix-matiere .reglage-aide { width: 100%; font-size: .8rem; }
 }
+/* v7.3 : 4 choix en français (… Phonèmes) : sur écran étroit ET bas (téléphone carré), boutons plus serrés
+   pour qu'Orthographe, Conjugaison, Grammaire et Phonèmes tiennent sur 2 lignes sans faire défiler. */
+@container (max-height: 420px) and (max-width: 520px) {
+  .reglages-joueur .reglage.choix-matiere { gap: 5px; }
+  .reglages-joueur .choix-matiere .pack span { min-height: 34px; padding: 1px 11px; font-size: .95rem; }
+  .choix-matiere .packs { gap: 4px 6px; }
+}
 .reglage-ligne { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
 .reglage-ligne .reglage-titre { margin: 0; }
 .nombres .pack span { min-width: 44px; justify-content: center; padding: 4px 8px; }
@@ -486,6 +493,66 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 /* Conjugaison (v6.49) : les groupes de verbes sur l'écran des temps, à côté des modes ; le niveau sur l'écran de la matière. */
 #conj-temps .conj-haut { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: clamp(4px, 1.2cqh, 10px) clamp(14px, 3cqi, 32px); }
 #groupes .pack span { min-width: 3.2em; justify-content: center; }
+
+/* Phonèmes (v7.3), écran des sons : présenté comme l'écran des temps de la conjugaison. Les catégories en haut,
+   puis un cadre par catégorie choisie, ses sons sur deux colonnes : « [p] pomme », lettres du son en gras.
+   En largeur : les cadres côte à côte ; en hauteur : Consonnes | Voyelles côte à côte (symbole au-dessus du mot),
+   Semi-voyelles en dessous. Les boutons grandissent avec la place libre (9 lignes au plus : les consonnes). */
+#phon-sons { height: 100%; display: flex; flex-direction: column; gap: clamp(4px, 1.6cqh, 14px); }
+#phon-sons .reglage { margin: 0; }
+#phon-sons .conj-haut .reglage-ligne { justify-content: center; flex-wrap: wrap; }
+#phon-sons .conj-haut { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: clamp(4px, 1.2cqh, 10px) clamp(10px, 2cqi, 24px); }
+#phon-sons .conj-haut .reglage-ligne { width: auto; }
+#phon-sons > .reglage:last-child { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+#sons-phon {
+  --ht: clamp(24px, calc((100cqh - 11rem) / 9 - 1cqh), 60px);
+  flex: 1; min-height: 0; display: flex; flex-direction: row; gap: clamp(6px, 1.6cqi, 16px); align-items: flex-start; justify-content: center;
+}
+#sons-phon .phon-cadre {
+  flex: 2 1 0; min-width: 0; display: flex; flex-direction: column; align-items: stretch; gap: clamp(2px, .8cqh, 8px);
+  border: 3px solid var(--encre); border-radius: 16px; padding: clamp(4px, 1cqh, 10px) clamp(4px, 1cqi, 10px);
+  background: rgb(255 255 255 / .55);
+}
+#sons-phon .phon-cadre[data-cat="semi"] { flex-grow: 1.15; }
+#sons-phon[data-nb="1"] .phon-cadre { flex: 0 1 min(100%, 560px); } /* une seule catégorie : cadre pas trop large */
+#sons-phon .phon-cadre[hidden] { display: none; }
+.phon-tete { display: flex; align-items: center; justify-content: center; gap: 8px; }
+#sons-phon .mode-nom { width: auto; text-align: center; color: var(--encre); font-size: clamp(.78rem, calc(var(--ht) * .42), 1.3rem); }
+#sons-phon .btn-tout-famille { min-height: 24px; padding: 0 10px; font-size: .78rem; }
+#sons-phon .packs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(2px, .7cqh, 8px) clamp(3px, .8cqi, 8px); }
+#sons-phon .pack { display: flex; }
+#sons-phon .pack span {
+  width: 100%; height: var(--ht); min-height: 0; padding: 0 6px; justify-content: center; text-align: center; line-height: 1.05;
+  border-radius: 12px; font-size: clamp(.74rem, min(calc(var(--ht) * .4), 2.6cqi), 1.2rem); gap: .35em; white-space: nowrap;
+}
+.phon-api { font-weight: 800; margin: 0 !important; font-size: 1em !important; font-family: "Charis SIL", "Doulos SIL", "DejaVu Sans", "Segoe UI", system-ui, sans-serif; }
+.phon-ex { font-style: normal; font-weight: 500; }
+.phon-ex strong { font-weight: 900; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 2px; }
+@container (max-aspect-ratio: 1/1) or (max-width: 640px) {
+  #sons-phon { --ht: clamp(30px, calc((100cqh - 13rem) / 9 - 1cqh), 64px); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; }
+  #sons-phon .phon-cadre[data-cat="semi"] { grid-column: 1 / -1; }
+  #sons-phon .phon-cadre[data-cat="semi"] .packs { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #sons-phon[data-nb="1"] .phon-cadre { grid-column: 1 / -1; }
+  /* Deux cadres côte à côte, deux colonnes chacun : le symbole au-dessus du mot. */
+  #sons-phon:not([data-nb="1"]) .phon-cadre:not([data-cat="semi"]) .pack span { flex-direction: column; gap: 0; padding: 0 2px; font-size: clamp(.72rem, min(calc(var(--ht) * .3), 3.6cqi), 1.1rem); }
+}
+/* Téléphone en paysage ou carré : peu de hauteur ; les boutons restent touchables, le cadre défile s'il le faut. */
+@container (max-height: 460px) {
+  #sons-phon { --ht: clamp(26px, calc((100cqh - 8rem) / 9 - .5cqh), 44px); overflow-y: auto; }
+}
+@container (max-width: 400px) {
+  #cats-phon-titre { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+}
+/* Phonèmes (v7.3), écran des jeux : 6 jeux, 3 par ligne en largeur, 2 par ligne en hauteur. */
+#reglages-phon { --rangs: 2; --cols: 3; --larg: min(100cqi, 820px);
+  --h: clamp(30px, calc((100cqh - 5.2rem) / var(--rangs) - 2cqh), 110px); }
+#jeux-phon { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+#reglages-phon .pack { display: flex; }
+.reglages-joueur #reglages-phon .pack span { border-radius: 18px; }
+@container (max-aspect-ratio: 1/1) {
+  #reglages-phon { --rangs: 3; --cols: 2; }
+  #jeux-phon { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 
 /* 4. Aventures : la grille au-dessus, le résumé de l'aventure choisie en dessous. */
 .etape-aventure { display: flex; flex-direction: column; gap: 8px; overflow: hidden; }
@@ -832,6 +899,26 @@ span.gram-bulle.posee { display: inline-flex; align-items: center; cursor: defau
 .gram-mot-relier.fausse { background: #fbe6e6; }
 .gram-num { flex: none; width: 22px; height: 22px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--lien); color: #fff; font: 800 .8rem/1 system-ui, sans-serif; }
 .gram-relier.corrige .gram-num { display: none; }
+/* Phonèmes (v7.3) dans la carte : le mot en grand, les lettres du son en couleur, encadrées et en gras. */
+.phon-mot { font-size: clamp(1.8rem, 8vw, 2.6rem); letter-spacing: .02em; }
+.phon-lettres { background: #ffe9a8; color: var(--rouge-texte); font-weight: 900; padding: 0 .08em; border-radius: 6px; box-shadow: 0 0 0 3px var(--rouge-texte); }
+.phon-trou { min-width: 1.6em; }
+.gram-bouton .phon-api { font-size: 1.15em !important; }
+.gram-bouton .phon-ex, .gram-mot-relier .phon-ex { font-size: .85em; color: var(--encre-douce); }
+.gram-bouton.bonne .phon-ex, .gram-bouton.fausse .phon-ex { color: inherit; }
+/* Trier les mots : deux colonnes, chacune avec son son en tête (bouton « ranger ici »). */
+.phon-colonnes { width: 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.phon-colonne { display: flex; flex-direction: column; gap: 6px; border: 3px dashed var(--parchemin-bord); border-radius: 14px; padding: 6px; min-height: 120px; }
+.phon-col-tete {
+  min-height: 48px; padding: 4px 8px; font: 700 1.1rem/1.2 system-ui, sans-serif; color: var(--encre); cursor: pointer;
+  background: #fff; border: 3px solid var(--encre); border-radius: 10px; box-shadow: 0 3px 0 var(--encre); touch-action: manipulation;
+}
+.phon-col-tete:disabled { cursor: default; opacity: 1; }
+.phon-reste:has(.choisi) ~ .phon-colonnes .phon-col-tete:not(:disabled) { background: var(--jaune); box-shadow: 0 0 0 3px var(--bleu); }
+.phon-col-mots { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.gram-bulle.choisi { background: var(--jaune); box-shadow: 0 0 0 3px var(--bleu); }
+.phon-reste { min-height: 44px; }
+.phon-aide { margin: 0 !important; font-size: .9rem; color: var(--encre-douce); }
 /* Réponse écrite par le joueur (calcul, v5.7) : la case et « Valider » sur une ligne. */
 .carte-saisie { margin: 4px 0 8px; }
 .carte-saisie label { display: block; font-weight: 700; margin-bottom: 4px; }

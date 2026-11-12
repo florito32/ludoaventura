@@ -206,6 +206,8 @@
               <label class="pack"><input type="radio" name="francais" value="orthographe"><span>Orthographe</span></label>
               <label class="pack"><input type="radio" name="francais" value="conjugaison"><span>Conjugaison</span></label>
               <label class="pack"><input type="radio" name="francais" value="grammaire"><span>Grammaire</span></label>
+              <!-- v7.3 : Phonèmes (js/phonemes.js), sans niveau (choix de l'utilisateur). -->
+              <label class="pack"><input type="radio" name="francais" value="phonemes"><span>Phonèmes</span></label>
             </div>
           </div>
           <!-- Mathématiques : le niveau se choisit tout de suite, sur cet écran (v5.9). Facile = les tables. -->
@@ -329,6 +331,33 @@
                 <button type="button" class="btn-tout" data-liste="types-questions"></button>
               </div>
               <div class="packs" id="types-questions" role="group" aria-labelledby="types-titre"></div>
+            </div>
+          </div>
+          <!-- Phonèmes (v7.3, demande du 12/11/2026) : comme l'écran des temps de la conjugaison :
+               les catégories en haut (Consonnes, Voyelles, Semi-voyelles), puis un cadre par catégorie choisie
+               avec ses sons sur deux colonnes ([p] pomme…), et « Tout sélectionner ». -->
+          <div class="reglages-matiere" id="phon-sons" hidden>
+            <div class="reglage conj-haut">
+              <div class="reglage-ligne">
+                <p class="reglage-titre" id="cats-phon-titre">Catégories</p>
+                <div class="packs" id="cats-phon" role="group" aria-labelledby="cats-phon-titre"></div>
+              </div>
+              <button type="button" class="btn-tout" id="btn-tout-sons"></button>
+            </div>
+            <div class="reglage">
+              <p class="reglage-titre titre-temps" id="sons-phon-titre">Sons <span>(au moins un)</span></p>
+              <p class="reglage-aide aide-gauche" id="sons-phon-vide">Choisis d’abord une catégorie.</p>
+              <div class="temps-modes" id="sons-phon" role="group" aria-labelledby="sons-phon-titre"></div>
+            </div>
+          </div>
+          <!-- Phonèmes (v7.3) : les petits jeux, un tiré au hasard à chaque carte. -->
+          <div class="reglages-matiere reglages-remplir" id="reglages-phon" hidden>
+            <div class="reglage">
+              <div class="reglage-tete">
+                <p class="reglage-titre" id="jeux-phon-titre">Jeux <span>(un au hasard à chaque carte)</span></p>
+                <button type="button" class="btn-tout" id="btn-tout-phon"></button>
+              </div>
+              <div class="packs jeux-gram" id="jeux-phon" role="group" aria-labelledby="jeux-phon-titre"></div>
             </div>
           </div>
           <!-- Grammaire (v6.54) : les petits jeux, un tiré au hasard à chaque carte (js/grammaire.js). -->
@@ -620,6 +649,7 @@
 <script src="js/calcul.js"></script>
 <script src="js/conjugaison.js"></script>
 <script src="js/grammaire.js"></script>
+<script src="js/phonemes.js"></script>
 <script src="js/grammaire-carte.js"></script>
 <script src="js/phrases.js"></script>
 <script src="js/voix.js"></script>
