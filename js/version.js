@@ -4,9 +4,16 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.52';
+  var VERSION = '6.53';
 
   var HISTORY = [
+    { v: '6.53', date: '2026-11-12', changes: [
+      "Nouveau : la Grammaire, en français, à côté de l'orthographe et de la conjugaison. On choisit un niveau (Facile, Moyen, Difficile, Expert) puis ses petits jeux ; chaque carte en tire un au hasard.",
+      "Remettre la phrase : on touche les mots mélangés dans l'ordre pour refaire la phrase ; plus le niveau est haut, plus la phrase est longue (compléments, mais / car / donc, qui / que…).",
+      "Les contraires (3 choix), Trouve l'erreur (toucher le mot faux), Nature du mot (nom, verbe, adjectif…), Homophones (a / à, son / sont, c'est / s'est…).",
+      "Relier les paires : deux colonnes de 6 à 8 mots ; on touche un mot d'un côté puis de l'autre, une ligne de couleur les relie.",
+      "« Le ou la ? » et « Au pluriel » quittent l'orthographe pour la grammaire."
+    ] },
     { v: '6.52', date: '2026-11-12', changes: [
       "Mot mélangé : on n'écrit plus le mot. On touche les lettres mélangées : chacune va dans la case suivante du mot. Toucher une lettre placée la renvoie à sa place ; « ↺ Tout remettre » les renvoie toutes. Le mot complet est corrigé tout seul.",
       "Sur ordinateur, on peut aussi taper les lettres au clavier (Retour arrière retire la dernière)."

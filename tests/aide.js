@@ -143,4 +143,16 @@ async function conjugaison(page, { temps = ['indicatif.present'], groupes = [1],
   for (const t of temps) await page.locator('#temps-conj input[value="' + t + '"]').check();
 }
 
-module.exports = { repondre, valider, cocherJoueur, orthographe, maths, conjugaison, matiere, versReglages, lancer, lancerLeDe, lancerPartie, rapide, attendreJoueur, cocherTout, ouvrirNeuf };
+// Écran 3 : Français → Grammaire (v6.53) au niveau donné ; jeux = liste des jeux gardés (tous cochés au départ).
+async function grammaire(page, { jeux = null, niveau = 'facile' } = {}) {
+  await page.locator('#matieres input[value="francais"]').check();
+  await page.locator('#francais input[value="grammaire"]').check();
+  await page.locator('#niveau-gram input[value="' + niveau + '"]').check();
+  await valider(page);
+  await page.locator('#reglages-gram').waitFor();
+  if (jeux) {
+    for (const box of await page.locator('#jeux-gram input').all()) await box.setChecked(jeux.includes(await box.getAttribute('value')));
+  }
+}
+
+module.exports = { grammaire, repondre, valider, cocherJoueur, orthographe, maths, conjugaison, matiere, versReglages, lancer, lancerLeDe, lancerPartie, rapide, attendreJoueur, cocherTout, ouvrirNeuf };

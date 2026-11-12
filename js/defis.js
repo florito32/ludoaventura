@@ -44,9 +44,10 @@
   };
   var ORTHO = {
     facile: { mots: [1, 2], types: ['nombre', 'voyelles', 'consonnes', 'syllabes', 'nb-voyelles', 'nb-consonnes'], combien: 3 },
-    moyen: { mots: [3], types: ['syllabes', 'combien-lettre', 'manquante', 'melange', 'genre', 'muettes', 'nb-consonnes'], combien: 3 },
-    difficile: { mots: [4], types: ['ecrire', 'melange', 'manquante', 'pluriel', 'muettes', 'genre'], combien: 3 },
-    expert: { mots: [5], types: ['ecrire', 'melange', 'pluriel', 'muettes', 'manquante'], combien: 3 }
+    // v6.53 : sans « Le ou la ? » ni « Au pluriel », passés en grammaire.
+    moyen: { mots: [3], types: ['syllabes', 'combien-lettre', 'manquante', 'melange', 'muettes', 'nb-consonnes'], combien: 3 },
+    difficile: { mots: [4], types: ['ecrire', 'melange', 'manquante', 'muettes'], combien: 3 },
+    expert: { mots: [5], types: ['ecrire', 'melange', 'muettes', 'manquante'], combien: 3 }
   };
 
   // ---------- Hasard tiré de la date ----------

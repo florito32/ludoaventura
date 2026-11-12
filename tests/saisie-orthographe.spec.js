@@ -3,7 +3,7 @@
 const { test, expect } = require('@playwright/test');
 const Q = require('../js/questions.js');
 const C = require('../js/cartes.js');
-const { rapide, lancerLeDe, versReglages, cocherJoueur, lancer } = require('./aide');
+const { rapide, lancerLeDe, versReglages, cocherJoueur, lancer, grammaire } = require('./aide');
 
 const juste = (id, texte, mot) => Q.juste(Q.trouver(id), texte, mot, C.INFOS[mot]);
 
@@ -140,6 +140,16 @@ test.describe('nouvelles questions : logique', () => {
   });
 });
 
+// v6.53 : « Au pluriel » et « Le ou la ? » sont des jeux de grammaire (mots de tous les thèmes du niveau).
+async function partieGrammaire(page, jeux) {
+  await rapide(page);
+  await page.goto('./');
+  await versReglages(page, 1);
+  await grammaire(page, { jeux });
+  await lancer(page);
+  await page.getByRole('button', { name: 'Question suivante' }).click();
+  return page.evaluate(() => window.Aventura.partie.carte);
+}
 async function partieMots(page, types, packs) {
   await rapide(page);
   await page.goto('./');
@@ -314,7 +324,8 @@ test.describe('genre et pluriel : logique', () => {
 });
 
 test('Au pluriel : « UN … → DES … » affiché, bonne réponse écrite → dé FORT', async ({ page }) => {
-  const c = await partieMots(page, ['pluriel'], ['animaux']);
+  const c = await partieGrammaire(page, ['pluriel']);
+  await expect(page.locator('#carte-titre')).toHaveText('Grammaire · Facile · Au pluriel');
   const info = C.INFOS[c.mot];
   await expect(page.locator('#carte-mot')).toHaveText((info.genre === 'f' ? 'UNE ' : 'UN ') + c.mot + ' → DES …');
   await page.getByLabel('Ta réponse').fill('des ' + info.pluriel.toLowerCase());
@@ -324,7 +335,7 @@ test('Au pluriel : « UN … → DES … » affiché, bonne réponse écrite →
 });
 
 test('Le ou la ? : réponse illisible → message ; fausse → correction « LA MAISON »', async ({ page }) => {
-  const c = await partieMots(page, ['genre'], ['lieux']);
+  const c = await partieGrammaire(page, ['genre']);
   const info = C.INFOS[c.mot];
   await expect(page.locator('#carte-mot')).toHaveText(c.mot);
   await page.getByLabel('Ta réponse').fill('bof');

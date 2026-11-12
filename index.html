@@ -203,6 +203,7 @@
             <div class="packs" id="francais" role="radiogroup" aria-labelledby="francais-titre">
               <label class="pack"><input type="radio" name="francais" value="orthographe"><span>Orthographe</span></label>
               <label class="pack"><input type="radio" name="francais" value="conjugaison"><span>Conjugaison</span></label>
+              <label class="pack"><input type="radio" name="francais" value="grammaire"><span>Grammaire</span></label>
             </div>
           </div>
           <!-- Mathématiques : le niveau se choisit tout de suite, sur cet écran (v5.9). Facile = les tables. -->
@@ -222,6 +223,12 @@
             <p class="reglage-titre" id="niveau-conj-titre">Niveau</p>
             <div class="packs" id="niveau-conj" role="radiogroup" aria-labelledby="niveau-conj-titre" aria-describedby="niveau-conj-aide"></div>
             <p class="reglage-aide" id="niveau-conj-aide"></p>
+          </div>
+          <!-- Grammaire (v6.53, demande du 12/11/2026) : le niveau se choisit sur cet écran, comme l'orthographe. -->
+          <div class="reglage-ligne" id="reglage-niveau-gram" hidden>
+            <p class="reglage-titre" id="niveau-gram-titre">Niveau</p>
+            <div class="packs" id="niveau-gram" role="radiogroup" aria-labelledby="niveau-gram-titre" aria-describedby="niveau-gram-aide"></div>
+            <p class="reglage-aide" id="niveau-gram-aide"></p>
           </div>
           <!-- Nombre de signes par calcul (v6.14) : seuls les choix permis par le niveau apparaissent. -->
           <div class="reglage-ligne" id="reglage-nb-signes" hidden>
@@ -303,6 +310,16 @@
                 <button type="button" class="btn-tout" data-liste="types-questions"></button>
               </div>
               <div class="packs" id="types-questions" role="group" aria-labelledby="types-titre"></div>
+            </div>
+          </div>
+          <!-- Grammaire (v6.53) : les petits jeux, un tiré au hasard à chaque carte (js/grammaire.js). -->
+          <div class="reglages-matiere reglages-remplir" id="reglages-gram" hidden>
+            <div class="reglage">
+              <div class="reglage-tete">
+                <p class="reglage-titre" id="jeux-gram-titre">Jeux <span>(un au hasard à chaque carte)</span></p>
+                <button type="button" class="btn-tout" id="btn-tout-gram"></button>
+              </div>
+              <div class="packs jeux-gram" id="jeux-gram" role="group" aria-labelledby="jeux-gram-titre"></div>
             </div>
           </div>
         </div>
@@ -398,6 +415,8 @@
               <div class="lettres-rangee lettres-reponse" id="lettres-reponse" role="group" aria-label="Cases du mot"></div>
               <button type="button" class="btn btn-secondaire btn-remettre" id="btn-remettre"><span aria-hidden="true">↺</span> Tout remettre</button>
             </div>
+            <!-- Grammaire (v6.53) : boutons de réponse, mots en bulles ou colonnes à relier (js/grammaire-carte.js). -->
+            <div class="carte-gram" id="carte-gram" hidden></div>
             <!-- Calcul (et conjugaison) : le joueur écrit sa réponse, le jeu la corrige (v5.7). -->
             <form class="carte-saisie" id="carte-saisie" novalidate hidden>
               <label for="reponse-joueur">Ta réponse</label>
@@ -564,6 +583,8 @@
 <script src="js/questions.js"></script>
 <script src="js/calcul.js"></script>
 <script src="js/conjugaison.js"></script>
+<script src="js/grammaire.js"></script>
+<script src="js/grammaire-carte.js"></script>
 <script src="js/phrases.js"></script>
 <script src="js/voix.js"></script>
 <script src="js/constructions.js"></script>

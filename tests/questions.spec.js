@@ -59,7 +59,7 @@ async function preparer(page, types) {
 
 test('le joueur choisit ses questions ; « Lettres muettes » seule → il les écrit, la correction les surligne @smoke', async ({ page }) => {
   await preparer(page, ['muettes']);
-  await expect(page.locator('#types-questions input')).toHaveCount(13);
+  await expect(page.locator('#types-questions input')).toHaveCount(11);
   await expect(page.getByRole('checkbox', { name: 'Première lettre', exact: true })).toHaveCount(0);
   expect(await page.evaluate(() => window.Aventura.partie.types[0])).toEqual(['muettes']);
   await lancer(page);
