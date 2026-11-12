@@ -4,8 +4,8 @@
 // Le niveau fixe la difficulté des questions : mêmes réglages par niveau que le défi du jour (js/defis.js),
 // tirés de nouveau à chaque carte (hypothèse à valider) :
 //  - Maths : signes et nombres du niveau ;
-//  - Français : orthographe ou conjugaison (une chance sur deux) ; orthographe : tous les thèmes, mots et
-//    questions du niveau ; conjugaison : temps et groupes du niveau.
+//  - Français : orthographe, conjugaison ou grammaire (une chance sur trois, v6.55) ; orthographe : tous les thèmes,
+//    mots et questions du niveau ; conjugaison : temps et groupes du niveau ; grammaire : tous les jeux, au niveau.
 // Aventure : Facile → facile, Moyen → moyenne, Difficile et Expert → difficile (des aventures « Expert » viendront plus tard).
 // Partie logique (sans interface) utilisable dans les tests Node ; l'écran est construit plus bas, dans la page seulement.
 (function (racine) {
@@ -17,6 +17,7 @@
   var K = noeud ? require('./calcul.js') : racine.Calcul;
   var V = noeud ? require('./conjugaison.js') : racine.Conjugaison;
   var D = noeud ? require('./defis.js') : racine.Defis;
+  var G = noeud ? require('./grammaire.js') : racine.Grammaire;
 
   var MATIERES = [{ id: 'maths', nom: 'Maths' }, { id: 'francais', nom: 'Français' }];
   var NIVEAUX = D.NIVEAUX;
@@ -42,6 +43,9 @@
     return { niveau: niveau, modes: modes, temps: V.TEMPS.map(function (t) { return t.id; }), groupes: [1, 2, 3] };
   }
 
+  // Réglages de grammaire « tout coché » pour un niveau (v6.55).
+  function gramTout(niveau) { return { niveau: niveau, jeux: G.JEUX.map(function (j) { return j.id; }) }; }
+
   // La partie : choix = { matieres: ['maths', 'francais'], niveau } → aventure (de la difficulté du niveau)
   // et aventurier tirés au hasard. Toujours 1 joueur (partie rapide solo, v6.45).
   function generer(choix, r) {
@@ -66,13 +70,14 @@
     return { packs: D.PACKS.slice(), types: o.types.filter(function (t) { return !dispo || dispo.indexOf(t) >= 0; }), mots: o.mots.slice() };
   }
 
-  // Ce que demande la prochaine carte : { matiere: 'maths' | 'orthographe' | 'conjugaison', maths?, conj? }.
+  // Ce que demande la prochaine carte : { matiere: 'maths' | 'orthographe' | 'conjugaison' | 'grammaire', maths?, conj?, gram? }.
   // niveau absent (partie rapide gardée d'avant la v6.45) : un niveau au hasard, tout coché, comme avant.
   function carte(matieres, niveau, r) {
     r = r || Math.random;
     var m = tirer(matieres && matieres.length ? matieres : ['maths', 'francais'], r);
-    if (m === 'francais') m = r() < 0.5 ? 'orthographe' : 'conjugaison';
+    if (m === 'francais') { var f = r(); m = f < 1 / 3 ? 'orthographe' : f < 2 / 3 ? 'conjugaison' : 'grammaire'; }
     if (m === 'orthographe') return { matiere: 'orthographe' };
+    if (m === 'grammaire') return { matiere: 'grammaire', gram: gramTout(niveau ? niveauValide(niveau) : tirer(NIVEAUX, r).id) };
     if (!niveau) {
       if (m === 'maths') return { matiere: 'maths', maths: mathsTout(tirer(K.NIVEAUX, r).id) };
       return { matiere: 'conjugaison', conj: conjTout(tirer(V.NIVEAUX, r).id) };
@@ -81,7 +86,7 @@
     return m === 'maths' ? { matiere: 'maths', maths: reg.maths } : { matiere: 'conjugaison', conj: reg.conj };
   }
 
-  var api = { MATIERES: MATIERES, NIVEAUX: NIVEAUX, generer: generer, carte: carte, ortho: ortho, mathsTout: mathsTout, conjTout: conjTout };
+  var api = { MATIERES: MATIERES, NIVEAUX: NIVEAUX, generer: generer, carte: carte, ortho: ortho, gramTout: gramTout, mathsTout: mathsTout, conjTout: conjTout };
   if (noeud) { module.exports = api; return; }
   racine.Rapide = api;
 

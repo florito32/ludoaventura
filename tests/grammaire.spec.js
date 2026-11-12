@@ -284,3 +284,17 @@ test('relier les paires : une paire fausse → correction avec les bonnes paires
   await page.getByRole('button', { name: 'J’ai compris' }).click();
   expect(await de(page)).toBe('faible');
 });
+
+// v6.55 (ligne 268) : la grammaire dans la partie rapide et le défi du jour.
+test('partie rapide « Français » : une carte de grammaire au niveau choisi', async ({ page }) => {
+  await rapide(page);
+  await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); localStorage.setItem('ludoaventura-rapide-choix', JSON.stringify({ matieres: ['francais'], niveau: 'difficile' })); } catch (e) { /* */ } });
+  await page.goto('./');
+  await page.getByRole('button', { name: 'Partie rapide' }).click();
+  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  // On force la matière de la prochaine carte (le hasard choisit sinon entre les 3 matières du français).
+  await page.evaluate(() => { const R = window.Rapide, c = R.carte; R.carte = (m, n) => { const t = c(m, n, () => 0.9); return t; }; });
+  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await expect(page.locator('#carte-titre')).toContainText('Grammaire · Difficile');
+  await expect.poll(() => page.evaluate(() => !document.getElementById('carte-gram').hidden || !document.getElementById('carte-saisie').hidden)).toBe(true);
+});

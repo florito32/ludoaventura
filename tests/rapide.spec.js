@@ -5,6 +5,7 @@ const K = require('../js/calcul.js');
 const V = require('../js/conjugaison.js');
 const A = require('../js/aventures.js');
 const D = require('../js/defis.js');
+const G = require('../js/grammaire.js');
 const { rapide } = require('./aide');
 
 test.describe('tirage de la partie rapide', () => {
@@ -49,7 +50,15 @@ test.describe('tirage de la partie rapide', () => {
       expect(o.types).toEqual(D.ORTHO[n].types);
     }
     for (let k = 0; k < 300; k++) expect(R.carte(['maths'], 'moyen').matiere).toBe('maths');
-    for (let k = 0; k < 300; k++) expect(['orthographe', 'conjugaison']).toContain(R.carte(['francais'], 'moyen').matiere);
+    // v6.55 : Français = orthographe, conjugaison ou grammaire (tous les jeux, au niveau choisi).
+    const vues = new Set();
+    for (let k = 0; k < 300; k++) {
+      const t = R.carte(['francais'], 'moyen');
+      expect(['orthographe', 'conjugaison', 'grammaire']).toContain(t.matiere);
+      if (t.matiere === 'grammaire') expect(t.gram).toEqual({ niveau: 'moyen', jeux: G.JEUX.map((j) => j.id) });
+      vues.add(t.matiere);
+    }
+    expect(vues.size).toBe(3);
     // Partie rapide gardée d'avant la v6.45 (sans niveau) : tout coché, comme avant.
     expect(R.carte(['maths']).maths.signes).toHaveLength(4);
   });
@@ -98,12 +107,15 @@ test('accueil → Partie rapide solo : matières (« Tout » / « Aucune » à c
   // Français seulement : orthographe (mots du niveau) et conjugaison (temps du niveau).
   const tirees = await page.evaluate(() => {
     const j = window.Aventura.partie.joueurs[0], t = [];
-    for (let k = 0; k < 200; k++) { const c = window.Aventura.piocherCarte(j); t.push(c.type === 'conjugaison' ? 'conjugaison:' + c.temps : c.type === 'calcul' ? 'calcul' : 'ortho:' + c.niveau); }
+    for (let k = 0; k < 200; k++) { const c = window.Aventura.piocherCarte(j); t.push(c.type === 'conjugaison' ? 'conjugaison:' + c.temps : c.type === 'calcul' ? 'calcul' : c.type === 'grammaire' ? 'grammaire:' + c.niveau : c.pack === 'grammaire' ? 'grammaire:mot' : 'ortho:' + c.niveau); }
     return t;
   });
   expect(tirees).not.toContain('calcul');
   expect(tirees.some((t) => t.startsWith('conjugaison:'))).toBe(true);
   for (const t of tirees.filter((x) => x.startsWith('ortho:'))) expect(['ortho:4']).toContain(t); // v6.50 : Difficile = série 4
+  // v6.55 : la grammaire aussi, au niveau choisi.
+  expect(tirees.some((t) => t.startsWith('grammaire:'))).toBe(true);
+  for (const t of tirees.filter((x) => x.startsWith('grammaire:'))) expect(['grammaire:difficile', 'grammaire:mot']).toContain(t);
   await page.getByRole('button', { name: 'Question suivante' }).click();
   await expect(page.locator('#carte-piochee')).toBeVisible();
   // Recharger pendant la partie la reprend en partie rapide, avec son niveau.

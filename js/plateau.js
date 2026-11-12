@@ -719,12 +719,12 @@
   // une question parmi les types cochés par le joueur qui ont du sens pour ce mot.
   // Si aucun type coché ne convient à la carte, elle repart sous le tas et on en prend une autre.
   function piocherCarte(j) {
-    var mat = partie.matiere[j.index], mr = partie.maths[j.index], cr = partie.conj[j.index];
+    var mat = partie.matiere[j.index], mr = partie.maths[j.index], cr = partie.conj[j.index], gr = partie.gram[j.index];
     // Partie rapide (v6.43) : chaque carte tire sa matière parmi celles choisies, avec des réglages du niveau
     // choisi (v6.45) tirés pour cette carte (orthographe : thèmes, mots et questions du niveau, déjà dans le tas du joueur).
     if (partie.rapide && window.Rapide) {
       var t = window.Rapide.carte(partie.rapide.matieres, partie.rapide.niveau);
-      mat = t.matiere; if (t.maths) mr = t.maths; if (t.conj) cr = t.conj;
+      mat = t.matiere; if (t.maths) mr = t.maths; if (t.conj) cr = t.conj; if (t.gram) gr = t.gram;
     }
     // Mathématiques : une formule tirée au hasard selon les réglages du joueur (pas de tas).
     if (mat === 'maths') {
@@ -740,7 +740,7 @@
       cj.packNom = 'Conjugaison · ' + V.NIVEAUX.filter(function (n) { return n.id === cr.niveau; })[0].nom;
       return cj;
     }
-    if (mat === 'grammaire') return carteGrammaire(j, partie.gram[j.index]);
+    if (mat === 'grammaire') return carteGrammaire(j, gr);
     var choisis = partie.types[j.index];
     for (var essai = 0; essai < 400; essai++) {
       if (!j.tas.length) j.tas = melanger(cartesDuJoueur(j.index));
@@ -1840,6 +1840,7 @@
       partie.francais[i] = d.matiere !== 'maths';
       partie.maths[i] = d.maths ? copie(d.maths) : mathsVides();
       partie.conj[i] = d.conj ? copie(d.conj) : conjVide();
+      partie.gram[i] = d.gram ? copie(d.gram) : gramVide(); // v6.55 : défi de grammaire
       partie.packs[i] = d.packs ? d.packs.slice() : [];
       partie.types[i] = d.types ? d.types.slice() : [];
       partie.mots[i] = d.mots ? d.mots.slice() : null;
@@ -1891,6 +1892,7 @@
       if (!partie.packs[i].length) partie.packs[i] = TOUS_PACKS.slice();
       partie.types[i] = o.types.length ? o.types.slice() : TOUS_TYPES.slice();
       partie.mots[i] = o.mots.slice();
+      partie.gram[i] = R2.gramTout(d.niveau); // v6.55
     }
     partie.rapide = { matieres: d.matieres.slice(), niveau: d.niveau };
     partie.etapePrepa = 4; partie.sousEtape = 'matiere'; partie.actif = 0;

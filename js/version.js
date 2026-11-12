@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.54';
+  var VERSION = '6.55';
 
   var HISTORY = [
+    { v: '6.55', date: '2026-11-12', changes: [
+      "Partie rapide solo et défi du jour : avec « Français », les cartes peuvent aussi être de la grammaire (au niveau choisi), en plus de l'orthographe et de la conjugaison."
+    ] },
     { v: '6.54', date: '2026-11-12', changes: [
       "Nouveau : la Grammaire, en français, à côté de l'orthographe et de la conjugaison. On choisit un niveau (Facile, Moyen, Difficile, Expert) puis ses petits jeux ; chaque carte en tire un au hasard.",
       "Remettre la phrase : on touche les mots mélangés dans l'ordre pour refaire la phrase ; plus le niveau est haut, plus la phrase est longue (compléments, mais / car / donc, qui / que…).",
