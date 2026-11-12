@@ -4,9 +4,15 @@
 (function () {
   'use strict';
 
-  var VERSION = '6.55';
+  var VERSION = '7.0';
 
   var HISTORY = [
+    { v: '7.0', date: '2026-11-12', changes: [
+      "Nouvelle matière : la Géographie, avec 4 niveaux (Facile, Moyen, Difficile, Expert) ; chaque niveau a son propre contenu.",
+      "11 jeux au choix, rangés en 3 familles : France (numéros des départements, préfectures, régions), Monde (capitales, drapeaux, pays voisins, monuments) et Nature (fleuves, montagnes, records de la Terre, climats et paysages).",
+      "Plusieurs façons de répondre : relier deux colonnes, choisir la bonne réponse, écrire la réponse (Difficile et Expert, sans compter les accents), remettre dans l'ordre, vrai ou faux, classer en deux colonnes. Le jeu corrige tout seul et lance le bon dé.",
+      "Nouveau lien « Crédits » en bas de page : les drapeaux viennent de flag-icons (licence MIT)."
+    ] },
     { v: '6.55', date: '2026-11-12', changes: [
       "Partie rapide solo et défi du jour : avec « Français », les cartes peuvent aussi être de la grammaire (au niveau choisi), en plus de l'orthographe et de la conjugaison."
     ] },

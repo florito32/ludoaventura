@@ -62,7 +62,24 @@
   var TOUS_JEUX = G.JEUX.map(function (j) { return j.id; });
   var K = window.Calcul;
   var V = window.Conjugaison;
-  var MATIERES = ['maths', 'orthographe', 'conjugaison', 'grammaire']; // matières jouables (Français → Orthographe, Conjugaison ou Grammaire)
+  var MATIERES = ['maths', 'orthographe', 'conjugaison', 'grammaire', 'geographie', 'histoire']; // matières jouables (Français → Orthographe, Conjugaison ou Grammaire ; Géographie, Histoire)
+  // Géographie et Histoire (v7.0) : jeux et niveau de chaque joueur, pour chacune des deux matières (js/savoirs.js).
+  var SV = window.Savoirs;
+  var MATIERES_SAVOIR = ['geographie', 'histoire'];
+  function estSavoir(m) { return MATIERES_SAVOIR.indexOf(m) >= 0; }
+  function savoirVide() { return { geographie: { jeux: [], niveau: 'facile' }, histoire: { jeux: [], niveau: 'facile' } }; }
+  // Jeux proposés : ceux qui ont du contenu à chaque niveau (la carte à toucher attend ses cartes, js/cartes-geo.js).
+  function jeuxProposes(m) {
+    return SV.jeuxDe(m).filter(function (j) {
+      return SV.NIVEAUX.every(function (n) { return j.series.some(function (s) { return SV.utilisable(s, n.id) && (s.k !== 'carte' || window.CartesGeo); }); });
+    });
+  }
+  var AIDES_SAVOIR = {
+    facile: 'Facile : 3 réponses ou 3 paires à relier, ce qui est le plus connu.',
+    moyen: 'Moyen : 4 réponses ou 4 paires, des choses connues.',
+    difficile: 'Difficile : 5 paires, moins connu, des questions où l\u2019on écrit la réponse.',
+    expert: 'Expert : 6 paires, seulement du contenu d\u2019expert.'
+  };
   // Aide sous le niveau de calcul (v6.14) : nombres possibles et nombre de signes maximum.
   var AIDES_NIVEAU = {
     facile: 'Facile : les tables de 1 à 10, 1 signe (2 × 8, 2 + 8, 16 ÷ 2…).',
@@ -130,7 +147,9 @@
     // Défi du jour en cours (v6.37, js/defis.js) : { type: 'solo' | 'equipe', jour, niveau, … } ou null pour une partie libre.
     defi: null,
     // Partie rapide en cours (v6.43, js/rapide.js) : { matieres: ['maths', 'francais'], niveau: 'facile'… } ou null.
-    rapide: null
+    rapide: null,
+    // Géographie et Histoire (v7.0) : { geographie: { jeux, niveau }, histoire: { jeux, niveau } } par joueur.
+    savoirs: [savoirVide(), savoirVide(), savoirVide(), savoirVide()]
   };
 
   function afficher(id) {
@@ -230,7 +249,7 @@
     $('matieres').addEventListener('change', function () {
       var j = partie.actif, v = valeursCochees($('matieres'))[0];
       $('packs-alerte').textContent = '';
-      if (v === 'maths') { partie.matiere[j] = 'maths'; partie.francais[j] = false; }
+      if (v === 'maths' || estSavoir(v)) { partie.matiere[j] = v; partie.francais[j] = false; }
       else { partie.francais[j] = true; partie.matiere[j] = valeursCochees($('francais'))[0] || null; }
       majAventuriers();
     });
@@ -282,6 +301,47 @@
     });
     V.GROUPES.forEach(function (g) { choix($('groupes'), 'checkbox', 'groupe', g.id, g.nom.split(' ')[0], g.nom); }); // « 1er », « 2e », « 3e »
     V.NIVEAUX.forEach(function (nv) { choix($('niveau-conj'), 'radio', 'niveau-conj', nv.id, nv.nom); });
+    // Géographie et Histoire (v7.0) : niveau sur l'écran de la matière, jeux en familles sur l'écran suivant.
+    SV.NIVEAUX.forEach(function (nv) { choix($('niveau-savoir'), 'radio', 'niveau-savoir', nv.id, nv.nom); });
+    $('niveau-savoir').addEventListener('change', function () {
+      var r = reglageSavoir(partie.actif);
+      if (r) r.niveau = valeursCochees($('niveau-savoir'))[0] || 'facile';
+      majAventuriers();
+    });
+    var liste = $('savoir-liste');
+    window.Geographie.FAMILLES.forEach(function (f) {
+      var jeux = jeuxProposes('geographie').filter(function (j) { return j.famille === f.id; });
+      if (!jeux.length) return;
+      var b = famille(f, jeux.map(function (j) { return { id: j.id, nom: j.nom, court: j.icone + '\u00a0' + (j.court || j.nom) }; }), 'jeu');
+      b.dataset.matiere = 'geographie';
+      liste.appendChild(b);
+    });
+    liste.addEventListener('change', function () {
+      var r = reglageSavoir(partie.actif);
+      if (!r) return;
+      $('packs-alerte').textContent = '';
+      r.jeux = valeursCochees(liste).filter(function (id) { return (SV.trouver(id) || {}).matiere === partie.matiere[partie.actif]; });
+      majAventuriers();
+    });
+    liste.addEventListener('click', function (e) {
+      var b = e.target.closest('.btn-tout-famille');
+      var r = reglageSavoir(partie.actif);
+      if (!b || !r) return;
+      var ids = Array.prototype.map.call(b.closest('.famille').querySelectorAll('input'), function (i) { return i.value; });
+      var plein = ids.every(function (id) { return r.jeux.indexOf(id) >= 0; });
+      var reste = r.jeux.filter(function (id) { return ids.indexOf(id) < 0; });
+      r.jeux = plein ? reste : reste.concat(ids);
+      $('packs-alerte').textContent = '';
+      majAventuriers();
+    });
+    $('btn-tout-savoir').addEventListener('click', function () {
+      var r = reglageSavoir(partie.actif);
+      if (!r) return;
+      var tous = jeuxProposes(partie.matiere[partie.actif]).map(function (j) { return j.id; });
+      r.jeux = r.jeux.length === tous.length ? [] : tous;
+      $('packs-alerte').textContent = '';
+      majAventuriers();
+    });
     // Niveau d'orthographe (v6.50) : mêmes 4 niveaux, sur l'écran de la matière.
     window.Defis.NIVEAUX.forEach(function (nv) { choix($('niveau-ortho'), 'radio', 'niveau-ortho', nv.id, nv.nom); });
     $('niveau-ortho').addEventListener('change', function () {
@@ -401,15 +461,25 @@
         partie.conj[k] = JSON.parse(JSON.stringify(partie.conj[a]));
         partie.orthoNiveau[k] = partie.orthoNiveau[a];
         partie.gram[k] = JSON.parse(JSON.stringify(partie.gram[a]));
+        partie.savoirs[k] = JSON.parse(JSON.stringify(partie.savoirs[a]));
       }
       montrerEtape(4);
     });
+  }
+
+  // Réglages de Géographie ou d'Histoire du joueur i (null pour les autres matières).
+  function reglageSavoir(i) {
+    var m = partie.matiere[i];
+    if (!estSavoir(m)) return null;
+    if (!partie.savoirs[i]) partie.savoirs[i] = savoirVide();
+    return partie.savoirs[i][m];
   }
 
   // Ce qui manque au joueur i pour pouvoir jouer (null si tout est coché).
   function manque(i) {
     var m = partie.matiere[i];
     if (!m) return partie.francais[i] ? 'francais' : 'matiere';
+    if (estSavoir(m)) return reglageSavoir(i).jeux.length ? null : 'jeu';
     if (m === 'maths') {
       if (!partie.maths[i].signes.length) return 'signe';
       // Au moins un nombre de signes, et au moins une table (Facile) ou un nombre (dans les groupes du niveau).
@@ -453,7 +523,8 @@
     nbSignes: ['choisir le nombre de signes par calcul.', 'nb-signes'],
     table: ['choisir au moins une table.', 'nombres'],
     pack: ['choisir au moins un thème.', 'packs'],
-    type: ['choisir au moins un type de question.', 'types-questions']
+    type: ['choisir au moins un type de question.', 'types-questions'],
+    jeu: ['choisir au moins un jeu.', 'savoir-liste']
   };
 
   // Le joueur i a-t-il coché ce qu'il faut ? Sinon, message sous ses réglages et focus sur ce qui manque.
@@ -590,8 +661,8 @@
     $('reglages-joueur').className = 'etape-corps reglages-joueur joueur-' + couleur;
     $('reglages-titre').className = 'legende-joueur joueur-' + couleur;
     // Matière choisie : seuls ses réglages s'affichent.
-    var a = partie.actif, mat = partie.matiere[a], fr = partie.francais[a] || (mat && mat !== 'maths');
-    $('matieres').querySelectorAll('input').forEach(function (i) { i.checked = i.value === 'maths' ? mat === 'maths' : !!fr; });
+    var a = partie.actif, mat = partie.matiere[a], fr = partie.francais[a] || mat === 'orthographe' || mat === 'conjugaison';
+    $('matieres').querySelectorAll('input').forEach(function (i) { i.checked = i.value === 'francais' ? !!fr : i.value === mat; });
     $('francais').querySelectorAll('input').forEach(function (i) { i.checked = i.value === mat; });
     $('reglage-francais').hidden = !fr;
     $('reglages-maths').hidden = mat !== 'maths';
@@ -609,6 +680,26 @@
     $('reglage-nb-signes').hidden = mat !== 'maths';
     $('reglages-ortho').hidden = mat !== 'orthographe';
     $('reglages-gram').hidden = mat !== 'grammaire';
+    // Géographie et Histoire (v7.0) : niveau, puis les jeux de la matière (les familles des autres matières sont cachées).
+    var rs = reglageSavoir(a);
+    $('reglage-niveau-savoir').hidden = !rs;
+    $('savoir-jeux').hidden = !rs;
+    if (rs) {
+      $('niveau-savoir').querySelectorAll('input').forEach(function (i) { i.checked = i.value === rs.niveau; });
+      $('niveau-savoir-aide').textContent = AIDES_SAVOIR[rs.niveau] || '';
+      $('savoir-liste').querySelectorAll('.famille').forEach(function (f) { f.hidden = f.dataset.matiere !== mat; });
+      $('savoir-liste').querySelectorAll('input').forEach(function (i) { i.checked = rs.jeux.indexOf(i.value) >= 0; });
+      var tousJ = jeuxProposes(mat).length, pleinJ = rs.jeux.length === tousJ, bt = $('btn-tout-savoir');
+      bt.innerHTML = pleinJ ? '<span class="long">Tout désélectionner</span><span class="court">Aucun</span>'
+        : '<span class="long">Tout sélectionner</span><span class="court">Tout</span>';
+      bt.setAttribute('aria-label', (pleinJ ? 'Tout désélectionner : ' : 'Tout sélectionner : ') + 'jeux');
+      $('savoir-liste').querySelectorAll('.btn-tout-famille').forEach(function (b) {
+        var ids = Array.prototype.map.call(b.closest('.famille').querySelectorAll('input'), function (i) { return i.value; });
+        var plein = ids.every(function (id) { return rs.jeux.indexOf(id) >= 0; });
+        b.textContent = plein ? 'Aucun' : 'Tout';
+        b.setAttribute('aria-label', (plein ? 'Tout désélectionner : ' : 'Tout sélectionner : ') + b.closest('.famille').querySelector('.famille-nom').textContent.replace(/^\S+\s/, ''));
+      });
+    }
     var cc = partie.conj[a];
     $('reglage-niveau-conj').hidden = mat !== 'conjugaison';
     var on = partie.orthoNiveau[a] || 'facile';
@@ -660,7 +751,7 @@
         : '<span class="long">Tout sélectionner</span><span class="court">Tout</span>';
       b.setAttribute('aria-label', (plein ? 'Tout désélectionner : ' : 'Tout sélectionner : ') + (b.dataset.liste === 'packs' ? 'thèmes' : 'questions'));
     });
-    document.querySelectorAll('.btn-tout-famille').forEach(function (b) {
+    document.querySelectorAll('#packs .btn-tout-famille, #types-questions .btn-tout-famille').forEach(function (b) {
       var boite = b.closest('.famille'), ids = Array.prototype.map.call(boite.querySelectorAll('input'), function (i) { return i.value; });
       var cle = boite.closest('#packs') ? 'packs' : 'types';
       var plein = ids.every(function (id) { return partie[cle][partie.actif].indexOf(id) >= 0; });
@@ -675,10 +766,10 @@
     $('choix-matiere').hidden = !surMatiere;
     $('conj-temps').hidden = ecran !== 'modes';
     $('ortho-packs').hidden = ecran !== 'packs';
-    if (ecran !== 'reglages') { $('reglages-maths').hidden = $('reglages-ortho').hidden = $('reglages-gram').hidden = true; }
-    var NOMS_MATIERES = { maths: 'Mathématiques', orthographe: 'Orthographe', conjugaison: 'Conjugaison', grammaire: 'Grammaire' };
+    if (ecran !== 'reglages') { $('reglages-maths').hidden = $('reglages-ortho').hidden = $('reglages-gram').hidden = $('savoir-jeux').hidden = true; }
+    var NOMS_MATIERES = { maths: 'Mathématiques', orthographe: 'Orthographe', conjugaison: 'Conjugaison', grammaire: 'Grammaire', geographie: 'Géographie', histoire: 'Histoire' };
     var sousTitre = surMatiere ? 'quelle matière ?' : NOMS_MATIERES[mat] +
-      (mat === 'conjugaison' ? ', les réglages' : '') + (mat === 'grammaire' ? ', les jeux' : '') +
+      (mat === 'conjugaison' ? ', les réglages' : '') + (mat === 'grammaire' || estSavoir(mat) ? ', les jeux' : '') +
       (mat === 'orthographe' ? (ecran === 'packs' ? ', les thèmes' : ', les questions') : '');
     $('reglages-titre').innerHTML = '<img src="' + actif.image + '" alt="" width="200" height="220">' +
       actif.nom + ' (Joueur ' + (partie.actif + 1) + ') : ' + sousTitre;
@@ -725,6 +816,11 @@
     if (partie.rapide && window.Rapide) {
       var t = window.Rapide.carte(partie.rapide.matieres, partie.rapide.niveau);
       mat = t.matiere; if (t.maths) mr = t.maths; if (t.conj) cr = t.conj; if (t.gram) gr = t.gram;
+    }
+    // Géographie et Histoire (v7.0) : un jeu choisi par le joueur, une série et un format tirés au hasard.
+    if (estSavoir(mat)) {
+      var rsv = partie.savoirs[j.index][mat];
+      return SV.generer(rsv, mat) || SV.generer({ jeux: jeuxProposes(mat).map(function (x) { return x.id; }), niveau: rsv.niveau }, mat);
     }
     // Mathématiques : une formule tirée au hasard selon les réglages du joueur (pas de tas).
     if (mat === 'maths') {
@@ -1091,6 +1187,17 @@
         var q = partie.carte.question;
         if (q && q.dictee) window.Voix.lire(window.Voix.texteCarte(partie.carte));
       });
+    } else if (r.etape === 'repondre' && estCarteSavoir(partie.carte) && !aSaisir(partie.carte)) {
+      // Géographie et Histoire (v7.0) : le joueur répond dans la carte, le jeu corrige.
+      annoncer(j.nom + ' répond dans la carte.');
+    } else if ((r.etape === 'suivant' || r.etape === 'fin') && partie.carte && partie.carte.attente) {
+      // Qui suis-je ? raté (v7.0) : 1 point est déjà compté ; le joueur lit la réponse, puis « J'ai compris ».
+      annoncer(j.nom + ' lit la correction, puis touche « J\u2019ai compris ».');
+      bouton('J\u2019ai compris', 'btn-principal', function () {
+        partie.carte.attente = false;
+        rendre();
+        enchainer();
+      });
     } else if (r.etape === 'repondre' && aSaisir(partie.carte)) {
       // Calcul : le joueur écrit sa réponse dans la carte, le jeu la corrige (pas de maître du jeu).
       annoncer(j.nom + ' écrit sa réponse puis valide.');
@@ -1214,7 +1321,8 @@
   // Cartes où le joueur écrit lui-même sa réponse, corrigée par le jeu (calcul, v5.7).
   // Orthographe (v6.14) : nombre de lettres, de syllabes, consonnes, voyelles, lettres muettes s'écrivent aussi ;
   // « Réécrire le mot » s'écrit aussi depuis la v6.31 (dictée).
-  function aSaisir(c) { return !!(c && (c.type === 'calcul' || c.type === 'conjugaison' || (c.question && c.question.saisie))); }
+  function aSaisir(c) { return !!(c && (c.type === 'calcul' || c.type === 'conjugaison' || (c.type === 'savoir' && c.format === 'O') || (c.question && c.question.saisie))); }
+  function estCarteSavoir(c) { return !!(c && c.type === 'savoir'); }
   function orthoSaisie(c) { return !!(c && c.question && c.question.saisie); }
   // Carte de grammaire (v6.54) : réponse touchée dans la carte (js/grammaire-carte.js), corrigée par le jeu.
   function estGram(c) { return !!(c && c.type === 'grammaire'); }
@@ -1382,7 +1490,7 @@
     var champ = $('reponse-joueur'), texte = champ.value.trim();
     var rep = $('carte-reponse');
     var conj = c.type === 'conjugaison', ortho = orthoSaisie(c);
-    var illisible = ortho ? !Q.lisible(c.question, texte) : (!conj && isNaN(K.lire(texte)));
+    var illisible = estCarteSavoir(c) ? false : ortho ? !Q.lisible(c.question, texte) : (!conj && isNaN(K.lire(texte)));
     if (!texte || illisible) {
       rep.hidden = false;
       rep.className = 'carte-reponse alerte';
@@ -1401,6 +1509,7 @@
   // Corrige la réponse donnée (écrite, ou lettres placées pour le mot mélangé), puis lance le bon dé.
   function corrigerReponse(texte) {
     var r = partie.regles, c = partie.carte;
+    if (estCarteSavoir(c)) { c.reponseDonnee = texte; corrigerSavoir(); return; }
     var conj = c.type === 'conjugaison', ortho = orthoSaisie(c);
     c.reponseDonnee = texte;
     c.juste = ortho ? Q.juste(c.question, texte, c.mot, C.INFOS[c.mot], c.params)
@@ -1412,6 +1521,62 @@
     reagir(c.juste);
     rendre();
     lancerApresReaction();
+  }
+
+  // ---------- Géographie et Histoire (v7.0) ----------
+  // La carte est dessinée par js/savoirs-carte.js ; la question ouverte utilise la case de réponse commune.
+  function montrerSavoir(c) {
+    $('carte-consigne').textContent = c.consigne;
+    $('carte-mot').hidden = true;
+    $('carte-mot').textContent = '';
+    $('carte-boutons').hidden = true;
+    $('btn-voir-mot').hidden = true;
+    $('btn-tableau').hidden = true;
+    $('carte-tableau').hidden = true;
+    var fait = c.reponseDonnee != null;
+    if (c.format === 'O') {
+      var champ = $('reponse-joueur');
+      $('carte-saisie').hidden = fait;
+      champ.setAttribute('inputmode', 'text');
+      champ.setAttribute('autocapitalize', 'words');
+      champ.value = fait ? c.reponseDonnee : '';
+      champ.disabled = fait;
+      $('btn-valider-reponse').disabled = fait;
+      champ.removeAttribute('aria-invalid');
+      var rep = $('carte-reponse');
+      rep.hidden = !fait;
+      rep.className = 'carte-reponse' + (fait ? (c.juste ? ' juste' : ' fausse') : '');
+      rep.textContent = fait ? (c.juste ? 'Bonne réponse ! ' + c.bonne : 'Ce n\u2019est pas ça (tu as écrit « ' + c.reponseDonnee + ' »). La bonne réponse : ' + c.bonne + '.') : '';
+    }
+    window.SavoirsCarte.montrer(c, {
+      change: sauver,
+      repondu: corrigerSavoir,
+      taille: ajusterTour
+    });
+  }
+  // Réponse donnée : correction, réaction, puis le bon dé (ou, pour « Qui suis-je ? », les points sans dé).
+  function corrigerSavoir() {
+    var r = partie.regles, c = partie.carte;
+    if (!r || r.etape !== 'repondre' || !estCarteSavoir(c)) return;
+    c.juste = SV.juste(c);
+    if (c.format === 'I') {
+      // Qui suis-je ? (choix de l'utilisateur) : pas de dé ; 6 points au 1er indice… 1 point si c'est raté.
+      c.attente = !c.juste;
+      R.gagner(r, SV.pointsIndices(c));
+      montrerSavoir(c);
+      reagir(c.juste);
+      rendre();
+      if (!c.attente) plusTard(enchainer, DUREE_REACTION);
+      ajusterTour();
+      return;
+    }
+    c.attente = !c.juste; // réponse fausse : « J'ai compris » avant le dé, le temps de lire la correction
+    montrerSavoir(c);
+    R.repondre(r, c.juste);
+    reagir(c.juste);
+    rendre();
+    lancerApresReaction();
+    ajusterTour();
   }
 
   // Affiche la carte piochée : la question tirée et le mot caché (ou la lettre affichée), avec la lecture vocale.
@@ -1432,6 +1597,8 @@
     $('carte-gram').hidden = true;
     $('carte-mot').hidden = false;
     $('reponse-joueur').setAttribute('autocapitalize', 'off');
+    $('carte-savoir').hidden = true;
+    if (estCarteSavoir(c)) { $('carte-titre').textContent = c.packNom; montrerSavoir(c); return; }
     if (estGram(c)) { montrerGram(c); return; }
     if (aSaisir(c) && !orthoSaisie(c)) {
       // Le titre de la carte = son thème seul, écrit gros (v6.27 : plus de « Carte n° … de … »).
@@ -1649,7 +1816,7 @@
       ecouter.title = 'La lecture à voix haute n\u2019est pas disponible sur cet appareil';
     }
     ecouter.addEventListener('click', function () {
-      window.Voix.lire(window.Voix.texteCarte(partie.carte));
+      window.Voix.lire(estCarteSavoir(partie.carte) ? window.SavoirsCarte.texteOral(partie.carte) : window.Voix.texteCarte(partie.carte));
       // v6.40 : une fois la carte écoutée, « Phrase d'exemple » apparaît à côté (si la carte en a une).
       if (partie.carte && !partie.carte.ecoutee) { partie.carte.ecoutee = true; majPhrase(); sauver(); ajusterTour(); }
     });
@@ -1958,6 +2125,8 @@
       matiere: partie.matiere, francais: partie.francais, maths: partie.maths, conj: partie.conj,
       etapePrepa: partie.etapePrepa, sousEtape: partie.sousEtape, modif: !!partie.modif,
       mots: partie.mots, orthoNiveau: partie.orthoNiveau, gram: partie.gram, defi: partie.defi, avantDefi: partie.avantDefi || null, rapide: partie.rapide
+      mots: partie.mots, orthoNiveau: partie.orthoNiveau, defi: partie.defi, avantDefi: partie.avantDefi || null, rapide: partie.rapide,
+      savoirs: partie.savoirs
     };
     if (partie.regles && partie.joueurs.length) {
       d.jeu = {
@@ -1995,6 +2164,7 @@
       partie.defi = d.jeu ? d.defi || null : null;
       partie.avantDefi = d.avantDefi || null;
       partie.rapide = d.jeu ? d.rapide || null : null;
+      if (d.savoirs) partie.savoirs = d.savoirs.map(function (x) { return x && x.geographie ? x : savoirVide(); });
       if (d.matiere) {
         partie.matiere = d.matiere.map(function (m) { return MATIERES.indexOf(m) >= 0 ? m : null; });
         partie.francais = d.francais || partie.francais;
@@ -2085,6 +2255,10 @@
     $('menu-confirmer').hidden = false;
     $('btn-confirmer-non').focus();
   }
+  // Crédits (v7.0) : sources libres (drapeaux, cartes) et leurs licences.
+  $('btn-credits').addEventListener('click', function () { $('credits').showModal(); });
+  $('btn-credits-ok').addEventListener('click', function () { $('credits').close(); });
+  $('credits').addEventListener('click', function (e) { if (e.target === $('credits')) $('credits').close(); });
   function fermerMenu() { if ($('menu-partie').open) $('menu-partie').close(); }
 
   // Reprend la partie après « Modifier les choix ». Hypothèses (à valider, voir BACKLOG) :

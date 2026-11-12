@@ -196,6 +196,8 @@
             <div class="packs" id="matieres" role="radiogroup" aria-labelledby="matiere-titre">
               <label class="pack"><input type="radio" name="matiere" value="maths"><span>Mathématiques</span></label>
               <label class="pack"><input type="radio" name="matiere" value="francais"><span>Français</span></label>
+              <!-- v7.0 : Géographie (js/geographie.js), moteur commun js/savoirs.js. -->
+              <label class="pack"><input type="radio" name="matiere" value="geographie"><span>Géographie</span></label>
             </div>
           </div>
           <div class="reglage-ligne" id="reglage-francais" hidden>
@@ -229,6 +231,12 @@
             <p class="reglage-titre" id="niveau-gram-titre">Niveau</p>
             <div class="packs" id="niveau-gram" role="radiogroup" aria-labelledby="niveau-gram-titre" aria-describedby="niveau-gram-aide"></div>
             <p class="reglage-aide" id="niveau-gram-aide"></p>
+          </div>
+          <!-- Géographie et Histoire (v7.0) : le niveau se choisit sur cet écran ; chaque niveau a son propre contenu. -->
+          <div class="reglage-ligne" id="reglage-niveau-savoir" hidden>
+            <p class="reglage-titre" id="niveau-savoir-titre">Niveau</p>
+            <div class="packs" id="niveau-savoir" role="radiogroup" aria-labelledby="niveau-savoir-titre" aria-describedby="niveau-savoir-aide"></div>
+            <p class="reglage-aide" id="niveau-savoir-aide"></p>
           </div>
           <!-- Nombre de signes par calcul (v6.14) : seuls les choix permis par le niveau apparaissent. -->
           <div class="reglage-ligne" id="reglage-nb-signes" hidden>
@@ -290,6 +298,17 @@
               <p class="reglage-titre titre-temps" id="temps-conj-titre">Temps <span>(au moins un)</span></p>
               <p class="reglage-aide aide-gauche" id="temps-conj-vide">Choisis d’abord un mode.</p>
               <div class="temps-modes" id="temps-conj" role="group" aria-labelledby="temps-conj-titre"></div>
+            </div>
+          </div>
+
+          <!-- Géographie (v7.0) : les jeux, rangés en familles avec un bouton « Tout » chacune. -->
+          <div class="reglages-matiere reglages-remplir" id="savoir-jeux" hidden>
+            <div class="reglage">
+              <div class="reglage-tete">
+                <p class="reglage-titre" id="savoir-jeux-titre">Jeux <span>(au moins un)</span></p>
+                <button type="button" class="btn-tout" id="btn-tout-savoir"></button>
+              </div>
+              <div class="packs" id="savoir-liste" role="group" aria-labelledby="savoir-jeux-titre"></div>
             </div>
           </div>
 
@@ -408,6 +427,8 @@
             </div>
             <p class="carte-consigne" id="carte-consigne"></p>
             <p class="carte-mot" id="carte-mot"></p>
+            <!-- Géographie et Histoire (v7.0, js/savoirs-carte.js) : relier, choix, ordre, vrai ou faux, classer, qui suis-je ? -->
+            <div class="carte-savoir" id="carte-savoir" hidden></div>
             <!-- Mot mélangé (v6.52) : on touche les lettres mélangées (en haut) pour les placer dans l'ordre dans les cases (en bas).
                  Toucher une lettre placée la renvoie à sa place ; « Tout remettre » les renvoie toutes. Le mot complet est corrigé tout seul. -->
             <div class="carte-lettres" id="carte-lettres" hidden>
@@ -573,8 +594,19 @@
 </dialog>
 
 <footer class="pied">
-  <p><span class="pied-marque">Ludoaventura · Aventura</span> <span data-version></span> <span class="pied-sep" aria-hidden="true">·</span> <a class="pied-lien" href="https://www.ludo-aventura.fr/pages/mentions-legales">Mentions légales</a></p>
+  <p><span class="pied-marque">Ludoaventura · Aventura</span> <span data-version></span> <span class="pied-sep" aria-hidden="true">·</span> <a class="pied-lien" href="https://www.ludo-aventura.fr/pages/mentions-legales">Mentions légales</a> <span class="pied-sep" aria-hidden="true">·</span> <button type="button" class="pied-lien pied-bouton" id="btn-credits" aria-haspopup="dialog">Crédits</button></p>
 </footer>
+
+<!-- Crédits (v7.0) : sources libres utilisées par la Géographie, comme leurs licences le demandent. -->
+<dialog class="fin credits" id="credits" aria-labelledby="credits-titre">
+  <h2 id="credits-titre">Crédits</h2>
+  <ul class="credits-liste">
+    <li><strong>Drapeaux</strong> : <a href="https://github.com/lipis/flag-icons">flag-icons</a>, © 2013 Panayiotis Lipiridis, licence MIT (texte de la licence : <a href="img/drapeaux/LICENSE">img/drapeaux/LICENSE</a>).</li>
+  </ul>
+  <div class="fin-actions">
+    <button type="button" class="btn btn-principal" id="btn-credits-ok">Fermer</button>
+  </div>
+</dialog>
 
 <script src="js/des.js"></script>
 <script src="js/aventures.js"></script>
@@ -589,6 +621,9 @@
 <script src="js/voix.js"></script>
 <script src="js/constructions.js"></script>
 <script src="js/regles.js"></script>
+<script src="js/savoirs.js"></script>
+<script src="js/geographie.js"></script>
+<script src="js/savoirs-carte.js"></script>
 <script src="js/etoiles.js"></script>
 <script src="js/defis.js"></script>
 <script src="js/recompenses.js"></script>
