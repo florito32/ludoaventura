@@ -235,6 +235,10 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 @container (max-height: 420px) {
   #matiere-titre { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 }
+/* Écran étroit ET bas : « En français : » aussi (les choix Orthographe, Conjugaison… parlent d'eux-mêmes). */
+@container (max-height: 420px) and (max-width: 520px) {
+  #francais-titre { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+}
 .reglage-ligne { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
 .reglage-ligne .reglage-titre { margin: 0; }
 .nombres .pack span { min-width: 44px; justify-content: center; padding: 4px 8px; }
