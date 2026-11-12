@@ -743,6 +743,31 @@ body:has(#ecran-preparation:not([hidden])) .pied { padding-block: 4px calc(4px +
 .carte-mot.calcul { letter-spacing: .02em; font-size: clamp(1.3rem, 5.4vw, 2rem); overflow-wrap: normal; }
 .carte-reponse.fausse { color: var(--rouge-texte); }
 .carte-reponse.alerte { color: var(--rouge-texte); font-weight: 600; }
+/* Mot mélangé (v6.52) : lettres à toucher en haut, une case par lettre en bas. Cases de 52 px au plus,
+   plus petites si le mot est long ou la carte étroite (--n = nombre de lettres). */
+.carte-lettres { display: flex; flex-direction: column; align-items: center; gap: 12px; margin: 10px 0 8px; }
+.carte-lettres[hidden] { display: none; }
+.lettres-rangee { width: 100%; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; container-type: inline-size; }
+.lettres-reponse { padding-top: 12px; border-top: 2px dashed var(--parchemin-bord); }
+/* Taille d'une case : partage la largeur entre les lettres, entre 32 px (au-delà, passage à la ligne) et 52 px. */
+.lettre-tuile, .lettre-trou, .lettre-case {
+  --t: clamp(32px, calc((100cqw - (var(--n, 6) - 1) * 6px) / var(--n, 6)), 52px);
+  flex: none; width: var(--t); height: var(--t); padding: 0; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  font: 800 calc(var(--t) * .55)/1 "Rockwell", "Roboto Slab", Georgia, serif; color: var(--encre);
+}
+.lettre-tuile { background: #fff; border: 3px solid var(--encre); box-shadow: 0 4px 0 var(--encre); cursor: pointer; touch-action: manipulation; }
+.lettre-tuile:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--encre); }
+.lettre-trou { border: 3px dashed var(--parchemin-bord); }
+.lettre-case { border: 3px dashed var(--encre-douce); background: var(--parchemin); }
+.lettre-case.suivante { border-style: solid; border-color: var(--bleu); box-shadow: 0 0 0 3px rgba(28, 52, 115, .25); }
+.lettre-case.pleine { border-style: solid; border-color: var(--encre); background: #fff; box-shadow: 0 3px 0 var(--encre); cursor: pointer; touch-action: manipulation; }
+.lettre-volante {
+  position: fixed; z-index: 50; pointer-events: none; display: flex; align-items: center; justify-content: center;
+  background: #fff; border: 3px solid var(--encre); border-radius: 10px; color: var(--encre); font-weight: 800;
+  font-family: "Rockwell", "Roboto Slab", Georgia, serif; transition: left .2s ease, top .2s ease, width .2s ease, height .2s ease;
+}
+.btn-remettre { min-height: 44px; padding: 6px 16px; }
+.btn-remettre:disabled { opacity: .5; cursor: default; }
 /* Réponse écrite par le joueur (calcul, v5.7) : la case et « Valider » sur une ligne. */
 .carte-saisie { margin: 4px 0 8px; }
 .carte-saisie label { display: block; font-weight: 700; margin-bottom: 4px; }

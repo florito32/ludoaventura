@@ -161,21 +161,104 @@ test('lettre manquante : le mot s\'affiche avec « _ », pas de « Voir le mot �
   expect(await page.evaluate(() => window.Aventura.partie.regles.de)).toBe('fort');
 });
 
-test('mot mélangé : lettres en désordre, la voix ne dit pas le mot ; réponse fausse → la correction donne le mot', async ({ page }) => {
+// v6.52 : le mot mélangé ne s'écrit plus ; on touche les lettres pour les placer dans l'ordre.
+const lettresDe = (c) => c.params.melange.split(' ');
+// Numéro de la lettre mélangée à toucher pour chaque lettre du mot (lettres répétées : chacune la sienne).
+function ordreJuste(c) {
+  const l = lettresDe(c), pris = [];
+  return c.mot.split('').map((ch) => { const t = l.findIndex((x, k) => x === ch && !pris.includes(k)); pris.push(t); return t; });
+}
+const tuile = (page, t) => page.locator(`#lettres-melangees [data-t="${t}"]`);
+const casePleine = (page) => page.locator('#lettres-reponse .lettre-case.pleine');
+
+test('mot mélangé : lettres à toucher, pas de case à écrire ; la voix ne dit pas le mot ; réponse fausse → la correction donne le mot', async ({ page }) => {
   await page.addInitScript(() => {
     window.__lu = [];
     window.SpeechSynthesisUtterance = function (t) { this.text = t; };
     Object.defineProperty(window, 'speechSynthesis', { configurable: true, value: { speak: (u) => window.__lu.push(u.text), cancel() {}, getVoices: () => [] } });
   });
   const c = await partieMots(page, ['melange'], ['animaux']);
-  await expect(page.locator('#carte-mot')).toHaveText(c.params.melange);
+  const l = lettresDe(c);
+  await expect(page.locator('#carte-lettres')).toBeVisible();
+  await expect(page.locator('#carte-saisie')).toBeHidden();
+  await expect(page.locator('#carte-mot')).toBeHidden();
+  await expect(page.locator('#lettres-melangees .lettre-tuile')).toHaveText(l);
+  await expect(page.locator('#lettres-reponse .lettre-case')).toHaveCount(c.mot.length);
   await page.getByRole('button', { name: 'Écouter' }).click();
   expect(await page.evaluate(() => window.__lu.pop())).toBe('Remets les lettres dans l’ordre :');
-  await page.getByLabel('Ta réponse').fill('zzzz');
-  await page.getByRole('button', { name: 'OK', exact: true }).click();
+  // Ordre faux : on place les lettres telles qu'elles sont mélangées (jamais le bon mot).
+  for (let t = 0; t < l.length; t++) await tuile(page, t).click();
+  await expect(page.locator('#carte-reponse')).toContainText('tu as écrit « ' + l.join('') + ' »');
   await expect(page.locator('#carte-reponse')).toContainText('La bonne réponse : ' + c.mot + '.');
+  await expect(page.locator('#carte-lettres')).toBeHidden();
   await expect(page.locator('#carte-mot')).toHaveText(c.mot);
   await page.getByRole('button', { name: 'J’ai compris' }).click();
+});
+
+test('mot mélangé : chaque lettre va dans la case suivante ; une lettre placée retourne à sa place ; le trou se rebouche ; tout remettre @smoke', async ({ page }) => {
+  const c = await partieMots(page, ['melange'], ['animaux']);
+  const l = lettresDe(c);
+  await expect(page.getByRole('button', { name: 'Tout remettre' })).toBeDisabled();
+  await tuile(page, 2).click();
+  await tuile(page, 0).click();
+  await tuile(page, 1).click();
+  await expect(casePleine(page)).toHaveText([l[2], l[0], l[1]]);
+  // La lettre partie laisse une case vide en pointillés à sa place.
+  await expect(page.locator('#lettres-melangees .lettre-trou')).toHaveCount(3);
+  await expect(page.locator('#lettres-melangees > *')).toHaveCount(l.length);
+  // Retirer la 2e : elle retourne à sa place d'origine, le trou reste dans les cases…
+  await page.locator('#lettres-reponse [data-e="1"]').click();
+  await expect(tuile(page, 0)).toHaveText(l[0]);
+  await expect(tuile(page, 0)).toHaveClass(/lettre-tuile/);
+  await expect(page.locator('#lettres-reponse [data-e="1"]')).not.toHaveClass(/pleine/);
+  await expect(page.locator('#lettres-reponse [data-e="2"]')).toHaveText(l[1]);
+  // … et la prochaine lettre le bouche.
+  await tuile(page, 3).click();
+  await expect(page.locator('#lettres-reponse [data-e="1"]')).toHaveText(l[3]);
+  // Rechargement : les lettres placées sont gardées.
+  await page.reload();
+  await expect(casePleine(page)).toHaveText([l[2], l[3], l[1]]);
+  // Tout remettre : toutes les lettres reviennent à leur place d'origine.
+  await page.getByRole('button', { name: 'Tout remettre' }).click();
+  await expect(casePleine(page)).toHaveCount(0);
+  await expect(page.locator('#lettres-melangees .lettre-tuile')).toHaveText(l);
+  // Bon ordre : correction automatique, dé FORT.
+  for (const t of ordreJuste(c)) await tuile(page, t).click();
+  await expect(page.locator('#carte-reponse')).toContainText('Bonne réponse !');
+  expect(await page.evaluate(() => window.Aventura.partie.regles.de)).toBe('fort');
+  // Pas de débordement horizontal.
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+});
+
+test('mot mélangé : au clavier, taper les lettres les place (accents ignorés) et Retour arrière retire la dernière', async ({ page }) => {
+  test.skip(test.info().project.name !== 'ordinateur', 'clavier d\'ordinateur');
+  const c = await partieMots(page, ['melange'], ['animaux']);
+  const sans = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  await page.keyboard.press(sans(c.mot[0]));
+  await expect(casePleine(page)).toHaveText([c.mot[0]]);
+  await page.keyboard.press('Backspace');
+  await expect(casePleine(page)).toHaveCount(0);
+  for (const ch of c.mot) await page.keyboard.press(sans(ch));
+  await expect(page.locator('#carte-reponse')).toContainText('Bonne réponse !');
+});
+
+test('mot mélangé : les cases tiennent dans la carte pour un mot long', async ({ page }) => {
+  const c = await partieMots(page, ['melange'], ['animaux']);
+  // On force un mot long (12 lettres) pour vérifier la taille des cases.
+  await page.evaluate(() => {
+    const a = window.Aventura, c = a.partie.carte;
+    c.mot = 'HIPPOPOTAME'; c.params = { melange: 'P O H T I P A M E P O' }; c.placees = Array(11).fill(null);
+  });
+  await page.locator('#lettres-melangees [data-t="0"]').click(); // redessine avec les 11 lettres
+  await expect(page.locator('#lettres-reponse .lettre-case')).toHaveCount(11);
+  const ok = await page.evaluate(() => {
+    const box = document.getElementById('carte-piochee').getBoundingClientRect();
+    return [...document.querySelectorAll('#carte-lettres .lettre-tuile, #carte-lettres .lettre-case')].every((e) => {
+      const r = e.getBoundingClientRect(); return r.left >= box.left && r.right <= box.right && r.width >= 30;
+    });
+  });
+  expect(ok).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
 test('combien de fois une lettre : la consigne nomme la lettre ; le mot reste caché avec « Voir le mot »', async ({ page }) => {

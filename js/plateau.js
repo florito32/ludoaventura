@@ -1153,6 +1153,16 @@
     champ.disabled = corrigee;
     $('btn-valider-reponse').disabled = corrigee;
     champ.removeAttribute('aria-invalid');
+    $('carte-lettres').hidden = true;
+    $('carte-mot').hidden = false;
+    if (!corrigee && q.lettres) {
+      // Mot mélangé (v6.52) : pas de case à écrire, des lettres à toucher.
+      $('btn-voir-mot').hidden = true;
+      saisie.hidden = true;
+      rep.hidden = true; rep.className = 'carte-reponse';
+      montrerLettres(c);
+      return;
+    }
     if (!corrigee && q.montrer) {
       // Lettre manquante, mot mélangé : le joueur voit le mot transformé ; « Voir le mot » donnerait la réponse.
       $('btn-voir-mot').hidden = true;
@@ -1262,8 +1272,15 @@
       champ.focus();
       return;
     }
-    c.reponseDonnee = texte;
     champ.blur(); // le clavier se referme : la carte rend la place au plateau et au dé (v6.13)
+    corrigerReponse(texte);
+  }
+
+  // Corrige la réponse donnée (écrite, ou lettres placées pour le mot mélangé), puis lance le bon dé.
+  function corrigerReponse(texte) {
+    var r = partie.regles, c = partie.carte;
+    var conj = c.type === 'conjugaison', ortho = orthoSaisie(c);
+    c.reponseDonnee = texte;
     c.juste = ortho ? Q.juste(c.question, texte, c.mot, C.INFOS[c.mot], c.params)
       : conj ? V.juste(texte, c.verbe, c.temps, c.personne) : K.juste(texte, c.resultat);
     // Réponse fausse (calcul ou conjugaison) : on attend « J'ai compris » avant de lancer le dé (v6.1).
@@ -1289,6 +1306,8 @@
     box.hidden = false;
     box.className = 'carte-piochee joueur-' + j.couleur;
     $('carte-saisie').hidden = true;
+    $('carte-lettres').hidden = true;
+    $('carte-mot').hidden = false;
     $('reponse-joueur').setAttribute('autocapitalize', 'off');
     if (aSaisir(c) && !orthoSaisie(c)) {
       // Le titre de la carte = son thème seul, écrit gros (v6.27 : plus de « Carte n° … de … »).
@@ -1311,6 +1330,122 @@
     } else {
       cacherMot();
       boutons.hidden = false; voirMot.hidden = false;
+    }
+  }
+
+  // ---------- Mot mélangé : placer les lettres (v6.52, choix de l'utilisateur sur la maquette A/B) ----------
+  // En haut les lettres mélangées, en bas une case par lettre du mot. Toucher une lettre la place dans la
+  // première case libre ; toucher une lettre placée la renvoie à sa place d'origine (le trou reste, la
+  // prochaine lettre le bouche) ; « Tout remettre » les renvoie toutes. Mot complet → correction automatique.
+  // c.placees[i] = numéro de la lettre mélangée posée dans la case i (ou null) : gardé avec la partie.
+  var lettresEnCorrection = false;
+  function lettresMelangees(c) { return c.params.melange.split(' '); }
+  function lettresActives() {
+    var c = partie.carte;
+    return !!(c && c.question && c.question.lettres && c.reponseDonnee == null && !$('carte-lettres').hidden &&
+      partie.regles && partie.regles.etape === 'repondre' && !lettresEnCorrection);
+  }
+  function montrerLettres(c) {
+    var l = lettresMelangees(c);
+    if (!Array.isArray(c.placees) || c.placees.length !== l.length) c.placees = l.map(function () { return null; });
+    lettresEnCorrection = false;
+    $('carte-mot').hidden = true;
+    $('carte-lettres').hidden = false;
+    dessinerLettres();
+  }
+  function dessinerLettres() {
+    var c = partie.carte, l = lettresMelangees(c), p = c.placees, suivante = p.indexOf(null);
+    var haut = $('lettres-melangees'), bas = $('lettres-reponse');
+    haut.style.setProperty('--n', l.length);
+    bas.style.setProperty('--n', l.length);
+    // Lettre partie : une case vide en pointillés garde sa place.
+    haut.innerHTML = l.map(function (ch, t) {
+      return p.indexOf(t) >= 0 ? '<span class="lettre-trou" data-t="' + t + '" aria-hidden="true"></span>'
+        : '<button type="button" class="lettre-tuile" data-t="' + t + '" aria-label="Placer la lettre ' + ch + '">' + ch + '</button>';
+    }).join('');
+    bas.innerHTML = p.map(function (t, i) {
+      return t === null
+        ? '<span class="lettre-case' + (i === suivante ? ' suivante' : '') + '" data-e="' + i + '"><span class="visually-hidden">Case ' + (i + 1) + ' vide</span></span>'
+        : '<button type="button" class="lettre-case pleine" data-e="' + i + '" aria-label="Lettre ' + l[t] + ' en case ' + (i + 1) + ', toucher pour la retirer">' + l[t] + '</button>';
+    }).join('');
+    $('btn-remettre').disabled = p.every(function (t) { return t === null; });
+  }
+  // La lettre glisse de son ancienne place à la nouvelle (sauf si l'appareil demande moins d'animations).
+  function glisserLettre(depuis, cible, ch) {
+    if (!depuis || !cible || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+    var b = cible.getBoundingClientRect();
+    var v = document.createElement('span');
+    v.className = 'lettre-volante'; v.textContent = ch; v.setAttribute('aria-hidden', 'true');
+    v.style.cssText = 'left:' + depuis.left + 'px;top:' + depuis.top + 'px;width:' + depuis.width + 'px;height:' + depuis.height + 'px;font-size:' + getComputedStyle(cible).fontSize;
+    document.body.appendChild(v);
+    cible.style.visibility = 'hidden';
+    requestAnimationFrame(function () { requestAnimationFrame(function () {
+      v.style.left = b.left + 'px'; v.style.top = b.top + 'px'; v.style.width = b.width + 'px'; v.style.height = b.height + 'px';
+    }); });
+    setTimeout(function () { v.remove(); cible.style.visibility = ''; }, 230);
+  }
+  function poserLettre(t) {
+    if (!lettresActives()) return;
+    var c = partie.carte, p = c.placees, i = p.indexOf(null);
+    if (i < 0 || p.indexOf(t) >= 0) return;
+    var avant = $('lettres-melangees').querySelector('[data-t="' + t + '"]');
+    var depuis = avant && avant.getBoundingClientRect();
+    p[i] = t;
+    dessinerLettres();
+    glisserLettre(depuis, $('lettres-reponse').querySelector('[data-e="' + i + '"]'), lettresMelangees(c)[t]);
+    sauver();
+    if (p.indexOf(null) < 0) {
+      // Mot complet : correction automatique, le temps de voir la dernière lettre arriver.
+      lettresEnCorrection = true;
+      setTimeout(function () {
+        lettresEnCorrection = false;
+        if (partie.carte !== c || c.reponseDonnee != null) return;
+        var l = lettresMelangees(c);
+        corrigerReponse(c.placees.map(function (k) { return l[k]; }).join(''));
+      }, 380);
+    } else {
+      var suite = $('lettres-melangees').querySelector('.lettre-tuile');
+      if (suite && document.activeElement === document.body) suite.focus();
+    }
+  }
+  function retirerLettre(i) {
+    if (!lettresActives()) return;
+    var c = partie.carte, t = c.placees[i];
+    if (t == null) return;
+    var avant = $('lettres-reponse').querySelector('[data-e="' + i + '"]');
+    var depuis = avant && avant.getBoundingClientRect();
+    c.placees[i] = null;
+    dessinerLettres();
+    var retour = $('lettres-melangees').querySelector('[data-t="' + t + '"]');
+    glisserLettre(depuis, retour, lettresMelangees(c)[t]);
+    if (document.activeElement === document.body && retour) retour.focus();
+    sauver();
+  }
+  function toutRemettre() {
+    if (!lettresActives()) return;
+    var c = partie.carte;
+    c.placees = c.placees.map(function () { return null; });
+    dessinerLettres();
+    var premiere = $('lettres-melangees').querySelector('.lettre-tuile');
+    if (premiere) premiere.focus();
+    sauver();
+  }
+  // Clavier d'ordinateur : taper une lettre la place (accents ignorés), Retour arrière retire la dernière.
+  function sansAccent(ch) { return ch.normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase(); }
+  function clavierLettres(e) {
+    if (e.ctrlKey || e.metaKey || e.altKey || !lettresActives()) return;
+    var cible = e.target;
+    if (cible && /^(INPUT|TEXTAREA|SELECT)$/.test(cible.tagName)) return;
+    if (document.querySelector('dialog[open]')) return;
+    var c = partie.carte, p = c.placees;
+    if (e.key === 'Backspace') {
+      for (var i = p.length - 1; i >= 0; i--) if (p[i] !== null) { e.preventDefault(); retirerLettre(i); return; }
+      return;
+    }
+    if (e.key.length !== 1 || !/\p{L}/u.test(e.key)) return;
+    var k = sansAccent(e.key), l = lettresMelangees(c);
+    for (var t = 0; t < l.length; t++) {
+      if (p.indexOf(t) < 0 && sansAccent(l[t]) === k) { e.preventDefault(); poserLettre(t); return; }
     }
   }
 
@@ -1365,6 +1500,15 @@
 
   function brancherCarte() {
     $('carte-saisie').addEventListener('submit', validerSaisie);
+    // Mot mélangé (v6.52) : lettres à toucher.
+    $('lettres-melangees').addEventListener('click', function (e) {
+      var b = e.target.closest('.lettre-tuile'); if (b) poserLettre(Number(b.dataset.t));
+    });
+    $('lettres-reponse').addEventListener('click', function (e) {
+      var b = e.target.closest('.lettre-case.pleine'); if (b) retirerLettre(Number(b.dataset.e));
+    });
+    $('btn-remettre').addEventListener('click', toutRemettre);
+    document.addEventListener('keydown', clavierLettres);
     $('btn-tableau').addEventListener('click', basculerTableau);
     $('btn-voir-mot').addEventListener('click', function () { if (partie.vue === 'mot') cacherMot(); else montrerMotSeul(); });
     $('btn-voir').addEventListener('click', function () { if (partie.vue === 'reponse') cacherMot(); else montrerReponse(); });
