@@ -1,7 +1,7 @@
 // Histoire (v7.1) : la matière Histoire, rangée par périodes (BACKLOG lignes 270 et 275).
 // Choix de l'utilisateur du 12/11/2026 : 7 périodes, 51 jeux, 4 niveaux, et chaque niveau n'a QUE son
 // propre contenu (Expert = seulement du contenu expert). Livraison par période : l'Antiquité d'abord (ses
-// 12 jeux sont tous retenus), puis la Préhistoire (v7.6, 5 jeux) ; les autres périodes viendront ensuite.
+// 12 jeux sont tous retenus), puis la Préhistoire (v7.6, 5 jeux) et le Moyen Âge (v7.7, 8 jeux) ; les autres périodes viendront ensuite.
 // Format des séries : voir js/savoirs.js. « A|B » = A s'affiche, B est aussi accepté en question ouverte.
 (function (racine) {
   'use strict';
@@ -417,6 +417,172 @@
         difficile: [['Quelle était la course la plus ancienne des Jeux ?', 'Le stade, environ 192 mètres', ['Le marathon', 'Le 10 000 mètres', 'Le relais', 'La course de haies', 'Le cross']]],
         expert: [['Qui a recréé les Jeux olympiques modernes ?', 'Pierre de Coubertin', ['Jules Ferry', 'Victor Hugo', 'Jules Verne', 'Louis Pasteur', 'Gustave Eiffel']],
           ['Quelle Spartiate a été la première femme à gagner aux Jeux, avec ses chevaux ?', 'Cynisca|Kyniska', ['Hélène', 'Cléopâtre', 'Sappho', 'Artémise', 'Pénélope']]]
+      } }
+    ] },    // ---------- Moyen Âge (v7.7, BACKLOG ligne 295 : 8 jeux, hypothèse à valider) ----------
+    { id: 'm01', matiere: 'histoire', famille: 'mag', nom: 'Rois de France', court: 'Rois', icone: '👑', series: [
+      { k: 'paires', gauche: 'Roi', droite: 'Ce qu’il a fait', consigneR: 'Relie chaque roi à ce qui le rend célèbre.', q: 'Pourquoi {a} est-il célèbre ?', qi: 'Quel roi : {b} ?', ouverte: false, niveaux: {
+        facile: [['Clovis', 'Roi des Francs baptisé à Reims'], ['Charlemagne', 'Couronné empereur en l’an 800'], ['Saint Louis', 'Rendait la justice sous un chêne']],
+        moyen: [['Hugues Capet', 'Élu roi en 987, premier des Capétiens'], ['Philippe Auguste', 'Vainqueur à Bouvines en 1214'], ['Charles VII', 'Sacré à Reims grâce à Jeanne d’Arc'],
+          ['Pépin le Bref', 'Premier roi carolingien']],
+        difficile: [['Dagobert Ier', 'Roi mérovingien conseillé par saint Éloi'], ['Charles Martel', 'Chef franc vainqueur à Poitiers en 732'], ['Philippe le Bel', 'Fait arrêter les Templiers'],
+          ['Louis XI', 'Surnommé « l’universelle aragne »'], ['Charles le Chauve', 'Reçoit l’ouest de l’empire au traité de Verdun']],
+        expert: [['Robert le Pieux', 'Fils d’Hugues Capet'], ['Louis VI le Gros', 'Conseillé par l’abbé Suger'], ['Louis VII', 'Premier mari d’Aliénor d’Aquitaine'],
+          ['Jean le Bon', 'Fait prisonnier à la bataille de Poitiers en 1356'], ['Charles V le Sage', 'Son connétable était Du Guesclin'], ['Charles VI', 'Surnommé le Fou, ou le Bien-Aimé']]
+      } },
+      { k: 'indices', consigne: 'Qui suis-je ? Trouve le roi.', niveaux: {
+        facile: [{ r: 'Charlemagne', i: ['Je suis le fils de Pépin le Bref.', 'J’ai combattu les Saxons et les Lombards.', 'Ma ville préférée était Aix-la-Chapelle.', 'On dit, à tort, que j’ai inventé l’école.', 'J’ai été couronné empereur à Rome en l’an 800.'] },
+          { r: 'Clovis', i: ['Je suis roi des Francs.', 'Mon père s’appelait Childéric.', 'On raconte l’histoire de mon vase brisé à Soissons.', 'Ma femme, Clotilde, était chrétienne.', 'J’ai été baptisé à Reims par l’évêque Remi.'] }],
+        moyen: [{ r: 'Saint Louis', i: ['Je suis roi de France au XIIIe siècle.', 'Ma mère, Blanche de Castille, a gouverné pendant mon enfance.', 'J’ai fait construire la Sainte-Chapelle à Paris.', 'Je suis mort à Tunis pendant une croisade.', 'On dit que je rendais la justice sous un chêne à Vincennes.'] }],
+        difficile: [{ r: 'Philippe Auguste', i: ['Je suis un roi capétien.', 'J’ai beaucoup agrandi le domaine royal.', 'J’ai fait entourer Paris d’un rempart et construire le premier Louvre.', 'Je suis parti en croisade avec Richard Cœur de Lion.', 'J’ai gagné la bataille de Bouvines en 1214.'] }],
+        expert: [{ r: 'Hugues Capet', i: ['J’étais duc des Francs.', 'Mon surnom viendrait d’une cape d’abbé.', 'Les grands seigneurs m’ont élu roi.', 'Je suis devenu roi en 987.', 'Ma dynastie porte mon nom : les Capétiens.'] }]
+      } }
+    ] },
+    { id: 'm02', matiere: 'histoire', famille: 'mag', nom: 'Le château fort', court: 'Château fort', icone: '🏰', series: [
+      { k: 'paires', gauche: 'Partie du château', droite: 'Ce que c’est', consigneR: 'Relie chaque partie du château fort à ce qu’elle est.', q: 'Qu’est-ce que {a} ?', qi: 'Comment s’appelle : {b} ?', niveaux: {
+        facile: [['le donjon', 'La plus haute tour, dernier refuge'], ['le pont-levis', 'Un pont qu’on relève'], ['les douves', 'Un fossé rempli d’eau'], ['les créneaux', 'Les découpes en haut des murs']],
+        moyen: [['la herse', 'Une grille qui descend pour fermer la porte'], ['le chemin de ronde', 'Le passage en haut des remparts'], ['la meurtrière', 'Une fente étroite pour tirer à l’arc'],
+          ['la basse-cour', 'La cour où vivent les gens et les animaux']],
+        difficile: [['les mâchicoulis', 'Des trous au sol d’un balcon de pierre pour jeter des projectiles'], ['le hourd', 'Une galerie en bois en haut des murs'], ['la barbacane', 'Un ouvrage avancé qui protège l’entrée'],
+          ['la courtine', 'Le mur entre deux tours'], ['la motte', 'La butte de terre des premiers châteaux']],
+        expert: [['le merlon', 'La partie pleine entre deux créneaux'], ['l’échauguette', 'Une petite tour accrochée en haut d’un mur'], ['la poterne', 'Une petite porte discrète'],
+          ['le châtelet', 'Le bâtiment fortifié qui garde l’entrée'], ['la bretèche', 'Un petit balcon fermé au-dessus d’une porte'], ['l’assommoir', 'Un trou dans la voûte de l’entrée pour frapper les assaillants']]
+      } },
+      { k: 'qcm', niveaux: {
+        facile: [['En quoi étaient construits les premiers châteaux forts, vers l’an 1000 ?', 'En bois', ['En béton', 'En verre']],
+          ['Qui habitait le château fort ?', 'Le seigneur et sa famille', ['Le pape', 'Les moines']]],
+        moyen: [['Quelle machine lançait de grosses pierres contre les murs ?', 'Le trébuchet', ['Le bélier', 'La tour de siège', 'L’arbalète']],
+          ['Comment appelle-t-on l’attaque d’un château qu’on encercle longtemps ?', 'Un siège', ['Un tournoi', 'Une croisade', 'Un adoubement']]],
+        difficile: [['Quel château de Richard Cœur de Lion domine la Seine, aux Andelys ?', 'Château-Gaillard', ['Carcassonne', 'Chinon', 'Pierrefonds', 'Vincennes']],
+          ['Quelle cité fortifiée, avec deux rangs de remparts, se trouve dans l’Aude ?', 'Carcassonne', ['Aigues-Mortes', 'Provins', 'Avignon', 'Saint-Malo']]],
+        expert: [['Quel architecte a restauré Carcassonne et Pierrefonds au XIXe siècle ?', 'Viollet-le-Duc', ['Vauban', 'Haussmann', 'Gustave Eiffel', 'Le Nôtre', 'Mansart']],
+          ['Quel roi a fait construire le Louvre, d’abord une forteresse ?', 'Philippe Auguste', ['Saint Louis', 'Charlemagne', 'Louis XIV', 'François Ier', 'Clovis']]]
+      } }
+    ] },
+    { id: 'm03', matiere: 'histoire', famille: 'mag', nom: 'Chevaliers', court: 'Chevaliers', icone: '⚔️', series: [
+      { k: 'paires', gauche: 'Mot', droite: 'Ce qu’il veut dire', consigneR: 'Relie chaque mot de la chevalerie à son sens.', q: 'Que veut dire « {a} » ?', qi: 'Quel mot veut dire : {b} ?', niveaux: {
+        facile: [['adoubement', 'La cérémonie pour devenir chevalier'], ['tournoi', 'Un combat pour s’entraîner et montrer sa force'], ['armure', 'Le costume de métal qui protège'], ['écu', 'Le bouclier du chevalier']],
+        moyen: [['page', 'Un jeune garçon qui commence à servir un seigneur'], ['écuyer', 'Celui qui aide le chevalier et porte ses armes'], ['joute', 'Un duel à cheval, avec une lance'], ['destrier', 'Le cheval de combat']],
+        difficile: [['cotte de mailles', 'Une chemise faite d’anneaux de fer'], ['heaume', 'Le casque qui couvre toute la tête'], ['blason', 'Les dessins et couleurs qui font reconnaître un chevalier'],
+          ['ost', 'L’armée que le vassal doit au seigneur'], ['croisade', 'Une expédition militaire vers Jérusalem']],
+        expert: [['palefroi', 'Le cheval de voyage'], ['colée', 'Le coup donné au futur chevalier pendant l’adoubement'], ['éperons', 'Des pointes aux talons pour diriger le cheval'],
+          ['lice', 'Le terrain clos des tournois'], ['Templiers', 'Des moines-soldats'], ['courtoisie', 'Les belles manières du chevalier envers les dames']]
+      } },
+      { k: 'qcm', niveaux: {
+        facile: [['Quel animal accompagne toujours le chevalier ?', 'Le cheval', ['Le chien', 'L’âne']]],
+        moyen: [['Qui adoubait le futur chevalier ?', 'Un seigneur ou un chevalier', ['Le pape', 'Un paysan', 'Un marchand']]],
+        difficile: [['Quel chevalier breton est devenu connétable de France sous Charles V ?', 'Bertrand Du Guesclin', ['Bayard', 'Godefroy de Bouillon', 'Roland', 'Lancelot']],
+          ['Où Roland, neveu de Charlemagne, est-il mort en 778 ?', 'À Roncevaux', ['À Poitiers', 'À Alésia', 'À Bouvines', 'À Azincourt']]],
+        expert: [['Quel ordre de chevaliers-moines Philippe le Bel a-t-il fait arrêter en 1307 ?', 'Les Templiers', ['Les Hospitaliers', 'Les Chevaliers teutoniques', 'Les Bénédictins', 'Les Cisterciens', 'Les Franciscains']],
+          ['Quel poème raconte la mort de Roland ?', 'La Chanson de Roland', ['Le Roman de Renart', 'Tristan et Iseut', 'Perceval', 'Le Cid', 'Les Fabliaux']]]
+      } }
+    ] },
+    { id: 'm05', matiere: 'histoire', famille: 'mag', nom: 'Jeanne d’Arc et la guerre de Cent Ans', court: 'Jeanne d’Arc', icone: '🗡️', series: [
+      { k: 'ordre', consigne: 'Range ces événements de la guerre de Cent Ans du plus ancien au plus récent.', q: 'En quelle année : {a} ?', niveaux: {
+        facile: [['Début de la guerre de Cent Ans', 1337, '1337'], ['Jeanne d’Arc délivre Orléans', 1429, '1429'], ['Jeanne d’Arc est brûlée à Rouen', 1431, '1431'], ['Fin de la guerre de Cent Ans', 1453, '1453']],
+        moyen: [['Bataille de Crécy', 1346, '1346'], ['Bataille de Poitiers, le roi Jean le Bon est pris', 1356, '1356'], ['Bataille d’Azincourt', 1415, '1415'], ['Bataille de Castillon, la dernière', 1453, '1453']],
+        difficile: [['La peste noire arrive en France', 1348, '1348'], ['Naissance de Jeanne d’Arc à Domrémy', 1412, '1412'], ['Traité de Troyes : le roi d’Angleterre héritier de la France', 1420, '1420'],
+          ['Jeanne d’Arc rencontre Charles VII à Chinon', 1429, '1429'], ['Jeanne d’Arc est capturée à Compiègne', 1430, '1430']],
+        expert: [['Les Anglais prennent Calais', 1347, '1347'], ['La Grande Jacquerie, révolte des paysans', 1358, '1358'], ['Traité de Brétigny', 1360, '1360'],
+          ['Charles VII reprend Paris', 1436, '1436'], ['Bataille de Formigny', 1450, '1450'], ['Prise de Constantinople par les Ottomans', 1453, '1453']]
+      } },
+      { k: 'qcm', niveaux: {
+        facile: [['Contre qui la France se bat-elle pendant la guerre de Cent Ans ?', 'L’Angleterre', ['L’Espagne', 'L’Italie']]],
+        moyen: [['Quelle ville Jeanne d’Arc a-t-elle délivrée en 1429 ?', 'Orléans', ['Paris', 'Reims', 'Rouen']],
+          ['Combien de temps a vraiment duré la guerre de Cent Ans ?', '116 ans', ['100 ans', '99 ans', '50 ans']]],
+        difficile: [['Dans quelle ville Jeanne d’Arc a-t-elle été brûlée en 1431 ?', 'Rouen', ['Orléans', 'Reims', 'Chinon', 'Compiègne']],
+          ['Dans quel village Jeanne d’Arc est-elle née ?', 'Domrémy', ['Vaucouleurs', 'Chinon', 'Orléans', 'Rouen']]],
+        expert: [['Qui a livré Jeanne d’Arc aux Anglais ?', 'Les Bourguignons', ['Les Armagnacs', 'Les Écossais', 'Les Bretons', 'Les Espagnols', 'Les Flamands']],
+          ['Quel évêque a présidé le procès de Jeanne d’Arc ?', 'Pierre Cauchon', ['Remi', 'Suger', 'Thomas Becket', 'Bernard de Clairvaux', 'Fulbert']]]
+      } },
+      { k: 'vf', niveaux: {
+        facile: [['Jeanne d’Arc disait entendre des voix qui lui parlaient.', true, ''],
+          ['La guerre de Cent Ans a duré exactement 100 ans.', false, 'Elle a duré 116 ans, de 1337 à 1453, avec de longues trêves.']],
+        moyen: [['Jeanne d’Arc a fait sacrer Charles VII à Reims.', true, ''],
+          ['À la fin de la guerre, les Anglais ont gardé Bordeaux.', false, 'Ils ont perdu Bordeaux en 1453 ; ils n’ont gardé que Calais.']],
+        difficile: [['À Azincourt, les archers anglais ont battu la chevalerie française.', true, '']],
+        expert: [['Jeanne d’Arc a été déclarée sainte en 1920.', true, '']]
+      } }
+    ] },
+    { id: 'm06', matiere: 'histoire', famille: 'mag', nom: 'Frise du Moyen Âge', court: 'Frise', icone: '📏', series: [
+      { k: 'ordre', consigne: 'Range ces événements du Moyen Âge du plus ancien au plus récent.', q: 'En quelle année : {a} ?', niveaux: {
+        facile: [['Fin de l’Empire romain d’Occident', 476, '476'], ['Charlemagne est couronné empereur', 800, '800'], ['Jeanne d’Arc délivre Orléans', 1429, '1429'],
+          ['Christophe Colomb arrive en Amérique', 1492, '1492']],
+        moyen: [['Charles Martel arrête les Arabes à Poitiers', 732, '732'], ['Hugues Capet devient roi', 987, '987'], ['Guillaume le Conquérant gagne à Hastings', 1066, '1066'],
+          ['Départ de la première croisade', 1096, '1096'], ['Fin de la guerre de Cent Ans', 1453, '1453']],
+        difficile: [['Traité de Verdun : l’empire de Charlemagne est partagé', 843, '843'], ['Rollon reçoit la Normandie', 911, '911'], ['Début de la construction de Notre-Dame de Paris', 1163, '1163'],
+          ['Bataille de Bouvines', 1214, '1214'], ['La peste noire arrive en Europe', 1347, '1347']],
+        expert: [['Le pape Urbain II appelle à la croisade à Clermont', 1095, '1095'], ['Les croisés prennent Jérusalem', 1099, '1099'], ['Début de la croisade contre les Albigeois', 1209, '1209'],
+          ['Mort de Saint Louis à Tunis', 1270, '1270'], ['Arrestation des Templiers', 1307, '1307'], ['Les Ottomans prennent Constantinople', 1453, '1453']]
+      } }
+    ] },
+    { id: 'm07', matiere: 'histoire', famille: 'mag', nom: 'Roman ou gothique ?', court: 'Églises', icone: '⛪', series: [
+      { k: 'classer', niveaux: {
+        facile: [{ q: 'Range ces caractéristiques : art roman ou art gothique ?', colonnes: ['Roman', 'Gothique'],
+          items: [['Des murs très épais', 0], ['De petites fenêtres', 0], ['Des arcs ronds', 0], ['Une église plutôt sombre', 0],
+            ['De grands vitraux', 1], ['Des arcs en pointe', 1], ['Une église très haute et lumineuse', 1], ['Des arcs-boutants à l’extérieur', 1]] }],
+        moyen: [{ q: 'Range ces églises célèbres : romanes ou gothiques ?', colonnes: ['Roman', 'Gothique'],
+          items: [['Saint-Sernin de Toulouse', 0], ['L’abbatiale Sainte-Foy de Conques', 0], ['Notre-Dame-la-Grande de Poitiers', 0], ['L’abbatiale de Saint-Savin', 0],
+            ['Notre-Dame de Paris', 1], ['La cathédrale de Chartres', 1], ['La cathédrale d’Amiens', 1], ['La Sainte-Chapelle', 1], ['La cathédrale de Reims', 1]] }],
+        difficile: [{ q: 'Range ces abbayes et cathédrales : romanes ou gothiques ?', colonnes: ['Roman', 'Gothique'],
+          items: [['L’abbaye de Fontenay', 0], ['Le cloître de Moissac', 0], ['Saint-Philibert de Tournus', 0], ['La basilique de Paray-le-Monial', 0],
+            ['La cathédrale de Strasbourg', 1], ['La cathédrale de Beauvais', 1], ['La cathédrale de Bourges', 1], ['La cathédrale de Rouen', 1]] }],
+        expert: [{ q: 'Range ces mots d’architecture : roman ou gothique ?', colonnes: ['Roman', 'Gothique'],
+          items: [['La voûte en berceau', 0], ['La voûte d’arêtes', 0], ['L’arc en plein cintre', 0], ['Le style de Cluny', 0],
+            ['La croisée d’ogives', 1], ['La rosace', 1], ['Le style flamboyant', 1], ['Le style rayonnant', 1]] }]
+      } },
+      { k: 'paires', gauche: 'Monument', droite: 'Où il se trouve', consigneR: 'Relie chaque monument du Moyen Âge à l’endroit où il se trouve.', q: 'Où se trouve {a} ?', ouverte: false, niveaux: {
+        facile: [['Le Mont-Saint-Michel', 'En Normandie'], ['La cité de Carcassonne', 'En Occitanie'], ['Le palais des Papes', 'À Avignon']],
+        moyen: [['La cathédrale du sacre des rois', 'À Reims'], ['La Sainte-Chapelle', 'À Paris, sur l’île de la Cité'], ['Les remparts d’Aigues-Mortes', 'Dans le Gard'],
+          ['La cité médiévale de Provins', 'En Seine-et-Marne']],
+        difficile: [['L’abbaye de Cluny', 'En Bourgogne'], ['La basilique de Vézelay', 'Dans l’Yonne'], ['L’abbatiale de Conques', 'En Aveyron'],
+          ['La cathédrale d’Albi, en brique', 'Dans le Tarn'], ['Le château de Chinon', 'En Indre-et-Loire']],
+        expert: [['Le cloître de Moissac', 'Dans le Tarn-et-Garonne'], ['La basilique Saint-Sernin', 'À Toulouse'], ['Le donjon de Vincennes', 'Dans le Val-de-Marne'],
+          ['Château-Gaillard', 'Aux Andelys, dans l’Eure'], ['L’abbaye de Fontenay', 'En Côte-d’Or'], ['La cathédrale de Beauvais', 'Dans l’Oise']]
+      } }
+    ] },
+    { id: 'm08', matiere: 'histoire', famille: 'mag', nom: 'Les Vikings', court: 'Vikings', icone: '⛵', series: [
+      { k: 'paires', gauche: 'Mot', droite: 'Ce que c’est', consigneR: 'Relie chaque mot du monde viking à ce qu’il désigne.', q: 'Qu’est-ce que {a} ?', qi: 'Comment s’appelle : {b} ?', niveaux: {
+        facile: [['le drakkar', 'Le bateau de guerre des Vikings'], ['la Scandinavie', 'La région d’où viennent les Vikings'], ['Odin', 'Le dieu principal des Vikings']],
+        moyen: [['Thor', 'Le dieu du tonnerre, avec son marteau'], ['les runes', 'L’alphabet des Vikings'], ['le Valhalla', 'Le palais des guerriers morts au combat'], ['une saga', 'Un long récit d’exploits']],
+        difficile: [['un jarl', 'Un chef viking'], ['le thing', 'L’assemblée des hommes libres'], ['le knarr', 'Le bateau de commerce viking'],
+          ['les Varègues', 'Les Vikings partis vers l’est'], ['le Vinland', 'La terre d’Amérique atteinte par les Vikings']],
+        expert: [['les Valkyries', 'Les guerrières qui choisissent les morts au combat'], ['le Ragnarök', 'La fin du monde des dieux'], ['Yggdrasil', 'L’arbre géant qui relie les mondes'],
+          ['Loki', 'Le dieu rusé qui joue des tours'], ['Frigg', 'L’épouse d’Odin'], ['le danegeld', 'La rançon payée aux Vikings']]
+      } },
+      { k: 'qcm', niveaux: {
+        facile: [['D’où venaient les Vikings ?', 'Du nord de l’Europe', ['D’Afrique', 'D’Amérique']]],
+        moyen: [['Quelle région de France doit son nom aux « hommes du Nord » ?', 'La Normandie', ['La Bretagne', 'La Picardie', 'La Provence']]],
+        difficile: [['Quel chef viking a reçu la Normandie en 911 ?', 'Rollon', ['Erik le Rouge', 'Ragnar', 'Harald à la Dent bleue', 'Leif Erikson']],
+          ['Quel Viking a atteint l’Amérique vers l’an 1000 ?', 'Leif Erikson', ['Rollon', 'Ragnar', 'Christophe Colomb', 'Harald à la Dent bleue']]],
+        expert: [['Quel monastère anglais, pillé en 793, marque le début de l’âge des Vikings ?', 'Lindisfarne', ['Canterbury', 'Iona', 'Cluny', 'Westminster', 'York']],
+          ['Quel descendant de Rollon a conquis l’Angleterre en 1066 ?', 'Guillaume le Conquérant', ['Richard Cœur de Lion', 'Harold', 'Henri II', 'Édouard le Confesseur', 'Canut le Grand']]]
+      } },
+      { k: 'vf', niveaux: {
+        facile: [['Les casques des Vikings avaient des cornes.', false, 'C’est une invention du XIXe siècle : leurs casques n’avaient pas de cornes.'],
+          ['Les Vikings étaient aussi des marchands et des paysans.', true, '']],
+        moyen: [['Les Vikings ont assiégé Paris.', true, 'En 845, puis en 885-886.']],
+        difficile: [['Les Vikings ont fondé la ville de Dublin.', true, '']],
+        expert: [['La tapisserie de Bayeux raconte la conquête de l’Angleterre par les Normands.', true, '']]
+      } }
+    ] },
+    { id: 'm09', matiere: 'histoire', famille: 'mag', nom: 'Seigneurs et paysans', court: 'Seigneurs', icone: '🌾', series: [
+      { k: 'paires', gauche: 'Mot', droite: 'Ce qu’il veut dire', consigneR: 'Relie chaque mot à son sens.', q: 'Que veut dire « {a} » ?', qi: 'Quel mot veut dire : {b} ?', niveaux: {
+        facile: [['seigneur', 'Le maître du château et des terres'], ['serf', 'Un paysan qui n’est pas libre'], ['corvée', 'Le travail gratuit dû au seigneur']],
+        moyen: [['fief', 'La terre donnée à un vassal'], ['vassal', 'Celui qui jure fidélité à un seigneur'], ['dîme', 'L’impôt payé à l’Église'], ['moulin banal', 'Le moulin du seigneur, payant']],
+        difficile: [['suzerain', 'Le seigneur à qui le vassal jure fidélité'], ['hommage', 'La cérémonie où le vassal jure fidélité'], ['taille', 'Un impôt payé au seigneur'],
+          ['jachère', 'Une terre laissée au repos'], ['vilain', 'Un paysan libre']],
+        expert: [['ban', 'Le pouvoir du seigneur de commander et de juger'], ['cens', 'La redevance payée pour une terre'], ['tenure', 'La terre confiée à un paysan'],
+          ['réserve', 'Les terres que le seigneur garde pour lui'], ['assolement triennal', 'La rotation des cultures sur trois ans'], ['mainmorte', 'Le droit du seigneur sur l’héritage du serf']]
+      } },
+      { k: 'classer', niveaux: {
+        facile: [{ q: 'Les trois ordres : ceux qui prient ou ceux qui combattent ?', colonnes: ['Ceux qui prient', 'Ceux qui combattent'],
+          items: [['Un moine', 0], ['Un évêque', 0], ['Un curé', 0], ['Un abbé', 0], ['Un chevalier', 1], ['Un seigneur', 1], ['Un duc', 1], ['Un comte', 1]] }],
+        moyen: [{ q: 'Les trois ordres : ceux qui combattent ou ceux qui travaillent ?', colonnes: ['Ceux qui combattent', 'Ceux qui travaillent'],
+          items: [['Un écuyer', 0], ['Un baron', 0], ['Un marquis', 0], ['Un connétable', 0], ['Un paysan', 1], ['Un serf', 1], ['Un forgeron', 1], ['Un meunier', 1], ['Un artisan', 1]] }],
+        difficile: [{ q: 'Les trois ordres : ceux qui prient ou ceux qui travaillent ?', colonnes: ['Ceux qui prient', 'Ceux qui travaillent'],
+          items: [['Une abbesse', 0], ['Un chanoine', 0], ['Le pape', 0], ['Un prieur', 0], ['Un berger', 1], ['Un tisserand', 1], ['Un bûcheron', 1], ['Un charpentier', 1]] }],
+        expert: [{ q: 'Qui reçoit ce paiement : le seigneur ou l’Église ?', colonnes: ['Le seigneur', 'L’Église'],
+          items: [['La corvée', 0], ['La taille', 0], ['Les banalités', 0], ['Le cens', 0], ['La dîme', 1], ['Le denier de saint Pierre', 1], ['Les offrandes de la messe', 1]] }]
       } }
     ] }
   ];
