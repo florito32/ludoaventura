@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '7.7';
+  var VERSION = '7.8';
 
   var HISTORY = [
+    { v: '7.8', date: '2026-11-13', changes: [
+      "Histoire : nouvelle période, la Renaissance, avec 6 jeux et 4 niveaux — Artistes et œuvres, Grandes découvertes, Châteaux de la Loire, Rois de la Renaissance (avec Qui suis-je ?), Réforme et guerres de Religion, Frise de la Renaissance.",
+      "Téléphone : sur l’écran des jeux d’histoire, le haut de la liste (Préhistoire) est de nouveau atteignable en faisant défiler."
+    ] },
     { v: '7.7', date: '2026-11-12', changes: [
       "Histoire : nouvelle période, le Moyen Âge, avec 8 jeux et 4 niveaux — Rois de France, Le château fort, Chevaliers, Jeanne d’Arc et la guerre de Cent Ans, Frise du Moyen Âge, Roman ou gothique ?, Les Vikings, Seigneurs et paysans."
     ] },

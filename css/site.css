@@ -1616,6 +1616,10 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
    Géographie : 11 jeux en 3 familles (3, 4 et 4) → 4 par ligne en largeur (3 lignes), 3 par ligne en hauteur (5 lignes). */
 #savoir-jeux { --rangs: 3; --cols: 4; --larg: min(100cqi, 1000px);
   --h: clamp(26px, calc((100cqh - 10.5rem) / var(--rangs) - 1.8cqh), 96px); }
+/* v7.8 : avec 4 périodes d'histoire, la liste dépasse la hauteur sur téléphone ; centrée avec « height: 100% »,
+   son haut sortait au-dessus de la zone qui défile (Préhistoire impossible à atteindre). min-height : centrée
+   quand elle tient, sinon elle grandit et tout se fait défiler. */
+#savoir-jeux { height: auto; min-height: 100%; }
 #savoir-liste { display: flex; flex-direction: column; gap: clamp(4px, 1.2cqh, 12px); }
 #savoir-liste .famille[hidden] { display: none; }
 #savoir-jeux .famille .packs { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(4px, 1cqh, 10px) clamp(5px, 1.4cqi, 12px); }
