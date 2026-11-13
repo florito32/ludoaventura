@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '8.4';
+  var VERSION = '8.5';
 
   var HISTORY = [
+    { v: '8.5', date: '2026-11-13', changes: [
+      "Histoire, Moyen Âge : les 8 petits jeux sont regroupés en 3, avec environ 35 à 40 questions par niveau chacun, jouables en Quiz et en Normal — Rois, batailles et frise ; Châteaux, chevaliers et paysans ; Églises, croisades et Vikings (les Vikings sont de nouveau jouables en Quiz)."
+    ] },
     { v: '8.4', date: '2026-11-13', changes: [
       "Histoire, Antiquité : les 12 petits jeux sont regroupés en 6, avec environ 40 questions par niveau chacun, jouables en Quiz et en Normal — Dieux et mythes, L’Égypte des pharaons, Rome et la Gaule, Monuments et merveilles, Chiffres romains, Vie antique et Jeux olympiques.",
       "Quiz : les questions « Qui a… ? » et « Chez les Égyptiens, qui est… ? » proposent bien 4 noms au choix (et non 4 descriptions)."
