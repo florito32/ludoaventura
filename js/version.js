@@ -4,9 +4,16 @@
 (function () {
   'use strict';
 
-  var VERSION = '7.11';
+  var VERSION = '8.0';
 
   var HISTORY = [
+    { v: '8.0', date: '2026-11-13', changes: [
+      "Géographie et Histoire : nouveau choix du mode, « Quiz » (une question et 4 réponses, une seule est bonne) ou « Normal » (relier, écrire la réponse, toucher la carte, remettre dans l’ordre, vrai ou faux, classer, qui suis-je ?).",
+      "Toujours 4 réponses au choix et toujours 4 paires à relier, quel que soit le niveau.",
+      "Géographie : un seul jeu « Départements » (numéro, nom et préfecture), 25 départements par niveau, rangés par population (Insee).",
+      "Géographie : la carte devient trois jeux, Carte de France (les départements), Carte d’Europe et Carte du monde ; plus le niveau monte, plus les zones sont petites. En Quiz, la zone est en vert et on choisit son nom parmi 4.",
+      "Géographie : « Régions » demande aussi dans quelle région se trouve chaque département."
+    ] },
     { v: '7.11', date: '2026-11-13', changes: [
       "Histoire : nouvelle période, le XXe siècle, avec 7 jeux et 4 niveaux — Conquête spatiale, Inventions du XXe siècle, Présidents de la Ve République (avec Qui suis-je ?), Femmes qui ont marqué l’histoire (avec Qui suis-je ?), Construction européenne, Grandes figures du monde (avec Qui suis-je ?), Frise du XXe siècle. Les 7 périodes de l’histoire sont maintenant toutes jouables."
     ] },

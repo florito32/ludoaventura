@@ -242,6 +242,13 @@
             <div class="packs" id="niveau-savoir" role="radiogroup" aria-labelledby="niveau-savoir-titre" aria-describedby="niveau-savoir-aide"></div>
             <p class="reglage-aide" id="niveau-savoir-aide"></p>
           </div>
+          <!-- v8.0 (demande du 13/11/2026) : Géographie et Histoire se jouent en « Quiz » (4 choix) ou en « Normal »
+               (relier, question ouverte, carte à toucher…). Les jeux se choisissent sur l'écran suivant. -->
+          <div class="reglage-ligne" id="reglage-mode-savoir" hidden>
+            <p class="reglage-titre" id="mode-savoir-titre">Mode</p>
+            <div class="packs" id="mode-savoir" role="radiogroup" aria-labelledby="mode-savoir-titre" aria-describedby="mode-savoir-aide"></div>
+            <p class="reglage-aide" id="mode-savoir-aide"></p>
+          </div>
           <!-- Nombre de signes par calcul (v6.14) : seuls les choix permis par le niveau apparaissent. -->
           <div class="reglage-ligne" id="reglage-nb-signes" hidden>
             <p class="reglage-titre" id="nb-signes-titre">Signes par calcul</p>
@@ -637,6 +644,7 @@
     <li><strong>Drapeaux</strong> : <a href="https://github.com/lipis/flag-icons">flag-icons</a>, © 2013 Panayiotis Lipiridis, licence MIT (texte de la licence : <a href="img/drapeaux/LICENSE">img/drapeaux/LICENSE</a>).</li>
     <li><strong>Carte de France</strong> (régions, départements) : IGN, Admin Express COG, édition 2018, Licence ouverte (Etalab) ; tracés mis en GeoJSON par <a href="https://github.com/gregoiredavid/france-geojson">Grégoire David (france-geojson)</a>.</li>
     <li><strong>Cartes d’Europe et du monde</strong> : <a href="https://www.naturalearthdata.com/">Natural Earth</a> (domaine public).</li>
+    <li><strong>Population des départements</strong> (niveaux du jeu Départements) : <a href="https://www.insee.fr/fr/statistiques/8290631">Insee, populations de référence 2022</a> ; Mayotte : Insee, recensement exhaustif au 1er janvier 2026.</li>
   </ul>
   <div class="fin-actions">
     <button type="button" class="btn btn-principal" id="btn-credits-ok">Fermer</button>

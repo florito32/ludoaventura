@@ -1,18 +1,20 @@
-#!/usr/bin/env python3
-"""Génère js/cartes-geo.js : les cartes du jeu « Carte à toucher » (Géographie, v7.1).
+"""Génère js/cartes-geo.js : les cartes des jeux Carte France, Carte Europe et Carte Monde (Géographie, v8.0).
 
 Sources (libres) :
   - France : contours IGN Admin Express COG (édition 2018, Licence ouverte), mis en GeoJSON par
     Grégoire David (github.com/gregoiredavid/france-geojson), versions simplifiées.
   - Europe et monde : Natural Earth 1:50m (domaine public, naturalearthdata.com).
-Usage : python3 outils/cartes_geo.py <france-geojson> <ne_50m_admin_0_countries.geojson> <deps.json>
-Zones trop petites pour être touchées (demande de l'utilisateur) : dessinées, mais jamais demandées.
+  - Populations des départements : Insee, populations de référence 2022 (outils/donnees/population-departements.csv ;
+    Mayotte : recensement exhaustif Insee, 1er janvier 2026).
+Usage : python3 outils/cartes_geo.py <dossier france-geojson> <ne_50m_admin_0_countries.geojson>
+Niveaux (choix de l'utilisateur du 13/11/2026) : départements par population (25 / 25 / 25 / le reste),
+pays par superficie (calculée sur les contours), découpés en quatre parts égales.
+Zones trop petites pour être touchées, même en zoomant : dessinées, mais jamais demandées.
 """
-import json, math, sys
+import csv, json, math, sys
 
-FR, NE, DEPS = sys.argv[1], sys.argv[2], sys.argv[3]
+FR, NE = sys.argv[1], sys.argv[2]
 LARGEUR = 1000.0
-
 def dp(points, tol):
     """Douglas-Peucker : simplifie un anneau fermé (liste de (x, y)) en le coupant au point le plus éloigné du premier."""
     if len(points) < 4:
@@ -96,115 +98,134 @@ def assez_grande(bbox, carte, seuil):
     taille = max(LARGEUR, carte.h)
     return min(w, h) >= seuil * taille
 
+NIVEAUX = ['facile', 'moyen', 'difficile', 'expert']
+
+def aire(geom):
+    """Superficie approchée (projection sinusoïdale, en degrés² × cos) : sert seulement à ranger les pays."""
+    total = 0.0
+    polys = [geom['coordinates']] if geom['type'] == 'Polygon' else geom['coordinates']
+    for poly in polys:
+        for k, r in enumerate(poly):
+            a = 0.0
+            for (x1, y1), (x2, y2) in zip(r, r[1:] + r[:1]):
+                a += x1 * math.cos(math.radians(y1)) * y2 - x2 * math.cos(math.radians(y2)) * y1
+            total += abs(a) / 2 * (1 if k == 0 else -1)
+    return total
+
+def quarts(ids):
+    """ids rangés du plus facile au plus dur → niveau de chacun (4 parts égales, la dernière prend le reste)."""
+    n = len(ids) // 4
+    return {i: NIVEAUX[min(3, k // n)] for k, i in enumerate(ids)}
+
 CARTES = {}
 
-# ---------- France : régions ----------
-reg = json.load(open(FR + '/regions-version-simplifiee.geojson'))
+# ---------- France : tous les départements de métropole, sur une seule carte ----------
+pop = {r['code']: int(r['population']) for r in csv.DictReader(open('outils/donnees/population-departements.csv'), delimiter=';')}
+rang = quarts(sorted(pop, key=lambda c: -pop[c]))          # 101 départements : 25, 25, 25, 26
+dep = json.load(open(FR + '/departements-version-simplifiee.geojson'))
 france = Carte(-5.3, 9.7, 41.2, 51.2)
 zs = []
-for f in reg['features']:
-    d, bb = france.chemin(f['geometry'], 1.2)
-    zs.append({'id': 'r' + f['properties']['code'], 'nom': f['properties']['nom'], 'd': d, 'cible': True})
-CARTES['regions'] = {'vb': '0 0 %d %d' % (LARGEUR, round(france.h)), 'zones': zs, 'titre': 'les régions de France'}
-
-# ---------- France : départements, une carte par région ----------
-deps = {d['code']: d for d in json.load(open(DEPS))}
-NOMS_REG = {'ARA': 'Auvergne-Rhône-Alpes', 'BFC': 'Bourgogne-Franche-Comté', 'BRE': 'Bretagne', 'CVL': 'Centre-Val de Loire',
-            'COR': 'Corse', 'GE': 'Grand Est', 'HDF': 'Hauts-de-France', 'IDF': 'Île-de-France', 'NOR': 'Normandie',
-            'NA': 'Nouvelle-Aquitaine', 'OCC': 'Occitanie', 'PDL': 'Pays de la Loire', 'PACA': 'Provence-Alpes-Côte d’Azur'}
-dep = json.load(open(FR + '/departements-version-simplifiee.geojson'))
-par_reg = {}
 for f in dep['features']:
-    par_reg.setdefault(deps[f['properties']['code']]['reg'], []).append(f)
-for r, feats in par_reg.items():
-    lons, lats = [], []
-    for f in feats:
-        for a in anneaux(f['geometry']):
-            lons += [c[0] for c in a]; lats += [c[1] for c in a]
-    marge = 0.15
-    c = Carte(min(lons) - marge, max(lons) + marge, min(lats) - marge, max(lats) + marge)
-    zs = []
-    for f in feats:
-        d, bb = c.chemin(f['geometry'], 1.0)
-        code = f['properties']['code']
-        if not d: print('vide', code, r); continue
-        zs.append({'id': 'd' + code, 'nom': deps[code]['nom'], 'd': d, 'cible': assez_grande(bb, c, 0.07)})
-    if sum(1 for z in zs if z['cible']) >= 2:
-        CARTES['dep-' + r] = {'vb': '0 0 %d %d' % (LARGEUR, round(c.h)), 'zones': zs, 'titre': NOMS_REG[r]}
+    code = f['properties']['code']
+    d, bb = france.chemin(f['geometry'], 0.9)
+    if not d:
+        continue
+    zs.append({'id': 'd' + code, 'nom': f['properties']['nom'], 'd': d, 'cible': assez_grande(bb, france, 0.006), 'niv': rang[code]})
+CARTES['france'] = {'vb': '0 0 %d %d' % (LARGEUR, round(france.h)), 'zones': zs, 'titre': 'la France', 'quoi': 'le département'}
 
 # ---------- Europe et monde (Natural Earth) ----------
 ne = json.load(open(NE))
-# Noms français corrigés (Natural Earth donne parfois une forme moins courante).
 NOMS = {'CZ': 'Tchéquie', 'GB': 'Royaume-Uni', 'MK': 'Macédoine du Nord', 'BA': 'Bosnie-Herzégovine', 'RU': 'Russie',
-        'US': 'États-Unis', 'CD': 'République démocratique du Congo', 'CF': 'République centrafricaine', 'SS': 'Soudan du Sud',
-        'KR': 'Corée du Sud', 'KP': 'Corée du Nord', 'MM': 'Myanmar', 'VN': 'Viêt Nam', 'SA': 'Arabie saoudite', 'NL': 'Pays-Bas',
+        'US': 'États-Unis', 'CD': 'République démocratique du Congo', 'CF': 'Centrafrique', 'SS': 'Soudan du Sud',
+        'KR': 'Corée du Sud', 'KP': 'Corée du Nord', 'MM': 'Birmanie', 'VN': 'Viêt Nam', 'SA': 'Arabie saoudite', 'NL': 'Pays-Bas',
         'IE': 'Irlande', 'MD': 'Moldavie', 'BY': 'Biélorussie', 'CN': 'Chine', 'IR': 'Iran', 'TZ': 'Tanzanie', 'LY': 'Libye',
-        'GL': 'Groenland (Danemark)', 'EH': None, 'PS': None, 'XK': 'Kosovo', 'NO': 'Norvège', 'FR': 'France'}
+        'GL': 'Groenland', 'XK': 'Kosovo', 'NO': 'Norvège', 'FR': 'France', 'VA': 'Vatican', 'CG': 'Congo',
+        'CI': 'Côte d’Ivoire', 'TL': 'Timor oriental', 'SZ': 'Eswatini', 'CV': 'Cap-Vert', 'DO': 'République dominicaine',
+        'AE': 'Émirats arabes unis', 'GW': 'Guinée-Bissau', 'GQ': 'Guinée équatoriale', 'PG': 'Papouasie-Nouvelle-Guinée',
+        'BN': 'Brunei', 'LA': 'Laos', 'SY': 'Syrie', 'FM': 'Micronésie', 'MH': 'Îles Marshall', 'SB': 'Îles Salomon',
+        'TT': 'Trinité-et-Tobago', 'PS': 'Palestine', 'EH': 'Sahara occidental', 'TW': 'Taïwan', 'KN': 'Saint-Christophe-et-Niévès'}
+# Pays demandés : États souverains (et Kosovo, Palestine, Taïwan, Groenland) ; dépendances seulement dessinées.
+DEMANDES = ('Sovereign country', 'Country', 'Sovereignty', 'Disputed')
+NON = {'EH', 'IO', 'FK', 'AX', 'GG', 'JE', 'IM', 'FO', 'CY-N'}
 def iso(p):
     i = p.get('ISO_A2')
     if i in (None, '-99'):
-        i = {'France': 'FR', 'Norway': 'NO', 'Kosovo': 'XK'}.get(p.get('NAME'), p.get('ADM0_A3'))
+        i = {'France': 'FR', 'Norway': 'NO', 'Kosovo': 'XK', 'N. Cyprus': 'CY-N', 'Somaliland': 'SO-S'}.get(p.get('NAME'), p.get('ADM0_A3'))
     return i
 def nom_fr(p):
-    i = iso(p)
-    return NOMS.get(i, p.get('NAME_FR') or p.get('NAME'))
+    n = NOMS.get(iso(p)) or p.get('NAME_FR') or p.get('NAME')
+    return n[0].upper() + n[1:]
+def demande(p):
+    return (p.get('TYPE') in DEMANDES or iso(p) in ('PS', 'TW')) and iso(p) not in NON and len(iso(p)) == 2
 
-def carte_pays(c, choix, seuil, tol):
+def carte_pays(c, choix, seuil, tol, titre, cle):
     zs = []
     for f in ne['features']:
         p = f['properties']
+        if p.get('CONTINENT') == 'Antarctica':
+            continue
         d, bb = c.chemin(f['geometry'], tol, dedans=True)
         if not d:
             continue
-        n = nom_fr(p)
-        zs.append({'id': 'p' + iso(p), 'nom': n or '', 'd': d, 'cible': bool(n) and choix(p) and assez_grande(bb, c, seuil)})
-    return zs
+        ok = demande(p) and choix(p) and assez_grande(bb, c, seuil)
+        zs.append({'id': 'p' + iso(p), 'nom': nom_fr(p), 'd': d, 'cible': ok, 'cont': p.get('CONTINENT'), '_aire': aire(f['geometry'])})
+    rangs = quarts([z['id'] for z in sorted([z for z in zs if z['cible']], key=lambda z: -z['_aire'])])
+    for z in zs:
+        z['niv'] = rangs.get(z['id'])
+        del z['_aire']
+        if not z['cible']:
+            del z['niv']
+    CARTES[cle] = {'vb': '0 0 %d %d' % (LARGEUR, round(c.h)), 'titre': titre, 'quoi': 'le pays', 'zones': zs}
 
-europe = Carte(-25, 45, 34, 71.5)
-CARTES['europe'] = {'vb': '0 0 %d %d' % (LARGEUR, round(europe.h)), 'titre': 'l’Europe',
-                    'zones': carte_pays(europe, lambda p: p.get('CONTINENT') == 'Europe' and iso(p) != 'RU', 0.06, 1.2)}
-# Monde (Expert) : une carte par grande région, zoomée, pour que les pays restent assez grands à toucher.
-MONDES = [('afrique', 'Afrique', (-20, 55, -36, 38), ('Africa',)),
-          ('asie', 'Asie et Océanie', (25, 180, -48, 60), ('Asia', 'Oceania')),
-          ('ameriques', 'Amériques', (-170, -30, -56, 75), ('North America', 'South America'))]
-for cle, titre, b, conts in MONDES:
-    c = Carte(*b)
-    CARTES['monde-' + cle] = {'vb': '0 0 %d %d' % (LARGEUR, round(c.h)), 'titre': titre,
-                              'zones': carte_pays(c, lambda p, conts=conts: p.get('CONTINENT') in conts, 0.06, 1.0)}
+EUROPE = lambda p: p.get('CONTINENT') == 'Europe' or iso(p) == 'CY'
+carte_pays(Carte(-25, 50, 34, 71.5), EUROPE, 0.0035, 1.0, 'l’Europe', 'europe')
+carte_pays(Carte(-170, 180, -57, 83.7), lambda p: True, 0.0028, 0.9, 'le monde', 'monde')
 
-js = """// Cartes du jeu « Carte à toucher » (Géographie, v7.1), générées par outils/cartes_geo.py — ne pas modifier à la main.
-// France : IGN Admin Express COG 2018 (Licence ouverte), via github.com/gregoiredavid/france-geojson.
-// Europe et monde : Natural Earth 1:50m (domaine public).
-// Chaque zone : id, nom, chemin SVG (d), cible (assez grande pour être touchée, sinon seulement dessinée).
+for c in CARTES.values():
+    for z in c['zones']:
+        if z.get('cont') is None: z.pop('cont', None)
+
+js = """// Cartes des jeux Carte France, Carte Europe et Carte Monde (Géographie, v8.0), générées par outils/cartes_geo.py — ne pas modifier à la main.
+// France : IGN Admin Express COG 2018 (Licence ouverte), via github.com/gregoiredavid/france-geojson ; niveaux = population Insee 2022.
+// Europe et monde : Natural Earth 1:50m (domaine public) ; niveaux = superficie des pays.
+// Chaque zone : id, nom, chemin SVG (d), cible (assez grande pour être touchée, même en zoomant), niv (niveau), cont (continent).
 (function (racine) {
   'use strict';
   var CARTES = %s;
-  // niveau : 'regions' (Facile), 'departements' (Moyen : la carte d'une seule région), 'europe', 'monde'.
-  function tirer(niveau, hasard) {
+  function auHasard(t, h) { return t[Math.floor(h() * t.length)]; }
+  function melanger(t, h) {
+    t = t.slice();
+    for (var i = t.length - 1; i > 0; i--) { var k = Math.floor(h() * (i + 1)); var x = t[i]; t[i] = t[k]; t[k] = x; }
+    return t;
+  }
+  function zonesDu(id, niveau) { return (CARTES[id] || { zones: [] }).zones.filter(function (z) { return z.cible && z.niv === niveau; }); }
+  // carte : 'france', 'europe' ou 'monde' ; niveau : 'facile'… ; mode : 'normal' (toucher la zone nommée)
+  // ou 'quiz' (la zone est en vert, 4 noms au choix dont un seul bon, choix de l'utilisateur du 13/11/2026).
+  function tirer(id, niveau, hasard, mode) {
     hasard = hasard || Math.random;
-    var id = niveau;
-    // Départements : la carte d'une seule région ; monde : la carte d'une grande région (Afrique, Asie, Amériques).
-    var prefixe = { departements: 'dep-', monde: 'monde-' }[niveau];
-    if (prefixe) {
-      var regs = Object.keys(CARTES).filter(function (k) { return k.indexOf(prefixe) === 0; });
-      id = regs[Math.floor(hasard() * regs.length)];
+    var carte = CARTES[id], cibles = zonesDu(id, niveau);
+    if (!carte || !cibles.length) return null;
+    var z = auHasard(cibles, hasard);
+    if (mode !== 'quiz') {
+      return { format: 'C', consigne: 'Touche ' + carte.quoi + ' : ' + z.nom, carte: id, bonne: z.id, bonneNom: z.nom, touche: null };
     }
-    var carte = CARTES[id];
-    if (!carte) return null;
-    var cibles = carte.zones.filter(function (z) { return z.cible; });
-    var z = cibles[Math.floor(hasard() * cibles.length)];
-    var quoi = { regions: 'la région', europe: 'le pays', monde: 'le pays' }[niveau] || 'le département';
+    // Mauvais choix : du même niveau, de préférence du même continent (monde) ; sinon des niveaux voisins.
+    var autres = cibles.filter(function (x) { return x.id !== z.id && (!z.cont || id !== 'monde' || x.cont === z.cont); });
+    if (autres.length < 3) autres = cibles.filter(function (x) { return x.id !== z.id; });
+    if (autres.length < 3) autres = carte.zones.filter(function (x) { return x.cible && x.id !== z.id; });
+    var noms = melanger(autres, hasard).slice(0, 3).map(function (x) { return x.nom; });
     return {
-      consigne: 'Touche ' + quoi + ' : ' + z.nom + (prefixe ? ' (' + carte.titre + ')' : ''),
-      carte: id, zones: null, bonne: z.id, bonneNom: z.nom
+      format: 'Q', consigne: 'Comment s’appelle ' + carte.quoi + ' en vert ?', carte: id, verte: z.id,
+      options: melanger([z.nom].concat(noms), hasard), bonne: z.nom
     };
   }
-  var api = { CARTES: CARTES, tirer: tirer };
+  var api = { CARTES: CARTES, tirer: tirer, zonesDu: zonesDu };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else racine.CartesGeo = api;
 })(this);
 """ % json.dumps(CARTES, ensure_ascii=False, separators=(',', ':'))
 open('js/cartes-geo.js', 'w').write(js)
 for k, v in CARTES.items():
-    print(k, len(v['zones']), sum(1 for z in v['zones'] if z['cible']))
+    cib = [z for z in v['zones'] if z['cible']]
+    print(k, len(v['zones']), len(cib), {n: sum(1 for z in cib if z['niv'] == n) for n in NIVEAUX})
 print(len(js) // 1024, 'Ko')

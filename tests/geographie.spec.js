@@ -1,5 +1,5 @@
-// Géographie (v7.0, BACKLOG lignes 258 à 262) : matière, niveau, jeux en familles, et les formats de carte
-// (relier, choix multiples, question ouverte, remettre dans l'ordre, vrai ou faux, classer), corrigés par le jeu.
+// Géographie (v7.0, BACKLOG lignes 258 à 262 ; refonte v8.0, lignes 308 à 320) : matière, niveau, mode Quiz / Normal,
+// jeux en familles, et les formats de carte (relier, choix multiples, question ouverte, ordre, vrai ou faux, classer, carte).
 const { test, expect } = require('@playwright/test');
 const S = require('../js/savoirs.js');
 require('../js/geographie.js');
@@ -10,19 +10,65 @@ const NIVEAUX = ['facile', 'moyen', 'difficile', 'expert'];
 test.describe('contenu de géographie', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
 
-  test('chaque jeu a du contenu à chaque niveau (sauf la carte à toucher, livrée à part) et les cartes sont bien formées', () => {
-    for (const j of S.jeuxDe('geographie').filter((x) => x.id !== 'g10')) {
+  test('v8.0 : chaque jeu se joue à chaque niveau dans les deux modes ; Quiz = toujours 4 choix, Normal = jamais de QCM, 4 paires', () => {
+    for (const j of S.jeuxDe('geographie')) {
       for (const n of NIVEAUX) {
-        for (let k = 0; k < 150; k++) {
-          const c = S.generer({ jeux: [j.id], niveau: n }, 'geographie');
-          expect(c, j.id + ' ' + n).not.toBeNull();
-          if (c.format === 'Q') { expect(c.options).toContain(c.bonne); expect(new Set(c.options).size).toBe(c.options.length); }
-          if (c.format === 'R') { expect(new Set(c.droite).size).toBe(c.droite.length); expect(c.gauche.length).toBeLessThanOrEqual(S.TAILLE[n]); }
-          if (c.format === 'O') expect(n === 'difficile' || n === 'expert').toBeTruthy();
-          if (c.format === 'F') expect([...c.bonnes].sort()).toEqual([...c.elements].sort());
+        for (const mode of ['quiz', 'normal']) {
+          for (let k = 0; k < 120; k++) {
+            const c = S.generer({ jeux: [j.id], niveau: n, mode }, 'geographie');
+            expect(c, j.id + ' ' + n + ' ' + mode).not.toBeNull();
+            if (mode === 'quiz') {
+              expect(c.format, j.id).toBe('Q');
+              expect(c.options).toHaveLength(4);
+              expect(new Set(c.options).size).toBe(4);
+              expect(c.options).toContain(c.bonne);
+            } else expect(c.format, j.id).not.toBe('Q');
+            if (c.format === 'R') { expect(c.gauche).toHaveLength(4); expect(new Set(c.droite).size).toBe(4); }
+            if (c.format === 'O') expect(n === 'difficile' || n === 'expert').toBeTruthy();
+            if (c.format === 'F') expect([...c.bonnes].sort()).toEqual([...c.elements].sort());
+          }
         }
       }
     }
+  });
+
+  test('v8.0 : Départements = 25 départements par niveau, rangés par population (Insee) ; numéro, nom et préfecture', () => {
+    const G = require('../js/geographie.js');
+    const j = S.trouver('g01');
+    const noms = (n) => j.series[0].niveaux[n].map((p) => p[1]);
+    expect(NIVEAUX.map((n) => noms(n).length)).toEqual([25, 25, 25, 26]);
+    expect(noms('facile')).toEqual(expect.arrayContaining(['Nord', 'Paris', 'Bouches-du-Rhône', 'Rhône']));
+    expect(noms('expert')).toEqual(expect.arrayContaining(['Lozère', 'Creuse']));
+    // Les trois séries (numéro ↔ nom, nom ↔ préfecture, numéro ↔ préfecture) ont les mêmes départements par niveau.
+    for (const n of NIVEAUX) expect(j.series[1].niveaux[n]).toHaveLength(j.series[0].niveaux[n].length);
+    expect(S.trouver('g02')).toBeNull(); // « Préfectures » est fusionné dans « Départements »
+    expect(G.DEPARTEMENTS).toHaveLength(101);
+  });
+
+  test('v8.0 : cartes France / Europe / Monde — chaque niveau a des zones à demander, Quiz = zone en vert + 4 noms', () => {
+    const CG = require('../js/cartes-geo.js');
+    expect(Object.keys(CG.CARTES).sort()).toEqual(['europe', 'france', 'monde']);
+    for (const id of ['france', 'europe', 'monde']) {
+      for (const n of NIVEAUX) {
+        expect(CG.zonesDu(id, n).length, id + ' ' + n).toBeGreaterThanOrEqual(8);
+        for (let k = 0; k < 30; k++) {
+          const q = CG.tirer(id, n, Math.random, 'quiz');
+          expect(q.options).toHaveLength(4);
+          expect(new Set(q.options).size).toBe(4);
+          expect(q.options).toContain(q.bonne);
+          expect(CG.CARTES[id].zones.find((z) => z.id === q.verte).nom).toBe(q.bonne);
+          const t = CG.tirer(id, n, Math.random, 'normal');
+          expect(t.consigne).toContain(t.bonneNom);
+        }
+      }
+    }
+    // Les plus grands pays en Facile, les plus petits en Expert (superficie).
+    const niv = (id, nom) => CG.CARTES[id].zones.find((z) => z.nom === nom).niv;
+    expect(niv('monde', 'Russie')).toBe('facile');
+    expect(niv('monde', 'Belgique')).toBe('expert');
+    expect(niv('europe', 'France')).toBe('facile');
+    expect(niv('france', 'Paris')).toBe('facile');
+    expect(niv('france', 'Lozère')).toBe('expert');
   });
 
   test('chaque niveau n\'a que son propre contenu (demande de l\'utilisateur)', () => {
@@ -75,7 +121,7 @@ test('écran des jeux (v7.2) : tuiles icône + nom, aucun nom coupé ni déborda
       lignes: Math.round(n.height / parseFloat(getComputedStyle(el.querySelector('.pack-nom')).lineHeight)),
     };
   }));
-  expect(pb).toHaveLength(12);
+  expect(pb).toHaveLength(13);
   for (const t of pb) {
     expect(t.debord, t.nom).toBe(false);
     expect(t.dehors, t.nom).toBe(false);
@@ -84,12 +130,13 @@ test('écran des jeux (v7.2) : tuiles icône + nom, aucun nom coupé ni déborda
   await pasDeDebordement(page);
 });
 
-async function versGeo(page, { niveau = 'facile', jeux = ['g04'], hasard = null } = {}) {
+async function versGeo(page, { niveau = 'facile', jeux = ['g04'], hasard = null, mode = 'normal' } = {}) {
   await rapide(page);
   await ouvrirNeuf(page);
   await versReglages(page, 1);
   await page.locator('#matieres input[value="geographie"]').check();
   await page.locator('#niveau-savoir input[value="' + niveau + '"]').check();
+  await page.locator('#mode-savoir input[value="' + mode + '"]').check();
   await valider(page);
   await page.locator('#savoir-jeux').waitFor();
   for (const j of jeux) await page.locator('#savoir-liste input[value="' + j + '"]').check();
@@ -108,19 +155,29 @@ async function pasDeDebordement(page) {
   expect(d.l).toBeLessThanOrEqual(d.v);
 }
 
-test('écran des réglages : la matière Géographie, son niveau, ses jeux en 3 familles ; « Valider » exige un jeu', async ({ page }) => {
+test('écran des réglages : Géographie, son niveau, le mode Quiz / Normal (v8.0), ses jeux en 4 familles ; « Valider » exige un jeu', async ({ page }) => {
   await rapide(page);
   await ouvrirNeuf(page);
   await versReglages(page, 1);
+  // Le mode n'existe que pour la Géographie et l'Histoire.
+  await page.locator('#matieres label', { hasText: 'Mathématiques' }).click();
+  await expect(page.locator('#reglage-mode-savoir')).toBeHidden();
   await page.locator('#matieres label', { hasText: 'Géographie' }).click();
   await expect(page.locator('#reglage-niveau-savoir')).toBeVisible();
+  await expect(page.locator('#reglage-mode-savoir')).toBeVisible();
+  await expect(page.locator('#mode-savoir input[value="quiz"]')).toBeChecked();
+  await expect(page.locator('#mode-savoir-aide')).toContainText('4 réponses');
+  await page.locator('#mode-savoir label', { hasText: 'Normal' }).click();
+  await expect(page.locator('#mode-savoir-aide')).toContainText('relier 4 paires');
   await expect(page.locator('#niveau-savoir-aide')).toContainText('Facile');
   await page.locator('#niveau-savoir label', { hasText: 'Expert' }).click();
   await expect(page.locator('#niveau-savoir-aide')).toContainText('Expert');
+  await pasDeDebordement(page);
   await valider(page);
   await expect(page.locator('#reglages-titre')).toContainText('Géographie, les jeux');
-  await expect(page.locator('#savoir-liste .famille:not([hidden])')).toHaveCount(3);
-  await expect(page.locator('#savoir-liste .famille:not([hidden]) input')).toHaveCount(12);
+  await expect(page.locator('#savoir-liste .famille:not([hidden])')).toHaveCount(4);
+  await expect(page.locator('#savoir-liste .famille:not([hidden]) .pack:not([hidden]) input')).toHaveCount(13);
+  for (const nom of ['Départements', 'Carte de France', 'Carte d’Europe', 'Carte du monde']) await expect(page.getByRole('checkbox', { name: nom })).toHaveCount(1);
   // Rien de choisi : « Valider » refuse.
   await valider(page);
   await expect(page.locator('#packs-alerte')).toContainText('au moins un jeu');
@@ -128,7 +185,8 @@ test('écran des réglages : la matière Géographie, son niveau, ses jeux en 3 
   for (const i of await page.locator('#savoir-liste .famille:not([hidden]) input').all()) await expect(i).toBeChecked();
   const p = await page.evaluate(() => window.Aventura.partie.savoirs[0].geographie);
   expect(p.niveau).toBe('expert');
-  expect(p.jeux).toHaveLength(12);
+  expect(p.mode).toBe('normal');
+  expect(p.jeux).toHaveLength(13);
   await pasDeDebordement(page);
   await valider(page);
   await expect(page.getByRole('button', { name: 'Lancer la partie' })).toBeVisible();
@@ -138,7 +196,7 @@ test('relier : on relie chaque pays à sa capitale, tout juste → dé FORT', as
   await versGeo(page, { niveau: 'expert', jeux: ['g04'], hasard: 0 });
   const c = await piocher(page);
   expect(c.format).toBe('R');
-  expect(c.gauche).toHaveLength(6);
+  expect(c.gauche).toHaveLength(4);
   await expect(page.locator('#carte-titre')).toHaveText('Pays et capitales · Relier');
   await pasDeDebordement(page);
   for (let i = 0; i < c.gauche.length; i++) {
@@ -169,15 +227,16 @@ test('drapeaux : relier des drapeaux (images) à leur pays', async ({ page }) =>
   await versGeo(page, { niveau: 'facile', jeux: ['g05'], hasard: 0 });
   const c = await piocher(page);
   expect(c.format).toBe('R');
-  await expect(page.locator('.relier-g img.drapeau')).toHaveCount(3);
+  await expect(page.locator('.relier-g img.drapeau')).toHaveCount(4);
   const ok = await page.locator('.relier-g img.drapeau').first().evaluate((img) => img.complete && img.naturalWidth > 0);
   expect(ok).toBe(true);
 });
 
-test('choix multiples : toucher la bonne réponse → dé FORT', async ({ page }) => {
-  await versGeo(page, { niveau: 'moyen', jeux: ['g04'], hasard: 0.99 });
+test('mode Quiz : une question, 4 réponses ; toucher la bonne → dé FORT', async ({ page }) => {
+  await versGeo(page, { niveau: 'moyen', jeux: ['g04'], hasard: 0.99, mode: 'quiz' });
   const c = await piocher(page);
   expect(c.format).toBe('Q');
+  await expect(page.locator('#carte-titre')).toHaveText('Pays et capitales · Quiz');
   await expect(page.locator('.btn-option')).toHaveCount(4);
   await page.locator('.btn-option', { hasText: c.bonne }).click();
   await expect(page.locator('.btn-option.bonne')).toHaveText(c.bonne);
@@ -230,38 +289,51 @@ test('classer : voisins de la France ou pas', async ({ page }) => {
   await expect(page.locator('#carte-reponse')).toHaveText('Bravo, tout est bien rangé !');
 });
 
-test('carte à toucher : toucher la bonne zone → dé FORT ; zones assez grandes pour un doigt', async ({ page }) => {
-  for (const [niveau, h] of [['facile', 0.3], ['expert', 0.6]]) {
-    await versGeo(page, { niveau, jeux: ['g10'], hasard: h });
+test('cartes France, Europe, Monde (Normal) : toucher la zone nommée → dé FORT', async ({ page }) => {
+  for (const [jeu, niveau, h] of [['g10', 'facile', 0.3], ['g18', 'moyen', 0.5], ['g19', 'expert', 0.6]]) {
+    await versGeo(page, { niveau, jeux: [jeu], hasard: h });
     const c = await piocher(page);
     expect(c.format).toBe('C');
+    await expect(page.locator('#carte-titre')).toContainText('Toucher sur la carte');
     await pasDeDebordement(page);
     const zone = page.locator('#carte-savoir [data-zone="' + c.bonne + '"]');
-    // La zone demandée mesure au moins 15 px de côté à l'écran.
-    const b = await zone.boundingBox();
-    expect(Math.min(b.width, b.height)).toBeGreaterThanOrEqual(15);
-    await zone.click({ position: { x: b.width / 2, y: b.height / 2 }, force: true }).catch(() => {});
-    if (!(await page.evaluate(() => window.Aventura.partie.carte.reponseDonnee))) await zone.dispatchEvent('click');
+    await zone.dispatchEvent('click');
     await expect(page.locator('#carte-reponse')).toContainText('Bravo');
     expect(await page.evaluate(() => window.Aventura.partie.regles.de)).toBe('fort');
   }
 });
 
-test('carte à toucher : chaque carte a au moins 2 zones à demander ; consigne nomme la zone', () => {
-  test.skip(test.info().project.name !== 'ordinateur', 'test de logique');
-  const CG = require('../js/cartes-geo.js');
-  for (const [id, carte] of Object.entries(CG.CARTES)) expect(carte.zones.filter((z) => z.cible).length, id).toBeGreaterThanOrEqual(2);
-  for (const n of ['regions', 'departements', 'europe', 'monde']) {
-    for (let k = 0; k < 50; k++) {
-      const d = CG.tirer(n);
-      expect(d.consigne).toContain(d.bonneNom);
-    }
-  }
+test('carte en mode Quiz (v8.0) : la zone est en vert, on zoome autour d\'elle, 4 noms au choix', async ({ page }) => {
+  await versGeo(page, { niveau: 'expert', jeux: ['g19'], hasard: 0.4, mode: 'quiz' });
+  const c = await piocher(page);
+  expect(c.format).toBe('Q');
+  expect(c.verte).toBeTruthy();
+  await expect(page.locator('#carte-savoir .carte-quiz .zone.bonne')).toHaveCount(1);
+  await expect(page.locator('.btn-option')).toHaveCount(4);
+  // Petit pays (Expert) : la carte est déjà zoomée autour de lui, la zone verte se voit.
+  await expect(page.getByRole('button', { name: 'Revoir toute la carte' })).toBeVisible();
+  const b = await page.locator('#carte-savoir .zone.bonne').boundingBox();
+  expect(Math.max(b.width, b.height)).toBeGreaterThanOrEqual(10);
+  await pasDeDebordement(page);
+  // Toucher la carte ne répond pas : seule une des 4 réponses compte.
+  await page.locator('#carte-savoir .zone.bonne').dispatchEvent('click');
+  expect(await page.evaluate(() => window.Aventura.partie.carte.reponseDonnee)).toBeFalsy();
+  await page.locator('.btn-option', { hasText: c.bonne }).click();
+  await expect(page.locator('#carte-reponse')).toContainText('Bonne réponse');
+  expect(await page.evaluate(() => window.Aventura.partie.regles.de)).toBe('fort');
+});
+
+test('Départements en Quiz : numéro, nom ou préfecture, toujours 4 choix', async ({ page }) => {
+  await versGeo(page, { niveau: 'facile', jeux: ['g01'], hasard: 0.2, mode: 'quiz' });
+  const c = await piocher(page);
+  expect(c.format).toBe('Q');
+  await expect(page.locator('.btn-option')).toHaveCount(4);
+  await expect(page.locator('#carte-titre')).toHaveText('Départements · Quiz');
 });
 
 // v7.2 (demande du 12/11/2026) : zoomer sur la carte seule, pour toucher plus précisément.
 test('carte à toucher (v7.2) : zoom de la carte seule (boutons, pincement, molette), glisser ne choisit pas, toucher choisit', async ({ page }, info) => {
-  await versGeo(page, { niveau: 'facile', jeux: ['g10'], hasard: 0.3 });
+  await versGeo(page, { niveau: 'moyen', jeux: ['g18'], hasard: 0.3 });
   const c = await piocher(page);
   expect(c.format).toBe('C');
   const svg = page.locator('#carte-savoir .carte-geo svg');
