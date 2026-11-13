@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '7.8';
+  var VERSION = '7.9';
 
   var HISTORY = [
+    { v: '7.9', date: '2026-11-13', changes: [
+      "Histoire : nouvelle période, les Temps modernes, avec 4 jeux et 4 niveaux — Louis XIV et Versailles (avec Qui suis-je ?), Écrivains classiques (Molière, La Fontaine, Racine…), Les Lumières (Voltaire, Rousseau, Montesquieu, Diderot), Frise des Temps modernes."
+    ] },
     { v: '7.8', date: '2026-11-13', changes: [
       "Histoire : nouvelle période, la Renaissance, avec 6 jeux et 4 niveaux — Artistes et œuvres, Grandes découvertes, Châteaux de la Loire, Rois de la Renaissance (avec Qui suis-je ?), Réforme et guerres de Religion, Frise de la Renaissance.",
       "Téléphone : sur l’écran des jeux d’histoire, le haut de la liste (Préhistoire) est de nouveau atteignable en faisant défiler."
