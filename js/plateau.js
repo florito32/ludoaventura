@@ -81,39 +81,8 @@
       });
     });
   }
-  var AIDES_SAVOIR = {
-    facile: 'Facile : ce qui est le plus connu.',
-    moyen: 'Moyen : des choses connues.',
-    difficile: 'Difficile : moins connu ; en Normal, des questions où l\u2019on écrit la réponse.',
-    expert: 'Expert : seulement du contenu d\u2019expert.'
-  };
-  var AIDES_MODE = {
-    quiz: 'Quiz : une question et 4 réponses, une seule est bonne.',
-    normal: 'Normal : relier 4 paires, écrire la réponse, toucher la carte, remettre dans l\u2019ordre, vrai ou faux…'
-  };
-  // Aide sous le niveau de calcul (v6.14) : nombres possibles et nombre de signes maximum.
-  var AIDES_NIVEAU = {
-    facile: 'Facile : les tables de 1 à 10, 1 signe (2 × 8, 2 + 8, 16 ÷ 2…).',
-    moyen: 'Moyen : les nombres de 1 à 99, jusqu’à 2 signes.',
-    difficile: 'Difficile : les nombres de 1 à 999, jusqu’à 3 signes.',
-    expert: 'Expert : les nombres de 1 à 9999, jusqu’à 4 signes.'
-  };
-  // Aide sous le niveau d'orthographe (v6.50) : quelques mots du niveau (séries de js/cartes.js, voir js/defis.js → ORTHO).
-  var AIDES_ORTHO = {
-    facile: 'Facile : des mots courts et courants (chien, lapin, maison, pluie…).',
-    moyen: 'Moyen : des mots plus longs (crocodile, bibliothèque, hélicoptère…).',
-    difficile: 'Difficile : des mots pièges (rhinocéros, cathédrale, chauve-souris…).',
-    expert: 'Expert : des mots rares et très pièges (ornithorynque, amphithéâtre, kinésithérapeute…).'
-  };
   // Séries de mots piochées à chaque niveau d'orthographe (v6.50) : les mêmes que la partie rapide et les défis.
   function motsDuNiveau(niveau) { return (window.Defis.ORTHO[niveau] || window.Defis.ORTHO.facile).mots.slice(); }
-  // Aide sous le niveau de conjugaison (v6.49) : quelques verbes du niveau (js/conjugaison.js).
-  var AIDES_CONJ = {
-    facile: 'Facile : les verbes de tous les jours (chanter, finir, être, avoir, faire…).',
-    moyen: 'Moyen : des verbes un peu moins courants (manger, réussir, pouvoir, écrire…).',
-    difficile: 'Difficile : des verbes qui changent d’écriture (appeler, jeter, payer, recevoir…).',
-    expert: 'Expert : des verbes rares ou pièges (céder, acquérir, résoudre, moudre…).'
-  };
   function mathsVides() { return { signes: [], nbSignes: [1], nombres: [], dizaines: [], centaines: [], milliers: [], niveau: 'facile' }; }
   function conjVide() { return { modes: [], temps: [], groupes: [], niveau: 'facile' }; }
   // Grammaire (v6.54) : niveau et petits jeux, tous cochés au départ (hypothèse à valider).
@@ -787,12 +756,11 @@
     $('reglage-niveau-maths').hidden = mat !== 'maths';
     // Niveau de calcul : une phrase d'aide sous les choix ; au niveau Facile, les nombres deviennent des tables.
     var nvm = partie.maths[a].niveau;
-    $('niveau-maths-aide').textContent = AIDES_NIVEAU[nvm];
     // v6.14 : le niveau décide des groupes de nombres et des nombres de signes proposés.
     var permis = K.groupes(nvm).map(function (g) { return g.id; });
     ['nombres', 'dizaines', 'centaines', 'milliers'].forEach(function (g) { $(g).closest('.reglage').hidden = permis.indexOf(g) < 0; });
     $('reglages-maths').dataset.niveau = nvm;
-    $('nombres-titre').innerHTML = nvm === 'facile' ? 'Tables <em>(2 → 2 × 8, 2 + 8…)</em>' : 'Unités';
+    $('nombres-titre').innerHTML = nvm === 'facile' ? 'Tables' : 'Unités';
     var maxS = K.niveau(nvm).signes;
     $('nb-signes').querySelectorAll('.pack').forEach(function (l) { l.hidden = Number(l.querySelector('input').value) > maxS; });
     $('reglage-nb-signes').hidden = mat !== 'maths';
@@ -828,9 +796,7 @@
     if (rs) {
       if (!rs.mode) rs.mode = 'quiz'; // parties sauvegardées avant la v8.0
       $('niveau-savoir').querySelectorAll('input').forEach(function (i) { i.checked = i.value === rs.niveau; });
-      $('niveau-savoir-aide').textContent = AIDES_SAVOIR[rs.niveau] || '';
       $('mode-savoir').querySelectorAll('input').forEach(function (i) { i.checked = i.value === rs.mode; });
-      $('mode-savoir-aide').textContent = AIDES_MODE[rs.mode];
       // Seuls les jeux de la matière, jouables dans le mode choisi (v8.0) ; une famille vide est cachée.
       var proposes = jeuxProposes(mat, rs.mode).map(function (j) { return j.id; });
       rs.jeux = rs.jeux.filter(function (id) { return proposes.indexOf(id) >= 0; });
@@ -853,13 +819,10 @@
     var on = partie.orthoNiveau[a] || 'facile';
     $('reglage-niveau-ortho').hidden = mat !== 'orthographe';
     $('niveau-ortho').querySelectorAll('input').forEach(function (i) { i.checked = i.value === on; });
-    $('niveau-ortho-aide').textContent = AIDES_ORTHO[on];
-    $('niveau-conj-aide').textContent = AIDES_CONJ[cc.niveau] || '';
     // Grammaire (v6.54).
     var gr = partie.gram[a];
     $('reglage-niveau-gram').hidden = mat !== 'grammaire';
     $('niveau-gram').querySelectorAll('input').forEach(function (i) { i.checked = i.value === gr.niveau; });
-    $('niveau-gram-aide').textContent = G.AIDES[gr.niveau] || '';
     $('jeux-gram').querySelectorAll('input').forEach(function (i) { i.checked = gr.jeux.indexOf(i.value) >= 0; });
     var pleinG = gr.jeux.length === TOUS_JEUX.length;
     $('btn-tout-gram').innerHTML = pleinG ? '<span class="long">Tout désélectionner</span><span class="court">Aucun</span>'
@@ -965,8 +928,10 @@
     // Partie rapide (v6.43) : chaque carte tire sa matière parmi celles choisies, avec des réglages du niveau
     // choisi (v6.45) tirés pour cette carte (orthographe : thèmes, mots et questions du niveau, déjà dans le tas du joueur).
     if (partie.rapide && window.Rapide) {
-      var t = window.Rapide.carte(partie.rapide.matieres, partie.rapide.niveau);
+      var t = window.Rapide.carte(partie.rapide.matieres, partie.rapide.niveau, null, partie.rapide.mode);
       mat = t.matiere; if (t.maths) mr = t.maths; if (t.conj) cr = t.conj; if (t.gram) gr = t.gram;
+      // v8.5 : Géographie et Histoire en partie rapide : tous les jeux de la matière jouables dans le mode choisi.
+      if (t.savoir) return SV.generer({ jeux: jeuxProposes(mat, t.savoir.mode).map(function (x) { return x.id; }), niveau: t.savoir.niveau, mode: t.savoir.mode }, mat);
     }
     // Géographie et Histoire (v7.0) : un jeu choisi par le joueur, une série et un format tirés au hasard.
     if (estSavoir(mat)) {
@@ -1344,7 +1309,9 @@
       $('carte-piochee').hidden = true;
       // Pas de commentaire visible (v4.3) : seulement pour les lecteurs d'écran.
       annoncer(j.nom + ' pioche une carte dans son tas.');
-      bouton('Question suivante', 'btn-principal', function () {
+      // v8.5 (demande du 13/11/2026) : la toute première question de la partie (premier joueur, première croix)
+      // s'appelle « Première question ».
+      bouton(r.manche === 1 && r.joueur === 0 ? 'Première question' : 'Question suivante', 'btn-principal', function () {
         partie.carte = piocherCarte(j);
         partie.vue = 'cache'; // nouvelle carte : mot caché
         R.piocher(r);
@@ -2233,7 +2200,7 @@
       partie.mots[i] = o.mots.slice();
       partie.gram[i] = R2.gramTout(d.niveau); // v6.55
     }
-    partie.rapide = { matieres: d.matieres.slice(), niveau: d.niveau };
+    partie.rapide = { matieres: d.matieres.slice(), niveau: d.niveau, mode: d.mode || 'quiz' };
     partie.etapePrepa = 4; partie.sousEtape = 'matiere'; partie.actif = 0;
     majDetail(); majAventuriers();
     lancerPartie();

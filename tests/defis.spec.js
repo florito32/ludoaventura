@@ -53,7 +53,7 @@ test.describe('tirage des défis', () => {
 async function gagner(page) {
   for (let t = 0; t < 5 * 4; t++) {
     if (await page.evaluate(() => document.getElementById('fin').open)) return;
-    await page.getByRole('button', { name: 'Question suivante' }).click();
+    await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
     const juste = await page.evaluate(() => window.Aventura.partie.carte.resultatTexte);
     await page.locator('#reponse-joueur').fill(juste);
     await page.getByRole('button', { name: 'OK' }).click();

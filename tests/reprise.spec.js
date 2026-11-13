@@ -4,7 +4,7 @@ const { test, expect } = require('@playwright/test');
 const { repondre, lancerPartie, attendreJoueur, rapide, lancerLeDe, versReglages, cocherJoueur, valider, orthographe } = require('./aide');
 
 async function unTour(page) {
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await repondre(page, true);
   await lancerLeDe(page);
 }
@@ -25,14 +25,14 @@ test('rafraîchir la page en pleine partie : on reprend au même joueur, mêmes 
   // On peut continuer à jouer : c'est à Tom, et sa carte suivante est sa 1re.
   // (v6.27 : la carte n'affiche plus « Carte n° 1 de Tom », on vérifie le compteur et « À Tom de jouer ».)
   await expect(page.locator('#tour-nom')).toHaveText('Tom');
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await expect(page.locator('#carte-piochee')).toBeVisible();
   expect(await page.evaluate(() => { const r = window.Aventura.partie.regles; return r.pioches[r.joueur]; })).toBe(1);
 });
 
 test('rafraîchir pendant une carte : la même carte reste affichée, avec la réponse si elle était montrée', async ({ page }) => {
   await lancerPartie(page, { joueurs: 1 });
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   const titre = await page.locator('#carte-titre').textContent();
   const consigne = await page.locator('#carte-consigne').textContent();
   await page.reload();
@@ -44,7 +44,7 @@ test('rafraîchir pendant une carte : la même carte reste affichée, avec la r�
 
 test('rafraîchir après « Bonne réponse » : le dé FORT se lance et les points ne sont comptés qu\'une fois', async ({ page }) => {
   await lancerPartie(page, { joueurs: 2 });
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await repondre(page, true);
   await page.reload();
   await expect(page.locator('#points')).toHaveText('0');

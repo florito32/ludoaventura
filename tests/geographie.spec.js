@@ -183,7 +183,7 @@ async function versGeo(page, { niveau = 'facile', jeux = ['g04'], hasard = null,
   if (hasard !== null) await page.evaluate((h) => window.Savoirs.regler(() => h), hasard);
 }
 async function piocher(page) {
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await page.locator('#carte-piochee').waitFor();
   return page.evaluate(() => window.Aventura.partie.carte);
 }
@@ -203,12 +203,11 @@ test('écran des réglages : Géographie, son niveau, le mode Quiz / Normal (v8.
   await expect(page.locator('#reglage-niveau-savoir')).toBeVisible();
   await expect(page.locator('#reglage-mode-savoir')).toBeVisible();
   await expect(page.locator('#mode-savoir input[value="quiz"]')).toBeChecked();
-  await expect(page.locator('#mode-savoir-aide')).toContainText('4 réponses');
+  await expect(page.locator('#mode-savoir-aide, #niveau-savoir-aide')).toHaveCount(0); // v8.5 : plus de commentaires
   await page.locator('#mode-savoir label', { hasText: 'Normal' }).click();
-  await expect(page.locator('#mode-savoir-aide')).toContainText('relier 4 paires');
-  await expect(page.locator('#niveau-savoir-aide')).toContainText('Facile');
+  await expect(page.locator('#mode-savoir input[value="normal"]')).toBeChecked();
   await page.locator('#niveau-savoir label', { hasText: 'Expert' }).click();
-  await expect(page.locator('#niveau-savoir-aide')).toContainText('Expert');
+  await expect(page.locator('#niveau-savoir input[value="expert"]')).toBeChecked();
   await pasDeDebordement(page);
   await valider(page);
   await expect(page.locator('#reglages-titre')).toContainText('Géographie, les jeux');

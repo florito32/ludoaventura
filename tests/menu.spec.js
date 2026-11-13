@@ -4,7 +4,7 @@ const { test, expect } = require('@playwright/test');
 const { repondre, lancerPartie, lancerLeDe, attendreJoueur, valider, cocherJoueur } = require('./aide');
 
 async function jouerUnTour(page) {
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await repondre(page, true);
   await lancerLeDe(page);
 }
@@ -25,7 +25,7 @@ test('le menu s\'ouvre au milieu de l\'écran avec les 3 choix, et se referme sa
   for (const x of await boutons.all()) await expect(x).toBeInViewport({ ratio: 1 });
   await page.getByRole('button', { name: 'Fermer le menu et continuer la partie' }).click();
   await expect(menu(page)).toBeHidden();
-  await expect(page.getByRole('button', { name: 'Question suivante' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^(Première question|Question suivante)$/ })).toBeVisible();
 });
 
 test('« Redémarrer partie » : la partie recommence à zéro, sans repasser par la préparation', async ({ page }) => {
@@ -47,7 +47,7 @@ test('« Redémarrer partie » : la partie recommence à zéro, sans repasser pa
   await expect(page.locator('#points')).toHaveText('0');
   await expect(page.locator('#tour-nom')).toHaveText('Léa');
   await expect(page.locator('.pion')).toHaveCount(2);
-  await expect(page.getByRole('button', { name: 'Question suivante' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^(Première question|Question suivante)$/ })).toBeVisible();
 });
 
 test('« Modifier les choix » : on change l\'aventure, puis la partie reprend là où elle en était', async ({ page }) => {
@@ -107,7 +107,7 @@ test('« Modifier les choix » : un joueur ajouté joue la manche en cours à so
   await page.getByRole('button', { name: 'Modifier les choix' }).click();
   await page.getByRole('button', { name: /Partie/ }).click();
   await expect(page.locator('#tour-nom')).toHaveText('Nour');
-  await expect(page.getByRole('button', { name: 'Question suivante' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^(Première question|Question suivante)$/ })).toBeVisible();
 });
 
 test('« Retour à l\'accueil » : la partie est arrêtée et tout repart de zéro', async ({ page }) => {

@@ -28,7 +28,7 @@ test('bonne réponse → dé FORT (4 à 6 points), mauvaise → dé FAIBLE (1 à
   await lancerPartie(page);
   let total = 0;
   for (const [juste, min, max] of [[true, 4, 6], [false, 1, 3]]) {
-    await page.getByRole('button', { name: 'Question suivante' }).click();
+    await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
     await repondre(page, juste);
     if (juste) await lancerLeDe(page);
     else await page.getByRole('button', { name: 'J’ai compris' }).click(); // « J'ai compris » lance le dé FAIBLE
@@ -37,7 +37,7 @@ test('bonne réponse → dé FORT (4 à 6 points), mauvaise → dé FAIBLE (1 à
     expect(pts - total).toBeGreaterThanOrEqual(min);
     expect(pts - total).toBeLessThanOrEqual(max);
     total = pts;
-    await page.getByRole('button', { name: 'Question suivante' }).waitFor();
+    await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).waitFor();
   }
 });
 
@@ -45,7 +45,7 @@ test('le dé roule sur le plateau puis montre, face visible, les points gagnés'
   await page.addInitScript(() => { window.AVENTURA_PAUSE = 80; window.AVENTURA_DUREE_DE = 700; window.AVENTURA_AUTO_DE = 600000; });
   page.__rapide = true; // garder la durée réelle du roulé
   await lancerPartie(page);
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await repondre(page, true);
   await lancerLeDe(page);
   const zone = page.locator('#de-plateau');
@@ -73,7 +73,7 @@ test('le dé roule sur le plateau puis montre, face visible, les points gagnés'
 
 test('v4.4 : les coins du dé restent arrondis (les faces de derrière ne dépassent pas)', async ({ page }) => {
   await lancerPartie(page);
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await repondre(page, true);
   await lancerLeDe(page);
   const faces = page.locator('#de3d .face');
@@ -87,12 +87,12 @@ test('v4.4 : les coins du dé restent arrondis (les faces de derrière ne dépas
 test('v5.1 : les points du dé sont noirs, sur le dé FORT comme sur le dé FAIBLE', async ({ page }) => {
   await lancerPartie(page);
   for (const juste of [true, false]) {
-    await page.getByRole('button', { name: 'Question suivante' }).click();
+    await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
     await repondre(page, juste);
     if (juste) await lancerLeDe(page);
     else await page.getByRole('button', { name: 'J’ai compris' }).click(); // « J'ai compris » lance le dé FAIBLE
     const couleurs = await page.locator('#de3d .face i').evaluateAll((p) => [...new Set(p.map((x) => getComputedStyle(x).backgroundColor))]);
     expect(couleurs).toEqual(['rgb(0, 0, 0)']);
-    await page.getByRole('button', { name: 'Question suivante' }).waitFor();
+    await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).waitFor();
   }
 });

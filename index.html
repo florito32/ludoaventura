@@ -215,39 +215,33 @@
           <!-- Mathématiques : le niveau se choisit tout de suite, sur cet écran (v5.9). Facile = les tables. -->
           <div class="reglage-ligne" id="reglage-niveau-maths" hidden>
             <p class="reglage-titre" id="niveau-maths-titre">Niveau</p>
-            <div class="packs" id="niveau-maths" role="radiogroup" aria-labelledby="niveau-maths-titre" aria-describedby="niveau-maths-aide"></div>
-            <p class="reglage-aide" id="niveau-maths-aide"></p>
+            <div class="packs" id="niveau-maths" role="radiogroup" aria-labelledby="niveau-maths-titre"></div>
           </div>
           <!-- Orthographe : le niveau des mots se choisit sur cet écran (v6.50, demande du 12/11/2026). -->
           <div class="reglage-ligne" id="reglage-niveau-ortho" hidden>
             <p class="reglage-titre" id="niveau-ortho-titre">Niveau</p>
-            <div class="packs" id="niveau-ortho" role="radiogroup" aria-labelledby="niveau-ortho-titre" aria-describedby="niveau-ortho-aide"></div>
-            <p class="reglage-aide" id="niveau-ortho-aide"></p>
+            <div class="packs" id="niveau-ortho" role="radiogroup" aria-labelledby="niveau-ortho-titre"></div>
           </div>
           <!-- Conjugaison : le niveau se choisit aussi sur cet écran (v6.49, demande du 12/11/2026). -->
           <div class="reglage-ligne" id="reglage-niveau-conj" hidden>
             <p class="reglage-titre" id="niveau-conj-titre">Niveau</p>
-            <div class="packs" id="niveau-conj" role="radiogroup" aria-labelledby="niveau-conj-titre" aria-describedby="niveau-conj-aide"></div>
-            <p class="reglage-aide" id="niveau-conj-aide"></p>
+            <div class="packs" id="niveau-conj" role="radiogroup" aria-labelledby="niveau-conj-titre"></div>
           </div>
           <!-- Grammaire (v6.54, demande du 12/11/2026) : le niveau se choisit sur cet écran, comme l'orthographe. -->
           <div class="reglage-ligne" id="reglage-niveau-gram" hidden>
             <p class="reglage-titre" id="niveau-gram-titre">Niveau</p>
-            <div class="packs" id="niveau-gram" role="radiogroup" aria-labelledby="niveau-gram-titre" aria-describedby="niveau-gram-aide"></div>
-            <p class="reglage-aide" id="niveau-gram-aide"></p>
+            <div class="packs" id="niveau-gram" role="radiogroup" aria-labelledby="niveau-gram-titre"></div>
           </div>
           <!-- Géographie et Histoire (v7.0) : le niveau se choisit sur cet écran ; chaque niveau a son propre contenu. -->
           <div class="reglage-ligne" id="reglage-niveau-savoir" hidden>
             <p class="reglage-titre" id="niveau-savoir-titre">Niveau</p>
-            <div class="packs" id="niveau-savoir" role="radiogroup" aria-labelledby="niveau-savoir-titre" aria-describedby="niveau-savoir-aide"></div>
-            <p class="reglage-aide" id="niveau-savoir-aide"></p>
+            <div class="packs" id="niveau-savoir" role="radiogroup" aria-labelledby="niveau-savoir-titre"></div>
           </div>
           <!-- v8.0 (demande du 13/11/2026) : Géographie et Histoire se jouent en « Quiz » (4 choix) ou en « Normal »
                (relier, question ouverte, carte à toucher…). Les jeux se choisissent sur l'écran suivant. -->
           <div class="reglage-ligne" id="reglage-mode-savoir" hidden>
             <p class="reglage-titre" id="mode-savoir-titre">Mode</p>
-            <div class="packs" id="mode-savoir" role="radiogroup" aria-labelledby="mode-savoir-titre" aria-describedby="mode-savoir-aide"></div>
-            <p class="reglage-aide" id="mode-savoir-aide"></p>
+            <div class="packs" id="mode-savoir" role="radiogroup" aria-labelledby="mode-savoir-titre"></div>
           </div>
           <!-- Nombre de signes par calcul (v6.14) : seuls les choix permis par le niveau apparaissent. -->
           <div class="reglage-ligne" id="reglage-nb-signes" hidden>
@@ -260,7 +254,7 @@
                chacun avec un bouton « Tout sélectionner / Tout désélectionner ». -->
           <div class="reglages-matiere reglages-remplir" id="reglages-maths" hidden>
             <div class="reglage">
-              <p class="reglage-titre" id="signes-titre">Signes <span>(au moins un)</span></p>
+              <p class="reglage-titre" id="signes-titre">Signes</p>
               <div class="packs" id="signes" role="group" aria-labelledby="signes-titre"></div>
             </div>
             <div class="reglage">
@@ -273,14 +267,14 @@
             </div>
             <div class="reglage">
               <div class="reglage-tete">
-                <p class="reglage-titre" id="dizaines-titre">Dizaines <em>(30 = de 30 à 39)</em></p>
+                <p class="reglage-titre" id="dizaines-titre">Dizaines</p>
                 <button type="button" class="btn-tout" data-groupe="dizaines"></button>
               </div>
               <div class="packs nombres" id="dizaines" role="group" aria-labelledby="dizaines-titre"></div>
             </div>
             <div class="reglage">
               <div class="reglage-tete">
-                <p class="reglage-titre" id="centaines-titre">Centaines <em>(300 = de 300 à 399)</em></p>
+                <p class="reglage-titre" id="centaines-titre">Centaines</p>
                 <button type="button" class="btn-tout" data-groupe="centaines"></button>
               </div>
               <div class="packs nombres" id="centaines" role="group" aria-labelledby="centaines-titre"></div>
@@ -306,7 +300,7 @@
               </div>
             </div>
             <div class="reglage">
-              <p class="reglage-titre titre-temps" id="temps-conj-titre">Temps <span>(au moins un)</span></p>
+              <p class="reglage-titre titre-temps" id="temps-conj-titre">Temps</p>
               <p class="reglage-aide aide-gauche" id="temps-conj-vide">Choisis d’abord un mode.</p>
               <div class="temps-modes" id="temps-conj" role="group" aria-labelledby="temps-conj-titre"></div>
             </div>
@@ -316,7 +310,7 @@
           <div class="reglages-matiere reglages-remplir" id="savoir-jeux" hidden>
             <div class="reglage">
               <div class="reglage-tete">
-                <p class="reglage-titre" id="savoir-jeux-titre">Jeux <span>(au moins un)</span></p>
+                <p class="reglage-titre" id="savoir-jeux-titre">Jeux</p>
                 <button type="button" class="btn-tout" id="btn-tout-savoir"></button>
               </div>
               <div class="packs" id="savoir-liste" role="group" aria-labelledby="savoir-jeux-titre"></div>
@@ -327,7 +321,7 @@
           <div class="reglages-matiere reglages-remplir" id="ortho-packs" hidden>
             <div class="reglage">
               <div class="reglage-tete">
-                <p class="reglage-titre" id="packs-titre">Thèmes <span>(au moins un)</span></p>
+                <p class="reglage-titre" id="packs-titre">Thèmes</p>
                 <button type="button" class="btn-tout" data-liste="packs"></button>
               </div>
               <div class="packs" id="packs" role="group" aria-labelledby="packs-titre"></div>
@@ -354,7 +348,7 @@
               <button type="button" class="btn-tout" id="btn-tout-sons"></button>
             </div>
             <div class="reglage">
-              <p class="reglage-titre titre-temps" id="sons-phon-titre">Sons <span>(au moins un)</span></p>
+              <p class="reglage-titre titre-temps" id="sons-phon-titre">Sons</p>
               <p class="reglage-aide aide-gauche" id="sons-phon-vide">Choisis d’abord une catégorie.</p>
               <div class="temps-modes" id="sons-phon" role="group" aria-labelledby="sons-phon-titre"></div>
             </div>
