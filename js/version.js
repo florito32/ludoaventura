@@ -4,9 +4,14 @@
 (function () {
   'use strict';
 
-  var VERSION = '8.0';
+  var VERSION = '8.1';
 
   var HISTORY = [
+    { v: '8.1', date: '2026-11-13', changes: [
+      "Géographie : environ 50 questions différentes par niveau dans chaque thème, de plus en plus difficiles — Pays et capitales (184 pays), Drapeaux (195 pays), Pays voisins (frontières de tous les pays), Monuments du monde (200 monuments), Fleuves et rivières, Montagnes et sommets, Records de la Terre.",
+      "Drapeaux : deux drapeaux qui se ressemblent (Tchad et Roumanie, Monaco et Indonésie…) ne sont jamais proposés ensemble.",
+      "Quiz : « Trouve le plus haut / le plus ancien… » remplace « Lequel est… » dans les questions de rangement."
+    ] },
     { v: '8.0', date: '2026-11-13', changes: [
       "Géographie et Histoire : nouveau choix du mode, « Quiz » (une question et 4 réponses, une seule est bonne) ou « Normal » (relier, écrire la réponse, toucher la carte, remettre dans l’ordre, vrai ou faux, classer, qui suis-je ?).",
       "Toujours 4 réponses au choix et toujours 4 paires à relier, quel que soit le niveau.",

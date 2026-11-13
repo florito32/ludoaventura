@@ -1,0 +1,196 @@
+# code	nom	capitale (A|B = autres écritures acceptées)	niveau drapeau	niveau capitale	(f facile, m moyen, d difficile, e expert ; - = pas demandé)
+fr	France	Paris	f	f
+it	Italie	Rome	f	f
+de	Allemagne	Berlin	f	f
+es	Espagne	Madrid	f	f
+gb	Royaume-Uni	Londres|London	f	f
+us	États-Unis|Etats-Unis|USA	Washington	f	f
+jp	Japon	Tokyo	f	f
+cn	Chine	Pékin|Beijing|Pekin	f	f
+ca	Canada	Ottawa	f	d
+br	Brésil|Bresil	Brasília|Brasilia	f	m
+ch	Suisse	Berne	f	m
+be	Belgique	Bruxelles	f	f
+pt	Portugal	Lisbonne	f	f
+gr	Grèce	Athènes	f	f
+ru	Russie	Moscou	f	f
+in	Inde	New Delhi|Delhi	f	m
+mx	Mexique	Mexico	f	m
+ar	Argentine	Buenos Aires	f	m
+au	Australie	Canberra	f	e
+eg	Égypte|Egypte	Le Caire|Caire	f	m
+ma	Maroc	Rabat	f	m
+dz	Algérie	Alger	f	f
+tn	Tunisie	Tunis	f	f
+tr	Turquie	Ankara	f	d
+nl	Pays-Bas|Hollande	Amsterdam	f	f
+se	Suède	Stockholm	f	m
+no	Norvège	Oslo	f	m
+dk	Danemark	Copenhague	f	m
+fi	Finlande	Helsinki	f	m
+ie	Irlande	Dublin	f	f
+pl	Pologne	Varsovie	f	m
+at	Autriche	Vienne	f	m
+kr	Corée du Sud	Séoul|Seoul	f	m
+za	Afrique du Sud	Pretoria|Le Cap|Bloemfontein	f	e
+sn	Sénégal	Dakar	f	m
+ua	Ukraine	Kiev|Kyiv|Kiyv	f	m
+is	Islande	Reykjavik|Reykjavík	f	m
+mc	Monaco	Monaco	f	f
+jm	Jamaïque	Kingston	f	d
+cu	Cuba	La Havane|Havane	f	m
+cl	Chili	Santiago	f	d
+co	Colombie	Bogota|Bogotá	f	d
+pe	Pérou	Lima	f	m
+va	Vatican	Vatican|Cité du Vatican	f	f
+cm	Cameroun	Yaoundé|Yaounde	f	d
+mg	Madagascar	Antananarivo|Tananarive	f	d
+ht	Haïti|Haiti	Port-au-Prince	f	d
+lu	Luxembourg	Luxembourg	m	f
+cz	Tchéquie|République tchèque	Prague	m	m
+hu	Hongrie	Budapest	m	m
+ro	Roumanie	Bucarest	m	m
+hr	Croatie	Zagreb	m	d
+nz	Nouvelle-Zélande	Wellington	m	e
+ci	Côte d’Ivoire|Cote d'Ivoire	Yamoussoukro	m	e
+id	Indonésie	Jakarta|Djakarta	m	m
+th	Thaïlande	Bangkok	m	m
+vn	Viêt Nam|Vietnam	Hanoï|Hanoi	m	d
+ph	Philippines	Manille|Manila	m	d
+ng	Nigeria	Abuja	m	e
+ke	Kenya	Nairobi	m	d
+et	Éthiopie|Ethiopie	Addis-Abeba|Addis Abeba	m	d
+sa	Arabie saoudite	Riyad|Riyadh	m	d
+ir	Iran	Téhéran|Teheran	m	d
+iq	Irak	Bagdad	m	d
+pk	Pakistan	Islamabad	m	e
+af	Afghanistan	Kaboul	m	d
+kp	Corée du Nord	Pyongyang	m	d
+mn	Mongolie	Oulan-Bator|Oulan Bator	m	d
+sg	Singapour	Singapour	m	m
+my	Malaisie	Kuala Lumpur	m	d
+ve	Venezuela	Caracas	m	d
+uy	Uruguay	Montevideo	m	d
+py	Paraguay	Asuncion|Asunción	m	e
+bo	Bolivie	Sucre|La Paz	m	e
+ec	Équateur|Equateur	Quito	d	d
+ml	Mali	Bamako	m	d
+gn	Guinée	Conakry	d	d
+cd	République démocratique du Congo|RDC	Kinshasa	m	d
+cg	Congo	Brazzaville	d	d
+ga	Gabon	Libreville	m	d
+bf	Burkina Faso	Ouagadougou	m	d
+ne	Niger	Niamey	m	e
+td	Tchad	N’Djaména|N'Djamena|Ndjamena	d	e
+ly	Libye	Tripoli	m	d
+lb	Liban	Beyrouth	m	d
+sy	Syrie	Damas	m	d
+jo	Jordanie	Amman	d	d
+ae	Émirats arabes unis|Emirats arabes unis	Abou Dabi|Abu Dhabi	m	d
+qa	Qatar	Doha	m	d
+bg	Bulgarie	Sofia	d	m
+rs	Serbie	Belgrade	d	m
+sk	Slovaquie	Bratislava	d	d
+si	Slovénie	Ljubljana	m	d
+ee	Estonie	Tallinn	d	d
+lv	Lettonie	Riga	d	d
+lt	Lituanie	Vilnius	d	d
+by	Biélorussie	Minsk	d	d
+mt	Malte	La Valette|Valette	m	d
+cy	Chypre	Nicosie	m	d
+ad	Andorre	Andorre-la-Vieille|Andorre la Vieille	m	e
+md	Moldavie	Chișinău|Chisinau	d	e
+li	Liechtenstein	Vaduz	d	e
+sm	Saint-Marin	Saint-Marin	d	e
+al	Albanie	Tirana	d	d
+ba	Bosnie-Herzégovine	Sarajevo	d	d
+me	Monténégro	Podgorica	e	e
+mk	Macédoine du Nord	Skopje	d	e
+ge	Géorgie	Tbilissi|Tbilisi	d	e
+am	Arménie	Erevan|Yerevan	d	e
+az	Azerbaïdjan	Bakou	d	e
+kz	Kazakhstan	Astana	d	e
+uz	Ouzbékistan	Tachkent	e	e
+tm	Turkménistan	Achgabat|Ashgabat	e	e
+tj	Tadjikistan	Douchanbé|Douchanbe	e	e
+kg	Kirghizistan	Bichkek	e	e
+np	Népal	Katmandou	m	d
+bt	Bhoutan	Thimphou|Thimphu	d	e
+bd	Bangladesh	Dacca|Dhaka	d	d
+lk	Sri Lanka	Sri Jayawardenepura Kotte|Kotte|Colombo	d	e
+mv	Maldives	Malé|Male	d	e
+mm	Birmanie|Myanmar	Naypyidaw|Naypyitaw	e	e
+la	Laos	Vientiane	d	e
+kh	Cambodge	Phnom Penh	d	d
+bn	Brunei	Bandar Seri Begawan	e	e
+tl	Timor oriental	Dili	e	e
+ye	Yémen	Sanaa	d	e
+om	Oman	Mascate|Muscat	e	e
+kw	Koweït|Koweit	Koweït|Koweit	e	d
+bh	Bahreïn|Bahrein	Manama	e	e
+dm	Dominique	Roseau	e	e
+do	République dominicaine	Saint-Domingue	d	d
+cr	Costa Rica	San José|San Jose	d	d
+pa	Panama	Panama	d	d
+gt	Guatemala	Guatemala	d	d
+hn	Honduras	Tegucigalpa	e	e
+sv	Salvador	San Salvador	e	d
+ni	Nicaragua	Managua	e	d
+bz	Belize	Belmopan	e	e
+bs	Bahamas	Nassau	d	e
+bb	Barbade	Bridgetown	e	e
+tt	Trinité-et-Tobago	Port-d’Espagne|Port of Spain	e	e
+gy	Guyana	Georgetown	e	e
+sr	Suriname	Paramaribo	e	e
+gd	Grenade	Saint-Georges|Saint George's	e	e
+lc	Sainte-Lucie	Castries	e	e
+vc	Saint-Vincent-et-les-Grenadines	Kingstown	e	-
+kn	Saint-Christophe-et-Niévès	Basseterre	e	-
+ag	Antigua-et-Barbuda	Saint John’s|Saint John's	e	-
+ao	Angola	Luanda	d	d
+mz	Mozambique	Maputo	d	d
+zw	Zimbabwe	Harare	d	d
+zm	Zambie	Lusaka	d	d
+na	Namibie	Windhoek	d	e
+bw	Botswana	Gaborone	e	e
+tz	Tanzanie	Dodoma	d	e
+ug	Ouganda	Kampala	d	d
+rw	Rwanda	Kigali	d	d
+bi	Burundi	Gitega	e	e
+so	Somalie	Mogadiscio|Mogadishu	d	d
+dj	Djibouti	Djibouti	d	d
+er	Érythrée	Asmara	e	e
+sd	Soudan	Khartoum	d	d
+ss	Soudan du Sud	Djouba|Juba	e	e
+mr	Mauritanie	Nouakchott	d	d
+gm	Gambie	Banjul	e	e
+gw	Guinée-Bissau	Bissau	e	e
+sl	Sierra Leone	Freetown	e	d
+lr	Liberia	Monrovia	d	d
+gh	Ghana	Accra	d	d
+tg	Togo	Lomé|Lome	d	d
+bj	Bénin|Benin	Porto-Novo	d	e
+cf	Centrafrique	Bangui	e	e
+gq	Guinée équatoriale	Malabo	e	e
+st	Sao Tomé-et-Principe	São Tomé|Sao Tome	e	e
+cv	Cap-Vert	Praia	e	e
+km	Comores	Moroni	e	e
+mu	Maurice	Port-Louis	d	d
+sc	Seychelles	Victoria	e	e
+ls	Lesotho	Maseru	e	e
+sz	Eswatini	Mbabane	e	e
+mw	Malawi	Lilongwe	e	e
+fj	Fidji	Suva	d	e
+pg	Papouasie-Nouvelle-Guinée	Port Moresby	e	e
+sb	Îles Salomon	Honiara	e	e
+vu	Vanuatu	Port-Vila	e	e
+ws	Samoa	Apia	e	e
+to	Tonga	Nukualofa|Nuku'alofa	e	e
+ki	Kiribati	Tarawa	e	-
+tv	Tuvalu	Funafuti	e	-
+mh	Îles Marshall	Majuro	e	-
+fm	Micronésie	Palikir	e	-
+pw	Palaos	Ngerulmud	e	-
+nr	Nauru	—	e	-
+il	Israël	—	m	-
+ps	Palestine	—	d	-
