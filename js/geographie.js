@@ -1,4 +1,4 @@
-// Géographie (v7.0) : les 12 jeux choisis par l'utilisateur le 12/11/2026 (BACKLOG ligne 258).
+// Géographie (v7.0, refonte v8.0 du 13/11/2026 : modes Quiz / Normal, 4 choix, cartes France / Europe / Monde) : les 12 jeux choisis par l'utilisateur le 12/11/2026 (BACKLOG ligne 258).
 // Chaque niveau n'a que son propre contenu (demande de l'utilisateur : Expert = seulement du contenu expert).
 // Format des séries : voir js/savoirs.js. « A|B » = A s'affiche, B est aussi accepté en question ouverte.
 (function (racine) {
@@ -6,65 +6,70 @@
   var S = typeof module !== 'undefined' && module.exports ? require('./savoirs.js') : racine.Savoirs;
 
   // ---------- Départements ----------
-  // [numéro, nom, préfecture, région, niveau du numéro, niveau de la préfecture]
-  // Niveaux : f facile, m moyen, d difficile, e expert. Préfectures : Insee (code officiel géographique).
+  // [numéro, nom, préfecture, région, population]. Préfectures : Insee (code officiel géographique).
+  // Population : Insee, populations de référence 2022 (Mayotte : recensement exhaustif du 1er janvier 2026),
+  // copie dans outils/donnees/population-departements.csv.
   var D = [
-    ['01', 'Ain', 'Bourg-en-Bresse', 'ARA', 'd', 'd'], ['02', 'Aisne', 'Laon', 'HDF', 'd', 'e'],
-    ['03', 'Allier', 'Moulins', 'ARA', 'd', 'e'], ['04', 'Alpes-de-Haute-Provence', 'Digne-les-Bains', 'PACA', 'd', 'e'],
-    ['05', 'Hautes-Alpes', 'Gap', 'PACA', 'd', 'd'], ['06', 'Alpes-Maritimes', 'Nice', 'PACA', 'f', 'f'],
-    ['07', 'Ardèche', 'Privas', 'ARA', 'd', 'e'], ['08', 'Ardennes', 'Charleville-Mézières', 'GE', 'd', 'd'],
-    ['09', 'Ariège', 'Foix', 'OCC', 'd', 'd'], ['10', 'Aube', 'Troyes', 'GE', 'd', 'd'],
-    ['11', 'Aude', 'Carcassonne', 'OCC', 'd', 'm'], ['12', 'Aveyron', 'Rodez', 'OCC', 'd', 'd'],
-    ['13', 'Bouches-du-Rhône', 'Marseille', 'PACA', 'f', 'f'], ['14', 'Calvados', 'Caen', 'NOR', 'm', 'm'],
-    ['15', 'Cantal', 'Aurillac', 'ARA', 'd', 'e'], ['16', 'Charente', 'Angoulême', 'NA', 'd', 'm'],
-    ['17', 'Charente-Maritime', 'La Rochelle', 'NA', 'm', 'm'], ['18', 'Cher', 'Bourges', 'CVL', 'd', 'd'],
-    ['19', 'Corrèze', 'Tulle', 'NA', 'd', 'e'], ['21', 'Côte-d’Or|Cote d\'Or', 'Dijon', 'BFC', 'm', 'm'],
-    ['22', 'Côtes-d’Armor|Cotes d\'Armor', 'Saint-Brieuc', 'BRE', 'm', 'd'], ['23', 'Creuse', 'Guéret', 'NA', 'e', 'e'],
-    ['24', 'Dordogne', 'Périgueux', 'NA', 'm', 'd'], ['25', 'Doubs', 'Besançon', 'BFC', 'd', 'm'],
-    ['26', 'Drôme', 'Valence', 'ARA', 'd', 'd'], ['27', 'Eure', 'Évreux', 'NOR', 'd', 'd'],
-    ['28', 'Eure-et-Loir', 'Chartres', 'CVL', 'd', 'd'], ['29', 'Finistère', 'Quimper', 'BRE', 'm', 'm'],
-    ['30', 'Gard', 'Nîmes', 'OCC', 'd', 'm'], ['31', 'Haute-Garonne', 'Toulouse', 'OCC', 'f', 'f'],
-    ['32', 'Gers', 'Auch', 'OCC', 'd', 'e'], ['33', 'Gironde', 'Bordeaux', 'NA', 'f', 'f'],
-    ['34', 'Hérault', 'Montpellier', 'OCC', 'm', 'f'], ['35', 'Ille-et-Vilaine', 'Rennes', 'BRE', 'm', 'f'],
-    ['36', 'Indre', 'Châteauroux', 'CVL', 'd', 'e'], ['37', 'Indre-et-Loire', 'Tours', 'CVL', 'd', 'm'],
-    ['38', 'Isère', 'Grenoble', 'ARA', 'm', 'm'], ['39', 'Jura', 'Lons-le-Saunier', 'BFC', 'd', 'e'],
-    ['40', 'Landes', 'Mont-de-Marsan', 'NA', 'd', 'd'], ['41', 'Loir-et-Cher', 'Blois', 'CVL', 'd', 'd'],
-    ['42', 'Loire', 'Saint-Étienne', 'ARA', 'd', 'm'], ['43', 'Haute-Loire', 'Le Puy-en-Velay', 'ARA', 'd', 'e'],
-    ['44', 'Loire-Atlantique', 'Nantes', 'PDL', 'm', 'f'], ['45', 'Loiret', 'Orléans', 'CVL', 'd', 'm'],
-    ['46', 'Lot', 'Cahors', 'OCC', 'd', 'e'], ['47', 'Lot-et-Garonne', 'Agen', 'NA', 'd', 'd'],
-    ['48', 'Lozère', 'Mende', 'OCC', 'e', 'e'], ['49', 'Maine-et-Loire', 'Angers', 'PDL', 'd', 'm'],
-    ['50', 'Manche', 'Saint-Lô', 'NOR', 'd', 'e'], ['51', 'Marne', 'Châlons-en-Champagne', 'GE', 'd', 'e'],
-    ['52', 'Haute-Marne', 'Chaumont', 'GE', 'e', 'e'], ['53', 'Mayenne', 'Laval', 'PDL', 'd', 'd'],
-    ['54', 'Meurthe-et-Moselle', 'Nancy', 'GE', 'd', 'm'], ['55', 'Meuse', 'Bar-le-Duc', 'GE', 'e', 'e'],
-    ['56', 'Morbihan', 'Vannes', 'BRE', 'm', 'd'], ['57', 'Moselle', 'Metz', 'GE', 'd', 'm'],
-    ['58', 'Nièvre', 'Nevers', 'BFC', 'd', 'd'], ['59', 'Nord', 'Lille', 'HDF', 'f', 'f'],
-    ['60', 'Oise', 'Beauvais', 'HDF', 'd', 'd'], ['61', 'Orne', 'Alençon', 'NOR', 'd', 'e'],
-    ['62', 'Pas-de-Calais', 'Arras', 'HDF', 'm', 'd'], ['63', 'Puy-de-Dôme', 'Clermont-Ferrand', 'ARA', 'm', 'm'],
-    ['64', 'Pyrénées-Atlantiques', 'Pau', 'NA', 'm', 'd'], ['65', 'Hautes-Pyrénées', 'Tarbes', 'OCC', 'd', 'd'],
-    ['66', 'Pyrénées-Orientales', 'Perpignan', 'OCC', 'm', 'm'], ['67', 'Bas-Rhin', 'Strasbourg', 'GE', 'f', 'f'],
-    ['68', 'Haut-Rhin', 'Colmar', 'GE', 'm', 'd'], ['69', 'Rhône', 'Lyon', 'ARA', 'f', 'f'],
-    ['70', 'Haute-Saône', 'Vesoul', 'BFC', 'd', 'e'], ['71', 'Saône-et-Loire', 'Mâcon', 'BFC', 'd', 'd'],
-    ['72', 'Sarthe', 'Le Mans', 'PDL', 'd', 'm'], ['73', 'Savoie', 'Chambéry', 'ARA', 'm', 'd'],
-    ['74', 'Haute-Savoie', 'Annecy', 'ARA', 'm', 'm'], ['75', 'Paris', 'Paris', 'IDF', 'f', 'f'],
-    ['76', 'Seine-Maritime', 'Rouen', 'NOR', 'm', 'm'], ['77', 'Seine-et-Marne', 'Melun', 'IDF', 'm', 'd'],
-    ['78', 'Yvelines', 'Versailles', 'IDF', 'm', 'm'], ['79', 'Deux-Sèvres', 'Niort', 'NA', 'd', 'd'],
-    ['80', 'Somme', 'Amiens', 'HDF', 'd', 'm'], ['81', 'Tarn', 'Albi', 'OCC', 'd', 'd'],
-    ['82', 'Tarn-et-Garonne', 'Montauban', 'OCC', 'd', 'd'], ['83', 'Var', 'Toulon', 'PACA', 'm', 'm'],
-    ['84', 'Vaucluse', 'Avignon', 'PACA', 'm', 'm'], ['85', 'Vendée', 'La Roche-sur-Yon', 'PDL', 'm', 'd'],
-    ['86', 'Vienne', 'Poitiers', 'NA', 'd', 'm'], ['87', 'Haute-Vienne', 'Limoges', 'NA', 'd', 'm'],
-    ['88', 'Vosges', 'Épinal', 'GE', 'd', 'd'], ['89', 'Yonne', 'Auxerre', 'BFC', 'd', 'd'],
-    ['90', 'Territoire de Belfort', 'Belfort', 'BFC', 'e', 'd'], ['91', 'Essonne', 'Évry-Courcouronnes|Évry', 'IDF', 'm', 'e'],
-    ['92', 'Hauts-de-Seine', 'Nanterre', 'IDF', 'm', 'd'], ['93', 'Seine-Saint-Denis', 'Bobigny', 'IDF', 'm', 'e'],
-    ['94', 'Val-de-Marne', 'Créteil', 'IDF', 'm', 'd'], ['95', 'Val-d’Oise|Val d\'Oise', 'Cergy|Pontoise|Cergy-Pontoise', 'IDF', 'm', 'e'],
-    ['2A', 'Corse-du-Sud', 'Ajaccio', 'COR', 'e', 'd'], ['2B', 'Haute-Corse', 'Bastia', 'COR', 'e', 'd'],
-    ['971', 'Guadeloupe', 'Basse-Terre', 'GUA', 'e', 'e'], ['972', 'Martinique', 'Fort-de-France', 'MAR', 'e', 'e'],
-    ['973', 'Guyane', 'Cayenne', 'GUY', 'e', 'e'], ['974', 'La Réunion|Réunion', 'Saint-Denis', 'REU', 'e', 'e'],
-    ['976', 'Mayotte', 'Mamoudzou', 'MAY', 'e', 'e']
+    ['01', 'Ain', 'Bourg-en-Bresse', 'ARA', 671289], ['02', 'Aisne', 'Laon', 'HDF', 525558],
+    ['03', 'Allier', 'Moulins', 'ARA', 334715], ['04', 'Alpes-de-Haute-Provence', 'Digne-les-Bains', 'PACA', 167179],
+    ['05', 'Hautes-Alpes', 'Gap', 'PACA', 141677], ['06', 'Alpes-Maritimes', 'Nice', 'PACA', 1114579],
+    ['07', 'Ardèche', 'Privas', 'ARA', 333229], ['08', 'Ardennes', 'Charleville-Mézières', 'GE', 267204],
+    ['09', 'Ariège', 'Foix', 'OCC', 155339], ['10', 'Aube', 'Troyes', 'GE', 311076],
+    ['11', 'Aude', 'Carcassonne', 'OCC', 377773], ['12', 'Aveyron', 'Rodez', 'OCC', 279736],
+    ['13', 'Bouches-du-Rhône', 'Marseille', 'PACA', 2069811], ['14', 'Calvados', 'Caen', 'NOR', 704605],
+    ['15', 'Cantal', 'Aurillac', 'ARA', 144399], ['16', 'Charente', 'Angoulême', 'NA', 351603],
+    ['17', 'Charente-Maritime', 'La Rochelle', 'NA', 668160], ['18', 'Cher', 'Bourges', 'CVL', 299496],
+    ['19', 'Corrèze', 'Tulle', 'NA', 240120], ['21', 'Côte-d’Or|Cote d\'Or', 'Dijon', 'BFC', 537577],
+    ['22', 'Côtes-d’Armor|Cotes d\'Armor', 'Saint-Brieuc', 'BRE', 609598], ['23', 'Creuse', 'Guéret', 'NA', 115529],
+    ['24', 'Dordogne', 'Périgueux', 'NA', 416325], ['25', 'Doubs', 'Besançon', 'BFC', 548662],
+    ['26', 'Drôme', 'Valence', 'ARA', 521432], ['27', 'Eure', 'Évreux', 'NOR', 601305],
+    ['28', 'Eure-et-Loir', 'Chartres', 'CVL', 432950], ['29', 'Finistère', 'Quimper', 'BRE', 927912],
+    ['30', 'Gard', 'Nîmes', 'OCC', 764010], ['31', 'Haute-Garonne', 'Toulouse', 'OCC', 1456261],
+    ['32', 'Gers', 'Auch', 'OCC', 192649], ['33', 'Gironde', 'Bordeaux', 'NA', 1674980],
+    ['34', 'Hérault', 'Montpellier', 'OCC', 1217331], ['35', 'Ille-et-Vilaine', 'Rennes', 'BRE', 1109232],
+    ['36', 'Indre', 'Châteauroux', 'CVL', 216809], ['37', 'Indre-et-Loire', 'Tours', 'CVL', 616326],
+    ['38', 'Isère', 'Grenoble', 'ARA', 1291380], ['39', 'Jura', 'Lons-le-Saunier', 'BFC', 258405],
+    ['40', 'Landes', 'Mont-de-Marsan', 'NA', 428427], ['41', 'Loir-et-Cher', 'Blois', 'CVL', 328953],
+    ['42', 'Loire', 'Saint-Étienne', 'ARA', 772041], ['43', 'Haute-Loire', 'Le Puy-en-Velay', 'ARA', 228161],
+    ['44', 'Loire-Atlantique', 'Nantes', 'PDL', 1473156], ['45', 'Loiret', 'Orléans', 'CVL', 687063],
+    ['46', 'Lot', 'Cahors', 'OCC', 175620], ['47', 'Lot-et-Garonne', 'Agen', 'NA', 332226],
+    ['48', 'Lozère', 'Mende', 'OCC', 76503], ['49', 'Maine-et-Loire', 'Angers', 'PDL', 828151],
+    ['50', 'Manche', 'Saint-Lô', 'NOR', 496815], ['51', 'Marne', 'Châlons-en-Champagne', 'GE', 564107],
+    ['52', 'Haute-Marne', 'Chaumont', 'GE', 169865], ['53', 'Mayenne', 'Laval', 'PDL', 305437],
+    ['54', 'Meurthe-et-Moselle', 'Nancy', 'GE', 732898], ['55', 'Meuse', 'Bar-le-Duc', 'GE', 180745],
+    ['56', 'Morbihan', 'Vannes', 'BRE', 776103], ['57', 'Moselle', 'Metz', 'GE', 1050721],
+    ['58', 'Nièvre', 'Nevers', 'BFC', 202299], ['59', 'Nord', 'Lille', 'HDF', 2616909],
+    ['60', 'Oise', 'Beauvais', 'HDF', 830725], ['61', 'Orne', 'Alençon', 'NOR', 276144],
+    ['62', 'Pas-de-Calais', 'Arras', 'HDF', 1460184], ['63', 'Puy-de-Dôme', 'Clermont-Ferrand', 'ARA', 664385],
+    ['64', 'Pyrénées-Atlantiques', 'Pau', 'NA', 699473], ['65', 'Hautes-Pyrénées', 'Tarbes', 'OCC', 231453],
+    ['66', 'Pyrénées-Orientales', 'Perpignan', 'OCC', 492964], ['67', 'Bas-Rhin', 'Strasbourg', 'GE', 1156963],
+    ['68', 'Haut-Rhin', 'Colmar', 'GE', 767800], ['69', 'Rhône', 'Lyon', 'ARA', 1907982],
+    ['70', 'Haute-Saône', 'Vesoul', 'BFC', 233920], ['71', 'Saône-et-Loire', 'Mâcon', 'BFC', 549136],
+    ['72', 'Sarthe', 'Le Mans', 'PDL', 566129], ['73', 'Savoie', 'Chambéry', 'ARA', 445288],
+    ['74', 'Haute-Savoie', 'Annecy', 'ARA', 849583], ['75', 'Paris', 'Paris', 'IDF', 2113705],
+    ['76', 'Seine-Maritime', 'Rouen', 'NOR', 1260205], ['77', 'Seine-et-Marne', 'Melun', 'IDF', 1452399],
+    ['78', 'Yvelines', 'Versailles', 'IDF', 1470778], ['79', 'Deux-Sèvres', 'Niort', 'NA', 375415],
+    ['80', 'Somme', 'Amiens', 'HDF', 565540], ['81', 'Tarn', 'Albi', 'OCC', 396168],
+    ['82', 'Tarn-et-Garonne', 'Montauban', 'OCC', 264924], ['83', 'Var', 'Toulon', 'PACA', 1108364],
+    ['84', 'Vaucluse', 'Avignon', 'PACA', 568702], ['85', 'Vendée', 'La Roche-sur-Yon', 'PDL', 706343],
+    ['86', 'Vienne', 'Poitiers', 'NA', 438688], ['87', 'Haute-Vienne', 'Limoges', 'NA', 372438],
+    ['88', 'Vosges', 'Épinal', 'GE', 358700], ['89', 'Yonne', 'Auxerre', 'BFC', 333896],
+    ['90', 'Territoire de Belfort', 'Belfort', 'BFC', 140082], ['91', 'Essonne', 'Évry-Courcouronnes|Évry', 'IDF', 1324546],
+    ['92', 'Hauts-de-Seine', 'Nanterre', 'IDF', 1647435], ['93', 'Seine-Saint-Denis', 'Bobigny', 'IDF', 1681725],
+    ['94', 'Val-de-Marne', 'Créteil', 'IDF', 1419531], ['95', 'Val-d’Oise|Val d\'Oise', 'Cergy|Pontoise|Cergy-Pontoise', 'IDF', 1270845],
+    ['2A', 'Corse-du-Sud', 'Ajaccio', 'COR', 166045], ['2B', 'Haute-Corse', 'Bastia', 'COR', 185231],
+    ['971', 'Guadeloupe', 'Basse-Terre', 'GUA', 383569], ['972', 'Martinique', 'Fort-de-France', 'MAR', 361019],
+    ['973', 'Guyane', 'Cayenne', 'GUY', 288382], ['974', 'La Réunion|Réunion', 'Saint-Denis', 'REU', 881348],
+    ['976', 'Mayotte', 'Mamoudzou', 'MAY', 323153]
   ];
-  var NIV = { f: 'facile', m: 'moyen', d: 'difficile', e: 'expert' };
-  function parNiveau(col, choix) {
+  // Niveaux (choix de l'utilisateur du 13/11/2026) : les départements rangés par population, les 25 plus peuplés
+  // en Facile, les 25 suivants en Moyen, puis en Difficile, et les 26 derniers en Expert.
+  var NIVEAUX_D = ['facile', 'moyen', 'difficile', 'expert'];
+  var RANG = D.slice().sort(function (a, b) { return b[4] - a[4]; });
+  function niveauDe(d) { return NIVEAUX_D[Math.min(3, Math.floor(RANG.indexOf(d) / 25))]; }
+  function parNiveau(choix) {
     var r = { facile: [], moyen: [], difficile: [], expert: [] };
-    D.forEach(function (d) { r[NIV[d[col]]].push(choix(d)); });
+    D.forEach(function (d) { r[niveauDe(d)].push(choix(d)); });
     return r;
   }
 
@@ -100,42 +105,39 @@
 
   var JEUX = [
     // ---------- France ----------
-    { id: 'g01', matiere: 'geographie', famille: 'france', nom: 'Numéros des départements', court: 'Numéros', icone: '🔢', series: [
+    // v8.0 (demande du 13/11/2026) : numéros et préfectures réunis en un seul jeu ; on demande le numéro,
+    // le nom ou la préfecture ; 25 départements par niveau (population).
+    { id: 'g01', matiere: 'geographie', famille: 'france', nom: 'Départements', court: 'Départ.', icone: '🔢', series: [
       { k: 'paires', gauche: 'Numéro', droite: 'Département', consigneR: 'Relie chaque numéro à son département.',
-        q: 'Quel département porte le numéro {a} ?', qi: 'Quel est le numéro du département : {b} ?',
-        niveaux: parNiveau(4, function (d) { return [d[0], d[1]]; }) }
-    ] },
-    { id: 'g02', matiere: 'geographie', famille: 'france', nom: 'Préfectures', court: 'Préfectures', icone: '🏛️', series: [
+        q: 'Quel département porte le numéro {a} ?', qi: 'Quel est le numéro de ce département : {b} ?',
+        niveaux: parNiveau(function (d) { return [d[0], d[1]]; }) },
       { k: 'paires', gauche: 'Département', droite: 'Préfecture', consigneR: 'Relie chaque département à sa préfecture.',
-        q: 'Quelle est la préfecture du département : {a} ?', qi: '{b} est la préfecture de quel département ?',
-        niveaux: parNiveau(5, function (d) { return [d[1], d[2]]; }) }
+        q: 'Quelle est la préfecture de ce département : {a} ?', qi: '{b} est la préfecture de quel département ?',
+        niveaux: parNiveau(function (d) { return [d[1], d[2]]; }) },
+      { k: 'paires', gauche: 'Numéro', droite: 'Préfecture', consigneR: 'Relie chaque numéro de département à sa préfecture.',
+        q: 'Quelle est la préfecture du département numéro {a} ?', qi: '{b} est la préfecture du département numéro… ?',
+        niveaux: parNiveau(function (d) { return [d[0], d[2]]; }) }
     ] },
-    { id: 'g03', matiere: 'geographie', famille: 'france', nom: 'Régions et chefs-lieux', court: 'Régions', icone: '🗺️', series: [
+    { id: 'g03', matiere: 'geographie', famille: 'france', nom: 'Régions', court: 'Régions', icone: '🗺️', series: [
+      // Département ↔ région : les 25 départements du niveau (population), dans les deux sens.
+      { k: 'paires', gauche: 'Département', droite: 'Région', consigneR: 'Relie chaque département à sa région.',
+        q: 'Dans quelle région se trouve ce département : {a} ?', qi: 'Lequel de ces départements se trouve en région {b} ?',
+        niveaux: parNiveau(function (d) { return [d[1], REGIONS[d[3]]]; }) },
       { k: 'paires', gauche: 'Région', droite: 'Chef-lieu', consigneR: 'Relie chaque région à son chef-lieu.',
         q: 'Quel est le chef-lieu de la région {a} ?', qi: '{b} est le chef-lieu de quelle région ?',
         niveaux: {
-          facile: [['Île-de-France', 'Paris'], ['Bretagne', 'Rennes'], ['Occitanie', 'Toulouse'],
-            ['Provence-Alpes-Côte d’Azur', 'Marseille'], ['Nouvelle-Aquitaine', 'Bordeaux'], ['Hauts-de-France', 'Lille']],
-          moyen: [['Auvergne-Rhône-Alpes', 'Lyon'], ['Bourgogne-Franche-Comté', 'Dijon'], ['Centre-Val de Loire', 'Orléans'],
-            ['Corse', 'Ajaccio'], ['Grand Est', 'Strasbourg'], ['Normandie', 'Rouen'], ['Pays de la Loire', 'Nantes']],
-          expert: [['Guadeloupe', 'Basse-Terre'], ['Martinique', 'Fort-de-France'], ['Guyane', 'Cayenne'],
-            ['La Réunion', 'Saint-Denis'], ['Mayotte', 'Mamoudzou']]
-        } },
-      // Département → région : départements connus (Difficile), puis les autres (Expert).
-      { k: 'paires', gauche: 'Département', droite: 'Région', consigneR: 'Relie chaque département à sa région.',
-        q: 'Dans quelle région se trouve le département : {a} ?', niveaux: (function () {
-          var r = { difficile: [], expert: [] };
-          D.forEach(function (d) {
-            if (d[0].length === 3) return; // outre-mer : la région porte le même nom
-            r[d[4] === 'f' || d[4] === 'm' ? 'difficile' : 'expert'].push([d[1], REGIONS[d[3]]]);
-          });
-          return r;
-        })() }
+          facile: [['Île-de-France', 'Paris'], ['Bretagne', 'Rennes'], ['Occitanie', 'Toulouse'], ['Provence-Alpes-Côte d’Azur', 'Marseille'],
+            ['Nouvelle-Aquitaine', 'Bordeaux'], ['Hauts-de-France', 'Lille'], ['Auvergne-Rhône-Alpes', 'Lyon'], ['Grand Est', 'Strasbourg'], ['Pays de la Loire', 'Nantes']],
+          moyen: [['Bourgogne-Franche-Comté', 'Dijon'], ['Centre-Val de Loire', 'Orléans'], ['Corse', 'Ajaccio'], ['Normandie', 'Rouen']],
+          difficile: [['Guadeloupe', 'Basse-Terre'], ['Martinique', 'Fort-de-France'], ['Guyane', 'Cayenne'], ['La Réunion', 'Saint-Denis'],
+            ['Mayotte', 'Mamoudzou']]
+        } }
     ] },
-    { id: 'g10', matiere: 'geographie', famille: 'france', nom: 'Carte à toucher', court: 'Carte', icone: '📍', series: [
-      // Zones assez grandes pour être touchées (demande de l'utilisateur) : voir js/cartes-geo.js.
-      { k: 'carte', niveaux: { facile: 'regions', moyen: 'departements', difficile: 'europe', expert: 'monde' } }
-    ] },
+    // Cartes (v8.0, demande du 13/11/2026) : France (départements), Europe, Monde. Niveaux : départements par
+    // population, pays par superficie (js/cartes-geo.js). Normal : toucher la zone nommée ; Quiz : la zone est en vert.
+    { id: 'g10', matiere: 'geographie', famille: 'cartes', nom: 'Carte de France', court: 'France', icone: '🇫🇷', series: [{ k: 'carte', carte: 'france' }] },
+    { id: 'g18', matiere: 'geographie', famille: 'cartes', nom: 'Carte d’Europe', court: 'Europe', icone: '🇪🇺', series: [{ k: 'carte', carte: 'europe' }] },
+    { id: 'g19', matiere: 'geographie', famille: 'cartes', nom: 'Carte du monde', court: 'Monde', icone: '🌍', series: [{ k: 'carte', carte: 'monde' }] },
 
     // ---------- Monde ----------
     { id: 'g04', matiere: 'geographie', famille: 'monde', nom: 'Pays et capitales', court: 'Capitales', icone: '🏙️', series: [
@@ -361,6 +363,7 @@
 
   // Familles de l'écran de réglage (icône, nom, jeux dans l'ordre).
   var FAMILLES = [
+    { id: 'cartes', nom: 'Cartes', icone: '📍' },
     { id: 'france', nom: 'France', icone: '🇫🇷' },
     { id: 'monde', nom: 'Monde', icone: '🌍' },
     { id: 'nature', nom: 'Nature', icone: '🏔️' }

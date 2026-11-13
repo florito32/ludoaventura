@@ -70,18 +70,26 @@
   var SV = window.Savoirs;
   var MATIERES_SAVOIR = ['geographie', 'histoire'];
   function estSavoir(m) { return MATIERES_SAVOIR.indexOf(m) >= 0; }
-  function savoirVide() { return { geographie: { jeux: [], niveau: 'facile' }, histoire: { jeux: [], niveau: 'facile' } }; }
+  // v8.0 : mode « quiz » (4 choix) ou « normal » (tout sauf le QCM) ; Quiz présélectionné (hypothèse à valider).
+  function savoirVide() { return { geographie: { jeux: [], niveau: 'facile', mode: 'quiz' }, histoire: { jeux: [], niveau: 'facile', mode: 'quiz' } }; }
   // Jeux proposés : ceux qui ont du contenu à chaque niveau (la carte à toucher attend ses cartes, js/cartes-geo.js).
-  function jeuxProposes(m) {
+  // Jeux proposés : jouables à tous les niveaux dans ce mode (sans mode : dans au moins un des deux modes).
+  function jeuxProposes(m, mode) {
     return SV.jeuxDe(m).filter(function (j) {
-      return SV.NIVEAUX.every(function (n) { return j.series.some(function (s) { return SV.utilisable(s, n.id) && (s.k !== 'carte' || window.CartesGeo); }); });
+      return (mode ? [mode] : ['quiz', 'normal']).some(function (md) {
+        return SV.NIVEAUX.every(function (n) { return j.series.some(function (s) { return SV.utilisable(s, n.id, md); }); });
+      });
     });
   }
   var AIDES_SAVOIR = {
-    facile: 'Facile : 3 réponses ou 3 paires à relier, ce qui est le plus connu.',
-    moyen: 'Moyen : 4 réponses ou 4 paires, des choses connues.',
-    difficile: 'Difficile : 5 paires, moins connu, des questions où l\u2019on écrit la réponse.',
-    expert: 'Expert : 6 paires, seulement du contenu d\u2019expert.'
+    facile: 'Facile : ce qui est le plus connu.',
+    moyen: 'Moyen : des choses connues.',
+    difficile: 'Difficile : moins connu ; en Normal, des questions où l\u2019on écrit la réponse.',
+    expert: 'Expert : seulement du contenu d\u2019expert.'
+  };
+  var AIDES_MODE = {
+    quiz: 'Quiz : une question et 4 réponses, une seule est bonne.',
+    normal: 'Normal : relier 4 paires, écrire la réponse, toucher la carte, remettre dans l\u2019ordre, vrai ou faux…'
   };
   // Aide sous le niveau de calcul (v6.14) : nombres possibles et nombre de signes maximum.
   var AIDES_NIVEAU = {
@@ -317,6 +325,16 @@
       if (r) r.niveau = valeursCochees($('niveau-savoir'))[0] || 'facile';
       majAventuriers();
     });
+    SV.MODES.forEach(function (md) { choix($('mode-savoir'), 'radio', 'mode-savoir', md.id, md.nom); });
+    $('mode-savoir').addEventListener('change', function () {
+      var r = reglageSavoir(partie.actif);
+      if (!r) return;
+      r.mode = valeursCochees($('mode-savoir'))[0] || 'quiz';
+      // Les jeux qui ne se jouent pas dans ce mode sont retirés du choix.
+      var ok = jeuxProposes(partie.matiere[partie.actif], r.mode).map(function (j) { return j.id; });
+      r.jeux = r.jeux.filter(function (id) { return ok.indexOf(id) >= 0; });
+      majAventuriers();
+    });
     var liste = $('savoir-liste');
     // Histoire : les familles sont les périodes ; « Tout » d'une période = choisir la période.
     [['geographie', window.Geographie.FAMILLES], ['histoire', window.Histoire.FAMILLES]].forEach(function (m) {
@@ -342,7 +360,7 @@
       var b = e.target.closest('.btn-tout-famille');
       var r = reglageSavoir(partie.actif);
       if (!b || !r) return;
-      var ids = Array.prototype.map.call(b.closest('.famille').querySelectorAll('input'), function (i) { return i.value; });
+      var ids = Array.prototype.map.call(b.closest('.famille').querySelectorAll('.pack:not([hidden]) input'), function (i) { return i.value; });
       var plein = ids.every(function (id) { return r.jeux.indexOf(id) >= 0; });
       var reste = r.jeux.filter(function (id) { return ids.indexOf(id) < 0; });
       r.jeux = plein ? reste : reste.concat(ids);
@@ -352,7 +370,7 @@
     $('btn-tout-savoir').addEventListener('click', function () {
       var r = reglageSavoir(partie.actif);
       if (!r) return;
-      var tous = jeuxProposes(partie.matiere[partie.actif]).map(function (j) { return j.id; });
+      var tous = jeuxProposes(partie.matiere[partie.actif], r.mode).map(function (j) { return j.id; });
       r.jeux = r.jeux.length === tous.length ? [] : tous;
       $('packs-alerte').textContent = '';
       majAventuriers();
@@ -805,18 +823,26 @@
     // Géographie et Histoire (v7.0) : niveau, puis les jeux de la matière (les familles des autres matières sont cachées).
     var rs = reglageSavoir(a);
     $('reglage-niveau-savoir').hidden = !rs;
+    $('reglage-mode-savoir').hidden = !rs;
     $('savoir-jeux').hidden = !rs;
     if (rs) {
+      if (!rs.mode) rs.mode = 'quiz'; // parties sauvegardées avant la v8.0
       $('niveau-savoir').querySelectorAll('input').forEach(function (i) { i.checked = i.value === rs.niveau; });
       $('niveau-savoir-aide').textContent = AIDES_SAVOIR[rs.niveau] || '';
-      $('savoir-liste').querySelectorAll('.famille').forEach(function (f) { f.hidden = f.dataset.matiere !== mat; });
+      $('mode-savoir').querySelectorAll('input').forEach(function (i) { i.checked = i.value === rs.mode; });
+      $('mode-savoir-aide').textContent = AIDES_MODE[rs.mode];
+      // Seuls les jeux de la matière, jouables dans le mode choisi (v8.0) ; une famille vide est cachée.
+      var proposes = jeuxProposes(mat, rs.mode).map(function (j) { return j.id; });
+      rs.jeux = rs.jeux.filter(function (id) { return proposes.indexOf(id) >= 0; });
+      $('savoir-liste').querySelectorAll('.pack').forEach(function (l) { var i = l.querySelector('input'); l.hidden = !!i && proposes.indexOf(i.value) < 0; });
+      $('savoir-liste').querySelectorAll('.famille').forEach(function (f) { f.hidden = f.dataset.matiere !== mat || !f.querySelector('.pack:not([hidden])'); });
       $('savoir-liste').querySelectorAll('input').forEach(function (i) { i.checked = rs.jeux.indexOf(i.value) >= 0; });
-      var tousJ = jeuxProposes(mat).length, pleinJ = rs.jeux.length === tousJ, bt = $('btn-tout-savoir');
+      var tousJ = proposes.length, pleinJ = rs.jeux.length === tousJ, bt = $('btn-tout-savoir');
       bt.innerHTML = pleinJ ? '<span class="long">Tout désélectionner</span><span class="court">Aucun</span>'
         : '<span class="long">Tout sélectionner</span><span class="court">Tout</span>';
       bt.setAttribute('aria-label', (pleinJ ? 'Tout désélectionner : ' : 'Tout sélectionner : ') + 'jeux');
       $('savoir-liste').querySelectorAll('.btn-tout-famille').forEach(function (b) {
-        var ids = Array.prototype.map.call(b.closest('.famille').querySelectorAll('input'), function (i) { return i.value; });
+        var ids = Array.prototype.map.call(b.closest('.famille').querySelectorAll('.pack:not([hidden]) input'), function (i) { return i.value; });
         var plein = ids.every(function (id) { return rs.jeux.indexOf(id) >= 0; });
         b.textContent = plein ? 'Aucun' : 'Tout';
         b.setAttribute('aria-label', (plein ? 'Tout désélectionner : ' : 'Tout sélectionner : ') + b.closest('.famille').querySelector('.famille-nom').textContent.replace(/^\S+\s/, ''));
@@ -945,7 +971,7 @@
     // Géographie et Histoire (v7.0) : un jeu choisi par le joueur, une série et un format tirés au hasard.
     if (estSavoir(mat)) {
       var rsv = partie.savoirs[j.index][mat];
-      return SV.generer(rsv, mat) || SV.generer({ jeux: jeuxProposes(mat).map(function (x) { return x.id; }), niveau: rsv.niveau }, mat);
+      return SV.generer(rsv, mat) || SV.generer({ jeux: jeuxProposes(mat, SV.modeDe(rsv)).map(function (x) { return x.id; }), niveau: rsv.niveau, mode: rsv.mode }, mat);
     }
     // Mathématiques : une formule tirée au hasard selon les réglages du joueur (pas de tas).
     if (mat === 'maths') {

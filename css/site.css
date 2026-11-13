@@ -1726,3 +1726,11 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .carte-geo .zone.bonne { fill: #3aa55c; }
 .carte-geo .zone.fausse { fill: #e3262a; }
 @media (max-height: 600px) { .carte-geo svg { max-height: 46vh; } .carte-savoir .carte-zoom .btn-zoom { width: 36px; height: 36px; font-size: 1.2rem; } .carte-zoom { gap: 4px; } }
+
+/* v8.0 : Quiz de géographie et d'histoire — phrases longues sur une colonne ; carte du quiz (zone en vert, pas à toucher). */
+.savoir-options.longues { grid-template-columns: 1fr; }
+.savoir-options.longues .btn-option { text-align: left; }
+.carte-quiz .zone { cursor: default; }
+.carte-quiz + .savoir-options { margin-top: 8px; }
+.carte-quiz svg { max-height: min(44vh, 460px); }
+@media (max-height: 600px) { .carte-quiz svg { max-height: 38vh; } }

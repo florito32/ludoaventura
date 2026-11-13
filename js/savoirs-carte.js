@@ -26,7 +26,7 @@
     var html = '';
     var fait = corrigee(c);
     if (c.format === 'R') html = relier(c, fait);
-    else if (c.format === 'Q') html = sujet(c) + options(c, c.options, fait);
+    else if (c.format === 'Q') html = sujet(c) + options(c, c.options, fait, null, c.longues);
     else if (c.format === 'V') html = vraiFaux(c, fait);
     else if (c.format === 'F') html = ordre(c, fait);
     else if (c.format === 'K') html = classer(c, fait);
@@ -36,7 +36,7 @@
     box.innerHTML = html;
     box.hidden = !html; // question ouverte : rien ici, la case de réponse commune suffit
     brancher(c, box, rappels, fait);
-    if (c.format === 'C' && box.querySelector('.carte-geo')) zoomCarte(box.querySelector('.carte-geo'));
+    if (box.querySelector('.carte-geo')) zoomCarte(box.querySelector('.carte-geo'));
     // Phrase de correction sous la carte (même endroit que pour le calcul et l'orthographe).
     var rep = $('carte-reponse');
     if (fait && c.format !== 'O') {
@@ -47,13 +47,17 @@
   }
 
   // Ce qu'on demande (drapeau, monument…) au-dessus des réponses.
+  // v8.0 : en mode Quiz, la carte avec la zone en vert, les indices de « Qui suis-je ? », la question de « Classer ».
   function sujet(c) {
     if (c.image === 'drapeau' && c.sujet) return '<p class="savoir-sujet">' + drapeau(c.sujet, 'grand') + '</p>';
+    if (c.verte) return carteGeo(c, false, c.verte);
+    if (c.indicesQuiz) return '<ol class="indices">' + c.indicesQuiz.map(function (t, k) { return '<li><span class="indice-num">Indice ' + (k + 1) + '</span> ' + esc(t) + '</li>'; }).join('') + '</ol>';
+    if (c.question) return '<p class="savoir-question">' + esc(c.question) + '</p>';
     return '';
   }
 
-  function options(c, liste, fait, nom) {
-    return '<div class="savoir-options" role="group" aria-label="' + (nom || 'Réponses proposées') + '">' + liste.map(function (o) {
+  function options(c, liste, fait, nom, longues) {
+    return '<div class="savoir-options' + (longues ? ' longues' : '') + '" role="group" aria-label="' + (nom || 'Réponses proposées') + '">' + liste.map(function (o) {
       var cl = 'btn-option';
       if (fait && o === c.bonne) cl += ' bonne';
       else if (fait && o === c.reponseDonnee) cl += ' fausse';
@@ -140,14 +144,15 @@
 
   // Toucher sur la carte (v7.1) : la carte SVG de js/cartes-geo.js ; chaque zone se touche.
   // Les zones assez grandes (« cibles ») se prennent aussi au clavier ; les petites restent touchables (réponse fausse).
-  function carteGeo(c, fait) {
+  // verte (mode Quiz, v8.0) : la zone à nommer est en vert ; la carte se zoome mais ne se touche pas.
+  function carteGeo(c, fait, verte) {
     var carte = racine.CartesGeo && racine.CartesGeo.CARTES[c.carte];
     if (!carte) return '<p>Carte indisponible.</p>';
     var zones = carte.zones.map(function (z) {
-      var cl = 'zone' + (z.cible ? ' cible' : '');
-      if (fait && z.id === c.bonne) cl += ' bonne';
+      var cl = 'zone' + (z.cible && !verte ? ' cible' : '');
+      if (verte ? z.id === verte : fait && z.id === c.bonne) cl += ' bonne';
       else if (fait && z.id === c.touche) cl += ' fausse';
-      var acces = z.cible && !fait ? ' role="button" tabindex="0" aria-label="' + esc(z.nom) + '"' : ' aria-hidden="true"';
+      var acces = z.cible && !fait && !verte ? ' role="button" tabindex="0" aria-label="' + esc(z.nom) + '"' : ' aria-hidden="true"';
       return '<path class="' + cl + '" data-zone="' + z.id + '" d="' + z.d + '"' + acces + '></path>';
     }).join('');
     // v7.2 : boutons de zoom (la carte seule grossit, pas la page) ; on peut aussi pincer à deux doigts ou tourner la molette.
@@ -155,7 +160,8 @@
       '<button type="button" class="btn-zoom" data-zoom="plus" aria-label="Zoomer sur la carte"><span aria-hidden="true">+</span></button>' +
       '<button type="button" class="btn-zoom" data-zoom="moins" aria-label="Dézoomer la carte" disabled><span aria-hidden="true">−</span></button>' +
       '<button type="button" class="btn-zoom" data-zoom="tout" aria-label="Revoir toute la carte" hidden><span aria-hidden="true">⤢</span></button></div>';
-    return '<div class="carte-geo"><svg viewBox="' + carte.vb + '" role="group" aria-label="Carte : ' + esc(carte.titre) + '">' + zones + '</svg>' + zoom + '</div>';
+    var nom = verte ? 'Carte : ' + carte.titre + ', une zone en vert' : 'Carte : ' + carte.titre;
+    return '<div class="carte-geo' + (verte ? ' carte-quiz' : '') + '"><svg viewBox="' + carte.vb + '" role="' + (verte ? 'img' : 'group') + '" aria-label="' + esc(nom) + '">' + zones + '</svg>' + zoom + '</div>';
   }
 
   // ---------- Zoom de la carte à toucher (v7.2) ----------
@@ -262,6 +268,17 @@
       if (bouge && !e.target.closest('.carte-zoom')) { e.stopPropagation(); e.preventDefault(); }
       if (!liste().length) bouge = false;
     }, true);
+    // Quiz (v8.0) : une petite zone verte serait invisible sur toute la carte ; on zoome d'abord autour d'elle
+    // (assez large pour voir les pays voisins). Le bouton ⤢ remontre toute la carte.
+    var verte = geo.classList.contains('carte-quiz') && svg.querySelector('.zone.bonne');
+    if (verte && verte.getBBox) {
+      var bb = verte.getBBox(), cote = Math.max(bb.width, bb.height * v0[2] / v0[3]) * 7;
+      var w = Math.min(v0[2], Math.max(v0[2] / 6, cote));
+      if (w < v0[2] * 0.9) {
+        v[2] = w; v[3] = w * v0[3] / v0[2];
+        v[0] = bb.x + bb.width / 2 - v[2] / 2; v[1] = bb.y + bb.height / 2 - v[3] / 2;
+      }
+    }
     appliquer();
   }
 
@@ -358,6 +375,7 @@
     if (c.format === 'V') t = c.question ? c.question + ' Réponse proposée : ' + c.affirmation + '. Vrai ou faux ?' : c.affirmation + ' Vrai ou faux ?';
     if (c.format === 'Q' && c.image !== 'drapeau') t += ' ' + c.options.join(', ') + '.';
     if (c.format === 'I') t = 'Qui suis-je ? ' + c.indices.slice(0, c.vus).join(' ');
+    if (c.format === 'Q' && c.indicesQuiz) t = 'Qui suis-je ? ' + c.indicesQuiz.join(' ') + ' ' + c.options.join(', ') + '.';
     return t;
   }
 

@@ -4,8 +4,8 @@
 // À chaque carte, le moteur tire un jeu parmi ceux choisis par le joueur, une série, puis un format :
 //   R relier (gauche ↔ droite)   Q choix multiples   O question ouverte   F remettre dans l'ordre
 //   V vrai ou faux   K classer en 2 colonnes   I qui suis-je ? (5 indices)   C toucher sur la carte
-// Règle commune des niveaux (choix de l'utilisateur) : Facile 3 réponses ou paires, Moyen 4, Difficile 5,
-// Expert 6 ; questions ouvertes à partir de Difficile.
+// v8.0 : deux modes, Quiz (4 choix) et Normal (tout sauf le QCM) ; toujours 4 choix, toujours 4 paires ;
+// questions ouvertes à partir de Difficile.
 // Utilisable dans la page (window.Savoirs) et dans les tests Node.
 (function (racine) {
   'use strict';
@@ -14,12 +14,16 @@
     { id: 'facile', nom: 'Facile' }, { id: 'moyen', nom: 'Moyen' },
     { id: 'difficile', nom: 'Difficile' }, { id: 'expert', nom: 'Expert' }
   ];
-  var TAILLE = { facile: 3, moyen: 4, difficile: 5, expert: 6 };          // paires, réponses proposées, éléments à ranger
+  // v8.0 (demande du 13/11/2026) : toujours 4 choix (une seule bonne réponse) et toujours 4 paires à relier.
+  var TAILLE = { facile: 4, moyen: 4, difficile: 4, expert: 4 };          // paires, réponses proposées, éléments à ranger
   var TAILLE_CLASSER = { facile: 4, moyen: 5, difficile: 6, expert: 8 };  // éléments à classer
-  // Formats d'une série de paires selon le niveau (question ouverte à partir de Difficile).
-  var FORMATS_PAIRES = { facile: ['R', 'Q'], moyen: ['R', 'Q'], difficile: ['R', 'Q', 'O'], expert: ['R', 'O'] };
+  // Deux modes (choix de l'utilisateur du 13/11/2026) : « quiz » = seulement des questions à 4 choix ;
+  // « normal » = tout sauf le QCM (relier, question ouverte, ordre, vrai ou faux, classer, qui suis-je ?, carte).
+  var MODES = [{ id: 'quiz', nom: 'Quiz' }, { id: 'normal', nom: 'Normal' }];
+  // Formats d'une série de paires en mode normal (question ouverte à partir de Difficile).
+  var FORMATS_PAIRES = { facile: ['R'], moyen: ['R'], difficile: ['R', 'O'], expert: ['R', 'O'] };
   var NOMS_FORMATS = {
-    R: 'Relier', Q: 'Choix multiples', O: 'Question ouverte', F: 'Remettre dans l’ordre',
+    R: 'Relier', Q: 'Quiz', O: 'Question ouverte', F: 'Remettre dans l’ordre',
     V: 'Vrai ou faux', K: 'Classer', I: 'Qui suis-je ?', C: 'Toucher sur la carte'
   };
 
@@ -59,58 +63,88 @@
   function remplir(modele, a, b) { return modele.replace(/\{a\}/g, affiche(a)).replace(/\{b\}/g, affiche(b)); }
 
   // ---------- Tirage d'une carte ----------
-  // reglage = { jeux: ['g04', …], niveau: 'facile' } ; matiere = 'geographie' ou 'histoire'.
+  // reglage = { jeux: ['g04', …], niveau: 'facile', mode: 'quiz' | 'normal' } ; matiere = 'geographie' ou 'histoire'.
   // Renvoie une carte (objet simple, sauvegardable en JSON) : { type: 'savoir', jeu, format, … }.
   function generer(reglage, matiere) {
-    var niveau = reglage.niveau || 'facile';
+    var niveau = reglage.niveau || 'facile', mode = modeDe(reglage);
     var choisis = (reglage.jeux || []).map(trouver).filter(function (j) { return j && (!matiere || j.matiere === matiere); });
     if (!choisis.length) choisis = jeuxDe(matiere || 'geographie');
-    for (var essai = 0; essai < 50; essai++) {
+    var tirages = mode === 'quiz' ? QUIZ : NORMAL;
+    for (var essai = 0; essai < 60; essai++) {
       var jeu = auHasard(choisis);
-      var series = jeu.series.filter(function (s) { return utilisable(s, niveau); });
+      var series = jeu.series.filter(function (s) { return utilisable(s, niveau, mode); });
       if (!series.length) continue;
       var s = auHasard(series);
-      var c = TIRAGES[s.k](s, niveau, jeu);
+      var c = tirages[s.k](s, niveau, jeu);
       if (!c) continue;
       c.type = 'savoir';
       c.jeu = jeu.id;
       c.matiere = jeu.matiere;
       c.niveau = niveau;
-      c.packNom = c.format === 'C' ? jeu.nom : jeu.nom + ' · ' + NOMS_FORMATS[c.format];
+      c.mode = mode;
+      c.packNom = jeu.nom + ' · ' + NOMS_FORMATS[c.format];
       return c;
     }
     return null;
   }
+  // Cartes de géographie (js/cartes-geo.js) : dans la page (window.CartesGeo) ou dans les tests Node.
+  function cartesGeo() {
+    if (racine && racine.CartesGeo) return racine.CartesGeo;
+    return typeof module !== 'undefined' && module.exports ? require('./cartes-geo.js') : null;
+  }
+  function modeDe(r) { return r && r.mode === 'quiz' ? 'quiz' : 'normal'; }
 
   function contenu(s, niveau) { return (s.niveaux && s.niveaux[niveau]) || []; }
-  function utilisable(s, niveau) {
-    var t = contenu(s, niveau);
-    if (s.k === 'carte') return !!(s.niveaux && s.niveaux[niveau]);
-    if (s.k === 'classer' || s.k === 'indices' || s.k === 'qcm' || s.k === 'vf') return t.length > 0;
-    return t.length >= 3;
+  // Une série peut-elle donner une carte à ce niveau, dans ce mode (normal par défaut) ?
+  function utilisable(s, niveau, mode) {
+    var t = contenu(s, niveau), quiz = mode === 'quiz';
+    if (s.k === 'carte') {
+      var CG = cartesGeo();
+      return !!CG && CG.zonesDu(s.carte, niveau).length >= (quiz ? 4 : 1);
+    }
+    if (s.k === 'paires') return pairesDistinctes(t, 4, true).length >= 4;
+    if (s.k === 'ordre') return t.length >= 4;
+    if (s.k === 'indices') return t.length > 0 && autresReponses(s, t[0]).length >= 3;
+    if (!quiz) return t.length > 0;
+    if (s.k === 'qcm') return t.some(function (x) { return x[2].length >= 3; });
+    if (s.k === 'vf') {
+      var v = t.filter(function (x) { return x[1]; }).length, f = t.length - v;
+      return (v >= 1 && f >= 3) || (v >= 3 && f >= 1);
+    }
+    if (s.k === 'classer') return t.some(function (g) { return classerQuiz(g, 0) || classerQuiz(g, 1); });
+    return false;
+  }
+  function classerQuiz(g, k) {
+    return g.items.some(function (x) { return x[1] === k; }) && g.items.filter(function (x) { return x[1] !== k; }).length >= 3;
+  }
+  function autresReponses(s, x) {
+    var tous = [];
+    Object.keys(s.niveaux).forEach(function (nv) { s.niveaux[nv].forEach(function (y) { if (y.r !== x.r) tous.push(y.r); }); });
+    return tous.filter(function (r, k) { return tous.indexOf(r) === k; });
   }
 
   // Paires sans doublon à gauche ni à droite (deux fleuves qui se jettent dans la même mer ne vont pas ensemble).
-  function pairesDistinctes(t, n) {
+  function pairesDistinctes(t, n, sansHasard) {
     var vuA = {}, vuB = {}, res = [];
-    melanger(t).forEach(function (p) {
+    (sansHasard ? t : melanger(t)).forEach(function (p) {
       var a = normaliser(affiche(p[0])), b = normaliser(affiche(p[1]));
       if (res.length < n && !vuA[a] && !vuB[b]) { vuA[a] = vuB[b] = true; res.push(p); }
     });
     return res;
   }
 
-  var TIRAGES = {
+  // Une paire tirée pour une question : dans un sens (q : on donne a, on cherche b) ou dans l'autre (qi).
+  function sens(s) { return !!s.qi && !s.image && hasard() < 0.5; }
+
+  // ---------- Mode normal : tout sauf le QCM ----------
+  var NORMAL = {
     // Série de paires : { k: 'paires', gauche, droite, q (demande b), qi (demande a, facultatif),
     //   ouverte: false pour ne jamais poser de question ouverte, image: 'drapeau' (a = code du pays) }
     paires: function (s, niveau) {
-      var t = contenu(s, niveau), n = TAILLE[niveau];
       var formats = FORMATS_PAIRES[niveau].filter(function (f) { return f !== 'O' || s.ouverte !== false; });
-      if (s.formats) formats = formats.filter(function (f) { return s.formats.indexOf(f) >= 0; });
-      if (!formats.length) formats = ['Q'];
       var format = auHasard(formats);
-      var choix = pairesDistinctes(t, format === 'R' ? n : Math.max(n, 3));
-      if (choix.length < 3) return null;
+      var choix = pairesDistinctes(contenu(s, niveau), 4);
+      if (choix.length < 4) return null;
       if (format === 'R') {
         return {
           format: 'R', consigne: s.consigneR || ('Relie chaque ' + s.gauche.toLowerCase() + ' à son ' + s.droite.toLowerCase() + '.'),
@@ -118,33 +152,17 @@
           bonnes: choix.map(function (p) { return affiche(p[1]); }), image: s.image || null, liens: choix.map(function () { return null; }), choisi: 0
         };
       }
-      // Choix multiples ou question ouverte : une paire, dans un sens ou dans l'autre.
-      var p = choix[0], inverse = !!s.qi && !s.image && hasard() < 0.4;
-      if (format === 'O') {
-        return {
-          format: 'O', consigne: remplir(inverse ? s.qi : s.q, p[0], p[1]), image: inverse ? null : s.image || null, sujet: inverse ? affiche(p[1]) : p[0],
-          attendu: inverse ? p[0] : p[1], bonne: affiche(inverse ? p[0] : p[1])
-        };
-      }
-      var autres = choix.slice(1, n).map(function (x) { return affiche(inverse ? x[0] : x[1]); });
-      var bonne = affiche(inverse ? p[0] : p[1]);
+      var p = choix[0], inverse = sens(s);
       return {
-        format: 'Q', consigne: remplir(inverse ? s.qi : s.q, p[0], p[1]), image: inverse ? null : s.image || null, sujet: inverse ? affiche(p[1]) : p[0],
-        options: melanger([bonne].concat(autres)), bonne: bonne
+        format: 'O', consigne: remplir(inverse ? s.qi : s.q, p[0], p[1]), image: inverse ? null : s.image || null, sujet: inverse ? affiche(p[1]) : p[0],
+        attendu: inverse ? p[0] : p[1], bonne: affiche(inverse ? p[0] : p[1])
       };
     },
-    // Série à ranger : { k: 'ordre', consigne, sens: 'plus ancien → plus récent', q: 'En quelle année … {a} ?',
-    //   niveaux: [[texte, valeur pour ranger, valeur affichée]] } → F (ranger) ou Q (« en quelle année ? »).
+    // Série à ranger : { k: 'ordre', consigne, sens: ['le plus ancien', 'le plus récent'], q: 'En quelle année … {a} ?',
+    //   niveaux: [[texte, valeur pour ranger, valeur affichée]] } → remettre 4 éléments dans l'ordre.
     ordre: function (s, niveau) {
-      var t = contenu(s, niveau), n = TAILLE[niveau];
-      var format = s.q && hasard() < 0.35 ? 'Q' : 'F';
-      // Pas deux éléments à la même place.
-      var vus = {}, items = melanger(t).filter(function (x) { if (vus[x[1]]) return false; vus[x[1]] = true; return true; }).slice(0, Math.max(3, n));
-      if (items.length < 3) return null;
-      if (format === 'Q') {
-        var p = items[0];
-        return { format: 'Q', consigne: remplir(s.q, p[0]), options: melanger(items.slice(0, n).map(function (x) { return String(x[2]); })), bonne: String(p[2]) };
-      }
+      var items = ordreItems(s, niveau);
+      if (items.length < 4) return null;
       var ordre = items.slice().sort(function (x, y) { return x[1] - y[1]; });
       return {
         format: 'F', consigne: s.consigne, sens: s.sens || ['le plus ancien', 'le plus récent'],
@@ -172,35 +190,93 @@
       var x = auHasard(contenu(s, niveau));
       return { format: 'V', consigne: 'Vrai ou faux ?', affirmation: x[0], bonne: x[1] ? 'Vrai' : 'Faux', explication: x[2] || '' };
     },
-    // Questions à choix : niveaux = [[question, bonne réponse, [fausses]]] ; donne aussi des vrai ou faux.
+    // Questions à choix : niveaux = [[question, bonne réponse, [fausses]]] ; en mode normal → vrai ou faux
+    // (« Quel est le plus grand océan ? » puis une réponse proposée, vraie ou fausse).
     qcm: function (s, niveau) {
-      var x = auHasard(contenu(s, niveau)), n = TAILLE[niveau];
-      if (s.vf !== false && hasard() < 0.3) {
-        var vrai = hasard() < 0.5, montre = vrai ? x[1] : auHasard(x[2]);
-        // « Quel est le plus grand océan ? » puis la réponse proposée, vraie ou fausse.
-        return {
-          format: 'V', consigne: 'Vrai ou faux ?', question: x[0], affirmation: affiche(montre),
-          bonne: vrai ? 'Vrai' : 'Faux', explication: vrai ? '' : 'La bonne réponse : ' + affiche(x[1]) + '.'
-        };
-      }
-      var fausses = melanger(x[2]).slice(0, n - 1).map(affiche);
-      return { format: 'Q', consigne: x[0], options: melanger([affiche(x[1])].concat(fausses)), bonne: affiche(x[1]) };
+      var x = auHasard(contenu(s, niveau));
+      var vrai = hasard() < 0.5, montre = vrai ? x[1] : auHasard(x[2]);
+      return {
+        format: 'V', consigne: 'Vrai ou faux ?', question: x[0], affirmation: affiche(montre),
+        bonne: vrai ? 'Vrai' : 'Faux', explication: vrai ? '' : 'La bonne réponse : ' + affiche(x[1]) + '.'
+      };
     },
     // Qui suis-je ? : niveaux = [{ r: réponse, i: [5 indices] }] ; 3 autres réponses de la même série pour choisir.
     indices: function (s, niveau) {
-      var t = contenu(s, niveau), x = auHasard(t);
-      var tous = [];
-      Object.keys(s.niveaux).forEach(function (nv) { s.niveaux[nv].forEach(function (y) { if (y.r !== x.r) tous.push(y.r); }); });
-      var autres = melanger(tous.filter(function (r, k) { return tous.indexOf(r) === k; })).slice(0, 3);
+      var x = auHasard(contenu(s, niveau)), autres = melanger(autresReponses(s, x)).slice(0, 3);
       return { format: 'I', consigne: s.consigne || 'Qui suis-je ?', indices: x.i.slice(0, 5), vus: 1, options: melanger([x.r].concat(autres)), bonne: x.r };
     },
-    // Toucher sur la carte : la carte et les zones viennent de js/cartes-geo.js (window.CartesGeo).
+    // Toucher sur la carte : { k: 'carte', carte: 'france' | 'europe' | 'monde' } (js/cartes-geo.js).
     carte: function (s, niveau) {
-      var CG = racine.CartesGeo;
-      if (!CG) return null;
-      var d = CG.tirer(s.niveaux[niveau], hasard);
-      if (!d) return null;
-      return { format: 'C', consigne: d.consigne, carte: d.carte, zones: d.zones, bonne: d.bonne, bonneNom: d.bonneNom, touche: null };
+      var CG = cartesGeo(); return CG ? CG.tirer(s.carte, niveau, hasard, 'normal') : null;
+    }
+  };
+
+  function ordreItems(s, niveau) {
+    var vus = {};
+    return melanger(contenu(s, niveau)).filter(function (x) { if (vus[x[1]]) return false; vus[x[1]] = true; return true; }).slice(0, 4);
+  }
+  function quiz(consigne, bonne, fausses, extra) {
+    var c = { format: 'Q', consigne: consigne, options: melanger([bonne].concat(fausses.slice(0, 3))), bonne: bonne };
+    Object.keys(extra || {}).forEach(function (k) { c[k] = extra[k]; });
+    return c;
+  }
+
+  // ---------- Mode quiz : toujours une question à 4 choix, une seule bonne réponse ----------
+  var QUIZ = {
+    paires: function (s, niveau) {
+      var choix = pairesDistinctes(contenu(s, niveau), 4);
+      if (choix.length < 4) return null;
+      var p = choix[0], inverse = sens(s);
+      var bonne = affiche(inverse ? p[0] : p[1]);
+      var fausses = choix.slice(1).map(function (x) { return affiche(inverse ? x[0] : x[1]); });
+      return quiz(remplir(inverse ? s.qi : s.q, p[0], p[1]), bonne, fausses,
+        { image: inverse ? null : s.image || null, sujet: inverse ? affiche(p[1]) : p[0] });
+    },
+    // « En quelle année … ? » (si la série le permet), sinon « Lequel est le plus ancien / le plus haut ? ».
+    ordre: function (s, niveau) {
+      var items = ordreItems(s, niveau);
+      if (items.length < 4) return null;
+      if (s.q && hasard() < 0.5) {
+        return quiz(remplir(s.q, items[0][0]), String(items[0][2]), items.slice(1).map(function (x) { return String(x[2]); }));
+      }
+      var bout = hasard() < 0.5 ? 0 : 1, sensT = s.sens || ['le plus ancien', 'le plus récent'];
+      var tri = items.slice().sort(function (x, y) { return x[1] - y[1]; });
+      var bon = bout ? tri[tri.length - 1] : tri[0];
+      return quiz('Lequel est ' + sensT[bout] + ' ?', bon[0], items.filter(function (x) { return x !== bon; }).map(function (x) { return x[0]; }));
+    },
+    // Classer → « Lequel va avec : … ? » (1 de la colonne, 3 de l'autre).
+    classer: function (s, niveau) {
+      var groupes = [];
+      contenu(s, niveau).forEach(function (g) { [0, 1].forEach(function (k) { if (classerQuiz(g, k)) groupes.push([g, k]); }); });
+      if (!groupes.length) return null;
+      var gk = auHasard(groupes), g = gk[0], k = gk[1];
+      var bon = auHasard(g.items.filter(function (x) { return x[1] === k; }));
+      var fausses = melanger(g.items.filter(function (x) { return x[1] !== k; })).map(function (x) { return x[0]; });
+      return quiz('Lequel va avec : « ' + g.colonnes[k] + ' » ?', bon[0], fausses, { question: g.q.replace(/^Range[^:]*:\s*/, '') });
+    },
+    // Vrai ou faux → « Laquelle de ces phrases est vraie (ou fausse) ? ».
+    vf: function (s, niveau) {
+      var t = contenu(s, niveau), v = melanger(t.filter(function (x) { return x[1]; })), f = melanger(t.filter(function (x) { return !x[1]; }));
+      var chercheVraie = v.length >= 1 && f.length >= 3 && (v.length < 3 || f.length < 1 || hasard() < 0.6);
+      if (chercheVraie) return quiz('Laquelle de ces phrases est vraie ?', v[0][0], f.map(function (x) { return x[0]; }), { longues: true });
+      if (v.length >= 3 && f.length >= 1) return quiz('Laquelle de ces phrases est fausse ?', f[0][0], v.map(function (x) { return x[0]; }), { longues: true });
+      return null;
+    },
+    qcm: function (s, niveau) {
+      var t = contenu(s, niveau).filter(function (x) { return x[2].length >= 3; });
+      if (!t.length) return null;
+      var x = auHasard(t);
+      return quiz(x[0], affiche(x[1]), melanger(x[2]).map(affiche));
+    },
+    // Qui suis-je ? → 3 indices d'un coup, 4 réponses au choix.
+    indices: function (s, niveau) {
+      var x = auHasard(contenu(s, niveau)), autres = melanger(autresReponses(s, x));
+      if (autres.length < 3) return null;
+      return quiz(s.consigne || 'Qui suis-je ?', x.r, autres, { indicesQuiz: x.i.slice(0, 3) });
+    },
+    // Carte : la zone est en vert, 4 noms au choix (choix de l'utilisateur du 13/11/2026).
+    carte: function (s, niveau) {
+      var CG = cartesGeo(); return CG ? CG.tirer(s.carte, niveau, hasard, 'quiz') : null;
     }
   };
 
@@ -219,7 +295,7 @@
   function pointsIndices(c) { return c.reponseDonnee === c.bonne ? 7 - c.vus : 1; }
 
   var api = {
-    NIVEAUX: NIVEAUX, TAILLE: TAILLE, NOMS_FORMATS: NOMS_FORMATS, JEUX: JEUX, PERIODES: PERIODES,
+    NIVEAUX: NIVEAUX, MODES: MODES, TAILLE: TAILLE, modeDe: modeDe, NOMS_FORMATS: NOMS_FORMATS, JEUX: JEUX, PERIODES: PERIODES,
     ajouter: ajouter, trouver: trouver, jeuxDe: jeuxDe, generer: generer, juste: juste, pointsIndices: pointsIndices,
     normaliser: normaliser, ouverteJuste: ouverteJuste, affiche: affiche, utilisable: utilisable,
     regler: function (f) { hasard = f || Math.random; }

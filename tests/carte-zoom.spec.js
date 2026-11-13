@@ -4,8 +4,10 @@ const { rapide, versReglages, valider, ouvrirNeuf, lancer } = require('./aide');
 test('carte à toucher zoomée (v7.2) : un vrai toucher (doigt ou souris) choisit bien la zone visée', async ({ page }, info) => {
   await rapide(page); await ouvrirNeuf(page); await versReglages(page, 1);
   await page.locator('#matieres input[value="geographie"]').check();
+  await page.locator('#mode-savoir input[value="normal"]').check();
+  await page.locator('#niveau-savoir input[value="moyen"]').check();
   await valider(page); await page.locator('#savoir-jeux').waitFor();
-  await page.locator('#savoir-liste input[value="g10"]').check();
+  await page.locator('#savoir-liste input[value="g18"]').check();
   await lancer(page);
   await page.getByRole('heading', { name: 'Le plateau' }).waitFor();
   await page.evaluate(() => window.Savoirs.regler(() => 0.3));

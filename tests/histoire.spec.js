@@ -30,6 +30,21 @@ test.describe('contenu d\'histoire', () => {
     }
   });
 
+  test('v8.0 : en mode Quiz, chaque jeu proposé ne pose que des questions à 4 choix, une seule bonne', () => {
+    for (const j of S.jeuxDe('histoire')) {
+      if (!NIVEAUX.every((n) => j.series.some((s) => S.utilisable(s, n, 'quiz')))) continue; // pas encore proposé en Quiz
+      for (const n of NIVEAUX) {
+        for (let k = 0; k < 60; k++) {
+          const c = S.generer({ jeux: [j.id], niveau: n, mode: 'quiz' }, 'histoire');
+          expect(c.format, j.id).toBe('Q');
+          expect(c.options).toHaveLength(4);
+          expect(new Set(c.options).size).toBe(4);
+          expect(c.options).toContain(c.bonne);
+        }
+      }
+    }
+  });
+
   test('chaque niveau n\'a que son propre contenu (demande de l\'utilisateur)', () => {
     for (const j of S.jeuxDe('histoire')) {
       for (const s of j.series) {
@@ -110,12 +125,13 @@ test.describe('contenu d\'histoire', () => {
 });
 
 // Va jusqu'au plateau avec 1 joueur en Histoire : niveau et jeux donnés.
-async function versHistoire(page, { niveau = 'facile', jeux = ['a01'], hasard = null } = {}) {
+async function versHistoire(page, { niveau = 'facile', jeux = ['a01'], hasard = null, mode = 'normal' } = {}) {
   await rapide(page);
   await ouvrirNeuf(page);
   await versReglages(page, 1);
   await page.locator('#matieres input[value="histoire"]').check();
   await page.locator('#niveau-savoir input[value="' + niveau + '"]').check();
+  await page.locator('#mode-savoir input[value="' + mode + '"]').check();
   await valider(page);
   await page.locator('#savoir-jeux').waitFor();
   for (const j of jeux) await page.locator('#savoir-liste input[value="' + j + '"]').check();
@@ -140,6 +156,7 @@ test('écran des réglages : la matière Histoire, son niveau, ses jeux rangés 
   await page.locator('#matieres label', { hasText: 'Histoire' }).click();
   await expect(page.locator('#reglage-niveau-savoir')).toBeVisible();
   await page.locator('#niveau-savoir label', { hasText: 'Moyen' }).click();
+  await page.locator('#mode-savoir label', { hasText: 'Normal' }).click();
   await valider(page);
   await expect(page.locator('#reglages-titre')).toContainText('Histoire, les jeux');
   // Préhistoire (v7.6), Antiquité, Moyen Âge (v7.7), Renaissance (v7.8), Temps modernes (v7.9), Révolution et XIXe (v7.10), XXe (v7.11), dans l'ordre ; les familles de Géographie sont cachées.
@@ -213,7 +230,7 @@ test('remettre dans l\'ordre : la frise de Rome', async ({ page }) => {
 });
 
 test('question ouverte : chiffres romains écrits en minuscules → juste', async ({ page }) => {
-  await versHistoire(page, { niveau: 'expert', jeux: ['a10'], hasard: 0 });
+  await versHistoire(page, { niveau: 'expert', jeux: ['a10'], hasard: 0.99 });
   const c = await piocher(page);
   expect(c.format).toBe('O');
   await page.getByLabel('Ta réponse').fill(c.bonne.toLowerCase());
