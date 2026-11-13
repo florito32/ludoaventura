@@ -27,8 +27,10 @@
   };
 
   var JEUX = [
-    // ---------- Préhistoire (v7.6, BACKLOG ligne 295 : 5 jeux, hypothèse à valider) ----------
-    { id: 'p01', matiere: 'histoire', famille: 'pre', nom: 'Nos ancêtres', court: 'Ancêtres', icone: '🧬', series: [
+    // ---------- Préhistoire (v7.6 ; v8.3 : 2 jeux regroupés, choix de l'utilisateur du 13/11/2026, BACKLOG ligne 326) ----------
+    // Nos ancêtres et les périodes = anciens jeux « Nos ancêtres » + « Paléolithique ou Néolithique ? » ;
+    // Art, outils et mégalithes = anciens « Grottes ornées » + « Outils et inventions » + « Mégalithes ». Dates « environ », les plus admises.
+    { id: 'p01', matiere: 'histoire', famille: 'pre', nom: 'Nos ancêtres et les périodes', court: 'Ancêtres', icone: '🧬', series: [
       { k: 'ordre', consigne: 'Range nos ancêtres du plus ancien au plus récent.', niveaux: {
         facile: [['Lucy, l’australopithèque', -3200000, 'il y a environ 3,2 millions d’années'],
           ['L’homme de Néandertal', -100000, 'il y a environ 100 000 ans'], ['Nous, Homo sapiens, aujourd’hui', 0, 'aujourd’hui']],
@@ -43,9 +45,9 @@
       } },
       { k: 'paires', gauche: 'Ancêtre', droite: 'Où on l’a trouvé', consigneR: 'Relie chaque ancêtre au pays où on l’a trouvé.',
         q: 'Dans quel pays a-t-on trouvé {a} ?', ouverte: false, niveaux: {
-          facile: [['Lucy', 'En Éthiopie'], ['L’homme de Tautavel', 'En France'], ['Ötzi, l’homme des glaces', 'Dans les Alpes, en Italie']],
-          moyen: [['Toumaï', 'Au Tchad'], ['L’homme de Néandertal, en 1856', 'En Allemagne'], ['Le premier Cro-Magnon', 'En France, en Dordogne'], ['Les plus vieux Homo sapiens', 'Au Maroc']],
-          difficile: [['L’homme de Kabwe', 'En Zambie'], ['L’homme de Pékin', 'En Chine'], ['L’homme de Flores', 'Sur l’île de Flores, en Indonésie'],
+          facile: [['Toumaï', 'Au Tchad'], ['Lucy', 'En Éthiopie'], ['L’homme de Tautavel', 'En France'], ['Ötzi, l’homme des glaces', 'Dans les Alpes, en Italie']],
+          moyen: [['L’homme de Pékin', 'En Chine'], ['L’homme de Néandertal, en 1856', 'En Allemagne'], ['Le premier Cro-Magnon', 'En France, en Dordogne'], ['Les plus vieux Homo sapiens', 'Au Maroc']],
+          difficile: [['L’homme de Kabwe', 'En Zambie'], ['L’homme de Flores', 'Sur l’île de Flores, en Indonésie'],
             ['L’enfant de Taung', 'En Afrique du Sud'], ['Turkana Boy', 'Au Kenya']],
           expert: [['Homo naledi', 'En Afrique du Sud, grotte Rising Star'], ['L’homme de Denisova', 'En Russie, dans l’Altaï'], ['Orrorin', 'Au Kenya, collines de Tugen'],
             ['La Ferrassie 1, un Néandertal', 'En Dordogne'], ['Le crâne de Petralona', 'En Grèce'], ['Le crâne de Steinheim', 'En Allemagne, près de Stuttgart']]
@@ -56,9 +58,7 @@
         moyen: [{ r: 'L’homme de Tautavel', i: ['J’ai vécu il y a environ 450 000 ans.', 'Je chassais le cheval, le renne et le bison.', 'J’habitais une grotte : la Caune de l’Arago.', 'Je vivais dans les Pyrénées-Orientales.', 'Je suis l’un des plus anciens habitants connus de France.'] }],
         difficile: [{ r: 'L’homme de Néandertal', i: ['J’ai vécu en Europe et en Asie.', 'J’étais trapu et j’avais un gros nez.', 'J’enterrais parfois mes morts.', 'J’ai disparu il y a environ 40 000 ans.', 'On m’a nommé d’après une vallée d’Allemagne.'] }],
         expert: [{ r: 'Toumaï', i: ['Je suis l’un des plus anciens ancêtres connus.', 'J’ai environ 7 millions d’années.', 'Une équipe franco-tchadienne m’a trouvé en 2001.', 'Mon nom veut dire « espoir de vie » en langue goran.', 'On a trouvé mon crâne au Tchad.'] }]
-      } }
-    ] },
-    { id: 'p02', matiere: 'histoire', famille: 'pre', nom: 'Paléolithique ou Néolithique ?', court: 'Paléo, Néo', icone: '🌾', series: [
+      } },
       { k: 'classer', niveaux: {
         facile: [{ q: 'Range : Paléolithique (pierre taillée) ou Néolithique (pierre polie) ?', colonnes: ['Paléolithique', 'Néolithique'],
           items: [['Chasser le mammouth', 0], ['Cueillir des fruits sauvages', 0], ['Peindre dans les grottes', 0], ['Changer souvent de camp', 0],
@@ -88,14 +88,94 @@
           ['Le chat a été le premier animal domestiqué.', false, 'C’est le chien, apprivoisé dès le Paléolithique.']],
         expert: [['L’invention de l’écriture marque la fin de la préhistoire.', true, 'Vers 3300 av. J.-C., en Mésopotamie.'],
           ['Le Néolithique commence partout dans le monde à la même date.', false, 'Il commence au Proche-Orient bien avant l’Europe de l’Ouest.']]
+      } },
+      { k: 'qcm', niveaux: {
+        facile: [
+          ["Comment appelle-t-on la très longue période avant l’invention de l’écriture ?", "La Préhistoire", ["L’Antiquité", "Le Moyen Âge", "Les Temps modernes"]],
+          ["Sur quel continent sont apparus les premiers humains ?", "L’Afrique", ["L’Europe", "L’Asie", "L’Amérique"]],
+          ["Quel grand animal à longs poils et à grandes défenses vivait pendant la préhistoire ?", "Le mammouth", ["L’éléphant d’Afrique", "Le tyrannosaure", "Le rhinocéros blanc"]],
+          ["Comment s’appelle l’ancêtre célèbre retrouvé en Éthiopie en 1974 ?", "Lucy", ["Toumaï", "Ötzi", "Cro-Magnon"]],
+          ["Au Paléolithique, les hommes se nourrissent en chassant, en pêchant et en…", "cueillant des plantes sauvages", ["cultivant du blé", "élevant des vaches", "achetant au marché"]],
+          ["Que veut dire « Paléolithique » ?", "L’âge de la pierre ancienne", ["L’âge de la pierre nouvelle", "L’âge du bronze", "L’âge du fer"]],
+          ["Au Néolithique, les hommes commencent à…", "cultiver la terre", ["chasser le gibier", "tailler la pierre", "faire du feu"]],
+          ["Quel animal a été apprivoisé en premier par les hommes ?", "Le chien", ["Le chat", "Le cheval", "La poule"]],
+          ["Qu’est-ce qu’un peuple nomade ?", "Un peuple qui se déplace souvent", ["Un peuple qui reste au même endroit", "Un peuple qui vit sur l’eau", "Un peuple qui vit dans un château"]],
+          ["Qu’est-ce qu’un peuple sédentaire ?", "Un peuple qui reste au même endroit", ["Un peuple qui se déplace souvent", "Un peuple qui vit dans les arbres", "Un peuple de marins"]],
+          ["Comment appelle-t-on la personne qui fouille le sol pour retrouver des traces du passé ?", "Un archéologue", ["Un astronome", "Un architecte", "Un météorologue"]],
+          ["Comment appelle-t-on les très longues périodes de grand froid de la préhistoire ?", "Les glaciations", ["Les canicules", "Les moussons", "Les éclipses"]],
+          ["Quelle invention marque la fin de la préhistoire ?", "L’écriture", ["La roue", "Le feu", "L’agriculture"]],
+          ["À quelle espèce humaine appartenons-nous ?", "Homo sapiens", ["Homo erectus", "Homo habilis", "Les australopithèques"]],
+          ["Que permet la maîtrise du feu ?", "Cuire les aliments et se chauffer", ["Écrire des livres", "Fabriquer du plastique", "Cultiver le blé"]]],
+        moyen: [
+          ["Que veut dire « Homo sapiens » ?", "L’homme sage", ["L’homme debout", "L’homme habile", "L’homme ancien"]],
+          ["Que veut dire « Homo erectus » ?", "L’homme debout", ["L’homme sage", "L’homme habile", "L’homme du Sud"]],
+          ["Que veut dire « Homo habilis » ?", "L’homme habile", ["L’homme debout", "L’homme sage", "L’homme des glaces"]],
+          ["Dans quelle région du monde l’agriculture est-elle née, il y a environ 11 000 ans ?", "Au Proche-Orient (le Croissant fertile)", ["En Gaule", "En Amazonie", "En Sibérie"]],
+          ["Quelles céréales a-t-on d’abord cultivées au Proche-Orient ?", "Le blé et l’orge", ["Le maïs et la pomme de terre", "Le riz et le millet", "Le cacao et le café"]],
+          ["Quelle céréale a-t-on d’abord cultivée en Chine ?", "Le riz", ["Le blé", "Le maïs", "La pomme de terre"]],
+          ["Quelle plante a-t-on d’abord cultivée en Amérique ?", "Le maïs", ["Le blé", "Le riz", "L’orge"]],
+          ["Quels animaux élevait-on au Néolithique ?", "Des moutons, des chèvres, des bœufs et des porcs", ["Des lions et des tigres", "Des chevaux de course", "Des perroquets"]],
+          ["Qu’est-ce qu’un fossile ?", "Un reste d’être vivant conservé dans la roche", ["Un outil en pierre", "Une peinture de grotte", "Une pierre précieuse"]],
+          ["Avec quelle méthode les savants datent-ils souvent les os et le charbon de bois ?", "Le carbone 14", ["La règle graduée", "La balance", "Le thermomètre"]],
+          ["De quel animal sauvage descend le chien ?", "Du loup", ["Du renard", "Du chacal du désert", "De l’ours"]],
+          ["Pourquoi les chasseurs du Paléolithique se déplaçaient-ils souvent ?", "Pour suivre les troupeaux d’animaux", ["Pour fuir les dinosaures", "Pour vendre leur blé", "Pour visiter des villes"]],
+          ["Comment appelle-t-on les Homo sapiens qui vivaient en Europe à la fin du Paléolithique ?", "Les hommes de Cro-Magnon", ["Les Néandertaliens", "Les hommes de Tautavel", "Les australopithèques"]],
+          ["Quel métal a donné son nom à la période qui suit le Néolithique ?", "Le bronze", ["L’or", "L’argent", "L’aluminium"]]],
+        difficile: [
+          ["Quels humains ont vécu en même temps en Europe il y a 45 000 ans ?", "Les Néandertaliens et les Homo sapiens", ["Lucy et Toumaï", "Homo habilis et Ötzi", "Toumaï et Cro-Magnon"]],
+          ["Que veut dire « australopithèque » ?", "Singe du Sud", ["Homme debout", "Homme sage", "Homme habile"]],
+          ["Où se trouve la Caune de l’Arago, grotte de l’homme de Tautavel ?", "Dans les Pyrénées-Orientales", ["En Dordogne", "En Ardèche", "En Bretagne"]],
+          ["Quelle vallée de Dordogne est très riche en sites préhistoriques ?", "La vallée de la Vézère", ["La vallée de la Loire", "La vallée du Rhône", "La vallée de la Seine"]],
+          ["Quel village de Dordogne est surnommé « la capitale mondiale de la préhistoire » ?", "Les Eyzies", ["Sarlat", "Montignac", "Brantôme"]],
+          ["Dans quel pays se trouve le grand village néolithique de Çatal Höyük ?", "En Turquie", ["En Égypte", "En Grèce", "En Irak"]],
+          ["Combien de temps environ a duré le Paléolithique ?", "Plus de 3 millions d’années", ["Environ 1 000 ans", "Environ 10 000 ans", "Environ 100 ans"]],
+          ["Vers quand le Néolithique commence-t-il dans le sud de la France ?", "Vers 6000 av. J.-C.", ["Vers 500 av. J.-C.", "Vers 50 000 av. J.-C.", "Vers l’an 1000"]],
+          ["Vers quand l’écriture apparaît-elle en Mésopotamie ?", "Vers 3300 av. J.-C.", ["Vers 33 000 av. J.-C.", "Vers 300 apr. J.-C.", "Vers 1300 apr. J.-C."]],
+          ["Quel ancêtre a été le premier à quitter l’Afrique ?", "Homo erectus", ["Lucy", "Toumaï", "Homo sapiens"]]],
+        expert: [
+          ["Quelle espèce humaine a été découverte grâce à un os de doigt, dans une grotte de Sibérie ?", "L’homme de Denisova", ["Homo naledi", "L’homme de Flores", "Homo antecessor"]],
+          ["Quelle petite espèce humaine, surnommée « le hobbit », vivait sur une île d’Indonésie ?", "Homo floresiensis", ["Homo naledi", "Homo antecessor", "Homo ergaster"]],
+          ["Quel site d’Espagne a livré les fossiles d’Homo antecessor ?", "Atapuerca", ["Altamira", "Tautavel", "Olduvai"]],
+          ["Dans quelles gorges de Tanzanie a-t-on trouvé beaucoup de fossiles d’Homo habilis ?", "Les gorges d’Olduvai", ["La vallée de la Vézère", "Le désert du Djourab", "Les gorges du Verdon"]],
+          ["Quelle culture du Paléolithique porte le nom de l’abri de la Madeleine, en Dordogne ?", "Le Magdalénien", ["L’Aurignacien", "Le Solutréen", "Le Moustérien"]],
+          ["D’où vient le nom de l’Aurignacien ?", "D’Aurignac, en Haute-Garonne", ["D’Aurillac, dans le Cantal", "D’Orange, dans le Vaucluse", "D’Aurignac, en Belgique"]],
+          ["D’où vient le nom du Solutréen ?", "De la roche de Solutré, en Saône-et-Loire", ["De Soleure, en Suisse", "De Salers, dans le Cantal", "De Saumur, en Maine-et-Loire"]],
+          ["D’où vient le nom du Moustérien, la culture de Néandertal ?", "Du site du Moustier, en Dordogne", ["De Moustiers, en Provence", "De Montier, en Champagne", "Du mont Moustier, dans les Alpes"]],
+          ["Quelle culture des premiers agriculteurs d’Europe centrale décorait ses poteries de rubans ?", "Le Rubané", ["Le Cardial", "Le Chasséen", "Le Campaniforme"]],
+          ["D’où vient le nom de la culture du Cardial, au bord de la Méditerranée ?", "D’un coquillage, la coque, utilisé pour décorer les poteries", ["D’une montagne", "D’un roi", "D’une plante"]],
+          ["Quel site de Turquie est considéré comme l’un des plus anciens sanctuaires monumentaux connus ?", "Göbekli Tepe", ["Çatal Höyük", "Stonehenge", "Karnak"]],
+          ["Comment appelle-t-on le passage de la chasse-cueillette à l’agriculture et à l’élevage ?", "La révolution néolithique", ["La révolution industrielle", "La guerre de Troie", "L’âge d’or"]]]
+      } },
+      { k: 'vf', niveaux: {
+        facile: [
+          ["Lucy était une australopithèque.", true, ""],
+          ["Les premiers humains sont apparus en Amérique.", false, "Les premiers humains sont apparus en Afrique."],
+          ["Le mammouth avait une épaisse fourrure contre le froid.", true, ""],
+          ["Au Néolithique, les hommes élèvent des animaux.", true, ""],
+          ["L’écriture a été inventée au début de la préhistoire.", false, "Son invention marque la fin de la préhistoire."]],
+        moyen: [
+          ["Homo sapiens est apparu en Afrique.", true, ""],
+          ["Les hommes de Cro-Magnon étaient des Homo sapiens, comme nous.", true, ""],
+          ["Le chien descend du loup.", true, ""],
+          ["L’agriculture est arrivée en France avant le Proche-Orient.", false, "Elle est née au Proche-Orient, puis s’est répandue jusqu’en France."]],
+        difficile: [
+          ["L’homme de Tautavel est plus ancien que Lucy.", false, "Lucy a environ 3,2 millions d’années, l’homme de Tautavel environ 450 000 ans."],
+          ["Les Néandertaliens enterraient parfois leurs morts.", true, ""],
+          ["Les Homo sapiens d’aujourd’hui (hors d’Afrique) portent un peu de gènes de Néandertal.", true, "Les deux espèces se sont rencontrées et ont eu des enfants."],
+          ["Les mammouths ont disparu avant l’apparition des premiers hommes.", false, "Les hommes ont chassé les mammouths pendant des dizaines de milliers d’années."]],
+        expert: [
+          ["Homo naledi a été découvert en Afrique du Sud.", true, ""],
+          ["L’homme de Flores mesurait environ 2 mètres.", false, "Il mesurait environ 1 mètre."],
+          ["Le chien a été domestiqué avant l’invention de l’agriculture.", true, ""],
+          ["Le Solutréen est célèbre pour ses très fines pointes de silex en « feuille de laurier ».", true, ""]]
       } }
     ] },
-    { id: 'p03', matiere: 'histoire', famille: 'pre', nom: 'Grottes ornées', court: 'Grottes', icone: '🎨', series: [
+    { id: 'p03', matiere: 'histoire', famille: 'pre', nom: 'Art, outils et mégalithes', court: 'Art, outils', icone: '🎨', series: [
       { k: 'paires', gauche: 'Grotte', droite: 'Où elle se trouve', consigneR: 'Relie chaque grotte ornée à l’endroit où elle se trouve.',
         q: 'Où se trouve la grotte {a} ?', qi: 'Quelle grotte ornée se trouve {b} ?', ouverte: false, niveaux: {
-          facile: [['de Lascaux', 'En Dordogne'], ['Chauvet', 'En Ardèche'], ['Cosquer', 'Près de Marseille, sous la mer']],
-          moyen: [['de Niaux', 'En Ariège'], ['de Pech-Merle', 'Dans le Lot'], ['d’Altamira', 'En Espagne'], ['de Gargas', 'Dans les Hautes-Pyrénées']],
-          difficile: [['de Rouffignac', 'En Dordogne, la grotte aux cent mammouths'], ['de Font-de-Gaume', 'Aux Eyzies, en Dordogne'], ['d’Arcy-sur-Cure', 'Dans l’Yonne'],
+          facile: [['de Niaux', 'En Ariège'], ['de Lascaux', 'En Dordogne'], ['Chauvet', 'En Ardèche'], ['Cosquer', 'Près de Marseille, sous la mer']],
+          moyen: [['de Rouffignac', 'En Dordogne, la grotte aux cent mammouths'], ['de Pech-Merle', 'Dans le Lot'], ['d’Altamira', 'En Espagne'], ['de Gargas', 'Dans les Hautes-Pyrénées']],
+          difficile: [['de Font-de-Gaume', 'Aux Eyzies, en Dordogne'], ['d’Arcy-sur-Cure', 'Dans l’Yonne'],
             ['de Cussac', 'En Dordogne, avec des tombes'], ['du Mas-d’Azil', 'En Ariège, une rivière la traverse']],
           expert: [['des Combarelles', 'Aux Eyzies, pleine de gravures'], ['de Lascaux IV', 'À Montignac : la copie qui se visite'], ['de Chauvet 2', 'À Vallon-Pont-d’Arc : la copie qui se visite'],
             ['d’Ekain', 'Au Pays basque espagnol'], ['de Foz Côa', 'Au Portugal, gravures en plein air'], ['de Coliboaia', 'En Roumanie']]
@@ -120,9 +200,7 @@
         moyen: [{ r: 'Cosquer', i: ['Je suis une grotte ornée.', 'J’ai été découverte par un plongeur.', 'La mer a monté depuis la préhistoire.', 'On y voit des mains et des pingouins.', 'Mon entrée est sous la mer, près de Marseille.'] }],
         difficile: [{ r: 'Altamira', i: ['Je suis une grotte ornée.', 'J’ai été découverte au XIXe siècle.', 'Une petite fille a vu mes peintures la première.', 'Mon plafond est couvert de bisons rouges et noirs.', 'Je suis en Espagne, en Cantabrie.'] }],
         expert: [{ r: 'Rouffignac', i: ['Je suis une grotte ornée.', 'Je suis très longue : on m’explore en petit train.', 'Des ours ont creusé des nids dans mon sol.', 'On m’appelle la grotte aux cent mammouths.', 'Je suis en Dordogne, dans le Périgord noir.'] }]
-      } }
-    ] },
-    { id: 'p04', matiere: 'histoire', famille: 'pre', nom: 'Outils et inventions', court: 'Outils', icone: '🪓', series: [
+      } },
       { k: 'paires', gauche: 'Outil', droite: 'À quoi il sert', consigneR: 'Relie chaque outil à ce qu’il permet de faire.',
         q: 'À quoi sert {a} ?', qi: 'Quel outil sert à : {b} ?', niveaux: {
           facile: [['Le biface', 'Couper et racler'], ['L’aiguille en os', 'Coudre des vêtements'], ['Le harpon', 'Pêcher des poissons'], ['La lampe à graisse', 'S’éclairer dans la grotte']],
@@ -133,30 +211,28 @@
             ['L’hameçon en os', 'Pêcher à la ligne'], ['L’herminette', 'Creuser le bois'], ['Le polissoir', 'Polir les haches']]
         } },
       { k: 'qcm', niveaux: {
-        facile: [['Quelle pierre les hommes préhistoriques taillaient-ils le plus ?', 'Le silex', ['Le marbre', 'Le diamant']],
-          ['Quelle grande découverte permet de cuire, se chauffer et se protéger ?', 'Le feu', ['La roue', 'L’électricité']]],
+        facile: [['Quelle pierre les hommes préhistoriques taillaient-ils le plus ?', 'Le silex', ['Le marbre', 'Le diamant', 'Le granit']],
+          ['Quelle grande découverte permet de cuire, se chauffer et se protéger ?', 'Le feu', ['La roue', 'L’électricité', 'La poudre']]],
         moyen: [['Comment faisait-on du feu ?', 'En frappant un silex contre une pierre de pyrite', ['Avec des allumettes', 'En frottant deux silex dans l’eau', 'Avec une loupe en verre']],
           ['En quoi étaient faits les premiers pots ?', 'En argile cuite', ['En fer', 'En verre', 'En plastique']]],
         difficile: [['Quel métal les hommes ont-ils travaillé en premier, avant le bronze ?', 'Le cuivre', ['Le fer', 'L’acier', 'L’aluminium', 'Le zinc']],
           ['Le bronze est un mélange de cuivre et de…', 'D’étain', ['De fer', 'D’or', 'De plomb', 'D’argent']]],
         expert: [['Quel ancêtre aurait fabriqué les premiers bifaces ?', 'Homo erectus', ['Lucy', 'Toumaï', 'Homo sapiens', 'L’homme de Cro-Magnon', 'Ötzi']],
           ['Qu’est-ce que l’obsidienne, échangée au Néolithique ?', 'Un verre volcanique très coupant', ['Un métal', 'Un coquillage', 'Une graine', 'Une teinture', 'Un os de baleine']]]
-      } }
-    ] },
-    { id: 'p07', matiere: 'histoire', famille: 'pre', nom: 'Mégalithes', court: 'Mégalithes', icone: '🗿', series: [
+      } },
       { k: 'paires', gauche: 'Mot', droite: 'Ce que c’est', consigneR: 'Relie chaque mot à ce qu’il désigne.', q: 'Qu’est-ce qu’{a} ?', qi: 'Comment s’appelle : {b} ?', niveaux: {
-        facile: [['un menhir', 'Une grande pierre dressée'], ['un dolmen', 'Une table de pierre, une tombe'], ['un alignement', 'Des rangées de menhirs']],
-        moyen: [['un cromlech', 'Un cercle de menhirs'], ['un tumulus', 'Une butte de terre sur une tombe'], ['une allée couverte', 'Un long couloir de pierres'], ['un mégalithe', 'Un monument en grosses pierres']],
-        difficile: [['un cairn', 'Un tas de pierres sur des tombes'], ['un orthostate', 'Une pierre dressée d’un mur de dolmen'], ['une table de couverture', 'La grande dalle posée sur un dolmen'],
+        facile: [['un tumulus', 'Une butte de terre sur une tombe'], ['un menhir', 'Une grande pierre dressée'], ['un dolmen', 'Une table de pierre, une tombe'], ['un alignement', 'Des rangées de menhirs']],
+        moyen: [['un cairn', 'Un tas de pierres sur des tombes'], ['un cromlech', 'Un cercle de menhirs'], ['une allée couverte', 'Un long couloir de pierres'], ['un mégalithe', 'Un monument en grosses pierres']],
+        difficile: [['un orthostate', 'Une pierre dressée d’un mur de dolmen'], ['une table de couverture', 'La grande dalle posée sur un dolmen'],
           ['un tertre', 'Une petite colline de terre'], ['un monolithe', 'Un monument d’un seul bloc']],
         expert: [['un menhir christianisé', 'Un menhir surmonté d’une croix'], ['une stèle', 'Une pierre plate gravée'], ['une statue-menhir', 'Un menhir sculpté en personnage'],
           ['une sépulture collective', 'Une tombe pour plusieurs morts'], ['un ciste', 'Un petit coffre de pierre pour un mort'], ['un péristalithe', 'Un cercle de pierres autour d’un tumulus']]
       } },
       { k: 'paires', gauche: 'Site', droite: 'Où il se trouve', consigneR: 'Relie chaque site mégalithique à l’endroit où il se trouve.', q: 'Où se trouve {a} ?', ouverte: false, niveaux: {
-        facile: [['Les alignements de Carnac', 'En Bretagne'], ['Stonehenge', 'En Angleterre'], ['Les statues de l’île de Pâques', 'Dans l’océan Pacifique']],
-        moyen: [['Le grand menhir brisé de Locmariaquer', 'Dans le Morbihan'], ['Le cairn de Barnenez', 'Dans le Finistère'], ['Newgrange', 'En Irlande'], ['La Roche-aux-Fées', 'En Ille-et-Vilaine']],
+        facile: [['Newgrange', 'En Irlande'], ['Les alignements de Carnac', 'En Bretagne'], ['Stonehenge', 'En Angleterre'], ['Les statues de l’île de Pâques', 'Dans l’océan Pacifique']],
+        moyen: [['Le cercle de Callanish', 'En Écosse'], ['Le grand menhir brisé de Locmariaquer', 'Dans le Morbihan'], ['Le cairn de Barnenez', 'Dans le Finistère'], ['La Roche-aux-Fées', 'En Ille-et-Vilaine']],
         difficile: [['Le cairn de Gavrinis', 'Sur une île du golfe du Morbihan'], ['Le grand dolmen de Bagneux', 'À Saumur'], ['Le menhir de Champ-Dolent', 'À Dol-de-Bretagne'],
-          ['Le cercle de Callanish', 'En Écosse'], ['Le temple de Göbekli Tepe', 'En Turquie']],
+          ['Le temple de Göbekli Tepe', 'En Turquie']],
         expert: [['Les statues-menhirs de Filitosa', 'En Corse'], ['Le cromlech d’Avebury', 'En Angleterre, près de Stonehenge'], ['Le dolmen de la Frébouchère', 'En Vendée'],
           ['Les alignements de Lagatjar', 'Dans la presqu’île de Crozon'], ['Le dolmen de Menga', 'En Espagne, en Andalousie'], ['Le menhir de Kerloas', 'Dans le Finistère']]
       } },
@@ -169,6 +245,76 @@
           ['Les mégalithes ont été construits avec des grues en métal.', false, 'Les hommes du Néolithique utilisaient des rondins, des cordes, des leviers et beaucoup de bras.']],
         expert: [['Stonehenge est aligné avec le lever du soleil au solstice d’été.', true, ''],
           ['Les statues de l’île de Pâques datent du Néolithique européen.', false, 'Les moaï ont été sculptés bien plus tard, par les Polynésiens de l’île.']]
+      } },
+      { k: 'qcm', niveaux: {
+        facile: [
+          ["Dans quelle région de France trouve-t-on le plus de menhirs ?", "La Bretagne", ["L’Alsace", "La Provence", "La Corse"]],
+          ["Avec quoi les hommes préhistoriques s’habillaient-ils ?", "Des peaux de bêtes", ["Du coton", "Du plastique", "De la soie"]],
+          ["Quel animal à bois, très chassé au Paléolithique, vivait alors en France ?", "Le renne", ["Le lion", "Le chat", "Le kangourou"]],
+          ["Quelles couleurs trouve-t-on surtout dans les peintures des grottes ?", "Le rouge, le jaune et le noir", ["Le bleu et le vert", "Le rose et le violet", "Le blanc et l’or"]],
+          ["Avec quoi faisait-on le noir des peintures ?", "Du charbon de bois ou de l’oxyde de manganèse", ["Du café", "Du goudron", "De l’encre de stylo"]],
+          ["Que dessinait-on surtout sur les parois des grottes ?", "Des animaux", ["Des maisons", "Des bateaux", "Des châteaux"]],
+          ["Comment s’appelle une habitation légère faite de branches et de peaux ?", "Une hutte", ["Un château", "Un immeuble", "Un moulin"]],
+          ["Comment s’appelle une lance légère qu’on lance à la main ?", "Une sagaie", ["Un boomerang", "Une épée", "Une catapulte"]],
+          ["Que fabriquait-on en argile au Néolithique ?", "Des poteries", ["Des vitres", "Des pièces de monnaie", "Des haches tranchantes"]],
+          ["Qu’est-ce que la cueillette ?", "Ramasser des fruits, des baies et des racines sauvages", ["Chasser les animaux", "Pêcher dans les rivières", "Cultiver un champ"]],
+          ["Comment appelle-t-on une petite statuette de femme du Paléolithique ?", "Une Vénus", ["Une Joconde", "Une Marianne", "Une sirène"]],
+          ["Sur quoi les hommes du Paléolithique gravaient-ils des dessins ?", "Sur l’os, le bois de renne et la pierre", ["Sur du papier", "Sur du verre", "Sur du plastique"]],
+          ["Quel grand animal hibernait dans les grottes ?", "L’ours des cavernes", ["Le lion", "Le cheval", "Le renne"]]],
+        moyen: [
+          ["Quelle grotte ornée a été découverte en 1994, en Ardèche ?", "La grotte Chauvet", ["La grotte de Lascaux", "La grotte Cosquer", "La grotte de Niaux"]],
+          ["Combien d’adolescents ont découvert la grotte de Lascaux en 1940 ?", "Quatre", ["Deux", "Dix", "Un seul"]],
+          ["Combien y a-t-il environ de menhirs dans les alignements de Carnac ?", "Environ 3 000", ["Environ 30", "Environ 300", "Environ 30 000"]],
+          ["Comment rendait-on une hache bien lisse au Néolithique ?", "En la frottant longtemps sur une pierre dure, avec du sable et de l’eau", ["En la chauffant au feu", "En la peignant", "En la trempant dans du métal"]],
+          ["Avec quoi fabriquait-on les aiguilles du Paléolithique ?", "De l’os", ["Du fer", "Du verre", "Du plastique"]],
+          ["Que gardait-on dans les greniers au Néolithique ?", "Les récoltes de grain", ["Les morts", "Les outils de chasse", "Les peintures"]],
+          ["Dans quel département a-t-on trouvé la Dame de Brassempouy ?", "Dans les Landes", ["En Dordogne", "En Ariège", "Dans le Finistère"]],
+          ["Dans quel pays a-t-on trouvé la Vénus de Willendorf ?", "En Autriche", ["En France", "En Italie", "En Russie"]],
+          ["Qu’est-ce qu’un abri sous roche ?", "Un creux au pied d’une falaise qui protège de la pluie", ["Une maison en pierre taillée", "Un tunnel creusé", "Une tombe sous un dolmen"]],
+          ["Pourquoi a-t-on fait une copie de la grotte de Lascaux ?", "Pour que le public la visite sans abîmer les vraies peintures", ["Parce que la vraie a été détruite", "Pour la vendre", "Pour un film"]]],
+        difficile: [
+          ["Comment s’appelle la grande salle de Lascaux aux immenses taureaux ?", "La salle des Taureaux", ["Le Puits", "L’Abside", "Le Salon noir"]],
+          ["Dans quelle partie de Lascaux voit-on un homme à tête d’oiseau face à un bison ?", "Le Puits", ["La salle des Taureaux", "Le Diverticule axial", "Le Passage"]],
+          ["Quel grand fauve, rare ailleurs, est peint en nombre dans la grotte Chauvet ?", "Le lion des cavernes", ["Le tigre", "Le guépard", "Le léopard des neiges"]],
+          ["Quelle grotte de l’Ariège possède un célèbre « Salon noir » ?", "La grotte de Niaux", ["La grotte de Lascaux", "La grotte Chauvet", "La grotte Cosquer"]],
+          ["Dans quel département se trouvent les alignements de Carnac ?", "Le Morbihan", ["Le Finistère", "Les Côtes-d’Armor", "L’Ille-et-Vilaine"]],
+          ["Combien mesure environ le menhir de Kerloas, le plus haut encore debout en France ?", "Environ 9,5 mètres", ["Environ 2 mètres", "Environ 30 mètres", "Environ 50 centimètres"]],
+          ["Qu’a-t-on d’abord fabriqué avec le cuivre ?", "Des bijoux et de petits outils", ["Des voitures", "Des canons", "Des rails"]],
+          ["Vers quand et où la roue est-elle apparue ?", "Vers 3500 av. J.-C., en Mésopotamie", ["Vers 35 000 av. J.-C., en Gaule", "Vers 500 apr. J.-C., à Rome", "Vers 1500, en Amérique"]],
+          ["Comment appelle-t-on les villages préhistoriques sur pilotis au bord des lacs des Alpes ?", "Les palafittes", ["Les dolmens", "Les cromlechs", "Les oppidums"]],
+          ["Quel animal commence-t-on à monter et à atteler à la fin de la préhistoire ?", "Le cheval", ["Le chat", "Le renne", "Le mammouth"]]],
+        expert: [
+          ["Combien de tatouages a-t-on comptés sur le corps d’Ötzi ?", "61", ["3", "12", "200"]],
+          ["Quelle arme, rare à son époque, Ötzi portait-il ?", "Une hache en cuivre", ["Une épée en fer", "Un bouclier en bronze", "Une arbalète"]],
+          ["Comment appelle-t-on les points, traits et grilles peints à côté des animaux dans les grottes ?", "Des signes", ["Des lettres", "Des chiffres", "Des cartes"]],
+          ["Quel grand tumulus de Carnac est l’un des plus grands d’Europe ?", "Le tumulus Saint-Michel", ["Le cairn de Gavrinis", "Le tumulus de Bougon", "Newgrange"]],
+          ["Quel jour le soleil éclaire-t-il le couloir de la tombe de Newgrange, en Irlande ?", "Au solstice d’hiver", ["Au solstice d’été", "À l’équinoxe de printemps", "Jamais"]],
+          ["D’où viennent les « pierres bleues » de Stonehenge ?", "Du pays de Galles", ["D’Écosse", "De Bretagne", "D’Irlande"]],
+          ["Qui a découvert la grotte Chauvet ?", "Jean-Marie Chauvet et deux amis spéléologues", ["Marcel Ravidat et ses amis", "Henri Cosquer", "Norbert Casteret"]],
+          ["Quel animal laineux à corne est peint plusieurs fois dans la grotte Chauvet ?", "Le rhinocéros laineux", ["L’élan", "Le bœuf musqué", "Le chamois"]],
+          ["Comment s’appelle la technique de taille qui prépare un bloc pour en détacher un éclat de forme choisie ?", "La méthode Levallois", ["Le polissage", "Le moulage", "La percussion au marteau d’acier"]],
+          ["Dans quel musée voit-on la Dame de Brassempouy ?", "Le musée d’Archéologie nationale, à Saint-Germain-en-Laye", ["Le musée du Louvre", "Le musée de la Préhistoire de Tautavel", "Le musée d’Orsay"]]]
+      } },
+      { k: 'vf', niveaux: {
+        facile: [
+          ["Les hommes préhistoriques soufflaient parfois la couleur pour peindre.", true, ""],
+          ["Les menhirs pèsent souvent plusieurs tonnes.", true, ""],
+          ["Au Néolithique, beaucoup de maisons sont en bois et en terre.", true, ""],
+          ["Les hommes préhistoriques peignaient avec de la peinture achetée en tube.", false, "Ils fabriquaient leurs couleurs avec des terres, du charbon et des minéraux."]],
+        moyen: [
+          ["La grotte Chauvet est plus ancienne que Lascaux.", true, "Ses peintures ont environ 36 000 ans, celles de Lascaux environ 20 000 ans."],
+          ["On peut visiter la vraie grotte de Lascaux.", false, "Elle est fermée pour protéger les peintures : on visite une copie, Lascaux IV."],
+          ["Beaucoup de dolmens étaient d’abord recouverts d’une butte de terre ou de pierres.", true, ""],
+          ["La Dame de Brassempouy est un petit visage sculpté dans l’ivoire.", true, ""]],
+        difficile: [
+          ["La grotte Cosquer est en partie sous l’eau.", true, ""],
+          ["Les peintures de la grotte Chauvet ont environ 3 000 ans.", false, "Elles ont environ 36 000 ans."],
+          ["Ötzi avait des tatouages sur le corps.", true, ""],
+          ["Les palafittes sont des maisons construites sur des pilotis.", true, ""]],
+        expert: [
+          ["Les pierres de Stonehenge ont été apportées de loin.", true, "Les pierres bleues viennent du pays de Galles, à plus de 200 km."],
+          ["Newgrange est plus ancien que les grandes pyramides d’Égypte.", true, "Il date d’environ 3200 av. J.-C., la grande pyramide d’environ 2560 av. J.-C."],
+          ["La grotte Cosquer a été découverte par un spéléologue à pied, par une entrée dans la forêt.", false, "Henri Cosquer l’a découverte en plongée : l’entrée est sous la mer."]]
       } }
     ] },
 

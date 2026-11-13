@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '8.2';
+  var VERSION = '8.3';
 
   var HISTORY = [
+    { v: '8.3', date: '2026-11-13', changes: [
+      "Histoire, Préhistoire : les 5 petits jeux sont regroupés en 2 grands jeux, « Nos ancêtres et les périodes » et « Art, outils et mégalithes », avec environ 40 questions par niveau chacun, jouables en Quiz et en Normal."
+    ] },
     { v: '8.2', date: '2026-11-13', changes: [
       "Géographie : « Climats et paysages » passe à environ 45 questions par niveau — paysages, animaux et leurs milieux, climats des villes de France, météo, vents, saisons et vocabulaire. Tous les thèmes de géographie ont maintenant leur grand choix de questions."
     ] },
