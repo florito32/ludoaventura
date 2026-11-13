@@ -71,6 +71,43 @@ test.describe('contenu de géographie', () => {
     expect(niv('france', 'Lozère')).toBe('expert');
   });
 
+  test('v8.1 : environ 50 éléments par niveau pour chaque thème (fini les petites listes qui tournent en boucle)', () => {
+    const minimum = { g01: 70, g04: 45, g05: 45, g07: 100, g11: 50, g06: 45, g09: 40, g13: 40 };
+    for (const [id, min] of Object.entries(minimum)) {
+      const j = S.trouver(id);
+      for (const n of NIVEAUX) {
+        const total = j.series.reduce((a, s) => a + (s.niveaux[n] || []).length, 0);
+        expect(total, id + ' ' + n).toBeGreaterThanOrEqual(min);
+      }
+    }
+  });
+
+  test('v8.1 : drapeaux — 195 pays, chaque drapeau existe, deux drapeaux qui se ressemblent ne sont jamais ensemble', () => {
+    const G = require('../js/geographie.js');
+    const fs = require('fs');
+    expect(G.MONDE.length).toBeGreaterThanOrEqual(190);
+    for (const p of G.MONDE) expect(fs.existsSync('img/drapeaux/' + p[0] + '.svg'), p[0]).toBe(true);
+    const nomVersCode = {};
+    for (const p of G.MONDE) nomVersCode[p[1].split('|')[0]] = p[0];
+    for (let k = 0; k < 2000; k++) {
+      const c = S.generer({ jeux: ['g05'], niveau: NIVEAUX[k % 4], mode: k % 2 ? 'quiz' : 'normal' }, 'geographie');
+      const codes = c.format === 'R' ? c.gauche : c.format === 'Q' ? c.options.map((o) => nomVersCode[o]) : [];
+      for (const [a, b] of G.SOSIES) expect(codes.includes(a) && codes.includes(b), a + ' / ' + b).toBe(false);
+    }
+  });
+
+  test('v8.1 : pays voisins — frontières justes (France, Allemagne), jamais un voisin parmi les mauvaises réponses', () => {
+    const j = S.trouver('g07');
+    const qcm = NIVEAUX.flatMap((n) => j.series[0].niveaux[n]);
+    const france = qcm.filter((x) => x[0] === 'Quel pays a une frontière avec ce pays : France ?').map((x) => x[1]).sort();
+    expect(france).toEqual(['Allemagne', 'Andorre', 'Belgique', 'Espagne', 'Italie', 'Luxembourg', 'Monaco', 'Suisse']);
+    for (const x of qcm.filter((y) => y[0].startsWith('Quel pays a une frontière'))) {
+      const pays = x[0].split(' : ')[1].replace(' ?', '');
+      const voisins = qcm.filter((y) => y[0] === x[0]).map((y) => y[1]);
+      for (const f of x[2]) expect(voisins, pays + ' / ' + f).not.toContain(f);
+    }
+  });
+
   test('chaque niveau n\'a que son propre contenu (demande de l\'utilisateur)', () => {
     for (const j of S.jeuxDe('geographie')) {
       for (const s of j.series) {
@@ -263,15 +300,15 @@ test('vrai ou faux : la réponse proposée est vraie → « Vrai » est juste', 
   expect(await page.evaluate(() => window.Aventura.partie.regles.de)).toBe('fort');
 });
 
-test('remettre dans l\'ordre : sommets du plus bas au plus haut ; rechargement en cours de rangement', async ({ page }) => {
-  await versGeo(page, { niveau: 'expert', jeux: ['g09'], hasard: 0 });
+test('remettre dans l\'ordre : records (pays du plus petit au plus grand) ; rechargement en cours de rangement', async ({ page }) => {
+  await versGeo(page, { niveau: 'facile', jeux: ['g13'], hasard: 0.6 });
   const c = await piocher(page);
   expect(c.format).toBe('F');
   // Les deux premiers éléments, puis on recharge la page : ils restent rangés.
   await page.locator('.ordre-el', { hasText: c.bonnes[0] }).click();
   await page.reload();
   await page.locator('#carte-savoir').waitFor();
-  await page.evaluate(() => window.Savoirs.regler(() => 0));
+  await page.evaluate(() => window.Savoirs.regler(() => 0.6));
   await expect(page.locator('.ordre-case').first()).toContainText(c.bonnes[0]);
   for (const b of c.bonnes.slice(1)) await page.locator('.ordre-el', { hasText: b }).click();
   await page.locator('.btn-savoir-ok').click();
@@ -279,8 +316,8 @@ test('remettre dans l\'ordre : sommets du plus bas au plus haut ; rechargement e
   expect(await page.evaluate(() => window.Aventura.partie.regles.de)).toBe('fort');
 });
 
-test('classer : voisins de la France ou pas', async ({ page }) => {
-  await versGeo(page, { niveau: 'facile', jeux: ['g07'], hasard: 0 });
+test('classer : voisins d\'un pays ou pas', async ({ page }) => {
+  await versGeo(page, { niveau: 'facile', jeux: ['g07'], hasard: 0.99 });
   const c = await piocher(page);
   expect(c.format).toBe('K');
   await pasDeDebordement(page);

@@ -98,6 +98,7 @@
   // Une série peut-elle donner une carte à ce niveau, dans ce mode (normal par défaut) ?
   function utilisable(s, niveau, mode) {
     var t = contenu(s, niveau), quiz = mode === 'quiz';
+    if (quiz && s.quiz === false) return false; // série réservée au mode Normal
     if (s.k === 'carte') {
       var CG = cartesGeo();
       return !!CG && CG.zonesDu(s.carte, niveau).length >= (quiz ? 4 : 1);
@@ -124,11 +125,16 @@
   }
 
   // Paires sans doublon à gauche ni à droite (deux fleuves qui se jettent dans la même mer ne vont pas ensemble).
-  function pairesDistinctes(t, n, sansHasard) {
+  // sosies (facultatif) : [[a, a'], …] éléments de gauche qui se ressemblent trop (drapeaux) : jamais ensemble.
+  function pairesDistinctes(t, n, sansHasard, sosies) {
     var vuA = {}, vuB = {}, res = [];
     (sansHasard ? t : melanger(t)).forEach(function (p) {
       var a = normaliser(affiche(p[0])), b = normaliser(affiche(p[1]));
-      if (res.length < n && !vuA[a] && !vuB[b]) { vuA[a] = vuB[b] = true; res.push(p); }
+      var proche = (sosies || []).some(function (s) {
+        var i = s.indexOf(p[0]);
+        return i >= 0 && res.some(function (q) { return q[0] === s[1 - i]; });
+      });
+      if (res.length < n && !vuA[a] && !vuB[b] && !proche) { vuA[a] = vuB[b] = true; res.push(p); }
     });
     return res;
   }
@@ -143,7 +149,7 @@
     paires: function (s, niveau) {
       var formats = FORMATS_PAIRES[niveau].filter(function (f) { return f !== 'O' || s.ouverte !== false; });
       var format = auHasard(formats);
-      var choix = pairesDistinctes(contenu(s, niveau), 4);
+      var choix = pairesDistinctes(contenu(s, niveau), 4, false, s.sosies);
       if (choix.length < 4) return null;
       if (format === 'R') {
         return {
@@ -152,7 +158,8 @@
           bonnes: choix.map(function (p) { return affiche(p[1]); }), image: s.image || null, liens: choix.map(function () { return null; }), choisi: 0
         };
       }
-      var p = choix[0], inverse = sens(s);
+      // qiOuverte: false → la question ouverte ne se pose que dans le sens q (on n'écrit pas un nom de monument).
+      var p = choix[0], inverse = s.qiOuverte !== false && sens(s);
       return {
         format: 'O', consigne: remplir(inverse ? s.qi : s.q, p[0], p[1]), image: inverse ? null : s.image || null, sujet: inverse ? affiche(p[1]) : p[0],
         attendu: inverse ? p[0] : p[1], bonne: affiche(inverse ? p[0] : p[1])
@@ -215,6 +222,7 @@
     var vus = {};
     return melanger(contenu(s, niveau)).filter(function (x) { if (vus[x[1]]) return false; vus[x[1]] = true; return true; }).slice(0, 4);
   }
+  function majuscule(t) { return t.charAt(0).toUpperCase() + t.slice(1); }
   function quiz(consigne, bonne, fausses, extra) {
     var c = { format: 'Q', consigne: consigne, options: melanger([bonne].concat(fausses.slice(0, 3))), bonne: bonne };
     Object.keys(extra || {}).forEach(function (k) { c[k] = extra[k]; });
@@ -224,7 +232,7 @@
   // ---------- Mode quiz : toujours une question à 4 choix, une seule bonne réponse ----------
   var QUIZ = {
     paires: function (s, niveau) {
-      var choix = pairesDistinctes(contenu(s, niveau), 4);
+      var choix = pairesDistinctes(contenu(s, niveau), 4, false, s.sosies);
       if (choix.length < 4) return null;
       var p = choix[0], inverse = sens(s);
       var bonne = affiche(inverse ? p[0] : p[1]);
@@ -232,7 +240,7 @@
       return quiz(remplir(inverse ? s.qi : s.q, p[0], p[1]), bonne, fausses,
         { image: inverse ? null : s.image || null, sujet: inverse ? affiche(p[1]) : p[0] });
     },
-    // « En quelle année … ? » (si la série le permet), sinon « Lequel est le plus ancien / le plus haut ? ».
+    // « En quelle année … ? » (si la série le permet), sinon « Trouve le plus ancien / le plus haut. ».
     ordre: function (s, niveau) {
       var items = ordreItems(s, niveau);
       if (items.length < 4) return null;
@@ -242,7 +250,7 @@
       var bout = hasard() < 0.5 ? 0 : 1, sensT = s.sens || ['le plus ancien', 'le plus récent'];
       var tri = items.slice().sort(function (x, y) { return x[1] - y[1]; });
       var bon = bout ? tri[tri.length - 1] : tri[0];
-      return quiz('Lequel est ' + sensT[bout] + ' ?', bon[0], items.filter(function (x) { return x !== bon; }).map(function (x) { return x[0]; }));
+      return quiz('Trouve ' + sensT[bout] + '.', bon[0], items.filter(function (x) { return x !== bon; }).map(function (x) { return x[0]; }));
     },
     // Classer → « Lequel va avec : … ? » (1 de la colonne, 3 de l'autre).
     classer: function (s, niveau) {
@@ -252,7 +260,7 @@
       var gk = auHasard(groupes), g = gk[0], k = gk[1];
       var bon = auHasard(g.items.filter(function (x) { return x[1] === k; }));
       var fausses = melanger(g.items.filter(function (x) { return x[1] !== k; })).map(function (x) { return x[0]; });
-      return quiz('Lequel va avec : « ' + g.colonnes[k] + ' » ?', bon[0], fausses, { question: g.q.replace(/^Range[^:]*:\s*/, '') });
+      return quiz('Lequel va avec : « ' + g.colonnes[k] + ' » ?', bon[0], fausses, { question: majuscule(g.q.replace(/^Range[^:]*:\s*/, '')) });
     },
     // Vrai ou faux → « Laquelle de ces phrases est vraie (ou fausse) ? ».
     vf: function (s, niveau) {
