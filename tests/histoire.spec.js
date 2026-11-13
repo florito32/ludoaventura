@@ -10,9 +10,8 @@ const NIVEAUX = ['facile', 'moyen', 'difficile', 'expert'];
 test.describe('contenu d\'histoire', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
 
-  test('les 12 jeux de l\'Antiquité ont du contenu à chaque niveau et les cartes sont bien formées', () => {
+  test('les jeux d\'histoire ont du contenu à chaque niveau et les cartes sont bien formées', () => {
     const jeux = S.jeuxDe('histoire');
-    expect(jeux.filter((j) => j.famille === 'ant')).toHaveLength(12);
     expect(new Set(jeux.map((j) => j.id)).size).toBe(jeux.length);
     for (const j of jeux) {
       for (const n of NIVEAUX) {
@@ -73,6 +72,31 @@ test.describe('contenu d\'histoire', () => {
     const c = S.generer({ jeux: ['p01'], niveau: 'moyen' }, 'histoire');
     S.regler();
     if (c.format === 'F') expect(c.bonnes[0]).toContain('Toumaï');
+  });
+
+  test('Antiquité (v8.4) : 12 jeux regroupés en 6, environ 40 éléments par niveau, jouables en Quiz et en Normal', () => {
+    const ant = S.jeuxDe('histoire').filter((j) => j.famille === 'ant');
+    expect(ant.map((j) => j.id)).toEqual(['a01', 'a03', 'a05', 'a07', 'a10', 'a11']);
+    for (const j of ant) {
+      for (const n of NIVEAUX) {
+        for (const mode of ['quiz', 'normal']) expect(j.series.some((s) => S.utilisable(s, n, mode)), j.id + ' ' + n + ' ' + mode).toBe(true);
+        if (j.id === 'a10') continue; // chiffres romains : contenu calculé
+        const total = j.series.reduce((a, s) => a + (s.k === 'classer' ? (s.niveaux[n] || []).reduce((x, g) => x + g.items.length, 0) : (s.niveaux[n] || []).length), 0);
+        expect(total, j.id + ' ' + n).toBeGreaterThanOrEqual(35);
+      }
+      // Frises : pas deux événements de la même année dans un niveau (sinon l'ordre serait ambigu).
+      for (const s of j.series.filter((x) => x.k === 'ordre')) for (const n of NIVEAUX) {
+        const annees = (s.niveaux[n] || []).map((x) => x[1]);
+        expect(new Set(annees).size, j.id + ' ' + n).toBe(annees.length);
+      }
+    }
+    // Quiz « description → nom » : la question donne la description, les 4 choix sont des noms (bug des anciennes paires « inverseSeul »).
+    let vues = 0;
+    for (let k = 0; k < 400; k++) {
+      const c = S.generer({ jeux: ['a01'], niveau: 'facile', mode: 'quiz' }, 'histoire');
+      if (/^Chez les Égyptiens/.test(c.consigne)) { vues++; for (const o of c.options) expect(['Râ', 'Anubis', 'Osiris', 'Horus', 'Isis']).toContain(o); }
+    }
+    expect(vues).toBeGreaterThan(0);
   });
 
   test('Moyen Âge (v7.7) : 8 jeux, chacun a du contenu à chaque niveau', () => {
@@ -171,7 +195,7 @@ test('écran des réglages : la matière Histoire, son niveau, ses jeux rangés 
   await expect(familles.nth(0).locator('.famille-nom')).toContainText('Préhistoire');
   await expect(familles.nth(0).locator('input')).toHaveCount(2);
   await expect(familles.nth(1).locator('.famille-nom')).toContainText('Antiquité');
-  await expect(familles.nth(1).locator('input')).toHaveCount(12);
+  await expect(familles.nth(1).locator('input')).toHaveCount(6);
   await expect(familles.nth(2).locator('.famille-nom')).toContainText('Moyen Âge');
   await expect(familles.nth(2).locator('input')).toHaveCount(8);
   await expect(familles.nth(3).locator('.famille-nom')).toContainText('Renaissance');
@@ -194,7 +218,7 @@ test('écran des réglages : la matière Histoire, son niveau, ses jeux rangés 
   await familles.nth(1).locator('.btn-tout-famille').click();
   const p = await page.evaluate(() => window.Aventura.partie.savoirs[0].histoire);
   expect(p.niveau).toBe('moyen');
-  expect(p.jeux).toHaveLength(12);
+  expect(p.jeux).toHaveLength(6);
   expect(await page.evaluate(() => window.Aventura.partie.savoirs[0].geographie.jeux)).toHaveLength(0);
   // Tuiles (v7.2) : aucun nom coupé ni débordant du contour.
   const pb = await page.locator('#savoir-liste .famille:not([hidden]) .pack > span').evaluateAll((els) => els.map((el) => {
@@ -203,7 +227,7 @@ test('écran des réglages : la matière Histoire, son niveau, ses jeux rangés 
       dehors: n.left < r.left + 1 || n.right > r.right - 1 || n.top < r.top || n.bottom > r.bottom,
       lignes: Math.round(n.height / parseFloat(getComputedStyle(el.querySelector('.pack-nom')).lineHeight)) };
   }));
-  expect(pb).toHaveLength(48);
+  expect(pb).toHaveLength(42);
   for (const x of pb) { expect(x.debord, x.nom).toBe(false); expect(x.dehors, x.nom).toBe(false); expect(x.lignes, x.nom).toBeLessThanOrEqual(1); }
   await pasDeDebordement(page);
   await valider(page);
@@ -214,7 +238,7 @@ test('relier : dieux grecs et noms romains, tout juste → dé FORT', async ({ p
   await versHistoire(page, { niveau: 'moyen', jeux: ['a01'], hasard: 0 });
   const c = await piocher(page);
   expect(c.format).toBe('R');
-  await expect(page.locator('#carte-titre')).toHaveText('Dieux grecs et romains · Relier');
+  await expect(page.locator('#carte-titre')).toHaveText('Dieux et mythes · Relier');
   await pasDeDebordement(page);
   for (let i = 0; i < c.gauche.length; i++) {
     await page.locator('.relier-g[data-g="' + i + '"]').click();

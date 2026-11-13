@@ -1,7 +1,7 @@
 // Histoire (v7.1) : la matière Histoire, rangée par périodes (BACKLOG lignes 270 et 275).
 // Choix de l'utilisateur du 12/11/2026 : 7 périodes, 51 jeux, 4 niveaux, et chaque niveau n'a QUE son
-// propre contenu (Expert = seulement du contenu expert). Livraison par période : l'Antiquité d'abord (ses
-// 12 jeux sont tous retenus), puis la Préhistoire (v7.6, 5 jeux), le Moyen Âge (v7.7, 8 jeux), la Renaissance (v7.8, 6 jeux), les Temps modernes (v7.9, 4 jeux), la Révolution et le XIXe siècle (v7.10, 9 jeux) et le XXe siècle (v7.11, 7 jeux).
+// propre contenu (Expert = seulement du contenu expert). Livraison par période : l'Antiquité d'abord (12
+// jeux, regroupés en 6 en v8.4), puis la Préhistoire (v7.6, 5 jeux), le Moyen Âge (v7.7, 8 jeux), la Renaissance (v7.8, 6 jeux), les Temps modernes (v7.9, 4 jeux), la Révolution et le XIXe siècle (v7.10, 9 jeux) et le XXe siècle (v7.11, 7 jeux).
 // Format des séries : voir js/savoirs.js. « A|B » = A s'affiche, B est aussi accepté en question ouverte.
 (function (racine) {
   'use strict';
@@ -318,8 +318,12 @@
       } }
     ] },
 
-    // ---------- Antiquité ----------
-    { id: 'a01', matiere: 'histoire', famille: 'ant', nom: 'Dieux grecs et romains', court: 'Dieux grecs', icone: '⚡', series: [
+    // ---------- Antiquité (v7.1 ; v8.4 : 12 jeux regroupés en 6, choix de l'utilisateur du 13/11/2026, BACKLOG lignes 327 et 334) ----------
+    // Dieux et mythes = anciens « Dieux grecs et romains » + « Dieux égyptiens » + « Héros et mythes » ;
+    // L'Égypte des pharaons = « Pharaons » + « Écritures anciennes » ; Rome et la Gaule = « Rome » + « La Gaule » ;
+    // Monuments et merveilles = « Monuments antiques » + « Les 7 merveilles » ; Vie antique et Jeux olympiques = « Vie quotidienne » + « Jeux olympiques antiques ».
+    // Les paires « description → nom » sont rangées [description, nom] : la question porte sur {a}, la réponse est le nom.
+    { id: 'a01', matiere: 'histoire', famille: 'ant', nom: 'Dieux et mythes', court: 'Mythes', icone: '⚡', series: [
       { k: 'paires', gauche: 'Dieu grec', droite: 'Nom romain', consigneR: 'Relie chaque dieu grec à son nom romain.',
         q: 'Quel est le nom romain de {a} ?', qi: 'Quel est le nom grec de {b} ?', niveaux: {
           facile: [['Zeus', 'Jupiter'], ['Poséidon|Poseidon', 'Neptune'], ['Arès|Ares', 'Mars'], ['Aphrodite', 'Vénus|Venus'], ['Hermès|Hermes', 'Mercure']],
@@ -330,34 +334,119 @@
           expert: [['Perséphone|Persephone', 'Proserpine'], ['Hélios|Helios', 'Sol'], ['Séléné|Selene', 'Luna'], ['Éos|Eos', 'Aurore|Aurora'],
             ['Tyché|Tyche', 'Fortuna|Fortune'], ['Asclépios|Asclepios', 'Esculape'], ['Niké|Nike', 'Victoria']]
         } },
-      { k: 'qcm', niveaux: {
-        facile: [['Qui est le roi des dieux grecs ?', 'Zeus', ['Poséidon', 'Hermès', 'Arès']],
-          ['Quel dieu grec règne sur la mer ?', 'Poséidon', ['Zeus', 'Arès', 'Hermès']],
-          ['Où vivent les dieux grecs ?', 'Sur le mont Olympe', ['Sur l’Etna', 'Sur le Vésuve', 'Sur le mont Blanc']]],
-        moyen: [['Quelle déesse est sortie tout armée de la tête de Zeus ?', 'Athéna', ['Héra', 'Artémis', 'Aphrodite', 'Déméter']],
-          ['Quel dieu forge les armes des dieux ?', 'Héphaïstos', ['Arès', 'Hermès', 'Apollon', 'Dionysos']],
-          ['Quel dieu règne sur le monde des morts ?', 'Hadès', ['Zeus', 'Poséidon', 'Apollon', 'Dionysos']]],
-        difficile: [['Quel dieu romain a donné son nom au mois de mars ?', 'Mars', ['Jupiter', 'Mercure', 'Neptune', 'Vulcain', 'Janus']],
-          ['Quel dieu romain à deux visages a donné son nom à janvier ?', 'Janus', ['Jupiter', 'Mars', 'Saturne', 'Pluton', 'Vulcain']],
-          ['Quel dieu a le même nom chez les Grecs et chez les Romains ?', 'Apollon', ['Zeus', 'Arès', 'Hermès', 'Hadès', 'Dionysos']]],
-        expert: [['Qui est la mère de Zeus ?', 'Rhéa', ['Héra', 'Gaïa', 'Déméter', 'Thétis', 'Léto', 'Métis']],
-          ['Quel Titan porte le ciel sur ses épaules ?', 'Atlas', ['Cronos', 'Prométhée', 'Hypérion', 'Océan', 'Ouranos', 'Japet']],
-          ['Comment s’appelle la boisson des dieux grecs ?', 'Le nectar', ['L’ambroisie', 'L’hydromel', 'La cervoise', 'Le vin de Chios', 'Le garum']]]
-      } }
-    ] },
-    { id: 'a02', matiere: 'histoire', famille: 'ant', nom: 'Dieux égyptiens', court: 'Dieux du Nil', icone: '🐍', series: [
-      { k: 'paires', gauche: 'Dieu', droite: 'Ce qu’il représente', consigneR: 'Relie chaque description au dieu égyptien.',
-        q: 'Quel dieu égyptien : {b} ?', inverseSeul: true, niveaux: {
-          facile: [['Râ|Ra|Rê', 'Le Soleil'], ['Anubis', 'La momification, à tête de chacal'], ['Osiris', 'Le roi des morts'],
-            ['Horus', 'Le dieu à tête de faucon'], ['Isis', 'La grande magicienne, épouse d’Osiris']],
-          moyen: [['Thot', 'L’écriture, à tête d’ibis'], ['Bastet', 'La déesse chatte'], ['Sobek', 'Le dieu crocodile'],
-            ['Hathor', 'La déesse vache, de la joie et de la musique'], ['Seth', 'Le désordre et le désert']],
-          difficile: [['Amon', 'Le roi des dieux, adoré à Thèbes'], ['Ptah', 'Le dieu des artisans, à Memphis'], ['Khnoum', 'Le potier à tête de bélier'],
-            ['Maât|Maat', 'La justice, une plume sur la tête'], ['Sekhmet', 'La déesse lionne'], ['Nout', 'La déesse du ciel']],
-          expert: [['Atoum', 'Le créateur du monde, à Héliopolis'], ['Hâpy|Hapy', 'La crue du Nil'], ['Taouret|Thouéris', 'La déesse hippopotame qui protège les naissances'],
-            ['Bès|Bes', 'Le nain qui protège les maisons'], ['Khépri|Khepri', 'Le scarabée, soleil du matin'], ['Aton', 'Le disque solaire adoré par Akhenaton'],
-            ['Ammit|Ammout', 'La dévoreuse des cœurs des méchants']]
+      { k: 'paires', gauche: 'Description', droite: 'Dieu égyptien', consigneR: 'Relie chaque description au dieu égyptien.',
+        q: 'Chez les Égyptiens, qui est {a} ?', niveaux: {
+          facile: [['le dieu du Soleil', 'Râ|Ra|Rê'], ['le dieu à tête de chacal, gardien des tombes', 'Anubis'], ['le roi des morts', 'Osiris'],
+            ['le dieu à tête de faucon', 'Horus'], ['la grande magicienne, épouse d’Osiris', 'Isis']],
+          moyen: [['le dieu de l’écriture, à tête d’ibis', 'Thot'], ['la déesse chatte', 'Bastet'], ['le dieu crocodile', 'Sobek'],
+            ['la déesse vache, de la joie et de la musique', 'Hathor'], ['le dieu du désordre et du désert', 'Seth']],
+          difficile: [['le roi des dieux, adoré à Thèbes', 'Amon'], ['le dieu des artisans, à Memphis', 'Ptah'], ['le potier à tête de bélier', 'Khnoum'],
+            ['la déesse de la justice, une plume sur la tête', 'Maât|Maat'], ['la déesse lionne', 'Sekhmet'], ['la déesse du ciel', 'Nout']],
+          expert: [['le créateur du monde, à Héliopolis', 'Atoum'], ['le dieu de la crue du Nil', 'Hâpy|Hapy'], ['la déesse hippopotame qui protège les naissances', 'Taouret|Thouéris'],
+            ['le nain qui protège les maisons', 'Bès|Bes'], ['le scarabée, soleil du matin', 'Khépri|Khepri'], ['le disque solaire adoré par Akhenaton', 'Aton'],
+            ['la dévoreuse des cœurs des méchants', 'Ammit|Ammout']]
         } },
+      { k: 'paires', gauche: 'Exploit', droite: 'Personnage', consigneR: 'Relie chaque histoire à son personnage.',
+        q: 'Qui {a} ?', niveaux: {
+          facile: [['a tué le Minotaure dans le labyrinthe', 'Thésée|Thesee'], ['a coupé la tête de Méduse', 'Persée|Persee'],
+            ['a réalisé douze travaux', 'Hercule|Héraclès|Heracles'], ['a eu l’idée du cheval de Troie', 'Ulysse'],
+            ['a volé trop près du Soleil avec des ailes de cire', 'Icare']],
+          moyen: [['est parti chercher la Toison d’or', 'Jason'], ['ne pouvait être blessé qu’au talon', 'Achille'],
+            ['a ouvert la jarre qui a libéré les malheurs du monde', 'Pandore'], ['est descendu aux Enfers chercher Eurydice', 'Orphée|Orphee'],
+            ['a fondé Rome, selon la légende', 'Romulus'], ['a volé le feu des dieux pour le donner aux hommes', 'Prométhée|Promethee']],
+          difficile: [['a tué la Chimère, monté sur Pégase', 'Bellérophon|Bellerophon'], ['a résolu l’énigme du Sphinx', 'Œdipe|Oedipe'],
+            ['était une chasseuse plus rapide que tous à la course', 'Atalante'], ['a fui Troie en flammes jusqu’en Italie', 'Énée|Enee'],
+            ['était le plus grand héros troyen, tué par Achille', 'Hector'], ['a enlevé Hélène, ce qui a déclenché la guerre de Troie', 'Pâris|Paris']],
+          expert: [['changeait en or tout ce qu’il touchait', 'Midas'], ['est tombé amoureux de son reflet', 'Narcisse'],
+            ['pousse sans fin un rocher qui retombe', 'Sisyphe'], ['ne peut jamais attraper l’eau ni les fruits placés devant lui', 'Tantale'],
+            ['a construit le labyrinthe de Crète', 'Dédale|Dedale'], ['a été changée en araignée par Athéna', 'Arachné|Arachne'],
+            ['a tué le sanglier de Calydon', 'Méléagre|Meleagre']]
+        } },
+      { k: 'qcm', niveaux: {
+        facile: [
+          ['Qui est le roi des dieux grecs ?', 'Zeus', ['Poséidon', 'Hermès', 'Arès']],
+          ['Quel dieu grec règne sur la mer ?', 'Poséidon', ['Zeus', 'Arès', 'Hermès']],
+          ['Où vivent les dieux grecs ?', 'Sur le mont Olympe', ['Sur l’Etna', 'Sur le Vésuve', 'Sur le mont Blanc']],
+          ['Quelle arme lance Zeus quand il est en colère ?', 'La foudre', ['Un trident', 'Un arc', 'Une épée']],
+          ['Quel objet à trois pointes tient Poséidon ?', 'Un trident', ['Une lance', 'Une massue', 'Un arc']],
+          ['Quel monstre à tête de taureau vivait dans le labyrinthe ?', 'Le Minotaure', ['Le Cyclope', 'Pégase', 'Le Sphinx']],
+          ['Quel monstre aux cheveux de serpents change en pierre ceux qui la regardent ?', 'Méduse', ['Le Minotaure', 'Le Cyclope', 'Pégase']],
+          ['Qu’est-ce qu’un cyclope ?', 'Un géant avec un seul œil', ['Un cheval ailé', 'Un serpent à neuf têtes', 'Un homme à tête de taureau']],
+          ['Comment s’appelle le cheval ailé de la mythologie grecque ?', 'Pégase', ['Bucéphale', 'Cerbère', 'Argos']],
+          ['Quel animal géant en bois les Grecs ont-ils utilisé pour entrer dans Troie ?', 'Un cheval', ['Un taureau', 'Un éléphant', 'Un lion']],
+          ['Quel héros grec est célèbre pour sa très grande force ?', 'Hercule', ['Ulysse', 'Icare', 'Pâris']],
+          ['Quel est le chien à trois têtes qui garde les Enfers ?', 'Cerbère', ['Pégase', 'Argos', 'Le Minotaure']],
+          ['Qui est la déesse grecque de l’amour et de la beauté ?', 'Aphrodite', ['Athéna', 'Héra', 'Artémis']],
+          ['De quelle île Ulysse est-il le roi ?', 'Ithaque', ['La Crète', 'Rhodes', 'La Sicile']],
+          ['Quel dieu est le messager des dieux grecs, avec des sandales ailées ?', 'Hermès', ['Arès', 'Hadès', 'Apollon']]],
+        moyen: [
+          ['Quelle déesse est sortie tout armée de la tête de Zeus ?', 'Athéna', ['Héra', 'Artémis', 'Aphrodite', 'Déméter']],
+          ['Quel dieu forge les armes des dieux ?', 'Héphaïstos', ['Arès', 'Hermès', 'Apollon', 'Dionysos']],
+          ['Quel dieu règne sur le monde des morts ?', 'Hadès', ['Zeus', 'Poséidon', 'Apollon', 'Dionysos']],
+          ['Qui est l’épouse de Zeus ?', 'Héra', ['Athéna', 'Aphrodite', 'Artémis']],
+          ['Quel dieu grec est le dieu du vin et de la fête ?', 'Dionysos', ['Apollon', 'Hermès', 'Héphaïstos']],
+          ['Quel dieu grec est le dieu de la guerre ?', 'Arès', ['Apollon', 'Hermès', 'Hadès']],
+          ['Quelle déesse chasseresse est la sœur jumelle d’Apollon ?', 'Artémis', ['Athéna', 'Héra', 'Déméter']],
+          ['Quel oiseau accompagne la déesse Athéna ?', 'La chouette', ['L’aigle', 'Le paon', 'La colombe']],
+          ['Quel arbre Athéna a-t-elle offert aux Athéniens ?', 'L’olivier', ['Le chêne', 'Le laurier', 'Le figuier']],
+          ['Qui a aidé Thésée à sortir du labyrinthe grâce à un fil ?', 'Ariane', ['Médée', 'Pénélope', 'Hélène']],
+          ['Quelle épouse a attendu Ulysse pendant vingt ans ?', 'Pénélope', ['Hélène', 'Ariane', 'Médée']],
+          ['Quel poète grec a raconté la guerre de Troie et le voyage d’Ulysse ?', 'Homère', ['Ésope', 'Platon', 'Virgile']],
+          ['Comment s’appelle le récit du long voyage de retour d’Ulysse ?', 'L’Odyssée', ['L’Iliade', 'L’Énéide', 'Les Métamorphoses']],
+          ['Quel cyclope Ulysse a-t-il aveuglé ?', 'Polyphème', ['Cerbère', 'Argos', 'Atlas']],
+          ['Selon la légende, quels jumeaux ont été nourris par une louve ?', 'Romulus et Rémus', ['Castor et Pollux', 'Apollon et Artémis', 'Thésée et Ariane']],
+          ['Quel dieu égyptien a une tête de faucon ?', 'Horus', ['Anubis', 'Thot', 'Sobek']]],
+        difficile: [
+          ['Quel dieu romain a donné son nom au mois de mars ?', 'Mars', ['Jupiter', 'Mercure', 'Neptune', 'Vulcain', 'Janus']],
+          ['Quel dieu romain à deux visages a donné son nom à janvier ?', 'Janus', ['Jupiter', 'Mars', 'Saturne', 'Pluton', 'Vulcain']],
+          ['Quel dieu a le même nom chez les Grecs et chez les Romains ?', 'Apollon', ['Zeus', 'Arès', 'Hermès', 'Hadès', 'Dionysos']],
+          ['Quel jour de la semaine porte le nom du dieu Mercure ?', 'Le mercredi', ['Le mardi', 'Le jeudi', 'Le vendredi']],
+          ['Quel serpent à plusieurs têtes Héraclès a-t-il combattu ?', 'L’hydre de Lerne', ['Le python de Delphes', 'Le dragon de Colchide', 'La Chimère']],
+          ['Quelle guerre l’Iliade raconte-t-elle ?', 'La guerre de Troie', ['La guerre du Péloponnèse', 'Les guerres médiques', 'La guerre des Gaules']],
+          ['Quel poète latin a raconté le voyage d’Énée dans l’Énéide ?', 'Virgile', ['Homère', 'Ovide', 'Cicéron']],
+          ['Comment s’appelle le bateau de Jason ?', 'L’Argo', ['Le Nautilus', 'L’Odyssée', 'Le Pégase']],
+          ['Quel dieu égyptien a tué son frère Osiris ?', 'Seth', ['Horus', 'Anubis', 'Thot']],
+          ['Qui est le fils d’Osiris et d’Isis, qui venge son père ?', 'Horus', ['Seth', 'Thot', 'Sobek']],
+          ['Au jugement des morts égyptien, on pèse le cœur du mort face à…', 'une plume', ['une pierre', 'une pièce d’or', 'un scarabée']],
+          ['Sur quel fleuve des Enfers le passeur Charon fait-il traverser les morts ?', 'Le Styx', ['Le Nil', 'Le Tibre', 'L’Euphrate']],
+          ['Quelle magicienne a aidé Jason à prendre la Toison d’or ?', 'Médée', ['Circé', 'Ariane', 'Pandore']],
+          ['Quelle magicienne a changé les compagnons d’Ulysse en cochons ?', 'Circé', ['Médée', 'Calypso', 'Pénélope']],
+          ['Quelles créatures chantaient pour attirer les marins vers les rochers ?', 'Les sirènes', ['Les Muses', 'Les nymphes', 'Les Amazones']]],
+        expert: [
+          ['Qui est la mère de Zeus ?', 'Rhéa', ['Héra', 'Gaïa', 'Déméter', 'Thétis', 'Léto', 'Métis']],
+          ['Quel Titan porte le ciel sur ses épaules ?', 'Atlas', ['Cronos', 'Prométhée', 'Hypérion', 'Océan', 'Ouranos', 'Japet']],
+          ['Comment s’appelle la boisson des dieux grecs ?', 'Le nectar', ['L’ambroisie', 'L’hydromel', 'La cervoise', 'Le garum']],
+          ['Combien y a-t-il de Muses ?', '9', ['3', '7', '12']],
+          ['Quelle Muse veille sur l’histoire ?', 'Clio', ['Calliope', 'Uranie', 'Thalie']],
+          ['Quelle nymphe a retenu Ulysse sept ans sur son île ?', 'Calypso', ['Circé', 'Nausicaa', 'Écho']],
+          ['Quel monstre à la fois lion, chèvre et serpent Bellérophon a-t-il tué ?', 'La Chimère', ['L’hydre', 'Le Sphinx', 'Typhon']],
+          ['Quel roi de Crète a fait construire le labyrinthe ?', 'Minos', ['Égée', 'Priam', 'Agamemnon']],
+          ['Qui est le roi de Troie pendant la guerre ?', 'Priam', ['Agamemnon', 'Ménélas', 'Minos']],
+          ['Quel roi grec commandait l’armée grecque devant Troie ?', 'Agamemnon', ['Priam', 'Ménélas', 'Ulysse']],
+          ['Quelle ville égyptienne était le grand centre du culte d’Amon ?', 'Thèbes', ['Alexandrie', 'Memphis', 'Le Caire']],
+          ['Quelle déesse romaine protégeait le foyer, avec ses prêtresses les vestales ?', 'Vesta', ['Junon', 'Minerve', 'Diane']],
+          ['Quel jour de la semaine porte le nom de Jupiter ?', 'Le jeudi', ['Le lundi', 'Le mardi', 'Le samedi']],
+          ['Quel héros a été plongé bébé dans le Styx par sa mère Thétis ?', 'Achille', ['Hector', 'Ulysse', 'Énée']],
+          ['Quelle prêtresse d’Apollon rendait les oracles à Delphes ?', 'La Pythie', ['La Sibylle', 'Cassandre', 'Médée']]]
+      } },
+      { k: 'vf', niveaux: {
+        facile: [['Zeus est le roi des dieux grecs.', true, ''], ['Les dieux grecs vivent sur le mont Olympe.', true, ''],
+          ['Le Minotaure est mi-homme, mi-taureau.', true, ''], ['Anubis a une tête de chacal.', true, ''],
+          ['Poséidon est le dieu du Soleil.', false, 'Poséidon est le dieu de la mer ; le Soleil, c’est Hélios.'],
+          ['Pégase est un dragon à trois têtes.', false, 'Pégase est un cheval ailé.']],
+        moyen: [['Athéna est la déesse de la sagesse.', true, ''], ['Hadès règne sur le monde des morts.', true, ''],
+          ['Achille ne pouvait être blessé qu’au talon.', true, ''],
+          ['Ulysse est rentré chez lui quelques jours après la guerre de Troie.', false, 'Son voyage de retour a duré dix ans.'],
+          ['Les Égyptiens adoraient un seul dieu.', false, 'Ils adoraient de nombreux dieux ; seul Akhenaton a imposé un temps le culte d’Aton.']],
+        difficile: [['Le mot « panique » vient du dieu Pan.', true, ''], ['Osiris a été tué par son frère Seth.', true, ''],
+          ['Les Romains ont repris beaucoup de dieux grecs en changeant leur nom.', true, ''],
+          ['Apollon s’appelle Mars chez les Romains.', false, 'Apollon garde le même nom chez les Romains.'],
+          ['L’Iliade raconte le voyage de retour d’Ulysse.', false, 'L’Iliade raconte la guerre de Troie ; le retour d’Ulysse, c’est l’Odyssée.']],
+        expert: [['Le mot « atlas » vient du Titan Atlas.', true, ''], ['Cronos avalait ses enfants à leur naissance.', true, ''],
+          ['Zeus a été caché en Crète pour échapper à son père.', true, ''],
+          ['Les Muses sont les filles d’Apollon.', false, 'Elles sont les filles de Zeus et de Mnémosyne.'],
+          ['Thot est le dieu égyptien de la guerre.', false, 'Thot est le dieu de l’écriture et du savoir.']]
+      } },
       { k: 'indices', consigne: 'Qui suis-je ? Trouve le dieu égyptien.', niveaux: {
         facile: [{ r: 'Anubis', i: ['Je suis un dieu égyptien.', 'Je veille sur les tombes.', 'J’aide à préparer les momies.', 'Je suis noir comme la terre du Nil.', 'J’ai une tête de chacal.'] },
           { r: 'Râ', i: ['Je suis un dieu égyptien très important.', 'Je traverse le ciel dans une barque.', 'La nuit, je voyage sous la terre.', 'Je porte un disque sur la tête.', 'Je suis le dieu du Soleil.'] }],
@@ -365,22 +454,138 @@
           { r: 'Bastet', i: ['Je suis une déesse égyptienne.', 'Je protège les maisons et les familles.', 'On m’adorait à Bubastis.', 'On a momifié beaucoup d’animaux en mon honneur.', 'Je suis une déesse chatte.'] }],
         difficile: [{ r: 'Maât', i: ['Je suis une déesse égyptienne.', 'Je suis l’ordre du monde.', 'Au jugement des morts, on pèse le cœur face à moi.', 'Je suis la vérité et la justice.', 'Je porte une plume d’autruche sur la tête.'] }],
         expert: [{ r: 'Khépri', i: ['Je suis un dieu égyptien.', 'Je suis une forme du Soleil.', 'On porte mon image comme porte-bonheur.', 'Je suis le soleil du matin.', 'Je suis un scarabée qui pousse le Soleil comme une boule.'] }]
+      } },
+      { k: 'indices', consigne: 'Qui suis-je ? Trouve le héros.', niveaux: {
+        facile: [{ r: 'Thésée', i: ['Je suis un héros grec.', 'Mon père, Égée, était roi d’Athènes.', 'Ariane m’a donné une pelote de fil.', 'Je suis entré dans le labyrinthe de Crète.', 'J’ai tué le Minotaure.'] },
+          { r: 'Ulysse', i: ['Je suis un héros grec.', 'Je suis roi d’Ithaque.', 'Ma femme Pénélope m’a attendu vingt ans.', 'J’ai trompé le cyclope Polyphème.', 'J’ai eu l’idée du cheval de Troie.'] }],
+        moyen: [{ r: 'Jason', i: ['Je suis un héros grec.', 'Mon oncle m’a pris mon trône.', 'Mon bateau s’appelait l’Argo.', 'Médée m’a aidé grâce à sa magie.', 'J’ai rapporté la Toison d’or.'] }],
+        difficile: [{ r: 'Œdipe', i: ['Je suis un héros grec.', 'Je suis devenu roi de Thèbes.', 'Bébé, j’ai été abandonné dans la montagne.', 'Un monstre posait une énigme sur un animal à 4, 2 puis 3 pattes.', 'J’ai trouvé la réponse à l’énigme du Sphinx : l’homme.'] }],
+        expert: [{ r: 'Sisyphe', i: ['Je suis un roi de la mythologie grecque.', 'J’ai fondé la ville de Corinthe.', 'J’ai enchaîné la Mort pour ne pas mourir.', 'Les dieux m’ont puni aux Enfers.', 'Je pousse un rocher en haut d’une colline, et il retombe toujours.'] }]
       } }
     ] },
-    { id: 'a03', matiere: 'histoire', famille: 'ant', nom: 'Pharaons', court: 'Pharaons', icone: '🔺', series: [
-      { k: 'paires', gauche: 'Pharaon', droite: 'Ce qui l’a rendu célèbre', consigneR: 'Relie chaque fait au pharaon.',
-        q: 'Quel pharaon : {b} ?', inverseSeul: true, niveaux: {
-          facile: [['Khéops|Kheops', 'La plus grande pyramide de Gizeh'], ['Toutânkhamon|Toutankhamon', 'Son tombeau plein d’or est découvert en 1922'],
-            ['Ramsès II|Ramses II|Ramsès', 'Il règne 66 ans et fait bâtir Abou Simbel'], ['Cléopâtre|Cleopatre', 'La dernière reine d’Égypte, alliée de César']],
-          moyen: [['Akhenaton', 'Il fait adorer un seul dieu : Aton'], ['Hatchepsout', 'Une femme devenue pharaon'], ['Narmer', 'Il unit la Haute et la Basse-Égypte'],
-            ['Djéser|Djeser', 'La première pyramide, à degrés'], ['Khéphren|Khephren', 'On lui attribue le grand Sphinx de Gizeh']],
-          difficile: [['Thoutmôsis III|Thoutmosis III', 'Grand conquérant, jusqu’à l’Euphrate'], ['Mykérinos|Mykerinos', 'La plus petite des trois pyramides de Gizeh'],
-            ['Snéfrou|Snefrou', 'La pyramide rhomboïdale et la pyramide rouge'], ['Séthi Ier|Sethi Ier|Séthi', 'Le père de Ramsès II'],
-            ['Ahmôsis|Ahmosis', 'Il chasse les Hyksôs d’Égypte'], ['Amenhotep III', 'Les colosses de Memnon gardaient son temple']],
-          expert: [['Mentouhotep II', 'Il réunifie l’Égypte : début du Moyen Empire'], ['Sésostris III|Sesostris III', 'Il conquiert la Nubie au Moyen Empire'],
-            ['Ramsès III|Ramses III', 'Il repousse les Peuples de la mer'], ['Ptolémée Ier|Ptolemee Ier', 'Général d’Alexandre le Grand devenu pharaon'],
-            ['Nectanébo II|Nectanebo II', 'Le dernier pharaon né en Égypte'], ['Pépi II|Pepi II', 'Monté sur le trône enfant, il règne plusieurs dizaines d’années']]
+    { id: 'a03', matiere: 'histoire', famille: 'ant', nom: 'L’Égypte des pharaons', court: 'Égypte', icone: '🔺', series: [
+      { k: 'paires', gauche: 'Ce qui l’a rendu célèbre', droite: 'Pharaon', consigneR: 'Relie chaque fait au pharaon.',
+        q: 'Qui {a} ?', niveaux: {
+          facile: [['a fait bâtir la plus grande pyramide de Gizeh', 'Khéops|Kheops'], ['avait un tombeau plein d’or, découvert en 1922', 'Toutânkhamon|Toutankhamon'],
+            ['a régné 66 ans et fait creuser Abou Simbel', 'Ramsès II|Ramses II|Ramsès'], ['a été la dernière reine d’Égypte, alliée de César', 'Cléopâtre|Cleopatre']],
+          moyen: [['a fait adorer un seul dieu, Aton', 'Akhenaton'], ['était une femme devenue pharaon', 'Hatchepsout'], ['a uni la Haute et la Basse-Égypte', 'Narmer'],
+            ['a fait bâtir la première pyramide, à degrés', 'Djéser|Djeser'], ['aurait fait sculpter le grand Sphinx de Gizeh', 'Khéphren|Khephren']],
+          difficile: [['a été un grand conquérant, jusqu’à l’Euphrate', 'Thoutmôsis III|Thoutmosis III'], ['a fait bâtir la plus petite des trois pyramides de Gizeh', 'Mykérinos|Mykerinos'],
+            ['a fait bâtir la pyramide rhomboïdale et la pyramide rouge', 'Snéfrou|Snefrou'], ['était le père de Ramsès II', 'Séthi Ier|Sethi Ier|Séthi'],
+            ['a chassé les Hyksôs d’Égypte', 'Ahmôsis|Ahmosis'], ['avait un temple gardé par les colosses de Memnon', 'Amenhotep III']],
+          expert: [['a réunifié l’Égypte au début du Moyen Empire', 'Mentouhotep II'], ['a conquis la Nubie au Moyen Empire', 'Sésostris III|Sesostris III'],
+            ['a repoussé les Peuples de la mer', 'Ramsès III|Ramses III'], ['était un général d’Alexandre le Grand devenu roi d’Égypte', 'Ptolémée Ier|Ptolemee Ier'],
+            ['a été le dernier pharaon né en Égypte', 'Nectanébo II|Nectanebo II'], ['est monté sur le trône enfant et a régné plusieurs dizaines d’années', 'Pépi II|Pepi II']]
         } },
+      { k: 'paires', gauche: 'Écriture', droite: 'Peuple', consigneR: 'Relie chaque écriture au peuple qui l’utilisait.',
+        q: 'Quel peuple utilisait cette écriture : {a} ?', ouverte: false, niveaux: {
+          facile: [['Les hiéroglyphes', 'Les Égyptiens'], ['Le cunéiforme', 'Les Mésopotamiens'], ['L’alphabet grec', 'Les Grecs'], ['L’alphabet latin', 'Les Romains']],
+          difficile: [['Les runes', 'Les peuples germaniques'], ['Les caractères chinois', 'Les Chinois'], ['L’alphabet phénicien', 'Les Phéniciens'],
+            ['Les glyphes mayas', 'Les Mayas'], ['L’alphabet hébreu', 'Les Hébreux'], ['L’alphabet étrusque', 'Les Étrusques']]
+        } },
+      { k: 'qcm', niveaux: {
+        facile: [
+          ['Quel grand fleuve traverse l’Égypte ?', 'Le Nil', ['Le Tibre', 'L’Amazone', 'La Seine']],
+          ['Comment s’appellent les rois de l’Égypte ancienne ?', 'Les pharaons', ['Les empereurs', 'Les consuls', 'Les tsars']],
+          ['Qu’est-ce qu’une momie ?', 'Un corps conservé et entouré de bandelettes', ['Un temple', 'Un bijou en or', 'Une écriture']],
+          ['Quelle est l’écriture des Égyptiens, faite de petits dessins ?', 'Les hiéroglyphes', ['L’alphabet latin', 'Le braille', 'Les runes']],
+          ['Sur quoi les Égyptiens écrivaient-ils ?', 'Le papyrus', ['Le papier', 'Le plastique', 'L’ardoise']],
+          ['Quelle est la capitale actuelle de l’Égypte ?', 'Le Caire', ['Alexandrie', 'Louxor', 'Assouan']],
+          ['À quoi servaient les pyramides de Gizeh ?', 'De tombeau au pharaon', ['D’observatoire des étoiles', 'De caserne pour les soldats', 'De grenier à blé']],
+          ['Quel animal mi-lion mi-homme garde les pyramides de Gizeh ?', 'Le Sphinx', ['Le Minotaure', 'Le griffon', 'Le centaure']],
+          ['Quel pharaon a été retrouvé avec un célèbre masque en or ?', 'Toutânkhamon', ['Khéops', 'Narmer', 'Djéser']],
+          ['Qui a découvert le tombeau de Toutânkhamon en 1922 ?', 'Howard Carter', ['Champollion', 'Napoléon', 'Christophe Colomb']],
+          ['Quel animal était souvent momifié en l’honneur de la déesse Bastet ?', 'Le chat', ['Le chien', 'Le cheval', 'Le lion']],
+          ['Grâce à quoi les champs d’Égypte étaient-ils fertiles ?', 'La crue du Nil', ['La neige', 'Les pluies tropicales', 'Les engrais chimiques']],
+          ['Comment appelle-t-on celui dont le métier est d’écrire, en Égypte ?', 'Le scribe', ['Le prêtre', 'Le vizir', 'Le pharaon']],
+          ['Sur quel continent se trouve l’Égypte ?', 'L’Afrique', ['L’Europe', 'L’Amérique', 'L’Océanie']]],
+        moyen: [
+          ['Quelle pierre a permis de comprendre les hiéroglyphes ?', 'La pierre de Rosette', ['La pierre philosophale', 'Le menhir de Carnac', 'La pierre de Lune', 'Le code d’Hammurabi']],
+          ['Qui a déchiffré les hiéroglyphes ?', 'Jean-François Champollion', ['Howard Carter', 'Napoléon Bonaparte', 'Louis Pasteur']],
+          ['Sur quoi écrivait-on le cunéiforme ?', 'Des tablettes d’argile', ['Du papyrus', 'Du papier', 'Des feuilles de palmier', 'Des tablettes de cire']],
+          ['Où l’écriture est-elle apparue en premier, vers 3300 av. J.-C. ?', 'En Mésopotamie', ['En Grèce', 'À Rome', 'En Gaule', 'En Chine']],
+          ['Dans quelle vallée sont creusés les tombeaux des pharaons du Nouvel Empire ?', 'La Vallée des Rois', ['La vallée de la Loire', 'La vallée du Jourdain', 'La vallée du Rhône']],
+          ['Près de quelle ville actuelle se trouvent les pyramides de Gizeh ?', 'Le Caire', ['Louxor', 'Assouan', 'Alexandrie']],
+          ['Que retirait-on du corps pendant la momification ?', 'Les organes, placés dans des vases', ['Les os', 'La peau', 'Les cheveux']],
+          ['Comment appelle-t-on les vases où l’on gardait les organes de la momie ?', 'Les vases canopes', ['Les amphores', 'Les jarres à huile', 'Les urnes grecques']],
+          ['Avec quel sel séchait-on le corps pendant la momification ?', 'Le natron', ['Le sel de mer', 'Le sucre', 'Le poivre']],
+          ['Quelle reine, épouse d’Akhenaton, est célèbre pour son buste ?', 'Néfertiti', ['Cléopâtre', 'Hatchepsout', 'Isis']],
+          ['Qui aidait le pharaon à gouverner, comme un Premier ministre ?', 'Le vizir', ['Le consul', 'Le druide', 'Le sénateur']],
+          ['Avec quel général romain Cléopâtre s’est-elle alliée contre Octave ?', 'Marc Antoine', ['Jules César', 'Pompée', 'Brutus']],
+          ['Quel conquérant macédonien a fondé Alexandrie ?', 'Alexandre le Grand', ['Jules César', 'Ramsès II', 'Darius']],
+          ['Quel temple Ramsès II a-t-il fait creuser dans la falaise, au sud de l’Égypte ?', 'Abou Simbel', ['Karnak', 'Le Parthénon', 'Philae']],
+          ['Avec quoi les grandes pyramides ont-elles été construites ?', 'De gros blocs de pierre', ['Des briques de verre', 'Du béton armé', 'Du bois de chêne']]],
+        difficile: [
+          ['En quelle année Champollion annonce-t-il qu’il a compris les hiéroglyphes ?', '1822', ['1799', '1789', '1850', '1901', '1715']],
+          ['Avec quoi écrivait-on sur l’argile en Mésopotamie ?', 'Un roseau taillé, le calame', ['Une plume d’oie', 'Un pinceau', 'Un stylo', 'Un burin en fer', 'Un morceau de charbon']],
+          ['Quelle était la hauteur d’origine de la pyramide de Khéops ?', 'Environ 146 mètres', ['Environ 46 mètres', 'Environ 300 mètres', 'Environ 1 000 mètres']],
+          ['Comment appelle-t-on la grande période des pyramides ?', 'L’Ancien Empire', ['Le Nouvel Empire', 'Le Moyen Empire', 'L’époque ptolémaïque']],
+          ['À quelle période ont régné Ramsès II et Toutânkhamon ?', 'Le Nouvel Empire', ['L’Ancien Empire', 'Le Moyen Empire', 'L’époque romaine']],
+          ['En hiéroglyphes, qu’est-ce qu’un cartouche ?', 'Un ovale qui entoure le nom d’un roi', ['Une arme de soldat', 'Un bateau du Nil', 'Un panier à blé']],
+          ['Dans quelle ville se trouvait la plus grande bibliothèque de l’Antiquité ?', 'Alexandrie', ['Memphis', 'Thèbes', 'Gizeh']],
+          ['Comment s’appelait la capitale de l’Ancien Empire, près du Caire ?', 'Memphis', ['Thèbes', 'Amarna', 'Alexandrie']],
+          ['Quelle ville Akhenaton a-t-il fondée pour en faire sa capitale ?', 'Amarna|Akhetaton', ['Memphis', 'Thèbes', 'Alexandrie']],
+          ['Quel grand temple de Thèbes était consacré à Amon ?', 'Karnak', ['Abou Simbel', 'Philae', 'Edfou']],
+          ['Quels étrangers ont régné sur le nord de l’Égypte juste avant le Nouvel Empire ?', 'Les Hyksôs', ['Les Romains', 'Les Vikings', 'Les Gaulois']],
+          ['Contre quel peuple Ramsès II a-t-il livré la bataille de Qadesh ?', 'Les Hittites', ['Les Romains', 'Les Perses', 'Les Grecs']],
+          ['Qui a mené l’expédition d’Égypte où l’on a trouvé la pierre de Rosette ?', 'Napoléon Bonaparte', ['Louis XIV', 'Jules César', 'Charlemagne']],
+          ['Comment s’appelle le recueil de formules magiques placé dans les tombes pour guider le mort ?', 'Le Livre des morts', ['L’Iliade', 'Le code d’Hammurabi', 'L’Énéide']]],
+        expert: [
+          ['Quelles sont les trois écritures de la pierre de Rosette ?', 'Hiéroglyphes, démotique et grec', ['Hiéroglyphes, latin et grec', 'Cunéiforme, grec et latin', 'Hiéroglyphes, hébreu et grec', 'Démotique, latin et phénicien']],
+          ['Qui a déchiffré le linéaire B en 1952 ?', 'Michael Ventris', ['Jean-François Champollion', 'Howard Carter', 'Heinrich Schliemann', 'Arthur Evans']],
+          ['Comment s’appelle l’écriture plus rapide des scribes égyptiens, tirée des hiéroglyphes ?', 'Le hiératique', ['Le cunéiforme', 'Le linéaire A', 'L’araméen', 'Le sanskrit']],
+          ['Combien de lettres compte l’alphabet grec ?', '24', ['22', '26', '20', '30']],
+          ['Dans quel musée se trouve la pierre de Rosette ?', 'Le British Museum, à Londres', ['Le Louvre, à Paris', 'Le musée du Caire', 'Le Metropolitan Museum, à New York']],
+          ['Dans quel musée se trouve le buste de Néfertiti ?', 'Le Neues Museum, à Berlin', ['Le Louvre, à Paris', 'Le British Museum, à Londres', 'Le musée du Caire']],
+          ['Qui a financé les fouilles d’Howard Carter dans la Vallée des Rois ?', 'Lord Carnarvon', ['Lord Byron', 'Lord Nelson', 'Lord Kelvin']],
+          ['Quel architecte a construit la pyramide à degrés de Djéser ?', 'Imhotep', ['Senenmout', 'Hémiounou', 'Amenhotep']],
+          ['Quelle langue des chrétiens d’Égypte est la dernière forme de l’égyptien ancien ?', 'Le copte', ['L’araméen', 'Le latin', 'Le phénicien']],
+          ['Quelle dynastie d’origine grecque a régné sur l’Égypte après Alexandre ?', 'Les Ptolémées|Les Lagides', ['Les Séleucides', 'Les Antigonides', 'Les Achéménides']],
+          ['Quel temple a été découpé et remonté plus haut dans les années 1960, pour échapper au lac Nasser ?', 'Abou Simbel', ['Karnak', 'Louxor', 'Edfou']],
+          ['Quel barrage a créé le lac Nasser ?', 'Le haut barrage d’Assouan', ['Le barrage des Trois-Gorges', 'Le barrage Hoover', 'Le barrage de Serre-Ponçon']],
+          ['Comment s’appelait la capitale de Ramsès II, dans le delta du Nil ?', 'Pi-Ramsès', ['Amarna', 'Memphis', 'Thèbes']]]
+      } },
+      { k: 'vf', niveaux: {
+        facile: [['Les Égyptiens momifiaient leurs morts.', true, ''], ['Les pyramides de Gizeh sont des tombeaux.', true, ''], ['Le Nil traverse l’Égypte.', true, ''],
+          ['Les Égyptiens écrivaient sur du papier comme le nôtre.', false, 'Ils écrivaient sur du papyrus, fait avec une plante du Nil.'],
+          ['Les pyramides ont été construites par les Romains.', false, 'Elles ont été construites par les Égyptiens, bien avant Rome.']],
+        moyen: [['Une femme, Hatchepsout, a été pharaon.', true, ''],
+          ['Les hiéroglyphes peuvent se lire de droite à gauche.', true, 'Ils se lisent aussi de gauche à droite ou de haut en bas : les personnages regardent vers le début de la ligne.'],
+          ['Toutânkhamon est mort très vieux.', false, 'Il est mort vers 19 ans.'],
+          ['Cléopâtre a vécu à l’époque des premières pyramides.', false, 'Environ 2 500 ans séparent la pyramide de Khéops de Cléopâtre : elle a vécu plus près de nous que de Khéops.']],
+        difficile: [['La pierre de Rosette a été trouvée pendant l’expédition de Bonaparte en Égypte.', true, 'En 1799.'], ['Le grand Sphinx de Gizeh a perdu son nez.', true, ''],
+          ['Ramsès II a régné moins de dix ans.', false, 'Il a régné environ 66 ans.'],
+          ['Akhenaton a fait adorer Amon plus que tous les autres dieux.', false, 'Il a imposé le culte d’Aton, le disque solaire.']],
+        expert: [['La pyramide de Khéops est restée la construction la plus haute du monde pendant près de 4 000 ans.', true, 'Jusqu’à la cathédrale de Lincoln, en Angleterre, au XIVe siècle.'],
+          ['Cléopâtre VII parlait égyptien, contrairement aux rois ptolémées avant elle.', true, 'C’est ce que raconte l’historien Plutarque.'],
+          ['Le cunéiforme est une écriture égyptienne.', false, 'Le cunéiforme vient de Mésopotamie.'],
+          ['Champollion était déjà allé en Égypte quand il a déchiffré les hiéroglyphes.', false, 'Il les a déchiffrés en 1822 et n’est allé en Égypte qu’en 1828.']]
+      } },
+      { k: 'classer', niveaux: {
+        facile: [{ q: 'Range : Égypte ancienne ou Rome antique ?', colonnes: ['Égypte', 'Rome'],
+          items: [['Les pyramides', 0], ['Le pharaon', 0], ['Les momies', 0], ['Les hiéroglyphes', 0], ['Le Colisée', 1], ['L’empereur', 1], ['Les gladiateurs', 1], ['La toge', 1]] }],
+        moyen: [{ q: 'Range : Égypte ou Mésopotamie ?', colonnes: ['Égypte', 'Mésopotamie'],
+          items: [['Les hiéroglyphes', 0], ['Le papyrus', 0], ['Le Nil', 0], ['Les pyramides', 0], ['Le pharaon', 0],
+            ['Le cunéiforme', 1], ['Les tablettes d’argile', 1], ['Le Tigre et l’Euphrate', 1], ['Les ziggourats', 1], ['Babylone', 1]] }],
+        difficile: [{ q: 'Range ces pharaons : Ancien Empire ou Nouvel Empire ?', colonnes: ['Ancien Empire', 'Nouvel Empire'],
+          items: [['Khéops', 0], ['Khéphren', 0], ['Mykérinos', 0], ['Djéser', 0], ['Snéfrou', 0],
+            ['Ramsès II', 1], ['Toutânkhamon', 1], ['Akhenaton', 1], ['Hatchepsout', 1], ['Thoutmôsis III', 1]] }],
+        expert: [{ q: 'Range ces villes : Haute-Égypte (le sud) ou Basse-Égypte (le nord et le delta) ?', colonnes: ['Haute-Égypte', 'Basse-Égypte'],
+          items: [['Thèbes', 0], ['Abydos', 0], ['Assouan', 0], ['Edfou', 0], ['Memphis', 1], ['Alexandrie', 1], ['Saïs', 1], ['Tanis', 1], ['Bubastis', 1]] }]
+      } },
+      { k: 'ordre', consigne: 'Range ces événements de l’Égypte du plus ancien au plus récent.', q: 'Quand : {a} ?', niveaux: {
+        facile: [['Construction de la pyramide de Khéops', -2560, 'vers 2560 av. J.-C.'], ['Règne de Toutânkhamon', -1330, 'vers 1330 av. J.-C.'],
+          ['Mort de Cléopâtre', -30, '30 av. J.-C.'], ['Découverte du tombeau de Toutânkhamon', 1922, '1922']],
+        moyen: [['Premiers hiéroglyphes', -3200, 'vers 3200 av. J.-C.'], ['Pyramide à degrés de Djéser', -2650, 'vers 2650 av. J.-C.'],
+          ['Début du règne de Ramsès II', -1279, '1279 av. J.-C.'], ['Alexandre le Grand fonde Alexandrie', -331, '331 av. J.-C.'],
+          ['Champollion déchiffre les hiéroglyphes', 1822, '1822']],
+        difficile: [['Début de l’Ancien Empire', -2700, 'vers 2700 av. J.-C.'], ['Début du Moyen Empire', -2050, 'vers 2050 av. J.-C.'],
+          ['Début du Nouvel Empire', -1550, 'vers 1550 av. J.-C.'], ['L’Égypte devient une province romaine', -30, '30 av. J.-C.'],
+          ['Découverte de la pierre de Rosette', 1799, '1799']],
+        expert: [['Narmer unifie l’Égypte', -3100, 'vers 3100 av. J.-C.'], ['Règne d’Akhenaton', -1350, 'vers 1350 av. J.-C.'],
+          ['Bataille de Qadesh', -1274, 'vers 1274 av. J.-C.'], ['Les Perses conquièrent l’Égypte', -525, '525 av. J.-C.'],
+          ['Ptolémée Ier devient roi d’Égypte', -305, '305 av. J.-C.'], ['Abou Simbel est déplacé', 1964, 'de 1964 à 1968']]
+      } },
       { k: 'indices', consigne: 'Qui suis-je ? Trouve le pharaon.', niveaux: {
         facile: [{ r: 'Toutânkhamon', i: ['J’ai régné sur l’Égypte.', 'Je suis devenu pharaon vers 9 ans.', 'Je suis mort jeune, vers 19 ans.', 'Howard Carter a trouvé mon tombeau en 1922.', 'Mon masque funéraire en or est très célèbre.'] },
           { r: 'Khéops', i: ['J’ai régné sur l’Égypte il y a plus de 4 500 ans.', 'Mon père s’appelait Snéfrou.', 'Mon tombeau est à Gizeh, près du Caire.', 'C’est la seule des 7 merveilles du monde encore debout.', 'J’ai fait construire la plus grande des pyramides.'] }],
@@ -390,30 +595,119 @@
         expert: [{ r: 'Ramsès III', i: ['J’ai régné sur l’Égypte.', 'Mon temple est à Médinet Habou.', 'Je suis le dernier grand pharaon du Nouvel Empire.', 'Un complot a été organisé contre moi dans mon palais.', 'J’ai repoussé les Peuples de la mer.'] }]
       } }
     ] },
-    { id: 'a04', matiere: 'histoire', famille: 'ant', nom: 'Héros et mythes', court: 'Héros', icone: '🦸', series: [
-      { k: 'paires', gauche: 'Personnage', droite: 'Exploit', consigneR: 'Relie chaque histoire à son personnage.',
-        q: 'Quel personnage : {b} ?', inverseSeul: true, niveaux: {
-          facile: [['Thésée|Thesee', 'Il tue le Minotaure dans le labyrinthe'], ['Persée|Persee', 'Il coupe la tête de Méduse'],
-            ['Hercule|Héraclès|Heracles', 'Il réalise douze travaux'], ['Ulysse', 'Il imagine le cheval de Troie'],
-            ['Icare', 'Il vole trop près du Soleil avec des ailes de cire']],
-          moyen: [['Jason', 'Il part chercher la Toison d’or'], ['Achille', 'Seul son talon peut être blessé'], ['Pandore', 'Elle ouvre la jarre qui libère les malheurs'],
-            ['Orphée|Orphee', 'Il descend aux Enfers chercher Eurydice'], ['Romulus', 'Il fonde Rome'], ['Prométhée|Promethee', 'Il vole le feu des dieux pour les hommes']],
-          difficile: [['Bellérophon|Bellerophon', 'Monté sur Pégase, il tue la Chimère'], ['Œdipe|Oedipe', 'Il résout l’énigme du Sphinx'],
-            ['Atalante', 'Une chasseuse plus rapide que tous à la course'], ['Énée|Enee', 'Il fuit Troie en flammes et arrive en Italie'],
-            ['Hector', 'Le plus grand héros troyen, tué par Achille'], ['Pâris|Paris', 'Il enlève Hélène, ce qui déclenche la guerre de Troie']],
-          expert: [['Midas', 'Tout ce qu’il touche se change en or'], ['Narcisse', 'Il tombe amoureux de son reflet'], ['Sisyphe', 'Il pousse un rocher qui retombe sans fin'],
-            ['Tantale', 'L’eau et les fruits s’éloignent quand il veut les prendre'], ['Dédale|Dedale', 'L’architecte qui construit le labyrinthe'],
-            ['Arachné|Arachne', 'Changée en araignée par Athéna'], ['Méléagre|Meleagre', 'Il tue le sanglier de Calydon']]
+    { id: 'a05', matiere: 'histoire', famille: 'ant', nom: 'Rome et la Gaule', court: 'Rome, Gaule', icone: '🏛️', series: [
+      { k: 'paires', gauche: 'Nom antique', droite: 'Ville actuelle', consigneR: 'Relie chaque nom antique à la ville d’aujourd’hui.',
+        q: 'Quelle ville s’appelait {a} dans l’Antiquité ?', qi: 'Comment s’appelait {b} dans l’Antiquité ?', niveaux: {
+          facile: [['Lutèce|Lutece', 'Paris'], ['Lugdunum', 'Lyon'], ['Massalia|Massilia', 'Marseille'], ['Burdigala', 'Bordeaux'], ['Nemausus', 'Nîmes|Nimes']],
+          moyen: [['Tolosa', 'Toulouse'], ['Arelate', 'Arles'], ['Nicaea|Nikaia', 'Nice'], ['Narbo Martius|Narbo', 'Narbonne'],
+            ['Argentoratum', 'Strasbourg'], ['Cenabum|Genabum', 'Orléans|Orleans']],
+          difficile: [['Rotomagus', 'Rouen'], ['Caesarodunum', 'Tours'], ['Limonum', 'Poitiers'], ['Vesontio', 'Besançon|Besancon'],
+            ['Durocortorum', 'Reims'], ['Gesoriacum', 'Boulogne-sur-Mer|Boulogne'], ['Condate', 'Rennes']],
+          expert: [['Augustonemetum', 'Clermont-Ferrand'], ['Samarobriva', 'Amiens'], ['Antipolis', 'Antibes'], ['Forum Julii', 'Fréjus|Frejus'],
+            ['Aquae Sextiae', 'Aix-en-Provence|Aix'], ['Avaricum', 'Bourges'], ['Divona', 'Cahors']]
         } },
-      { k: 'indices', consigne: 'Qui suis-je ? Trouve le héros.', niveaux: {
-        facile: [{ r: 'Thésée', i: ['Je suis un héros grec.', 'Mon père, Égée, était roi d’Athènes.', 'Ariane m’a donné une pelote de fil.', 'Je suis entré dans le labyrinthe de Crète.', 'J’ai tué le Minotaure.'] },
-          { r: 'Ulysse', i: ['Je suis un héros grec.', 'Je suis roi d’Ithaque.', 'Ma femme Pénélope m’a attendu vingt ans.', 'J’ai trompé le cyclope Polyphème.', 'J’ai eu l’idée du cheval de Troie.'] }],
-        moyen: [{ r: 'Jason', i: ['Je suis un héros grec.', 'Mon oncle m’a pris mon trône.', 'Mon bateau s’appelait l’Argo.', 'Médée m’a aidé grâce à sa magie.', 'J’ai rapporté la Toison d’or.'] }],
-        difficile: [{ r: 'Œdipe', i: ['Je suis un héros grec.', 'Je suis devenu roi de Thèbes.', 'Bébé, j’ai été abandonné dans la montagne.', 'Un monstre posait une énigme sur un animal à 4, 2 puis 3 pattes.', 'J’ai trouvé la réponse à l’énigme du Sphinx : l’homme.'] }],
-        expert: [{ r: 'Sisyphe', i: ['Je suis un roi de la mythologie grecque.', 'J’ai fondé la ville de Corinthe.', 'J’ai enchaîné la Mort pour ne pas mourir.', 'Les dieux m’ont puni aux Enfers.', 'Je pousse un rocher en haut d’une colline, et il retombe toujours.'] }]
-      } }
-    ] },
-    { id: 'a05', matiere: 'histoire', famille: 'ant', nom: 'Rome, de la fondation à la chute', court: 'Rome', icone: '🏛️', series: [
+      { k: 'paires', gauche: 'Ce qu’il a fait', droite: 'Personnage', consigneR: 'Relie chaque fait à son personnage.',
+        q: 'Qui {a} ?', niveaux: {
+          facile: [['a conquis la Gaule', 'Jules César|César'], ['a été le premier empereur romain', 'Auguste|Octave'],
+            ['était le chef gaulois vaincu à Alésia', 'Vercingétorix|Vercingetorix'], ['a traversé les Alpes avec des éléphants', 'Hannibal'],
+            ['a été nourri par une louve avec son frère jumeau, selon la légende', 'Romulus']],
+          moyen: [['a été accusé d’avoir incendié Rome en 64', 'Néron|Neron'], ['a été le premier empereur chrétien', 'Constantin'],
+            ['a fait bâtir un mur au nord de la Bretagne romaine', 'Hadrien'], ['a mené une grande révolte d’esclaves', 'Spartacus'],
+            ['a gouverné l’Empire quand il était le plus grand', 'Trajan'], ['a été le dernier empereur romain d’Occident', 'Romulus Augustule']],
+          difficile: [['a fait commencer le Colisée', 'Vespasien'], ['a été l’empereur philosophe, auteur des Pensées', 'Marc Aurèle|Marc Aurele'],
+            ['a donné la citoyenneté romaine à tous les hommes libres de l’Empire', 'Caracalla'], ['était le roi des Huns, battu en 451', 'Attila'],
+            ['a battu Hannibal à Zama', 'Scipion l’Africain|Scipion'], ['a déposé le dernier empereur d’Occident en 476', 'Odoacre']],
+          expert: [['a été le dernier roi de Rome, chassé en 509 av. J.-C.', 'Tarquin le Superbe|Tarquin'], ['était le chef gaulois qui a pris Rome vers 390 av. J.-C.', 'Brennus'],
+            ['a fait du christianisme la religion officielle de l’Empire', 'Théodose|Theodose'], ['a partagé le pouvoir entre quatre empereurs, la tétrarchie', 'Dioclétien|Diocletien'],
+            ['était le roi de Numidie vaincu par Marius', 'Jugurtha'], ['était le roi d’Épire aux victoires trop coûteuses', 'Pyrrhus']]
+        } },
+      { k: 'qcm', niveaux: {
+        facile: [
+          ['Quel chef gaulois a résisté à Jules César ?', 'Vercingétorix', ['Astérix', 'Clovis', 'Charlemagne']],
+          ['Dans quelle ville Vercingétorix se rend-il à César en 52 av. J.-C. ?', 'Alésia', ['Lutèce', 'Rome', 'Gergovie']],
+          ['Comment s’appellent les prêtres gaulois ?', 'Les druides', ['Les pharaons', 'Les moines', 'Les vestales']],
+          ['Dans quel pays actuel se trouve Rome ?', 'L’Italie', ['La Grèce', 'L’Espagne', 'L’Égypte']],
+          ['Comment s’appelle le soldat de l’armée romaine ?', 'Le légionnaire', ['Le chevalier', 'Le samouraï', 'Le mousquetaire']],
+          ['Comment s’appelle le chef de l’Empire romain ?', 'L’empereur', ['Le pharaon', 'Le roi de France', 'Le président']],
+          ['Quelle langue parlaient les Romains ?', 'Le latin', ['Le grec', 'L’italien', 'Le gaulois']],
+          ['Comment s’appelait la France à l’époque de Jules César ?', 'La Gaule', ['La Bretagne', 'La Germanie', 'L’Ibérie']],
+          ['Quelle ville a été ensevelie par le Vésuve en 79 ?', 'Pompéi', ['Rome', 'Naples', 'Venise']],
+          ['Où les Romains regardaient-ils les combats de gladiateurs ?', 'Dans un amphithéâtre', ['Dans une église', 'Dans un château fort', 'Dans une pyramide']],
+          ['Quel fleuve traverse Rome ?', 'Le Tibre', ['Le Nil', 'La Seine', 'Le Rhône']],
+          ['Sur combien de collines Rome a-t-elle été bâtie, selon la tradition ?', '7', ['3', '12', '100']],
+          ['Quel était le métier de la plupart des Gaulois ?', 'Paysan', ['Marin', 'Soldat romain', 'Marchand d’épices']],
+          ['Quelle plante sacrée les druides coupaient-ils dans les arbres ?', 'Le gui', ['La rose', 'Le blé', 'Le maïs']]],
+        moyen: [
+          ['Quelle victoire Vercingétorix remporte-t-il contre César ?', 'Gergovie', ['Alésia', 'Bibracte', 'Lutèce', 'Avaricum']],
+          ['Comment s’appelle le grand village fortifié des Gaulois ?', 'L’oppidum', ['Le castrum', 'Le forum', 'La villa', 'Le donjon']],
+          ['De quelle ville venait Hannibal ?', 'Carthage', ['Athènes', 'Sparte', 'Alexandrie']],
+          ['Comment appelle-t-on les guerres entre Rome et Carthage ?', 'Les guerres puniques', ['Les guerres médiques', 'La guerre de Cent Ans', 'La guerre des Gaules']],
+          ['Quel volcan a détruit Pompéi ?', 'Le Vésuve', ['L’Etna', 'Le Stromboli', 'Le Kilimandjaro']],
+          ['Que veut dire « SPQR », inscrit partout à Rome ?', 'Le Sénat et le peuple romain', ['Sauvons Pompéi, quittons Rome', 'Soldats prêts, quittons Rome', 'Sénat, prêtres, questeurs, rois']],
+          ['Comment les Romains appelaient-ils la Méditerranée ?', 'Mare Nostrum, « notre mer »', ['Mare Magnum, « la grande mer »', 'Oceanus, « l’océan »', 'Mare Rubrum, « la mer Rouge »']],
+          ['Comment appelle-t-on le mélange des cultures gauloise et romaine ?', 'La civilisation gallo-romaine', ['La Renaissance', 'La féodalité', 'La préhistoire']],
+          ['Quelles routes les Romains ont-ils construites dans tout l’Empire ?', 'Les voies romaines', ['Les autoroutes', 'Les chemins de fer', 'Les canaux']],
+          ['Quelle phrase célèbre César a-t-il dite après une victoire rapide ?', '« Je suis venu, j’ai vu, j’ai vaincu »', ['« Après moi, le déluge »', '« Paris vaut bien une messe »', '« L’État, c’est moi »']],
+          ['Quel fleuve César a-t-il franchi en 49 av. J.-C. en disant « Le sort en est jeté » ?', 'Le Rubicon', ['Le Rhin', 'Le Tibre', 'Le Rhône']],
+          ['Comment s’appelait le sud de la Gaule, conquis par Rome avant César ?', 'La Narbonnaise', ['L’Aquitaine', 'La Belgique', 'L’Armorique']],
+          ['Comment s’appelait la Bretagne actuelle à l’époque gauloise ?', 'L’Armorique', ['La Narbonnaise', 'L’Aquitaine', 'La Belgique']],
+          ['Quel mois porte le nom de Jules César ?', 'Juillet', ['Juin', 'Janvier', 'Août']]],
+        difficile: [
+          ['De quel peuple Vercingétorix était-il le chef ?', 'Les Arvernes', ['Les Éduens', 'Les Parisii', 'Les Belges', 'Les Helvètes', 'Les Vénètes']],
+          ['Comment César a-t-il appelé son livre sur la conquête ?', 'La Guerre des Gaules', ['L’Énéide', 'L’Odyssée', 'Les Métamorphoses', 'Les Vies parallèles']],
+          ['Qu’arrive-t-il à Vercingétorix après Alésia ?', 'Il est emmené à Rome puis exécuté', ['Il devient sénateur', 'Il s’enfuit en Bretagne', 'Il devient roi de Gaule', 'Il est libéré']],
+          ['Où Hannibal a-t-il été vaincu en 202 av. J.-C. ?', 'À Zama', ['À Cannes', 'À Alésia', 'À Actium']],
+          ['Quel empereur est le premier à être né en Gaule, à Lyon ?', 'Claude', ['Néron', 'Trajan', 'Hadrien']],
+          ['Combien de consuls dirigeaient la République romaine chaque année ?', '2', ['1', '3', '10']],
+          ['À Rome, comment appelle-t-on un chef qui a tous les pouvoirs pendant six mois en cas de danger ?', 'Un dictateur', ['Un consul', 'Un tribun', 'Un censeur']],
+          ['Selon César, quels sont les trois peuples de la Gaule ?', 'Les Belges, les Celtes et les Aquitains', ['Les Francs, les Goths et les Huns', 'Les Grecs, les Romains et les Étrusques', 'Les Bretons, les Normands et les Basques']],
+          ['Quel peuple voisin a donné ses derniers rois à Rome ?', 'Les Étrusques', ['Les Grecs', 'Les Gaulois', 'Les Carthaginois']],
+          ['Sur quelle colline de Rome les empereurs avaient-ils leur palais ?', 'Le Palatin', ['Le Capitole', 'L’Aventin', 'Le Vatican']],
+          ['Quel peuple germanique a donné son nom à la France ?', 'Les Francs', ['Les Wisigoths', 'Les Vandales', 'Les Burgondes']],
+          ['Quelle ville était la capitale des Gaules à l’époque romaine ?', 'Lyon', ['Paris', 'Marseille', 'Nîmes']],
+          ['Qui a fondé Marseille, vers 600 av. J.-C. ?', 'Des Grecs venus de Phocée', ['Des Romains', 'Des Phéniciens de Tyr', 'Des Gaulois arvernes']],
+          ['Quel mois porte le nom de l’empereur Auguste ?', 'Août', ['Juillet', 'Avril', 'Mai']],
+          ['Comment s’appelle la formation où les légionnaires se protègent avec leurs boucliers, même au-dessus de la tête ?', 'La tortue', ['Le hérisson', 'La phalange', 'Le carré']]],
+        expert: [
+          ['Quel peuple gaulois a donné son nom à Paris ?', 'Les Parisii', ['Les Arvernes', 'Les Éduens', 'Les Sénons', 'Les Carnutes']],
+          ['Selon Pline, avec quoi les druides coupaient-ils le gui ?', 'Une serpe d’or', ['Une épée de fer', 'Une hache de bronze', 'Un couteau de silex']],
+          ['Quel peuple gaulois avait son oppidum à Bibracte ?', 'Les Éduens', ['Les Arvernes', 'Les Parisii', 'Les Bituriges', 'Les Vénètes']],
+          ['Quel mot français vient du Palatin, la colline des empereurs ?', 'Palais', ['Palette', 'Palissade', 'Palier']],
+          ['Quel calendrier Jules César a-t-il créé, avec une année de 365 jours et un quart ?', 'Le calendrier julien', ['Le calendrier grégorien', 'Le calendrier républicain', 'Le calendrier lunaire']],
+          ['Combien de soldats comptait environ une légion romaine ?', 'Environ 5 000', ['Environ 50', 'Environ 500', 'Environ 50 000']],
+          ['Sur quelle colline de Rome se trouvait le grand temple de Jupiter ?', 'Le Capitole', ['Le Palatin', 'L’Aventin', 'Le Janicule']],
+          ['Quel futur empereur a été proclamé à Lutèce en 360 ?', 'Julien', ['Constantin', 'Néron', 'Trajan']],
+          ['Quel Romain a fondé Lugdunum en 43 av. J.-C. ?', 'Munatius Plancus', ['Jules César', 'Agrippa', 'Marc Antoine']],
+          ['Comment s’appelaient les prêtresses qui gardaient le feu sacré de Rome ?', 'Les vestales', ['Les sibylles', 'Les druidesses', 'Les bacchantes']],
+          ['Quelle bataille de 216 av. J.-C. a été la plus grande victoire d’Hannibal ?', 'Cannes', ['Zama', 'Alésia', 'Actium']],
+          ['Quel général romain a vaincu les Cimbres et les Teutons ?', 'Marius', ['Sylla', 'Pompée', 'Crassus']]]
+      } },
+      { k: 'vf', niveaux: {
+        facile: [['Vercingétorix était un chef gaulois.', true, ''], ['Les Romains parlaient latin.', true, ''],
+          ['Les Gaulois vivaient surtout à la campagne, dans des fermes et des villages.', true, ''],
+          ['Jules César a été empereur de Rome.', false, 'Jules César a été général et dictateur, mais jamais empereur : le premier empereur est Auguste.'],
+          ['La Gaule a été conquise par les Grecs.', false, 'Elle a été conquise par les Romains de Jules César.']],
+        moyen: [['Le latin est l’ancêtre du français.', true, ''], ['Les Gaulois portaient des braies, une sorte de pantalon.', true, ''],
+          ['Les Romains ont construit des routes pavées dans toute la Gaule.', true, ''],
+          ['Vercingétorix a gagné la bataille d’Alésia.', false, 'Il a gagné à Gergovie mais perdu à Alésia.'],
+          ['Les gladiateurs combattaient au Sénat.', false, 'Ils combattaient dans l’arène des amphithéâtres.']],
+        difficile: [['Rome a d’abord été gouvernée par des rois.', true, 'Sept rois, selon la tradition, avant la République en 509 av. J.-C.'],
+          ['Carthage se trouvait dans l’actuelle Tunisie.', true, ''],
+          ['L’Empire romain d’Orient a disparu en même temps que celui d’Occident.', false, 'L’Empire d’Orient (byzantin) a duré jusqu’en 1453.'],
+          ['Dès Auguste, tous les habitants libres de l’Empire étaient citoyens romains.', false, 'Il a fallu attendre l’édit de Caracalla, en 212.']],
+        expert: [['Marseille est plus ancienne que la conquête de la Gaule par César.', true, 'Elle a été fondée par des Grecs vers 600 av. J.-C.'],
+          ['La Narbonnaise a été conquise par Rome avant le reste de la Gaule.', true, ''],
+          ['Dans la Guerre des Gaules, César parle de lui en disant « je ».', false, 'Il parle de lui à la troisième personne, en disant « César ».'],
+          ['Hannibal a fini par prendre Rome.', false, 'Il n’a jamais attaqué Rome elle-même et a été vaincu à Zama.']]
+      } },
+      { k: 'classer', niveaux: {
+        facile: [{ q: 'Range : les Gaulois ou les Romains ?', colonnes: ['Gaulois', 'Romains'],
+          items: [['Les druides', 0], ['Vercingétorix', 0], ['L’oppidum', 0], ['Les braies', 0], ['Le gui', 0],
+            ['Le légionnaire', 1], ['La toge', 1], ['L’empereur', 1], ['Le Colisée', 1], ['Le latin', 1]] }],
+        moyen: [{ q: 'Range : République romaine ou Empire romain ?', colonnes: ['République', 'Empire'],
+          items: [['Les deux consuls', 0], ['Les guerres puniques', 0], ['Spartacus', 0], ['Jules César', 0], ['La destruction de Carthage', 0],
+            ['Auguste', 1], ['Néron', 1], ['Trajan', 1], ['Le Colisée', 1], ['Constantin', 1]] }]
+      } },
       { k: 'ordre', consigne: 'Range ces événements de Rome du plus ancien au plus récent.', q: 'En quelle année : {a} ?', niveaux: {
         facile: [['Fondation de Rome, selon la légende', -753, '753 av. J.-C.'], ['Jules César bat Vercingétorix à Alésia', -52, '52 av. J.-C.'],
           ['Auguste devient le premier empereur', -27, '27 av. J.-C.'], ['Fin de l’Empire romain d’Occident', 476, '476']],
@@ -429,38 +723,12 @@
           ['Le sac de Rome par les Vandales', 455, '455']]
       } }
     ] },
-    { id: 'a06', matiere: 'histoire', famille: 'ant', nom: 'La Gaule', court: 'Gaule', icone: '🛡️', series: [
-      { k: 'paires', gauche: 'Nom antique', droite: 'Ville actuelle', consigneR: 'Relie chaque nom antique à la ville d’aujourd’hui.',
-        q: 'Quelle ville s’appelait {a} dans l’Antiquité ?', qi: 'Comment s’appelait {b} dans l’Antiquité ?', niveaux: {
-          facile: [['Lutèce|Lutece', 'Paris'], ['Lugdunum', 'Lyon'], ['Massalia|Massilia', 'Marseille'], ['Burdigala', 'Bordeaux'], ['Nemausus', 'Nîmes|Nimes']],
-          moyen: [['Tolosa', 'Toulouse'], ['Arelate', 'Arles'], ['Nicaea|Nikaia', 'Nice'], ['Narbo Martius|Narbo', 'Narbonne'],
-            ['Argentoratum', 'Strasbourg'], ['Cenabum|Genabum', 'Orléans|Orleans']],
-          difficile: [['Rotomagus', 'Rouen'], ['Caesarodunum', 'Tours'], ['Limonum', 'Poitiers'], ['Vesontio', 'Besançon|Besancon'],
-            ['Durocortorum', 'Reims'], ['Gesoriacum', 'Boulogne-sur-Mer|Boulogne'], ['Condate', 'Rennes']],
-          expert: [['Augustonemetum', 'Clermont-Ferrand'], ['Samarobriva', 'Amiens'], ['Antipolis', 'Antibes'], ['Forum Julii', 'Fréjus|Frejus'],
-            ['Aquae Sextiae', 'Aix-en-Provence|Aix'], ['Avaricum', 'Bourges'], ['Divona', 'Cahors']]
-        } },
-      { k: 'qcm', niveaux: {
-        facile: [['Quel chef gaulois a résisté à Jules César ?', 'Vercingétorix', ['Astérix', 'Clovis', 'Charlemagne']],
-          ['Dans quelle ville Vercingétorix se rend-il à César en 52 av. J.-C. ?', 'Alésia', ['Lutèce', 'Rome', 'Gergovie']],
-          ['Comment s’appellent les prêtres gaulois ?', 'Les druides', ['Les pharaons', 'Les moines', 'Les vestales']]],
-        moyen: [['Quelle victoire Vercingétorix remporte-t-il contre César ?', 'Gergovie', ['Alésia', 'Bibracte', 'Lutèce', 'Avaricum']],
-          ['Quel général romain a conquis la Gaule ?', 'Jules César', ['Auguste', 'Néron', 'Hannibal', 'Trajan']],
-          ['Comment s’appelle le grand village fortifié des Gaulois ?', 'L’oppidum', ['Le castrum', 'Le forum', 'La villa', 'Le donjon']]],
-        difficile: [['De quel peuple Vercingétorix était-il le chef ?', 'Les Arvernes', ['Les Éduens', 'Les Parisii', 'Les Belges', 'Les Helvètes', 'Les Vénètes']],
-          ['Comment César a-t-il appelé son livre sur la conquête ?', 'La Guerre des Gaules', ['L’Énéide', 'L’Odyssée', 'Les Métamorphoses', 'Les Vies parallèles', 'L’Iliade']],
-          ['Qu’arrive-t-il à Vercingétorix après Alésia ?', 'Il est emmené à Rome puis exécuté', ['Il devient sénateur', 'Il s’enfuit en Bretagne', 'Il devient roi de Gaule', 'Il part en Égypte', 'Il est libéré']]],
-        expert: [['Quel peuple gaulois a donné son nom à Paris ?', 'Les Parisii', ['Les Arvernes', 'Les Éduens', 'Les Sénons', 'Les Carnutes', 'Les Lingons']],
-          ['Selon Pline, quelle plante les druides coupaient-ils avec une serpe d’or ?', 'Le gui', ['Le houx', 'Le lierre', 'Le chêne', 'Le laurier', 'La verveine']],
-          ['Quel peuple gaulois avait son oppidum à Bibracte ?', 'Les Éduens', ['Les Arvernes', 'Les Parisii', 'Les Bituriges', 'Les Vénètes', 'Les Rèmes']]]
-      } }
-    ] },
-    { id: 'a07', matiere: 'histoire', famille: 'ant', nom: 'Monuments antiques', court: 'Monuments', icone: '🏟️', series: [
+    { id: 'a07', matiere: 'histoire', famille: 'ant', nom: 'Monuments et merveilles', court: 'Monuments', icone: '🏟️', series: [
       { k: 'paires', gauche: 'Monument', droite: 'Lieu', consigneR: 'Relie chaque monument à son lieu.',
         q: 'Où se trouve ce monument : {a} ?', ouverte: false, niveaux: {
           facile: [['Le Colisée', 'Rome'], ['Le Parthénon', 'Athènes'], ['Les pyramides de Gizeh', 'L’Égypte'], ['Le pont du Gard', 'Le sud de la France']],
           moyen: [['La Maison carrée', 'Nîmes'], ['Pompéi', 'Près de Naples'], ['Le mur d’Hadrien', 'Le nord de l’Angleterre'],
-            ['Les temples d’Abou Simbel', 'Le sud de l’Égypte'], ['Pétra, la ville taillée dans la roche', 'La Jordanie']]
+            ['Les temples d’Abou Simbel', 'Le sud de l’Égypte'], ['Pétra, la ville taillée dans la roche', 'La Jordanie'], ['Le théâtre antique d’Orange', 'Le Vaucluse']]
         } },
       { k: 'paires', gauche: 'Site', droite: 'Pays actuel', consigneR: 'Relie chaque site antique à son pays actuel.',
         q: 'Dans quel pays actuel se trouve ce site : {a} ?', ouverte: false, niveaux: {
@@ -468,103 +736,231 @@
             ['Palmyre', 'La Syrie'], ['Éphèse', 'La Turquie'], ['Carthage', 'La Tunisie']],
           expert: [['Volubilis', 'Le Maroc'], ['Timgad', 'L’Algérie'], ['Baalbek', 'Le Liban'], ['La Porta Nigra de Trèves', 'L’Allemagne'],
             ['Le théâtre romain de Mérida', 'L’Espagne'], ['Jerash', 'La Jordanie'], ['L’amphithéâtre d’El Jem', 'La Tunisie']]
-        } }
-    ] },
-    { id: 'a08', matiere: 'histoire', famille: 'ant', nom: 'Les 7 merveilles du monde', court: '7 merveilles', icone: '🌟', series: [
-      { k: 'qcm', niveaux: {
-        facile: [['Laquelle des 7 merveilles du monde antique existe encore ?', 'La pyramide de Khéops', ['Le phare d’Alexandrie', 'Le Colosse de Rhodes', 'Les jardins de Babylone']],
-          ['Combien y avait-il de merveilles du monde antique ?', '7', ['3', '10', '12']],
-          ['Dans quel pays se trouve la pyramide de Khéops ?', 'L’Égypte', ['La Grèce', 'L’Italie', 'Le Mexique']]],
-        moyen: [['Quelle merveille était un géant de bronze à l’entrée d’un port ?', 'Le Colosse de Rhodes', ['Le phare d’Alexandrie', 'La statue de Zeus', 'Le Mausolée d’Halicarnasse', 'Le temple d’Artémis']],
-          ['Dans quelle ville se trouvaient les jardins suspendus, selon la légende ?', 'Babylone', ['Athènes', 'Rome', 'Alexandrie', 'Memphis']],
-          ['Dans quelle ville se trouvait le célèbre phare de l’Antiquité ?', 'Alexandrie', ['Rhodes', 'Athènes', 'Carthage', 'Rome']],
-          ['Où se trouvait la grande statue de Zeus ?', 'À Olympie', ['À Athènes', 'À Rome', 'À Sparte', 'À Delphes']]],
-        difficile: [['Quelle merveille était le tombeau d’un roi de Carie ?', 'Le Mausolée d’Halicarnasse', ['Le temple d’Artémis', 'Le phare d’Alexandrie', 'Le Colosse de Rhodes', 'La statue de Zeus', 'Les jardins de Babylone']],
-          ['Dans quelle ville se trouvait le temple d’Artémis ?', 'Éphèse', ['Athènes', 'Olympie', 'Rhodes', 'Alexandrie', 'Corinthe']],
-          ['Quel sculpteur a créé la statue de Zeus à Olympie ?', 'Phidias', ['Praxitèle', 'Michel-Ange', 'Myron', 'Polyclète', 'Lysippe']],
-          ['L’île de Pharos a donné un mot à la langue française. Lequel ?', 'Phare', ['Pharmacie', 'Pharaon', 'Fard', 'Farine', 'Fanal']]],
-        expert: [['Qui a incendié le temple d’Artémis en 356 av. J.-C. pour devenir célèbre ?', 'Érostrate', ['Alexandre le Grand', 'Néron', 'Darius', 'Xerxès', 'Périclès', 'Hannibal']],
-          ['Quelle ville turque se trouve aujourd’hui à la place d’Halicarnasse ?', 'Bodrum', ['Istanbul', 'Izmir', 'Antalya', 'Ankara', 'Troie', 'Éphèse']],
-          ['Quel dieu représentait le Colosse de Rhodes ?', 'Hélios, le Soleil', ['Zeus', 'Poséidon', 'Apollon', 'Arès', 'Hermès', 'Héraclès']],
-          ['Qui a fait bâtir le Mausolée pour le roi Mausole ?', 'Son épouse Artémise', ['Son fils', 'Alexandre le Grand', 'Le roi de Perse', 'Les Athéniens', 'Les Romains', 'Le pharaon']]]
-      } },
-      { k: 'vf', niveaux: {
-        facile: [['La pyramide de Khéops est la plus ancienne des 7 merveilles.', true, ''],
-          ['La tour Eiffel fait partie des 7 merveilles du monde antique.', false, 'Elle date de 1889 : bien après l’Antiquité.']],
-        moyen: [['Le Colosse de Rhodes a été renversé par un tremblement de terre.', true, ''],
-          ['Les jardins suspendus de Babylone ont été retrouvés intacts.', false, 'On n’a jamais trouvé de traces sûres de ces jardins.']],
-        difficile: [['Le phare d’Alexandrie a été détruit par des tremblements de terre.', true, ''],
-          ['La statue de Zeus à Olympie était en marbre blanc.', false, 'Elle était faite d’or et d’ivoire, sur une structure en bois.']],
-        expert: [['Le mot « mausolée » vient du roi Mausole.', true, ''],
-          ['Le temple d’Artémis n’a jamais été reconstruit.', false, 'Il a été reconstruit après l’incendie de 356 av. J.-C.']]
-      } }
-    ] },
-    { id: 'a09', matiere: 'histoire', famille: 'ant', nom: 'Écritures anciennes', court: 'Écritures', icone: '📜', series: [
-      { k: 'paires', gauche: 'Écriture', droite: 'Peuple', consigneR: 'Relie chaque écriture au peuple qui l’utilisait.',
-        q: 'Quel peuple utilisait cette écriture : {a} ?', ouverte: false, niveaux: {
-          facile: [['Les hiéroglyphes', 'Les Égyptiens'], ['Le cunéiforme', 'Les Mésopotamiens'], ['L’alphabet grec', 'Les Grecs'], ['L’alphabet latin', 'Les Romains']],
-          difficile: [['Les runes', 'Les peuples germaniques'], ['Les caractères chinois', 'Les Chinois'], ['L’alphabet phénicien', 'Les Phéniciens'],
-            ['Les glyphes mayas', 'Les Mayas'], ['L’alphabet hébreu', 'Les Hébreux'], ['L’alphabet étrusque', 'Les Étrusques']]
+        } },
+      { k: 'paires', gauche: 'Merveille', droite: 'Ville', consigneR: 'Relie chaque merveille du monde à sa ville.',
+        q: 'Où se trouvait cette merveille : {a} ?', ouverte: false, niveaux: {
+          moyen: [['Le Colosse', 'Rhodes'], ['Le phare', 'Alexandrie'], ['Les jardins suspendus', 'Babylone'], ['La statue de Zeus', 'Olympie'],
+            ['Le temple d’Artémis', 'Éphèse'], ['Le Mausolée', 'Halicarnasse'], ['La grande pyramide', 'Gizeh']]
         } },
       { k: 'qcm', niveaux: {
-        moyen: [['Sur quoi les Égyptiens écrivaient-ils ?', 'Le papyrus', ['Le papier', 'Le parchemin', 'Le tissu', 'L’ardoise']],
-          ['Sur quoi écrivait-on le cunéiforme ?', 'Des tablettes d’argile', ['Du papyrus', 'Du papier', 'Des feuilles de palmier', 'Des tablettes de cire']],
-          ['Quelle pierre a permis de comprendre les hiéroglyphes ?', 'La pierre de Rosette', ['La pierre philosophale', 'Le menhir de Carnac', 'La pierre de Lune', 'Le code d’Hammurabi']],
-          ['Comment appelle-t-on celui dont le métier est d’écrire, en Égypte ?', 'Le scribe', ['Le prêtre', 'Le vizir', 'Le pharaon', 'L’artisan']],
-          ['Où l’écriture est-elle apparue en premier, vers 3300 av. J.-C. ?', 'En Mésopotamie', ['En Grèce', 'À Rome', 'En Gaule', 'En Chine']]],
-        expert: [['Quelles sont les trois écritures de la pierre de Rosette ?', 'Hiéroglyphes, démotique et grec', ['Hiéroglyphes, latin et grec', 'Cunéiforme, grec et latin', 'Hiéroglyphes, hébreu et grec', 'Démotique, latin et phénicien', 'Hiératique, cunéiforme et grec']],
-          ['Qui a déchiffré le linéaire B en 1952 ?', 'Michael Ventris', ['Jean-François Champollion', 'Howard Carter', 'Heinrich Schliemann', 'Arthur Evans', 'Henry Rawlinson']],
-          ['Comment s’appelle l’écriture plus rapide des scribes égyptiens, tirée des hiéroglyphes ?', 'Le hiératique', ['Le cunéiforme', 'Le linéaire A', 'Le copte', 'L’araméen', 'Le sanskrit']],
-          ['Combien de lettres compte l’alphabet grec ?', '24', ['22', '26', '20', '30', '33']],
-          ['Dans quel musée se trouve la pierre de Rosette ?', 'Le British Museum, à Londres', ['Le Louvre, à Paris', 'Le musée du Caire', 'Le Metropolitan Museum, à New York', 'Le musée de l’Acropole', 'Le Vatican']]],
-        difficile: [['En quelle année Champollion annonce-t-il qu’il a compris les hiéroglyphes ?', '1822', ['1799', '1789', '1850', '1901', '1715']],
-          ['Avec quoi écrivait-on sur l’argile en Mésopotamie ?', 'Un roseau taillé, le calame', ['Une plume d’oie', 'Un pinceau', 'Un stylo', 'Un burin en fer', 'Un morceau de charbon']]]
+        facile: [
+          ['Laquelle des 7 merveilles du monde antique existe encore ?', 'La pyramide de Khéops', ['Le phare d’Alexandrie', 'Le Colosse de Rhodes', 'Les jardins de Babylone']],
+          ['Combien y avait-il de merveilles du monde antique ?', '7', ['3', '10', '12']],
+          ['Dans quel pays se trouve la pyramide de Khéops ?', 'L’Égypte', ['La Grèce', 'L’Italie', 'Le Mexique']],
+          ['Dans quelle ville se trouve le Colisée ?', 'Rome', ['Athènes', 'Paris', 'Le Caire']],
+          ['À quoi servait le Colisée ?', 'Aux combats de gladiateurs', ['À prier les dieux', 'À loger l’empereur', 'À stocker le blé']],
+          ['À quoi servait le pont du Gard ?', 'À faire passer de l’eau : c’est un aqueduc', ['À faire passer des trains', 'À défendre une ville', 'À traverser la mer']],
+          ['Sur quelle colline d’Athènes se trouve le Parthénon ?', 'L’Acropole', ['Le Capitole', 'Le Palatin', 'L’Olympe']],
+          ['À quelle déesse le Parthénon était-il consacré ?', 'Athéna', ['Aphrodite', 'Héra', 'Artémis']],
+          ['Quel monument de Paris date de l’époque de Lutèce ?', 'Les arènes de Lutèce', ['La tour Eiffel', 'Notre-Dame', 'L’Arc de triomphe de l’Étoile']],
+          ['Comment appelle-t-on les rangées de sièges d’un théâtre ou d’un amphithéâtre ?', 'Les gradins', ['Les créneaux', 'Les colonnes', 'Les vitraux']],
+          ['Quelle forme a un amphithéâtre romain ?', 'Une forme ovale', ['Un carré', 'Un triangle', 'Une étoile']],
+          ['Quel monument en forme d’arc célébrait les victoires romaines ?', 'L’arc de triomphe', ['La pyramide', 'Le menhir', 'Le phare']],
+          ['Quelle ville a pour symbole l’Acropole ?', 'Athènes', ['Sparte', 'Rome', 'Le Caire']],
+          ['Dans quel pays se trouve Pompéi ?', 'L’Italie', ['La Grèce', 'L’Espagne', 'La France']],
+          ['Que regardait-on dans un théâtre grec ?', 'Des pièces de théâtre', ['Des combats de gladiateurs', 'Des courses de chars', 'Des matchs de football']]],
+        moyen: [
+          ['Quelle merveille était un géant de bronze à l’entrée d’un port ?', 'Le Colosse de Rhodes', ['Le phare d’Alexandrie', 'La statue de Zeus', 'Le Mausolée d’Halicarnasse', 'Le temple d’Artémis']],
+          ['Combien de spectateurs le Colisée pouvait-il accueillir ?', 'Environ 50 000', ['Environ 500', 'Environ 5 000', 'Environ 1 million']],
+          ['Quel temple de Rome possède une grande coupole percée d’un trou au sommet ?', 'Le Panthéon', ['Le Colisée', 'Le Circus Maximus', 'Le forum']],
+          ['Dans quel grand cirque de Rome avaient lieu les courses de chars ?', 'Le Circus Maximus', ['Le Colisée', 'Le Panthéon', 'Le Capitole']],
+          ['Quel style de colonne grecque est le plus simple ?', 'Le dorique', ['Le corinthien', 'Le gothique', 'Le roman']],
+          ['À quoi servait un aqueduc ?', 'À amener l’eau dans les villes', ['À défendre les frontières', 'À faire tourner les moulins', 'À garder les céréales']],
+          ['Dans quelle ville de France le grand mur d’un théâtre romain est-il encore debout ?', 'Orange', ['Lille', 'Brest', 'Strasbourg']],
+          ['Quel mur a été bâti pour protéger la Bretagne romaine des peuples du nord ?', 'Le mur d’Hadrien', ['La Grande Muraille', 'Le mur de Berlin', 'Le mur des Lamentations']],
+          ['De quelle couleur est la pierre de Pétra ?', 'Rose', ['Blanche', 'Noire', 'Verte']],
+          ['Quel peuple a construit le Parthénon ?', 'Les Grecs', ['Les Romains', 'Les Égyptiens', 'Les Perses']],
+          ['De quoi était fait le Colosse de Rhodes ?', 'De bronze', ['D’or massif', 'De bois', 'De verre']],
+          ['Qu’est-ce qu’une nécropole ?', 'Une ville des morts, un grand cimetière', ['Une place de marché', 'Un grand port', 'Un palais royal']]],
+        difficile: [
+          ['Quelle merveille était le tombeau d’un roi de Carie ?', 'Le Mausolée d’Halicarnasse', ['Le temple d’Artémis', 'Le phare d’Alexandrie', 'Le Colosse de Rhodes', 'La statue de Zeus']],
+          ['Quel sculpteur a créé la statue de Zeus à Olympie ?', 'Phidias', ['Praxitèle', 'Michel-Ange', 'Myron', 'Polyclète']],
+          ['L’île de Pharos a donné un mot à la langue française. Lequel ?', 'Phare', ['Pharmacie', 'Pharaon', 'Fard', 'Farine']],
+          ['Sous quel empereur le Panthéon de Rome a-t-il été reconstruit, tel qu’on le voit aujourd’hui ?', 'Hadrien', ['Néron', 'Auguste', 'Caligula']],
+          ['Quel est le vrai nom du Colisée ?', 'L’amphithéâtre Flavien', ['Le cirque Maxime', 'Le forum de Trajan', 'Le théâtre de Marcellus']],
+          ['Quelle colonne de Rome raconte en images les guerres contre les Daces ?', 'La colonne Trajane', ['La colonne Vendôme', 'La colonne de Juillet', 'La colonne Morris']],
+          ['Dans quelle grande ville de Mésopotamie se trouvait la porte d’Ishtar ?', 'Babylone', ['Ninive', 'Ur', 'Thèbes']],
+          ['Quel style de colonne a un chapiteau décoré de feuilles d’acanthe ?', 'Le corinthien', ['Le dorique', 'L’ionique', 'Le toscan']],
+          ['Quel style de colonne a un chapiteau à volutes, en forme de spirales ?', 'L’ionique', ['Le dorique', 'Le corinthien', 'Le toscan']],
+          ['Quelle ville a été ensevelie par le Vésuve en même temps que Pompéi ?', 'Herculanum', ['Ostie', 'Carthage', 'Troie']],
+          ['Dans quel sanctuaire grec se trouvait l’oracle d’Apollon ?', 'Delphes', ['Olympie', 'Sparte', 'Corinthe']],
+          ['Quel est le grand port de Rome, dont on visite les ruines ?', 'Ostie', ['Herculanum', 'Pompéi', 'Brindisi']]],
+        expert: [
+          ['Qui a incendié le temple d’Artémis en 356 av. J.-C. pour devenir célèbre ?', 'Érostrate', ['Alexandre le Grand', 'Néron', 'Darius', 'Xerxès', 'Périclès']],
+          ['Quelle ville turque se trouve aujourd’hui à la place d’Halicarnasse ?', 'Bodrum', ['Istanbul', 'Izmir', 'Antalya', 'Ankara']],
+          ['Quel dieu représentait le Colosse de Rhodes ?', 'Hélios, le Soleil', ['Zeus', 'Poséidon', 'Apollon', 'Arès']],
+          ['Qui a fait achever le Mausolée du roi Mausole ?', 'Son épouse Artémise', ['Son fils', 'Alexandre le Grand', 'Le roi de Perse', 'Les Athéniens']],
+          ['Comment s’appelle le trou au sommet de la coupole du Panthéon de Rome ?', 'L’oculus', ['L’atrium', 'Le pronaos', 'L’abside']],
+          ['Où se trouve aujourd’hui la porte d’Ishtar de Babylone ?', 'Au musée de Pergame, à Berlin', ['Au Louvre, à Paris', 'Au British Museum, à Londres', 'Au musée du Caire']],
+          ['Où se trouvent beaucoup de sculptures du Parthénon, les « marbres d’Elgin » ?', 'Au British Museum, à Londres', ['Au Louvre, à Paris', 'Au Vatican', 'Au Metropolitan Museum, à New York']],
+          ['Quel temple de l’Acropole a des statues de femmes à la place des colonnes ?', 'L’Érechthéion', ['Le Parthénon', 'Le temple d’Athéna Niké', 'Les Propylées']],
+          ['Comment s’appellent ces statues de femmes qui servent de colonnes ?', 'Les caryatides', ['Les atlantes', 'Les sirènes', 'Les vestales']],
+          ['Quel grand temple d’Athènes, consacré à Zeus, a été achevé par Hadrien ?', 'L’Olympiéion', ['L’Érechthéion', 'Le Parthénon', 'Le temple d’Héphaïstos']],
+          ['Quel pont romain franchit le Tage, en Espagne ?', 'Le pont d’Alcántara', ['Le pont du Gard', 'Le pont Saint-Bénézet', 'Le pont Valentré']],
+          ['Quelle était, selon les auteurs antiques, la hauteur du Colosse de Rhodes ?', 'Environ 30 mètres', ['Environ 3 mètres', 'Environ 300 mètres', 'Environ 1 kilomètre']],
+          ['Selon la légende, quel roi de Babylone a fait créer les jardins suspendus pour son épouse ?', 'Nabuchodonosor II', ['Hammurabi', 'Darius Ier', 'Sargon']]]
+      } },
+      { k: 'vf', niveaux: {
+        facile: [['La pyramide de Khéops est la plus ancienne des 7 merveilles.', true, ''], ['Le Colisée se trouve à Rome.', true, ''],
+          ['Le pont du Gard est un aqueduc romain.', true, ''], ['Le Parthénon est un temple grec.', true, ''],
+          ['La tour Eiffel fait partie des 7 merveilles du monde antique.', false, 'Elle date de 1889 : bien après l’Antiquité.'],
+          ['Le Colisée a été construit au Moyen Âge.', false, 'Il a été inauguré en 80, sous l’Empire romain.']],
+        moyen: [['Le Colosse de Rhodes a été renversé par un tremblement de terre.', true, ''], ['On peut encore se promener dans les rues de Pompéi.', true, ''],
+          ['Le Panthéon de Rome a toujours son toit d’origine.', true, 'Sa coupole en béton a près de 1 900 ans.'],
+          ['Les jardins suspendus de Babylone ont été retrouvés intacts.', false, 'On n’a jamais trouvé de traces sûres de ces jardins.']],
+        difficile: [['Le phare d’Alexandrie a été détruit par des tremblements de terre.', true, ''], ['Le Colisée doit peut-être son nom à une statue colossale de Néron, tout près.', true, ''],
+          ['La statue de Zeus à Olympie était en marbre blanc.', false, 'Elle était faite d’or et d’ivoire, sur une structure en bois.'],
+          ['Le Parthénon a toujours été un temple, jusqu’à aujourd’hui.', false, 'Il a été aussi une église, puis une mosquée, et a été très abîmé par une explosion en 1687.']],
+        expert: [['Le mot « mausolée » vient du roi Mausole.', true, ''],
+          ['Les statues grecques étaient souvent peintes de couleurs vives.', true, 'Des traces de peinture le montrent : le blanc du marbre vient du temps.'],
+          ['Le temple d’Artémis n’a jamais été reconstruit.', false, 'Il a été reconstruit après l’incendie de 356 av. J.-C.'],
+          ['Le Colosse de Rhodes avait une jambe sur chaque rive du port.', false, 'C’est une légende : une statue si grande au-dessus de l’eau aurait été impossible à construire.']]
+      } },
+      { k: 'classer', niveaux: {
+        facile: [{ q: 'Range : monument grec ou monument romain ?', colonnes: ['Grec', 'Romain'],
+          items: [['Le Parthénon', 0], ['L’Acropole d’Athènes', 0], ['Le sanctuaire de Delphes', 0], ['Le théâtre d’Épidaure', 0], ['Le Colisée', 1], ['Le pont du Gard', 1], ['Les arènes de Nîmes', 1], ['La Maison carrée', 1]] }],
+        moyen: [{ q: 'Range ces monuments : en Égypte ou en Grèce ?', colonnes: ['Égypte', 'Grèce'],
+          items: [['Les pyramides de Gizeh', 0], ['Le Sphinx', 0], ['Abou Simbel', 0], ['Le temple de Karnak', 0], ['Le phare d’Alexandrie', 0],
+            ['Le Parthénon', 1], ['Le théâtre d’Épidaure', 1], ['Le sanctuaire de Delphes', 1], ['Le stade d’Olympie', 1], ['Le temple de Poséidon au cap Sounion', 1]] }],
+        difficile: [{ q: 'Range ces sites romains : en France ou ailleurs dans l’Empire ?', colonnes: ['En France', 'Ailleurs'],
+          items: [['Le pont du Gard', 0], ['La Maison carrée', 0], ['Le théâtre d’Orange', 0], ['Les arènes d’Arles', 0], ['Le site de Glanum', 0],
+            ['Leptis Magna', 1], ['Le mur d’Hadrien', 1], ['Pompéi', 1], ['Éphèse', 1], ['L’amphithéâtre d’El Jem', 1]] }],
+        expert: [{ q: 'Range ces merveilles : dans le monde grec ou en Égypte et Mésopotamie ?', colonnes: ['Monde grec', 'Égypte et Mésopotamie'],
+          items: [['La statue de Zeus', 0], ['Le Colosse de Rhodes', 0], ['Le temple d’Artémis', 0], ['Le Mausolée d’Halicarnasse', 0],
+            ['La pyramide de Khéops', 1], ['Le phare d’Alexandrie', 1], ['Les jardins suspendus', 1]] }]
+      } },
+      { k: 'ordre', consigne: 'Range ces monuments du plus ancien au plus récent.', q: 'Quand a été construit ce monument : {a} ?', niveaux: {
+        facile: [['La pyramide de Khéops', -2560, 'vers 2560 av. J.-C.'], ['Le Parthénon', -438, 'achevé en 438 av. J.-C.'],
+          ['Le Colisée', 80, 'inauguré en 80'], ['La tour Eiffel', 1889, '1889']],
+        moyen: [['Stonehenge (grandes pierres)', -2500, 'vers 2500 av. J.-C.'], ['Le temple d’Abou Simbel', -1260, 'vers 1260 av. J.-C.'],
+          ['Le phare d’Alexandrie', -280, 'vers 280 av. J.-C.'], ['Le pont du Gard', 50, 'vers 50'], ['Le Panthéon de Rome actuel', 125, 'vers 125']],
+        difficile: [['La porte d’Ishtar', -575, 'vers 575 av. J.-C.'], ['Le Mausolée d’Halicarnasse', -350, 'vers 350 av. J.-C.'],
+          ['Le Colosse de Rhodes', -280, 'achevé vers 280 av. J.-C.'], ['Le mur d’Hadrien', 122, 'commencé en 122'], ['Sainte-Sophie de Constantinople', 537, '537']],
+        expert: [['La ziggourat d’Ur', -2100, 'vers 2100 av. J.-C.'], ['Persépolis', -518, 'fondée vers 518 av. J.-C.'],
+          ['Le théâtre d’Épidaure', -340, 'vers 340 av. J.-C.'], ['La colonne Trajane', 113, '113'], ['Le pont d’Alcántara', 104, 'vers 104']]
       } }
     ] },
     { id: 'a10', matiere: 'histoire', famille: 'ant', nom: 'Chiffres romains', court: 'I, V, X…', icone: 'Ⅻ', series: [
       { k: 'paires', gauche: 'Chiffres romains', droite: 'Nombre', formats: ['Q', 'O'],
         q: 'Combien vaut {a} ?', qi: 'Comment écrit-on {b} en chiffres romains ?', niveaux: ROMAINS }
     ] },
-    { id: 'a11', matiere: 'histoire', famille: 'ant', nom: 'Vie quotidienne', court: 'Vie antique', icone: '🏺', series: [
-      { k: 'paires', gauche: 'Mot', droite: 'Définition', consigneR: 'Relie chaque définition à son mot.',
-        q: 'Quel mot : {b} ?', inverseSeul: true, niveaux: {
-          facile: [['Les thermes', 'Les bains publics'], ['Le forum', 'La grande place au centre de la ville romaine'], ['Le gladiateur', 'Il combat dans l’arène'],
-            ['La toge', 'Le vêtement du citoyen romain'], ['L’amphithéâtre|Amphitheatre', 'On y regarde les combats de gladiateurs']],
-          moyen: [['Le sénat', 'L’assemblée des anciens qui conseille Rome'], ['La démocratie', 'Le pouvoir du peuple, inventé à Athènes'],
-            ['L’aqueduc|Aqueduc', 'Un canal qui amène l’eau dans les villes'], ['Le légionnaire', 'Le soldat de l’armée romaine'],
-            ['La villa', 'Une grande maison à la campagne'], ['L’esclave|Esclave', 'Une personne qui appartient à un maître']],
-          difficile: [['Le patricien', 'Membre d’une riche famille noble de Rome'], ['Le plébéien', 'Homme du peuple à Rome'], ['L’agora|Agora', 'La place publique d’une cité grecque'],
-            ['La domus', 'La maison d’une riche famille, en ville'], ['L’insula|Insula', 'Un immeuble où vivent les Romains pauvres'],
-            ['Le consul', 'L’un des deux chefs élus pour un an à Rome'], ['La cité', 'Une ville et ses terres, qui se gouvernent seules en Grèce']],
-          expert: [['L’hoplite|Hoplite', 'Le fantassin grec, avec bouclier et lance'], ['L’ostracisme|Ostracisme', 'Un vote d’Athènes pour exiler un citoyen'],
-            ['Le tribun de la plèbe', 'Il défend les plébéiens à Rome'], ['Le péplos|Peplos', 'La longue tunique des femmes grecques'],
-            ['Le triclinium', 'La salle à manger, où l’on mange couché'], ['L’atrium|Atrium', 'La pièce d’entrée avec un bassin'],
-            ['L’hypocauste|Hypocauste', 'Le chauffage par le sol des thermes']]
-        } }
-    ] },
-    { id: 'a12', matiere: 'histoire', famille: 'ant', nom: 'Jeux olympiques antiques', court: 'Olympie', icone: '🥇', series: [
+    { id: 'a11', matiere: 'histoire', famille: 'ant', nom: 'Vie antique et Jeux olympiques', court: 'Vie antique', icone: '🏺', series: [
+      { k: 'paires', gauche: 'Définition', droite: 'Mot', consigneR: 'Relie chaque définition à son mot.',
+        q: 'Comment appelle-t-on {a} ?', niveaux: {
+          facile: [['les bains publics des Romains', 'Les thermes|Thermes'], ['la grande place au centre d’une ville romaine', 'Le forum|Forum'],
+            ['l’homme qui combat dans l’arène', 'Le gladiateur|Gladiateur'], ['le vêtement du citoyen romain', 'La toge|Toge'],
+            ['le bâtiment où l’on regarde les combats de gladiateurs', 'L’amphithéâtre|Amphitheatre']],
+          moyen: [['l’assemblée des anciens qui conseille Rome', 'Le sénat|Senat'], ['le pouvoir du peuple, inventé à Athènes', 'La démocratie|Democratie'],
+            ['le canal qui amène l’eau dans les villes', 'L’aqueduc|Aqueduc'], ['le soldat de l’armée romaine', 'Le légionnaire|Legionnaire'],
+            ['la grande maison à la campagne', 'La villa|Villa'], ['la personne qui appartient à un maître', 'L’esclave|Esclave']],
+          difficile: [['un membre d’une riche et ancienne famille de Rome', 'Le patricien|Patricien'], ['un homme du peuple, à Rome', 'Le plébéien|Plebeien'],
+            ['la place publique d’une cité grecque', 'L’agora|Agora'], ['la maison d’une riche famille, en ville', 'La domus|Domus'],
+            ['l’immeuble où vivent les Romains pauvres', 'L’insula|Insula'], ['l’un des deux chefs élus pour un an à Rome', 'Le consul|Consul'],
+            ['une ville et ses terres, qui se gouvernent seules, en Grèce', 'La cité|Cite']],
+          expert: [['le fantassin grec, avec bouclier rond et lance', 'L’hoplite|Hoplite'], ['le vote d’Athènes pour exiler un citoyen', 'L’ostracisme|Ostracisme'],
+            ['le magistrat qui défend les plébéiens, à Rome', 'Le tribun de la plèbe|Tribun'], ['la longue tunique des femmes grecques', 'Le péplos|Peplos'],
+            ['la salle à manger romaine, où l’on mange couché', 'Le triclinium|Triclinium'], ['la pièce d’entrée d’une maison romaine, avec un bassin', 'L’atrium|Atrium'],
+            ['le chauffage par le sol des thermes', 'L’hypocauste|Hypocauste']]
+        } },
+      { k: 'qcm', niveaux: {
+        facile: [
+          ['Que recevait le vainqueur d’une épreuve aux Jeux olympiques antiques ?', 'Une couronne d’olivier', ['Une médaille d’or', 'Une coupe', 'Un cheval']],
+          ['Où avaient lieu les Jeux olympiques antiques ?', 'À Olympie', ['À Rome', 'À Paris', 'Au Caire']],
+          ['Dans quel pays se trouve Olympie ?', 'La Grèce', ['L’Italie', 'L’Égypte', 'L’Espagne']],
+          ['Que mangeaient surtout les Romains pauvres ?', 'Des bouillies de céréales et du pain', ['Des frites', 'Du chocolat', 'Des pommes de terre']],
+          ['Avec quoi les Romains s’éclairaient-ils le soir ?', 'Des lampes à huile', ['Des ampoules', 'Des lampes de poche', 'Des néons']],
+          ['Sur quoi les élèves romains écrivaient-ils à l’école ?', 'Des tablettes de cire', ['Des cahiers', 'Des ordinateurs', 'Des tableaux blancs']],
+          ['Quelle boisson les Grecs et les Romains buvaient-ils souvent mélangée à de l’eau ?', 'Le vin', ['Le café', 'Le thé', 'Le soda']],
+          ['Quel spectacle les Romains aimaient-ils voir au cirque ?', 'Les courses de chars', ['Les matchs de football', 'Les films', 'Les concerts de rock']],
+          ['Dans quelle ville grecque est née la démocratie ?', 'Athènes', ['Sparte', 'Rome', 'Troie']],
+          ['Quelle cité grecque était célèbre pour ses soldats très entraînés ?', 'Sparte', ['Athènes', 'Corinthe', 'Olympie']],
+          ['Avec quoi payait-on chez les Grecs et les Romains ?', 'Des pièces de monnaie', ['Des billets', 'Des cartes bancaires', 'Des chèques']],
+          ['Comment les Romains voyageaient-ils sur de longues distances ?', 'À pied, à cheval ou en char', ['En train', 'En voiture', 'En avion']],
+          ['Quelle course faisait-on aux Jeux, sur la longueur du stade ?', 'Une course à pied', ['Une course à vélo', 'Une course en voiture', 'Une course à ski']],
+          ['Quel animal tirait les chars de course ?', 'Le cheval', ['Le bœuf', 'L’éléphant', 'Le chameau']],
+          ['Qui allait à l’école, à Rome ?', 'Surtout les enfants des familles riches', ['Tous les enfants, gratuitement', 'Seulement les filles', 'Personne']]],
+        moyen: [
+          ['En quelle année ont eu lieu les premiers Jeux olympiques, selon la tradition ?', '776 av. J.-C.', ['1896', '476', '44 av. J.-C.']],
+          ['Quelle épreuve consistait à lancer un objet rond et plat ?', 'Le disque', ['Le javelot', 'Le saut', 'La lutte']],
+          ['Comment s’appelle l’épreuve qui réunissait cinq épreuves en une ?', 'Le pentathlon', ['Le marathon', 'Le pancrace', 'Le triathlon']],
+          ['Qu’est-ce qu’un affranchi ?', 'Un ancien esclave devenu libre', ['Un soldat romain', 'Un prêtre gaulois', 'Un sénateur']],
+          ['Quelle sauce de poisson les Romains adoraient-ils ?', 'Le garum', ['Le ketchup', 'La mayonnaise', 'Le pesto']],
+          ['Avec quoi écrivait-on sur une tablette de cire ?', 'Un stylet', ['Un stylo à bille', 'Une craie', 'Un feutre']],
+          ['À quel jeu d’adresse les enfants grecs et romains jouaient-ils avec de petits os ?', 'Les osselets', ['Les échecs', 'Les cartes', 'Les dominos']],
+          ['Quel instrument à cordes, une petite harpe, jouait-on en Grèce ?', 'La lyre', ['Le piano', 'La guitare électrique', 'Le violon']],
+          ['Dans une cité grecque comme Athènes, qui pouvait voter ?', 'Seulement les citoyens, des hommes', ['Tout le monde', 'Les femmes et les esclaves', 'Seulement le roi']],
+          ['Quel roi de Sparte a combattu aux Thermopyles avec 300 Spartiates ?', 'Léonidas', ['Périclès', 'Agamemnon', 'Darius']],
+          ['Contre quel peuple les Grecs ont-ils mené les guerres médiques ?', 'Les Perses', ['Les Romains', 'Les Égyptiens', 'Les Gaulois']],
+          ['Quel savant grec aurait crié « Eurêka ! » dans son bain ?', 'Archimède', ['Pythagore', 'Euclide', 'Thalès']],
+          ['Quel conteur grec a écrit des fables avec des animaux ?', 'Ésope', ['Homère', 'Sophocle', 'Platon']],
+          ['Quel Grec a donné son nom à un théorème sur le triangle rectangle ?', 'Pythagore', ['Thalès', 'Euclide', 'Archimède']]],
+        difficile: [
+          ['Quelle était la course la plus ancienne des Jeux ?', 'Le stade, environ 192 mètres', ['Le marathon', 'Le 10 000 mètres', 'Le relais', 'La course de haies']],
+          ['Comment s’appelait un char tiré par quatre chevaux ?', 'Un quadrige', ['Un bige', 'Un tricycle', 'Un carrosse']],
+          ['Selon la tradition, quel empereur a mis fin aux Jeux olympiques antiques ?', 'Théodose Ier', ['Néron', 'Auguste', 'Constantin']],
+          ['À partir de quel âge les garçons de Sparte étaient-ils entraînés par la cité ?', '7 ans', ['15 ans', '2 ans', '20 ans']],
+          ['En Grèce, qui était le « pédagogue », au départ ?', 'L’esclave qui accompagnait l’enfant à l’école', ['Le directeur de l’école', 'Un médecin', 'Un juge']],
+          ['Quel homme politique a dirigé Athènes à son âge d’or, au Ve siècle av. J.-C. ?', 'Périclès', ['Alexandre le Grand', 'Léonidas', 'Solon']],
+          ['Quel philosophe grec a été condamné à boire la ciguë ?', 'Socrate', ['Platon', 'Aristote', 'Pythagore']],
+          ['Qui a été le professeur d’Alexandre le Grand ?', 'Aristote', ['Socrate', 'Platon', 'Homère']],
+          ['Quel médecin grec a donné son nom au serment des médecins ?', 'Hippocrate', ['Galien', 'Aristote', 'Archimède']],
+          ['Comment s’appelle le chef de famille romain, qui a tous les pouvoirs sur les siens ?', 'Le pater familias', ['Le consul', 'Le préfet', 'Le tribun']],
+          ['Quelle fête romaine de décembre permettait aux esclaves de se croire libres quelques jours ?', 'Les Saturnales', ['Les Lupercales', 'Les Floralies', 'Les Panathénées']],
+          ['Que faisait-on avec l’huile d’olive aux thermes ?', 'On s’en frottait le corps avant de la racler', ['On la buvait', 'On allumait le feu avec', 'On la versait dans le bassin']],
+          ['Quel historien grec est appelé « le père de l’histoire » ?', 'Hérodote', ['Homère', 'Thucydide', 'Plutarque']],
+          ['Quelle cité grecque a gagné la bataille de Marathon contre les Perses, en 490 av. J.-C. ?', 'Athènes', ['Sparte', 'Corinthe', 'Thèbes']]],
+        expert: [
+          ['Qui a recréé les Jeux olympiques modernes ?', 'Pierre de Coubertin', ['Jules Ferry', 'Victor Hugo', 'Jules Verne', 'Louis Pasteur']],
+          ['Quelle Spartiate a été la première femme à gagner aux Jeux, avec ses chevaux ?', 'Cynisca|Kyniska', ['Hélène', 'Cléopâtre', 'Sappho', 'Artémise']],
+          ['Quel empereur romain a gagné la course de chars aux Jeux, alors qu’il était tombé de son char ?', 'Néron', ['Auguste', 'Trajan', 'Hadrien']],
+          ['Avec quel outil, une sorte de racloir, les Romains se nettoyaient-ils la peau ?', 'Le strigile', ['La fibule', 'Le stylet', 'Le calame']],
+          ['Comment s’appelle l’épingle qui attachait les vêtements ?', 'La fibule', ['Le strigile', 'La bulla', 'Le torque']],
+          ['Que portait un enfant romain libre autour du cou pour le protéger ?', 'La bulla', ['La fibule', 'Le torque', 'Le scarabée']],
+          ['Qui étaient les hilotes, à Sparte ?', 'Des paysans asservis qui cultivaient la terre', ['Les deux rois', 'Les athlètes des Jeux', 'Des prêtres d’Apollon']],
+          ['Sur quelle colline d’Athènes les citoyens se réunissaient-ils pour voter ?', 'La Pnyx', ['L’Acropole', 'L’Olympe', 'Le Palatin']],
+          ['Sur quoi les Athéniens écrivaient-ils le nom de l’homme à exiler ?', 'Un morceau de poterie, l’ostracon', ['Une tablette de cire', 'Un papyrus', 'Une feuille d’or']],
+          ['Combien de membres comptait le Conseil d’Athènes (la Boulè) à l’époque de Clisthène ?', '500', ['50', '100', '5 000']],
+          ['Quel législateur athénien a supprimé l’esclavage pour dettes ?', 'Solon', ['Dracon', 'Clisthène', 'Périclès']],
+          ['Quel adjectif vient du législateur Dracon, aux lois très sévères ?', 'Draconien', ['Dragon', 'Drastique', 'Dramatique']]]
+      } },
       { k: 'vf', niveaux: {
         facile: [['Les Jeux olympiques antiques avaient lieu à Olympie, en Grèce.', true, ''],
           ['Les Jeux olympiques étaient organisés en l’honneur de Zeus.', true, ''],
-          ['Les vainqueurs recevaient une médaille d’or.', false, 'Ils recevaient une couronne d’olivier.']],
+          ['Les athlètes venaient de toutes les cités grecques.', true, ''],
+          ['Les vainqueurs recevaient une médaille d’or.', false, 'Ils recevaient une couronne d’olivier.'],
+          ['Les Romains mangeaient des pommes de terre.', false, 'La pomme de terre vient d’Amérique : les Romains ne la connaissaient pas.']],
         moyen: [['Les Jeux avaient lieu tous les 4 ans.', true, ''],
+          ['Pendant les Jeux, une trêve sacrée arrêtait les guerres entre cités.', true, ''],
           ['Les femmes mariées pouvaient participer aux Jeux.', false, 'Elles n’avaient même pas le droit de les regarder.'],
-          ['Pendant les Jeux, une trêve sacrée arrêtait les guerres entre cités.', true, '']],
+          ['Les Jeux olympiques antiques avaient des épreuves de ski.', false, 'Il n’y avait pas de sports d’hiver : course, sauts, lancers, lutte, boxe, chars…'],
+          ['À Rome, les esclaves pouvaient parfois être libérés par leur maître.', true, 'Ils devenaient alors des affranchis.']],
         difficile: [['Les athlètes concouraient nus.', true, ''],
           ['Le pancrace mélangeait la lutte et la boxe.', true, ''],
-          ['Le marathon faisait partie des Jeux antiques.', false, 'Le marathon a été créé pour les Jeux modernes de 1896.']],
+          ['Les Jeux olympiques antiques ont duré plus de mille ans.', true, 'De 776 av. J.-C. à la fin du IVe siècle, selon la tradition.'],
+          ['Le marathon faisait partie des Jeux antiques.', false, 'Le marathon a été créé pour les Jeux modernes de 1896.'],
+          ['À Athènes, les femmes votaient à l’assemblée.', false, 'Seuls les citoyens, des hommes, votaient.']],
         expert: [['Les juges des Jeux s’appelaient les hellanodices.', true, ''],
           ['Les Héraia étaient des jeux réservés aux jeunes filles, en l’honneur d’Héra.', true, ''],
-          ['Le pentathlon antique comprenait la natation.', false, 'Il comprenait la course, le saut en longueur, le disque, le javelot et la lutte.']]
+          ['Une olympiade est la période de quatre ans entre deux Jeux.', true, ''],
+          ['Le pentathlon antique comprenait la natation.', false, 'Il comprenait la course, le saut en longueur, le disque, le javelot et la lutte.'],
+          ['Sparte avait un seul roi.', false, 'Sparte avait deux rois en même temps.']]
       } },
-      { k: 'qcm', vf: false, niveaux: {
-        facile: [['Que recevait le vainqueur d’une épreuve ?', 'Une couronne d’olivier', ['Une médaille d’or', 'Une coupe', 'Un cheval']]],
-        moyen: [['En quelle année ont eu lieu les premiers Jeux, selon la tradition ?', '776 av. J.-C.', ['1896', '476', '44 av. J.-C.', '1200 av. J.-C.']]],
-        difficile: [['Quelle était la course la plus ancienne des Jeux ?', 'Le stade, environ 192 mètres', ['Le marathon', 'Le 10 000 mètres', 'Le relais', 'La course de haies', 'Le cross']]],
-        expert: [['Qui a recréé les Jeux olympiques modernes ?', 'Pierre de Coubertin', ['Jules Ferry', 'Victor Hugo', 'Jules Verne', 'Louis Pasteur', 'Gustave Eiffel']],
-          ['Quelle Spartiate a été la première femme à gagner aux Jeux, avec ses chevaux ?', 'Cynisca|Kyniska', ['Hélène', 'Cléopâtre', 'Sappho', 'Artémise', 'Pénélope']]]
+      { k: 'classer', niveaux: {
+        facile: [{ q: 'Range : Grèce antique ou Rome antique ?', colonnes: ['Grèce', 'Rome'],
+          items: [['Athènes', 0], ['Sparte', 0], ['Les Jeux olympiques', 0], ['L’agora', 0], ['L’Acropole', 0],
+            ['Le Colisée', 1], ['Les légionnaires', 1], ['Le latin', 1], ['Le forum', 1], ['Les gladiateurs', 1]] }],
+        moyen: [{ q: 'Range : Athènes ou Sparte ?', colonnes: ['Athènes', 'Sparte'],
+          items: [['La démocratie', 0], ['Périclès', 0], ['Le Parthénon', 0], ['Le port du Pirée', 0], ['Socrate', 0],
+            ['Léonidas', 1], ['Deux rois en même temps', 1], ['L’entraînement militaire dès l’enfance', 1], ['Les hilotes', 1], ['Les 300 des Thermopyles', 1]] }],
+        difficile: [{ q: 'Range ces mots : Grèce ou Rome ?', colonnes: ['Grèce', 'Rome'],
+          items: [['L’agora', 0], ['L’hoplite', 0], ['La cité', 0], ['Le stratège', 0], ['L’ostracisme', 0],
+            ['Le consul', 1], ['La domus', 1], ['L’insula', 1], ['Le légionnaire', 1], ['Le patricien', 1]] }],
+        expert: [{ q: 'Range ces épreuves : aux Jeux olympiques antiques ou seulement aux Jeux modernes ?', colonnes: ['Jeux antiques', 'Seulement modernes'],
+          items: [['Le stade', 0], ['Le pancrace', 0], ['Le pentathlon', 0], ['La course en armes', 0], ['La course de chars', 0], ['Le pugilat (la boxe)', 0],
+            ['Le marathon', 1], ['La natation', 1], ['Le saut à la perche', 1], ['Le cyclisme', 1], ['Le volley-ball', 1]] }]
       } }
-    ] },    // ---------- Moyen Âge (v7.7, BACKLOG ligne 295 : 8 jeux, hypothèse à valider) ----------
+    ] },
+    // ---------- Moyen Âge (v7.7, BACKLOG ligne 295 : 8 jeux, hypothèse à valider) ----------
     { id: 'm01', matiere: 'histoire', famille: 'mag', nom: 'Rois de France', court: 'Rois', icone: '👑', series: [
       { k: 'paires', gauche: 'Roi', droite: 'Ce qu’il a fait', consigneR: 'Relie chaque roi à ce qui le rend célèbre.', q: 'Pourquoi {a} est-il célèbre ?', qi: 'Quel roi : {b} ?', ouverte: false, niveaux: {
         facile: [['Clovis', 'Roi des Francs baptisé à Reims'], ['Charlemagne', 'Couronné empereur en l’an 800'], ['Saint Louis', 'Rendait la justice sous un chêne']],

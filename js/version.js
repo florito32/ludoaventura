@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '8.3';
+  var VERSION = '8.4';
 
   var HISTORY = [
+    { v: '8.4', date: '2026-11-13', changes: [
+      "Histoire, Antiquité : les 12 petits jeux sont regroupés en 6, avec environ 40 questions par niveau chacun, jouables en Quiz et en Normal — Dieux et mythes, L’Égypte des pharaons, Rome et la Gaule, Monuments et merveilles, Chiffres romains, Vie antique et Jeux olympiques.",
+      "Quiz : les questions « Qui a… ? » et « Chez les Égyptiens, qui est… ? » proposent bien 4 noms au choix (et non 4 descriptions)."
+    ] },
     { v: '8.3', date: '2026-11-13', changes: [
       "Histoire, Préhistoire : les 5 petits jeux sont regroupés en 2 grands jeux, « Nos ancêtres et les périodes » et « Art, outils et mégalithes », avec environ 40 questions par niveau chacun, jouables en Quiz et en Normal."
     ] },
