@@ -1,7 +1,7 @@
 // Histoire (v7.1) : la matière Histoire, rangée par périodes (BACKLOG lignes 270 et 275).
 // Choix de l'utilisateur du 12/11/2026 : 7 périodes, 51 jeux, 4 niveaux, et chaque niveau n'a QUE son
 // propre contenu (Expert = seulement du contenu expert). Livraison par période : l'Antiquité d'abord (ses
-// 12 jeux sont tous retenus), puis la Préhistoire (v7.6, 5 jeux) et le Moyen Âge (v7.7, 8 jeux) ; les autres périodes viendront ensuite.
+// 12 jeux sont tous retenus), puis la Préhistoire (v7.6, 5 jeux) le Moyen Âge (v7.7, 8 jeux) et la Renaissance (v7.8, 6 jeux) ; les autres périodes viendront ensuite.
 // Format des séries : voir js/savoirs.js. « A|B » = A s'affiche, B est aussi accepté en question ouverte.
 (function (racine) {
   'use strict';
@@ -583,6 +583,134 @@
           items: [['Une abbesse', 0], ['Un chanoine', 0], ['Le pape', 0], ['Un prieur', 0], ['Un berger', 1], ['Un tisserand', 1], ['Un bûcheron', 1], ['Un charpentier', 1]] }],
         expert: [{ q: 'Qui reçoit ce paiement : le seigneur ou l’Église ?', colonnes: ['Le seigneur', 'L’Église'],
           items: [['La corvée', 0], ['La taille', 0], ['Les banalités', 0], ['Le cens', 0], ['La dîme', 1], ['Le denier de saint Pierre', 1], ['Les offrandes de la messe', 1]] }]
+      } }
+    ] },
+    // ---------- Renaissance (v7.8, BACKLOG ligne 295 : 6 jeux, hypothèse à valider) ----------
+    { id: 'r01', matiere: 'histoire', famille: 'ren', nom: 'Artistes et œuvres', court: 'Artistes', icone: '🖼️', series: [
+      { k: 'paires', gauche: 'Artiste', droite: 'Œuvre', consigneR: 'Relie chaque artiste à son œuvre.', q: 'Quelle œuvre a faite {a} ?', qi: 'Qui a fait : {b} ?', ouverte: false, niveaux: {
+        facile: [['Léonard de Vinci', 'La Joconde'], ['Michel-Ange', 'Le plafond de la chapelle Sixtine'], ['Botticelli', 'La Naissance de Vénus']],
+        moyen: [['Raphaël', 'L’École d’Athènes'], ['Michel-Ange', 'La statue de David, en marbre'], ['Léonard de Vinci', 'La Cène'], ['Albrecht Dürer', 'Le Jeune Lièvre']],
+        difficile: [['Titien', 'La Vénus d’Urbin'], ['Jérôme Bosch', 'Le Jardin des délices'], ['Bruegel l’Ancien', 'La Tour de Babel'],
+          ['Jan van Eyck', 'Les Époux Arnolfini'], ['Brunelleschi', 'La coupole de la cathédrale de Florence']],
+        expert: [['Donatello', 'Le David en bronze'], ['Hans Holbein le Jeune', 'Les Ambassadeurs'], ['Mantegna', 'La Chambre des Époux, à Mantoue'],
+          ['Piero della Francesca', 'La Flagellation du Christ'], ['Giorgione', 'La Tempête'], ['Jean Clouet', 'Le portrait de François Ier']]
+      } },
+      { k: 'qcm', niveaux: {
+        facile: [['Dans quel pays la Renaissance a-t-elle commencé ?', 'En Italie', ['En Chine', 'Au Japon']]],
+        moyen: [['Dans quel musée peut-on voir La Joconde ?', 'Au Louvre', ['Au musée d’Orsay', 'Au Prado', 'Au British Museum']],
+          ['Quel roi de France a invité Léonard de Vinci ?', 'François Ier', ['Louis XIV', 'Henri IV', 'Charlemagne']]],
+        difficile: [['Quelle famille de banquiers protégeait les artistes à Florence ?', 'Les Médicis', ['Les Borgia', 'Les Bourbons', 'Les Habsbourg', 'Les Valois']],
+          ['Où se trouve la chapelle Sixtine ?', 'Au Vatican', ['À Florence', 'À Venise', 'À Milan', 'À Paris']]],
+        expert: [['Dans quelle ville Léonard de Vinci est-il mort en 1519 ?', 'Amboise', ['Florence', 'Milan', 'Rome', 'Vinci', 'Paris']],
+          ['Sur quoi La Joconde est-elle peinte ?', 'Sur un panneau de bois', ['Sur une toile', 'Sur un mur', 'Sur du papier', 'Sur du cuivre', 'Sur du verre']]]
+      } }
+    ] },
+    { id: 'r02', matiere: 'histoire', famille: 'ren', nom: 'Grandes découvertes', court: 'Découvertes', icone: '🧭', series: [
+      { k: 'paires', gauche: 'Explorateur', droite: 'Son voyage', consigneR: 'Relie chaque explorateur à son voyage.', q: 'Qu’a fait {a} ?', qi: 'Quel explorateur : {b} ?', ouverte: false, niveaux: {
+        facile: [['Christophe Colomb', 'Arrive en Amérique en 1492'], ['Magellan', 'Lance le premier tour du monde'], ['Vasco de Gama', 'Ouvre la route des Indes par l’Afrique'],
+          ['Jacques Cartier', 'Explore le Canada']],
+        moyen: [['Amerigo Vespucci', 'A donné son nom à l’Amérique'], ['Bartolomeu Dias', 'Passe le cap de Bonne-Espérance'], ['Hernán Cortés', 'Conquiert l’empire aztèque'],
+          ['Francisco Pizarro', 'Conquiert l’empire inca']],
+        difficile: [['Pedro Álvares Cabral', 'Arrive au Brésil en 1500'], ['Juan Sebastián Elcano', 'Termine le tour du monde après la mort de Magellan'],
+          ['Giovanni da Verrazzano', 'Explore la baie de New York pour François Ier'], ['Vasco Núñez de Balboa', 'Voit l’océan Pacifique depuis l’Amérique'],
+          ['Jean Cabot', 'Atteint Terre-Neuve pour l’Angleterre']],
+        expert: [['Henri le Navigateur', 'Prince portugais qui lance les explorations'], ['Francisco de Orellana', 'Descend l’Amazone'], ['Hernando de Soto', 'Atteint le Mississippi'],
+          ['Juan Ponce de León', 'Aborde la Floride'], ['Diogo Cão', 'Atteint l’embouchure du fleuve Congo'], ['Pedro de Valdivia', 'Fonde Santiago du Chili']]
+      } },
+      { k: 'ordre', consigne: 'Range ces voyages du plus ancien au plus récent.', q: 'En quelle année : {a} ?', niveaux: {
+        facile: [['Christophe Colomb arrive en Amérique', 1492, '1492'], ['Vasco de Gama arrive en Inde', 1498, '1498'], ['Fin du premier tour du monde', 1522, '1522']],
+        moyen: [['Bartolomeu Dias passe le cap de Bonne-Espérance', 1488, '1488'], ['Cabral arrive au Brésil', 1500, '1500'], ['Cortés arrive au Mexique', 1519, '1519'],
+          ['Jacques Cartier arrive au Canada', 1534, '1534']],
+        difficile: [['Diogo Cão atteint le fleuve Congo', 1482, '1482'], ['Balboa voit l’océan Pacifique', 1513, '1513'], ['Cortés prend Tenochtitlan', 1521, '1521'],
+          ['Pizarro capture l’empereur inca Atahualpa', 1532, '1532'], ['Jacques Cartier remonte le Saint-Laurent', 1535, '1535']],
+        expert: [['Les Portugais prennent Ceuta', 1415, '1415'], ['Traité de Tordesillas', 1494, '1494'], ['Verrazzano entre dans la baie de New York', 1524, '1524'],
+          ['Pizarro fonde Lima', 1535, '1535'], ['Orellana descend l’Amazone', 1542, '1542'], ['Fondation de Saint-Augustin, en Floride', 1565, '1565']]
+      } },
+      { k: 'qcm', niveaux: {
+        facile: [['Quel bateau léger et rapide a servi aux grandes découvertes ?', 'La caravelle', ['Le drakkar', 'Le paquebot']]],
+        moyen: [['Quel pays a payé le voyage de Christophe Colomb ?', 'L’Espagne', ['Le Portugal', 'La France', 'L’Angleterre']]],
+        difficile: [['Quel traité de 1494 partage le monde entre l’Espagne et le Portugal ?', 'Le traité de Tordesillas', ['Le traité de Verdun', 'Le traité de Westphalie', 'Le traité de Paris', 'Le traité de Versailles']]],
+        expert: [['Quel instrument mesurait la hauteur des astres pour se repérer en mer ?', 'L’astrolabe', ['Le télescope', 'Le baromètre', 'Le thermomètre', 'Le sablier', 'Le gouvernail']]]
+      } }
+    ] },
+    { id: 'r04', matiere: 'histoire', famille: 'ren', nom: 'Châteaux de la Loire', court: 'Châteaux', icone: '🏯', series: [
+      { k: 'paires', gauche: 'Château', droite: 'Ce qui le rend célèbre', consigneR: 'Relie chaque château à ce qui le rend célèbre.', q: 'Qu’est-ce qui rend {a} célèbre ?', qi: 'Quel château : {b} ?', ouverte: false, niveaux: {
+        facile: [['Chambord', 'Le plus grand château de la Loire'], ['Chenonceau', 'Il est construit au-dessus du Cher'], ['Amboise', 'Léonard de Vinci y est enterré']],
+        moyen: [['Blois', 'Son grand escalier à vis de François Ier'], ['Azay-le-Rideau', 'Il se reflète dans l’Indre'], ['le Clos Lucé', 'La dernière maison de Léonard de Vinci'],
+          ['Villandry', 'Ses jardins et son grand potager']],
+        difficile: [['Chaumont-sur-Loire', 'Donné à Diane de Poitiers en échange de Chenonceau'], ['Cheverny', 'Il a inspiré le Moulinsart de Tintin'],
+          ['Ussé', 'Il aurait inspiré La Belle au bois dormant'], ['Langeais', 'Charles VIII y épouse Anne de Bretagne'], ['Chinon', 'Jeanne d’Arc y rencontre Charles VII']],
+        expert: [['Chambord', 'Son escalier à double révolution'], ['Chenonceau', 'On l’appelle le château des Dames'], ['Blois', 'Le duc de Guise y est assassiné en 1588'],
+          ['Amboise', 'Une conjuration protestante y échoue en 1560'], ['Loches', 'Ludovic Sforza y meurt prisonnier'], ['Saumur', 'Il est peint dans les Très Riches Heures du duc de Berry']]
+      } },
+      { k: 'qcm', niveaux: {
+        facile: [['Quel fleuve passe près de ces châteaux ?', 'La Loire', ['La Seine', 'Le Rhône']]],
+        moyen: [['Quel roi a fait construire Chambord ?', 'François Ier', ['Louis XIV', 'Henri IV', 'Charlemagne']]],
+        difficile: [['Quel animal, emblème de François Ier, est sculpté à Chambord et à Blois ?', 'La salamandre', ['Le lion', 'L’aigle', 'Le porc-épic', 'Le dauphin']]],
+        expert: [['Quelle favorite d’Henri II a reçu Chenonceau ?', 'Diane de Poitiers', ['Catherine de Médicis', 'Gabrielle d’Estrées', 'Marie Stuart', 'Anne de Bretagne', 'Marguerite de Valois']]]
+      } },
+      { k: 'vf', niveaux: {
+        facile: [['Le château de Chambord a plus de 400 pièces.', true, '']],
+        moyen: [['Léonard de Vinci a passé ses dernières années à Amboise.', true, '']],
+        difficile: [['Le Val de Loire est inscrit au patrimoine mondial de l’Unesco.', true, '']],
+        expert: [['Le château de Chenonceau enjambe la Loire.', false, 'Il enjambe le Cher, une rivière qui se jette dans la Loire.']]
+      } }
+    ] },
+    { id: 'r05', matiere: 'histoire', famille: 'ren', nom: 'Rois de la Renaissance', court: 'Rois', icone: '👑', series: [
+      { k: 'paires', gauche: 'Personnage', droite: 'Ce qui le rend célèbre', consigneR: 'Relie chaque roi ou reine à ce qui le rend célèbre.', q: 'Qu’est-ce qui rend {a} célèbre ?', qi: 'Qui est-ce : {b} ?', ouverte: false, niveaux: {
+        facile: [['François Ier', 'Vainqueur à Marignan en 1515'], ['Henri IV', 'Signe l’édit de Nantes en 1598'], ['Catherine de Médicis', 'Reine venue de Florence']],
+        moyen: [['Charles VIII', 'Lance les guerres d’Italie en 1494'], ['Henri II', 'Meurt blessé dans un tournoi en 1559'], ['Charles IX', 'Roi pendant le massacre de la Saint-Barthélemy'],
+          ['Louis XII', 'Surnommé le Père du peuple']],
+        difficile: [['François II', 'Époux de Marie Stuart'], ['Henri III', 'Dernier roi Valois, assassiné en 1589'], ['Anne de Bretagne', 'Deux fois reine de France'],
+          ['Marguerite de Valois', 'La reine Margot, première épouse d’Henri IV'], ['Diane de Poitiers', 'Favorite d’Henri II']],
+        expert: [['Claude de France', 'Épouse de François Ier ; une prune porte son nom'], ['Louise de Savoie', 'Mère de François Ier, régente du royaume'], ['Charles Quint', 'Empereur, grand rival de François Ier'],
+          ['Henri VIII', 'Roi d’Angleterre reçu au camp du Drap d’or'], ['Gabrielle d’Estrées', 'Favorite d’Henri IV'], ['Ravaillac', 'Assassin d’Henri IV en 1610']]
+      } },
+      { k: 'indices', consigne: 'Qui suis-je ? Trouve le roi ou la reine.', niveaux: {
+        facile: [{ r: 'François Ier', i: ['Je suis roi de France au XVIe siècle.', 'J’aime les arts et j’ai invité Léonard de Vinci en France.', 'J’ai fait construire le château de Chambord.', 'Mon emblème est une salamandre.', 'J’ai gagné la bataille de Marignan en 1515.'] },
+          { r: 'Henri IV', i: ['Je suis né à Pau, en Béarn.', 'J’ai d’abord été roi de Navarre.', 'J’étais protestant, puis je suis devenu catholique.', 'On dit que je voulais la poule au pot chaque dimanche pour les paysans.', 'J’ai signé l’édit de Nantes en 1598.'] }],
+        moyen: [{ r: 'Catherine de Médicis', i: ['Je suis née à Florence.', 'J’ai épousé le roi Henri II.', 'Trois de mes fils sont devenus rois de France.', 'J’ai fait construire le palais des Tuileries.', 'On m’accuse d’avoir voulu le massacre de la Saint-Barthélemy.'] }],
+        difficile: [{ r: 'Henri II', i: ['Je suis le fils de François Ier.', 'J’ai épousé Catherine de Médicis.', 'Ma favorite s’appelait Diane de Poitiers.', 'Mon armée a repris Calais aux Anglais en 1558.', 'Je suis mort blessé à l’œil dans un tournoi en 1559.'] }],
+        expert: [{ r: 'Anne de Bretagne', i: ['Je suis duchesse de Bretagne.', 'J’ai épousé Charles VIII à Langeais.', 'Après sa mort, j’ai épousé Louis XII.', 'J’ai été deux fois reine de France.', 'Ma fille Claude a épousé François Ier.'] }]
+      } }
+    ] },
+    { id: 'r06', matiere: 'histoire', famille: 'ren', nom: 'Réforme et guerres de Religion', court: 'Réforme', icone: '✝️', series: [
+      { k: 'ordre', consigne: 'Range ces événements du plus ancien au plus récent.', q: 'En quelle année : {a} ?', niveaux: {
+        facile: [['Luther publie ses 95 thèses', 1517, '1517'], ['Massacre de la Saint-Barthélemy', 1572, '1572'], ['Édit de Nantes', 1598, '1598']],
+        moyen: [['Affaire des Placards contre la messe', 1534, '1534'], ['Massacre de Wassy, début des guerres de Religion', 1562, '1562'], ['Mort de Calvin à Genève', 1564, '1564'],
+          ['Henri IV devient catholique', 1593, '1593']],
+        difficile: [['Le pape excommunie Luther', 1521, '1521'], ['Calvin s’installe pour de bon à Genève', 1541, '1541'], ['Début du concile de Trente', 1545, '1545'],
+          ['Conjuration d’Amboise', 1560, '1560'], ['Assassinat du duc de Guise à Blois', 1588, '1588']],
+        expert: [['Luther refuse de se rétracter à la diète de Worms', 1521, '1521'], ['Paix d’Augsbourg', 1555, '1555'], ['Colloque de Poissy', 1561, '1561'],
+          ['Paix de Saint-Germain', 1570, '1570'], ['Naissance de la Sainte Ligue catholique', 1576, '1576'], ['Assassinat d’Henri III', 1589, '1589']]
+      } },
+      { k: 'qcm', niveaux: {
+        facile: [['Comment appelle-t-on les chrétiens qui suivent Luther ou Calvin ?', 'Les protestants', ['Les catholiques', 'Les orthodoxes']]],
+        moyen: [['Quel moine allemand a lancé la Réforme ?', 'Martin Luther', ['Érasme', 'Savonarole', 'Thomas More']]],
+        difficile: [['Quel roi a signé l’édit de Nantes ?', 'Henri IV', ['Henri III', 'Charles IX', 'François Ier', 'Louis XIII']],
+          ['Dans quelle ville Calvin a-t-il organisé l’Église protestante ?', 'Genève', ['Wittenberg', 'Rome', 'Lyon', 'Avignon']]],
+        expert: [['Quel jour a commencé le massacre de la Saint-Barthélemy, en 1572 ?', 'Le 24 août', ['Le 14 juillet', 'Le 1er novembre', 'Le 25 décembre', 'Le 11 novembre', 'Le 15 août']],
+          ['Quel mariage avait réuni les nobles protestants à Paris en août 1572 ?', 'Henri de Navarre et Marguerite de Valois', ['Henri II et Catherine de Médicis', 'François II et Marie Stuart',
+            'Louis XII et Anne de Bretagne', 'François Ier et Claude de France', 'Charles VIII et Anne de Bretagne']]]
+      } },
+      { k: 'vf', niveaux: {
+        facile: [['Les protestants et les catholiques sont tous des chrétiens.', true, '']],
+        moyen: [['L’édit de Nantes autorise le culte protestant, avec des limites.', true, '']],
+        difficile: [['Luther a traduit la Bible en allemand.', true, ''],
+          ['L’édit de Nantes a été signé par Louis XIV.', false, 'Henri IV l’a signé en 1598 ; Louis XIV l’a révoqué en 1685.']],
+        expert: [['L’imprimerie a aidé les idées de la Réforme à se répandre.', true, '']]
+      } }
+    ] },
+    { id: 'r07', matiere: 'histoire', famille: 'ren', nom: 'Frise de la Renaissance', court: 'Frise', icone: '📏', series: [
+      { k: 'ordre', consigne: 'Range ces événements de la Renaissance du plus ancien au plus récent.', q: 'En quelle année : {a} ?', niveaux: {
+        facile: [['Gutenberg imprime sa Bible', 1455, 'vers 1455'], ['Christophe Colomb arrive en Amérique', 1492, '1492'], ['Bataille de Marignan', 1515, '1515'],
+          ['Édit de Nantes', 1598, '1598']],
+        moyen: [['Charles VIII part conquérir l’Italie', 1494, '1494'], ['Léonard de Vinci s’installe en France', 1516, '1516'], ['Luther publie ses 95 thèses', 1517, '1517'],
+          ['Mort de Léonard de Vinci', 1519, '1519'], ['Jacques Cartier arrive au Canada', 1534, '1534']],
+        difficile: [['Laurent de Médicis gouverne Florence', 1469, '1469'], ['Léonard de Vinci commence La Joconde', 1503, 'vers 1503'], ['Michel-Ange finit le plafond de la chapelle Sixtine', 1512, '1512'],
+          ['Début de la construction de Chambord', 1519, '1519'], ['Ordonnance de Villers-Cotterêts : le français dans les actes officiels', 1539, '1539']],
+        expert: [['Les Ottomans prennent Constantinople', 1453, '1453'], ['Copernic publie que la Terre tourne autour du Soleil', 1543, '1543'], ['Ronsard publie Les Amours', 1552, '1552'],
+          ['Mort d’Henri II dans un tournoi', 1559, '1559'], ['Massacre de la Saint-Barthélemy', 1572, '1572'], ['Montaigne publie les Essais', 1580, '1580']]
       } }
     ] }
   ];
