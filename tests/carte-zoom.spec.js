@@ -11,7 +11,7 @@ test('carte à toucher zoomée (v7.2) : un vrai toucher (doigt ou souris) choisi
   await lancer(page);
   await page.getByRole('heading', { name: 'Le plateau' }).waitFor();
   await page.evaluate(() => window.Savoirs.regler(() => 0.3));
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await page.locator('#carte-piochee').waitFor();
   const c = await page.evaluate(() => window.Aventura.partie.carte);
   await page.getByRole('button', { name: 'Zoomer sur la carte' }).click();

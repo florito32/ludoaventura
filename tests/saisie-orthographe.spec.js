@@ -55,7 +55,7 @@ async function partieAvec(page, types) {
   await versReglages(page, 1);
   await cocherJoueur(page, { types });
   await lancer(page);
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   return page.evaluate(() => window.Aventura.partie.carte.mot);
 }
 
@@ -82,7 +82,7 @@ test('nombre de syllabes faux → correction avec le découpage, « J’ai compr
   await expect(page.locator('#carte-reponse')).toContainText(n + ' syllabe');
   expect(await page.evaluate(() => window.Aventura.partie.regles.de)).toBe('faible');
   await page.getByRole('button', { name: 'J’ai compris' }).click();
-  await page.getByRole('button', { name: 'Question suivante' }).waitFor({ timeout: 15000 });
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).waitFor({ timeout: 15000 });
 });
 
 test('réponse illisible : un message demande de corriger, sans compter de faute', async ({ page }) => {
@@ -147,7 +147,7 @@ async function partieGrammaire(page, jeux) {
   await versReglages(page, 1);
   await grammaire(page, { jeux });
   await lancer(page);
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   return page.evaluate(() => window.Aventura.partie.carte);
 }
 async function partieMots(page, types, packs) {
@@ -156,7 +156,7 @@ async function partieMots(page, types, packs) {
   await versReglages(page, 1);
   await cocherJoueur(page, { types, packs });
   await lancer(page);
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   return page.evaluate(() => window.Aventura.partie.carte);
 }
 

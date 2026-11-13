@@ -249,7 +249,7 @@ test('une aventure gagnée rapporte ses unités en étoiles, une seule fois mêm
   await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); } catch (e) { /* */ } });
   await lancerPartie(page, { joueurs: 1 });
   for (let t = 0; t < 5; t++) {
-    await page.getByRole('button', { name: 'Question suivante' }).click();
+    await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
     await repondre(page, true);
     await lancerLeDe(page);
   }
@@ -273,7 +273,7 @@ test('fin de partie : passer le niveau 5 propose d\'ouvrir le coffre d\'argent',
   });
   await lancerPartie(page, { joueurs: 1 });
   for (let t = 0; t < 5; t++) {
-    await page.getByRole('button', { name: 'Question suivante' }).click();
+    await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
     await repondre(page, true);
     await lancerLeDe(page);
   }

@@ -193,7 +193,7 @@ async function versHistoire(page, { niveau = 'facile', jeux = ['a01'], hasard = 
   if (hasard !== null) await page.evaluate((h) => window.Savoirs.regler(() => h), hasard);
 }
 async function piocher(page) {
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await page.locator('#carte-piochee').waitFor();
   return page.evaluate(() => window.Aventura.partie.carte);
 }

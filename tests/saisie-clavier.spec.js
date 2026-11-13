@@ -11,7 +11,7 @@ async function partie(page, reglage) {
   await versReglages(page, 1);
   await reglage(page);
   await lancer(page);
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await expect(page.getByLabel('Ta réponse')).toBeFocused();
 }
 

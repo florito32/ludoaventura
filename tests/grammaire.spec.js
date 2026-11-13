@@ -115,7 +115,7 @@ async function partie(page, { jeux, niveau = 'facile' }) {
   await versReglages(page, 1);
   await grammaire(page, { jeux, niveau });
   await lancer(page);
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await page.locator('#carte-gram').waitFor();
   return page.evaluate(() => window.Aventura.partie.carte);
 }
@@ -142,9 +142,9 @@ test('écran des réglages : Grammaire, niveau avec exemples, jeux tous cochés 
   await page.locator('#matieres input[value="francais"]').check();
   await page.locator('#francais input[value="grammaire"]').check();
   await expect(page.locator('#reglage-niveau-gram')).toBeVisible();
-  await expect(page.locator('#niveau-gram-aide')).toContainText('Facile');
+  await expect(page.locator('#niveau-gram-aide')).toHaveCount(0); // v8.5
   await page.locator('#niveau-gram input[value="expert"]').check();
-  await expect(page.locator('#niveau-gram-aide')).toContainText('Expert');
+  await expect(page.locator('#niveau-gram input[value="expert"]')).toBeChecked();
   await valider(page);
   await expect(page.locator('#reglages-titre')).toContainText('Grammaire, les jeux');
   await expect(page.locator('#jeux-gram input:checked')).toHaveCount(8);
@@ -295,7 +295,7 @@ test('partie rapide « Français » : une carte de grammaire au niveau choisi', 
   await page.getByRole('button', { name: 'Lancer la partie' }).click();
   // On force la matière de la prochaine carte (le hasard choisit sinon entre les 3 matières du français).
   await page.evaluate(() => { const R = window.Rapide, c = R.carte; R.carte = (m, n) => { const t = c(m, n, () => 0.9); return t; }; });
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await expect(page.locator('#carte-titre')).toContainText('Grammaire · Difficile');
   await expect.poll(() => page.evaluate(() => !document.getElementById('carte-gram').hidden || !document.getElementById('carte-saisie').hidden)).toBe(true);
 });
