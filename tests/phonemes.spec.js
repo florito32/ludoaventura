@@ -185,7 +185,7 @@ async function partie(page, jeu, sons = P.TOUS_SONS) {
   await valider(page);
   for (const box of await page.locator('#jeux-phon input').all()) await box.setChecked((await box.getAttribute('value')) === jeu);
   await lancer(page);
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await page.locator('#carte-gram').waitFor();
   return page.evaluate(() => window.Aventura.partie.carte);
 }

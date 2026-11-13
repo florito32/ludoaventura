@@ -97,10 +97,10 @@ test('didacticiel : préparation et premier tour, flèche et bulle à chaque ét
   await page.getByRole('button', { name: 'Lancer la partie' }).click();
 
   // Premier tour : piocher, répondre, « J'ai compris », dé.
-  await expect(texte(page)).toContainText('Question suivante');
+  await expect(texte(page)).toContainText('Première question');
   await flecheSur(page, '#tour-actions .btn');
   await bulleSansBouton(page);
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await expect(texte(page)).toContainText('écris ta réponse');
   await bulleSansBouton(page);
   await A.repondre(page, false);
@@ -126,7 +126,7 @@ test('pendant une partie : toucher Ludo donne l’aide de l’étape, qui se ref
     expect(l.x < r.x + r.width && l.x + l.width > r.x && l.y < r.y + r.height && l.y + l.height > r.y).toBe(false);
   }
   await ludo.click();
-  await expect(texte(page)).toContainText('Question suivante');
+  await expect(texte(page)).toContainText('Première question');
   await flecheSur(page, '#tour-actions .btn');
   await bulleSansBouton(page);
   // « Compris » referme la bulle.
@@ -136,7 +136,7 @@ test('pendant une partie : toucher Ludo donne l’aide de l’étape, qui se ref
   // L'action faite referme aussi l'aide.
   await ludo.click();
   await expect(bulle(page)).toBeVisible();
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await expect(bulle(page)).toBeHidden();
 });
 

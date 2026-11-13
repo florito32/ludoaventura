@@ -16,7 +16,7 @@ test('le bouton s\'appelle « Question suivante »', async ({ page }) => {
   await versReglages(page, 1);
   await cocherJoueur(page);
   await lancer(page);
-  await expect(page.getByRole('button', { name: 'Question suivante' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^(Première question|Question suivante)$/ })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Piocher une carte' })).toHaveCount(0);
 });
 
@@ -26,7 +26,7 @@ test('le dé et ses points ne cachent ni le message ni l\'encadré des points', 
   await versReglages(page, 1); // 1 joueur : chaque tour finit la manche, message le plus long (« en route vers le lac »)
   await cocherJoueur(page);
   await lancer(page);
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await repondre(page, true);
   await lancerLeDe(page);
   await expect(page.locator('#bandeau')).toContainText('en route vers le lac');
@@ -65,7 +65,7 @@ test('la case de réponse et « Valider » restent dans le cadre de couleur de l
   await versReglages(page, 1);
   await conjugaison(page, { temps: ['indicatif.present'], groupes: [3], niveau: 'moyen' });
   await lancer(page);
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await expect(page.getByLabel('Ta réponse')).toBeFocused();
   // Clavier ouvert sur écran tactile (carte en grand), sinon carte normale.
   const tactile = await page.evaluate(() => matchMedia('(pointer: coarse)').matches);

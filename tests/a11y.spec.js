@@ -77,7 +77,7 @@ test('aucune violation WCAG A/AA : Comment gagner des étoiles, Partie rapide', 
   await expect(page.getByRole('heading', { name: 'Partie rapide' })).toBeVisible();
   expect(await audit(page)).toEqual([]);
   await page.getByRole('button', { name: 'Lancer la partie' }).click();
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await expect(page.locator('#carte-piochee')).toBeVisible();
   expect(await audit(page)).toEqual([]);
 });
@@ -93,7 +93,7 @@ test('aucune violation WCAG A/AA : réglages de grammaire, cartes Relier et Reme
   await grammaire(page, { jeux: ['relier'], niveau: 'expert' });
   expect(await audit(page)).toEqual([]);
   await lancer(page);
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await page.locator('.gram-relier').waitFor();
   await page.locator('[data-cote="g"][data-i="0"]').click();
   await page.locator('[data-cote="d"][data-i="0"]').click();

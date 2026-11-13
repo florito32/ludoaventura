@@ -173,7 +173,7 @@ test('la carte piochée vient des packs du joueur, tous niveaux mêlés ; mot ca
   await lancer(page);
   const temps = Object.values(C.PACKS.find((p) => p.id === 'temps').niveaux).flat();
   for (let t = 0; t < 5; t++) {
-    await page.getByRole('button', { name: 'Question suivante' }).click();
+    await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
     await expect(page.locator('#carte-titre')).toContainText('· Nombre de lettres');
     await expect(page.locator('#carte-titre')).not.toContainText('niveau');
     await expect(page.locator('#carte-consigne')).toHaveText('Combien de lettres y a-t-il dans le mot :');
@@ -188,7 +188,7 @@ test('la carte piochée vient des packs du joueur, tous niveaux mêlés ; mot ca
     await repondre(page, true);
     await expect(page.locator('#carte-reponse')).toContainText('Bonne réponse !');
     await lancerLeDe(page);
-    if (t < 4) await page.getByRole('button', { name: 'Question suivante' }).waitFor();
+    if (t < 4) await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).waitFor();
   }
 });
 
@@ -199,7 +199,7 @@ test('pack « Lettres » plus proposé : aucune carte lettre n\'est piochée, m�
   const packs = await page.evaluate(() => [...new Set(window.Aventura.cartesDuJoueur(0).map((c) => c.pack + ':' + c.niveau))]);
   expect(packs.filter((p) => p.startsWith('lettres'))).toEqual([]);
   expect(packs).toHaveLength(8);
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await expect(page.locator('#carte-consigne')).not.toHaveText('Quelle est cette lettre ?');
 });
 
@@ -208,7 +208,7 @@ test('🔊 Écouter : la voix lit la consigne et le mot (en français)', async (
   await preparer(page, 1, { packs: ['temps'] });
   await seulement(page, ['Nombre de lettres']);
   await lancer(page);
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await page.getByRole('button', { name: 'Écouter' }).click();
   const mot = await page.evaluate(() => window.Aventura.partie.carte.mot);
   const lu = await page.evaluate(() => window.__lu);
@@ -244,7 +244,7 @@ test('le bouton « Mêmes réglages » n\'apparaît pas pour un seul joueur', as
 test('« Voir le mot » montre le mot seul (aide), sans la réponse ; « Cacher le mot » le recache', async ({ page }) => {
   await preparer(page, 1);
   await lancer(page);
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await expect(page.locator('#carte-mot')).toHaveClass(/cache/);
   await page.getByRole('button', { name: 'Voir le mot' }).click();
   await expect(page.locator('#carte-mot')).not.toHaveClass(/cache/);
@@ -258,7 +258,7 @@ test('« Voir le mot » montre le mot seul (aide), sans la réponse ; « Cacher 
 test('« Voir le mot » est juste sous « Écouter », avec une icône d\'œil', async ({ page }) => {
   await preparer(page, 1);
   await lancer(page);
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   const ecouter = page.getByRole('button', { name: 'Écouter' });
   const voir = page.getByRole('button', { name: 'Voir le mot' });
   await expect(voir.locator('[aria-hidden="true"]')).toHaveText('👁️');
@@ -301,7 +301,7 @@ test('v6.40 : « Phrase d’exemple » apparaît après « Écouter » et lit la
   await preparer(page, 1, { packs: ['animaux'] });
   await seulement(page, ['Nombre de syllabes']);
   await lancer(page);
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   const phrase = page.getByRole('button', { name: 'Écouter une phrase d’exemple' });
   await expect(phrase).toBeHidden();
   await page.getByRole('button', { name: 'Écouter' }).click();
@@ -318,7 +318,7 @@ test('v6.40 : « Phrase d’exemple » apparaît après « Écouter » et lit la
   await page.getByLabel('Ta réponse').fill('99');
   await page.getByRole('button', { name: 'OK', exact: true }).click();
   await page.getByRole('button', { name: 'J’ai compris' }).click();
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await expect(phrase).toBeHidden();
 });
 

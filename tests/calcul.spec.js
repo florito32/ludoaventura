@@ -78,9 +78,9 @@ test('étape 3 : Mathématiques et son niveau sur le même écran, puis signes e
   await expect(page.locator('#reglage-niveau-maths')).toBeVisible();
   await expect(page.locator('#niveau-maths input')).toHaveCount(4);
   await expect(page.locator('#niveau-maths input[value="facile"]')).toBeChecked();
-  await expect(page.locator('#niveau-maths-aide')).toContainText('les tables');
+  await expect(page.locator('#niveau-maths-aide')).toHaveCount(0); // v8.6 : plus de commentaire sous le niveau
   await page.locator('#niveau-maths label', { hasText: 'Moyen' }).click();
-  await expect(page.locator('#niveau-maths-aide')).toHaveText('Moyen : les nombres de 1 à 99, jusqu’à 2 signes.');
+  await expect(page.locator('#niveau-maths input[value="moyen"]')).toBeChecked();
   await page.locator('#niveau-maths label', { hasText: 'Facile' }).click();
   await valider(page); // deuxième écran : signes et tables
   await expect(page.locator('#reglages-maths')).toBeVisible();
@@ -130,7 +130,7 @@ test('le niveau montre les groupes de nombres et les nombres de signes possibles
   await expect(page.getByRole('checkbox', { name: 'Diviser' })).toHaveCount(1);
   await expect(page.locator('#nombres')).toBeVisible();
   await expect(page.locator('#dizaines')).toBeVisible();
-  await expect(page.locator('#dizaines-titre')).toContainText('30 = de 30 à 39');
+  await expect(page.locator('#dizaines-titre')).toHaveText('Dizaines'); // v8.6 : plus de commentaire entre parenthèses
   await expect(page.locator('#centaines')).toBeHidden();
   await expect(page.locator('#milliers')).toBeHidden();
   // Il faut un signe et au moins un nombre (plus de minimum de 4).
@@ -195,7 +195,7 @@ test('niveau Facile : la carte est une question de la table choisie', async ({ p
   await versMaths(page);
   await maths(page, { signes: ['fois'], nombres: [7], niveau: 'facile' });
   await lancer(page);
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await expect(page.locator('#carte-mot')).toHaveText(/^7\s×\s([1-9]|10)\s=\s\?$/);
   await expect(page.locator('#carte-titre')).toContainText('table de 7');
 });
@@ -205,7 +205,7 @@ test('la carte montre seulement son thème, en gros, et le bouton de réponse s\
   await versMaths(page);
   await maths(page, { signes: ['fois'], nombres: [7], niveau: 'facile' });
   await lancer(page);
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   const titre = page.locator('#carte-titre');
   await expect(titre).not.toContainText('Carte n°');
   await expect(titre).not.toContainText('Léa');
@@ -221,7 +221,7 @@ test('partie en mathématiques : bonne réponse → dé FORT, mauvaise → corre
   await maths(page, { signes: ['plus', 'fois'], nombres: [2, 3], niveau: 'moyen', nbSignes: [2] });
   await lancer(page);
   for (const [bonne, min, max] of [[true, 4, 6], [false, 1, 3]]) {
-    await page.getByRole('button', { name: 'Question suivante' }).click();
+    await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
     await expect(page.locator('#carte-mot')).toHaveText(/^\d+\s[+×]\s\d+\s[+×]\s\d+\s=\s\?$/);
     await expect(page.getByLabel('Ta réponse')).toBeFocused();
     // Plus de boutons « Bonne / Mauvaise réponse » : le jeu corrige.
@@ -240,7 +240,7 @@ test('partie en mathématiques : bonne réponse → dé FORT, mauvaise → corre
     const gain = Number(await page.locator('#points').textContent()) - avant;
     expect(gain).toBeGreaterThanOrEqual(min);
     expect(gain).toBeLessThanOrEqual(max);
-    await page.getByRole('button', { name: 'Question suivante' }).waitFor();
+    await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).waitFor();
   }
 });
 
@@ -248,7 +248,7 @@ test('réponse vide ou qui n\'est pas un nombre : message, rien n\'est compté',
   await versMaths(page);
   await maths(page, { signes: ['divise'], nombres: [7, 2], niveau: 'facile' });
   await lancer(page);
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await page.getByRole('button', { name: 'OK', exact: true }).click();
   await expect(page.locator('#carte-reponse')).toHaveText('Écris ta réponse dans la case.');
   await page.getByLabel('Ta réponse').fill('trois');
@@ -268,7 +268,7 @@ test('un joueur en mathématiques, l\'autre en orthographe ; « Mêmes réglages
   await valider(page);
   await cocherJoueur(page);
   await lancer(page);
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await expect(page.getByLabel('Ta réponse')).toBeVisible();
   const res = await page.evaluate(() => window.Aventura.partie.carte.resultatTexte);
   await page.getByLabel('Ta réponse').fill(res);
@@ -276,7 +276,7 @@ test('un joueur en mathématiques, l\'autre en orthographe ; « Mêmes réglages
   await lancerLeDe(page);
   // Joueur 2 : carte d'orthographe (« Nombre de lettres ») : il écrit aussi sa réponse.
   await page.locator('#tour-nom').filter({ hasText: 'Tom' }).waitFor();
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await expect(page.locator('#carte-consigne')).toHaveText('Combien de lettres y a-t-il dans le mot :');
   await expect(page.locator('#carte-saisie')).toBeVisible();
 
@@ -296,7 +296,7 @@ test('rafraîchir après la réponse : la correction reste et les points ne comp
   await versMaths(page);
   await maths(page, { signes: ['plus'], nombres: [3], niveau: 'facile' });
   await lancer(page);
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   const c = await page.evaluate(() => window.Aventura.partie.carte);
   await page.getByLabel('Ta réponse').fill(c.resultatTexte);
   await page.getByRole('button', { name: 'OK', exact: true }).click();
@@ -316,7 +316,7 @@ test('formule Expert : la page ne défile jamais de côté', async ({ page }) =>
   // v7.0 : au moins 4 nombres ; les centaines donnent les formules les plus longues.
   await maths(page, { signes: ['plus', 'moins', 'fois', 'divise'], nombres: [], centaines: [600, 700, 800, 900], milliers: [1000], niveau: 'expert', nbSignes: [4] });
   await lancer(page);
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await expect(page.locator('#carte-mot')).toHaveText(/^\d+(\s[+−×÷]\s\d+){1,4}\s=\s\?$/);
   expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
   await page.getByLabel('Ta réponse').fill('12345678901234567890');
@@ -331,7 +331,7 @@ test('calcul faux : la correction reste à l\'écran jusqu\'à « J\'ai compris 
   await versMaths(page);
   await maths(page, { signes: ['fois'], nombres: [3] });
   await lancer(page);
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await page.getByLabel('Ta réponse').fill('1000');
   await page.getByRole('button', { name: 'OK', exact: true }).click();
   await expect(page.locator('#carte-reponse')).toContainText('La bonne réponse est');

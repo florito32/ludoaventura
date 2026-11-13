@@ -107,9 +107,9 @@ test('conjugaison en 2 écrans : matière et niveau → modes, groupes et temps 
   // Écran 1 : le niveau apparaît tout de suite sous Orthographe / Conjugaison, Facile coché, avec une aide.
   await expect(page.locator('#niveau-conj input')).toHaveCount(4);
   await expect(page.locator('#niveau-conj input[value="facile"]')).toBeChecked();
-  await expect(page.locator('#niveau-conj-aide')).toContainText('Facile');
+  await expect(page.locator('#niveau-conj-aide')).toHaveCount(0); // v8.6 : plus de commentaire sous le niveau
   await page.locator('#niveau-conj label', { hasText: 'Expert' }).click();
-  await expect(page.locator('#niveau-conj-aide')).toContainText('Expert');
+  await expect(page.locator('#niveau-conj input[value="expert"]')).toBeChecked();
   await tient(page);
   await valider(page);
   // Écran 2 : les 4 modes et les 3 groupes ; aucun temps tant qu'aucun mode n'est choisi.
@@ -188,7 +188,7 @@ test('partie en conjugaison : bonne réponse → dé FORT tout seul @smoke', asy
   await preparer(page);
   await conjugaison(page, { temps: ['indicatif.imparfait'], groupes: [2], niveau: 'facile' });
   await lancer(page);
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await expect(page.locator('#carte-consigne')).toContainText(/Conjugue (finir|choisir|grandir|remplir)/);
   await expect(page.locator('#carte-consigne')).toContainText('Indicatif · imparfait');
   await expect(page.locator('#carte-mot')).toHaveText(/^(je|tu|il|nous|vous|ils) …$/);
@@ -204,7 +204,7 @@ test('conjugaison fausse : bonne réponse affichée, « ? » montre tout le verb
   await preparer(page);
   await conjugaison(page, { temps: ['indicatif.present'], groupes: [3], niveau: 'facile' });
   await lancer(page);
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   const c = await repondre(page, false);
   await expect(page.locator('#carte-reponse')).toHaveText('Ce n’est pas ça (tu as écrit « ' + c.ecrit + ' »). La bonne réponse : ' + c.bonne + '.');
   await expect(page.locator('#reaction')).toHaveClass(/mauvaise/);
@@ -236,8 +236,8 @@ test('impératif : pronom entre parenthèses ; subjonctif : « que » devant le 
   await conjugaison(page, { temps: ['imperatif.present', 'subjonctif.present'], groupes: [1], niveau: 'facile' });
   await lancer(page);
   for (let i = 0; i < 2; i++) {
-    if (i) { await lancerLeDe(page); await page.getByRole('button', { name: 'Question suivante' }).waitFor(); }
-    await page.getByRole('button', { name: 'Question suivante' }).click();
+    if (i) { await lancerLeDe(page); await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).waitFor(); }
+    await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
     const c = await page.evaluate(() => window.Aventura.partie.carte);
     await expect(page.locator('#carte-mot')).toHaveText(c.temps === 'imperatif.present' ? /^\((tu|nous|vous)\) …$/ : /^(que|qu’)/);
     await repondre(page, true);

@@ -85,7 +85,13 @@ test('accueil → Partie rapide solo : matières (« Tout » / « Aucune » à c
   await page.getByRole('button', { name: 'Tout', exact: true }).click();
   await expect(page.getByRole('checkbox', { name: 'Maths' })).toBeChecked();
   await expect(page.getByRole('checkbox', { name: 'Français' })).toBeChecked();
+  await expect(page.getByRole('checkbox', { name: 'Géographie' })).toBeChecked();
+  await expect(page.getByRole('checkbox', { name: 'Histoire' })).toBeChecked();
   await page.getByRole('checkbox', { name: 'Maths' }).uncheck();
+  await page.getByRole('checkbox', { name: 'Géographie' }).uncheck();
+  await page.getByRole('checkbox', { name: 'Histoire' }).uncheck();
+  // v8.6 : sans Géographie ni Histoire, pas de choix Quiz / Normal.
+  await expect(page.locator('input[name="rapide-mode"]')).toHaveCount(0);
   // Niveau : Facile par défaut, 4 choix.
   await expect(page.getByRole('radio', { name: 'Facile' })).toBeChecked();
   await expect(page.locator('input[name="rapide-niveau"]')).toHaveCount(4);
@@ -100,7 +106,7 @@ test('accueil → Partie rapide solo : matières (« Tout » / « Aucune » à c
   await expect(page.getByRole('heading', { name: 'Partie rapide' })).toBeVisible();
   const p = await page.evaluate(() => ({ nb: window.Aventura.partie.joueurs.length, rapide: window.Aventura.partie.rapide, diff: window.Aventura.partie.aventure.difficulte, mots: window.Aventura.partie.mots[0], types: window.Aventura.partie.types[0] }));
   expect(p.nb).toBe(1);
-  expect(p.rapide).toEqual({ matieres: ['francais'], niveau: 'difficile' });
+  expect(p.rapide).toEqual({ matieres: ['francais'], niveau: 'difficile', mode: 'quiz' });
   expect(p.diff).toBe('difficile');
   expect(p.mots).toEqual(D.ORTHO.difficile.mots);
   expect(p.types).toEqual(D.ORTHO.difficile.types);
@@ -116,12 +122,12 @@ test('accueil → Partie rapide solo : matières (« Tout » / « Aucune » à c
   // v6.55 : la grammaire aussi, au niveau choisi.
   expect(tirees.some((t) => t.startsWith('grammaire:'))).toBe(true);
   for (const t of tirees.filter((x) => x.startsWith('grammaire:'))) expect(['grammaire:difficile', 'grammaire:mot']).toContain(t);
-  await page.getByRole('button', { name: 'Question suivante' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await expect(page.locator('#carte-piochee')).toBeVisible();
   // Recharger pendant la partie la reprend en partie rapide, avec son niveau.
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Partie rapide' })).toBeVisible();
-  expect(await page.evaluate(() => window.Aventura.partie.rapide)).toEqual({ matieres: ['francais'], niveau: 'difficile' });
+  expect(await page.evaluate(() => window.Aventura.partie.rapide)).toEqual({ matieres: ['francais'], niveau: 'difficile', mode: 'quiz' });
 });
 
 // Fin d'une partie rapide (v6.45) : « Recommencer la partie » ou « Retour à l'accueil », pas de retour aux choix.
@@ -137,7 +143,7 @@ test('fin de partie rapide : « Recommencer la partie » et « Retour à l’acc
   const av = await page.evaluate(() => window.Aventura.partie.aventure.id);
   async function jouer() {
     for (let t = 0; t < 5; t++) {
-      await page.getByRole('button', { name: 'Question suivante' }).click();
+      await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
       await page.locator('#reponse-joueur').waitFor({ state: 'visible' });
       const c = await page.evaluate(() => window.Aventura.partie.carte);
       expect(c.type).toBe('calcul');
@@ -156,7 +162,7 @@ test('fin de partie rapide : « Recommencer la partie » et « Retour à l’acc
   await page.getByRole('button', { name: 'Recommencer la partie' }).click();
   await expect(page.locator('#fin')).toBeHidden();
   const apres = await page.evaluate(() => ({ av: window.Aventura.partie.aventure.id, pts: window.Aventura.partie.regles.points, rapide: window.Aventura.partie.rapide }));
-  expect(apres).toEqual({ av, pts: 0, rapide: { matieres: ['maths'], niveau: 'moyen' } });
+  expect(apres).toEqual({ av, pts: 0, rapide: { matieres: ['maths'], niveau: 'moyen', mode: 'quiz' } });
   await jouer();
   await page.getByRole('button', { name: 'Retour à l’accueil' }).click();
   await expect(page.locator('#btn-commencer')).toBeVisible();
