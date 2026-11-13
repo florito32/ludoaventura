@@ -72,7 +72,7 @@ test.describe('contenu de géographie', () => {
   });
 
   test('v8.1 : environ 50 éléments par niveau pour chaque thème (fini les petites listes qui tournent en boucle)', () => {
-    const minimum = { g01: 70, g04: 45, g05: 45, g07: 100, g11: 50, g06: 45, g09: 40, g13: 40 };
+    const minimum = { g01: 70, g04: 45, g05: 45, g07: 100, g11: 50, g06: 45, g09: 40, g13: 40, g17: 40 };
     for (const [id, min] of Object.entries(minimum)) {
       const j = S.trouver(id);
       for (const n of NIVEAUX) {
