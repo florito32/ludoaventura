@@ -58,10 +58,16 @@ test.describe('contenu d\'histoire', () => {
     }
   });
 
-  test('Préhistoire (v7.6) : 5 jeux, chacun a du contenu à chaque niveau', () => {
+  test('Préhistoire (v8.3) : 2 jeux regroupés, environ 40 éléments par niveau, jouables en Quiz et en Normal', () => {
     const pre = S.jeuxDe('histoire').filter((j) => j.famille === 'pre');
-    expect(pre.map((j) => j.id)).toEqual(['p01', 'p02', 'p03', 'p04', 'p07']);
-    for (const j of pre) for (const n of NIVEAUX) expect(j.series.some((s) => S.utilisable(s, n)), j.id + ' ' + n).toBe(true);
+    expect(pre.map((j) => j.id)).toEqual(['p01', 'p03']);
+    for (const j of pre) {
+      for (const n of NIVEAUX) {
+        for (const mode of ['quiz', 'normal']) expect(j.series.some((s) => S.utilisable(s, n, mode)), j.id + ' ' + n + ' ' + mode).toBe(true);
+        const total = j.series.reduce((a, s) => a + (s.k === 'classer' ? (s.niveaux[n] || []).reduce((x, g) => x + g.items.length, 0) : (s.niveaux[n] || []).length), 0);
+        expect(total, j.id + ' ' + n).toBeGreaterThanOrEqual(35);
+      }
+    }
     // Une frise se range dans le bon ordre.
     S.regler(() => 0.9);
     const c = S.generer({ jeux: ['p01'], niveau: 'moyen' }, 'histoire');
@@ -163,7 +169,7 @@ test('écran des réglages : la matière Histoire, son niveau, ses jeux rangés 
   const familles = page.locator('#savoir-liste .famille:not([hidden])');
   await expect(familles).toHaveCount(7);
   await expect(familles.nth(0).locator('.famille-nom')).toContainText('Préhistoire');
-  await expect(familles.nth(0).locator('input')).toHaveCount(5);
+  await expect(familles.nth(0).locator('input')).toHaveCount(2);
   await expect(familles.nth(1).locator('.famille-nom')).toContainText('Antiquité');
   await expect(familles.nth(1).locator('input')).toHaveCount(12);
   await expect(familles.nth(2).locator('.famille-nom')).toContainText('Moyen Âge');
@@ -197,7 +203,7 @@ test('écran des réglages : la matière Histoire, son niveau, ses jeux rangés 
       dehors: n.left < r.left + 1 || n.right > r.right - 1 || n.top < r.top || n.bottom > r.bottom,
       lignes: Math.round(n.height / parseFloat(getComputedStyle(el.querySelector('.pack-nom')).lineHeight)) };
   }));
-  expect(pb).toHaveLength(51);
+  expect(pb).toHaveLength(48);
   for (const x of pb) { expect(x.debord, x.nom).toBe(false); expect(x.dehors, x.nom).toBe(false); expect(x.lignes, x.nom).toBeLessThanOrEqual(1); }
   await pasDeDebordement(page);
   await valider(page);
