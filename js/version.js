@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '7.10';
+  var VERSION = '7.11';
 
   var HISTORY = [
+    { v: '7.11', date: '2026-11-13', changes: [
+      "Histoire : nouvelle période, le XXe siècle, avec 7 jeux et 4 niveaux — Conquête spatiale, Inventions du XXe siècle, Présidents de la Ve République (avec Qui suis-je ?), Femmes qui ont marqué l’histoire (avec Qui suis-je ?), Construction européenne, Grandes figures du monde (avec Qui suis-je ?), Frise du XXe siècle. Les 7 périodes de l’histoire sont maintenant toutes jouables."
+    ] },
     { v: '7.10', date: '2026-11-13', changes: [
       "Histoire : nouvelle période, la Révolution et le XIXe siècle, avec 9 jeux et 4 niveaux — La Révolution française, Symboles de la République, Napoléon (avec Qui suis-je ?), Les régimes politiques, Inventions de la révolution industrielle, Écrivains du XIXe siècle, Peintres impressionnistes (avec Qui suis-je ?), Monuments du XIXe siècle, Grandes lois."
     ] },

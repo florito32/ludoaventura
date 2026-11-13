@@ -83,6 +83,17 @@ test.describe('contenu d\'histoire', () => {
     }
   });
 
+  test('XXe siècle (v7.11) : 7 jeux, chacun a du contenu à chaque niveau', () => {
+    const xx = S.jeuxDe('histoire').filter((j) => j.famille === 'xx');
+    expect(xx.map((j) => j.id)).toEqual(['z03', 'z04', 'z05', 'z06', 'z07', 'z08', 'z11']);
+    for (const j of xx) for (const n of NIVEAUX) expect(j.series.some((s) => S.utilisable(s, n)), j.id + ' ' + n).toBe(true);
+    // Frises : pas deux événements de la même année dans un niveau (sinon l'ordre serait ambigu).
+    for (const j of xx) for (const s of j.series.filter((x) => x.k === 'ordre')) for (const n of NIVEAUX) {
+      const annees = (s.niveaux[n] || []).map((x) => x[1]);
+      expect(new Set(annees).size, j.id + ' ' + n).toBe(annees.length);
+    }
+  });
+
   test('chiffres romains : conversions justes', () => {
     expect(H.romain(4)).toBe('IV');
     expect(H.romain(14)).toBe('XIV');
@@ -131,9 +142,9 @@ test('écran des réglages : la matière Histoire, son niveau, ses jeux rangés 
   await page.locator('#niveau-savoir label', { hasText: 'Moyen' }).click();
   await valider(page);
   await expect(page.locator('#reglages-titre')).toContainText('Histoire, les jeux');
-  // Préhistoire (v7.6), Antiquité, Moyen Âge (v7.7), Renaissance (v7.8), Temps modernes (v7.9), Révolution et XIXe (v7.10), dans l'ordre ; les familles de Géographie sont cachées.
+  // Préhistoire (v7.6), Antiquité, Moyen Âge (v7.7), Renaissance (v7.8), Temps modernes (v7.9), Révolution et XIXe (v7.10), XXe (v7.11), dans l'ordre ; les familles de Géographie sont cachées.
   const familles = page.locator('#savoir-liste .famille:not([hidden])');
-  await expect(familles).toHaveCount(6);
+  await expect(familles).toHaveCount(7);
   await expect(familles.nth(0).locator('.famille-nom')).toContainText('Préhistoire');
   await expect(familles.nth(0).locator('input')).toHaveCount(5);
   await expect(familles.nth(1).locator('.famille-nom')).toContainText('Antiquité');
@@ -146,6 +157,8 @@ test('écran des réglages : la matière Histoire, son niveau, ses jeux rangés 
   await expect(familles.nth(4).locator('input')).toHaveCount(4);
   await expect(familles.nth(5).locator('.famille-nom')).toContainText('Révolution et XIXe');
   await expect(familles.nth(5).locator('input')).toHaveCount(9);
+  await expect(familles.nth(6).locator('.famille-nom')).toContainText('XXe siècle');
+  await expect(familles.nth(6).locator('input')).toHaveCount(7);
   // v7.8 : liste plus haute que l'écran → son haut reste atteignable (rien ne sort au-dessus de la zone qui défile).
   const haut = await page.locator('#savoir-liste').evaluate((el) => {
     let c = el.parentElement; while (getComputedStyle(c).overflowY === 'visible') c = c.parentElement;
@@ -167,7 +180,7 @@ test('écran des réglages : la matière Histoire, son niveau, ses jeux rangés 
       dehors: n.left < r.left + 1 || n.right > r.right - 1 || n.top < r.top || n.bottom > r.bottom,
       lignes: Math.round(n.height / parseFloat(getComputedStyle(el.querySelector('.pack-nom')).lineHeight)) };
   }));
-  expect(pb).toHaveLength(44);
+  expect(pb).toHaveLength(51);
   for (const x of pb) { expect(x.debord, x.nom).toBe(false); expect(x.dehors, x.nom).toBe(false); expect(x.lignes, x.nom).toBeLessThanOrEqual(1); }
   await pasDeDebordement(page);
   await valider(page);
