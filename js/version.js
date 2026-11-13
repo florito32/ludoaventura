@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '7.9';
+  var VERSION = '7.10';
 
   var HISTORY = [
+    { v: '7.10', date: '2026-11-13', changes: [
+      "Histoire : nouvelle période, la Révolution et le XIXe siècle, avec 9 jeux et 4 niveaux — La Révolution française, Symboles de la République, Napoléon (avec Qui suis-je ?), Les régimes politiques, Inventions de la révolution industrielle, Écrivains du XIXe siècle, Peintres impressionnistes (avec Qui suis-je ?), Monuments du XIXe siècle, Grandes lois."
+    ] },
     { v: '7.9', date: '2026-11-13', changes: [
       "Histoire : nouvelle période, les Temps modernes, avec 4 jeux et 4 niveaux — Louis XIV et Versailles (avec Qui suis-je ?), Écrivains classiques (Molière, La Fontaine, Racine…), Les Lumières (Voltaire, Rousseau, Montesquieu, Diderot), Frise des Temps modernes."
     ] },
