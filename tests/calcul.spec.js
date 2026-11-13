@@ -78,7 +78,7 @@ test('étape 3 : Mathématiques et son niveau sur le même écran, puis signes e
   await expect(page.locator('#reglage-niveau-maths')).toBeVisible();
   await expect(page.locator('#niveau-maths input')).toHaveCount(4);
   await expect(page.locator('#niveau-maths input[value="facile"]')).toBeChecked();
-  await expect(page.locator('#niveau-maths-aide')).toHaveCount(0); // v8.6 : plus de commentaire sous le niveau
+  await expect(page.locator('#niveau-maths-aide')).toHaveCount(0); // v8.5 : plus de commentaire sous le niveau
   await page.locator('#niveau-maths label', { hasText: 'Moyen' }).click();
   await expect(page.locator('#niveau-maths input[value="moyen"]')).toBeChecked();
   await page.locator('#niveau-maths label', { hasText: 'Facile' }).click();
@@ -130,7 +130,7 @@ test('le niveau montre les groupes de nombres et les nombres de signes possibles
   await expect(page.getByRole('checkbox', { name: 'Diviser' })).toHaveCount(1);
   await expect(page.locator('#nombres')).toBeVisible();
   await expect(page.locator('#dizaines')).toBeVisible();
-  await expect(page.locator('#dizaines-titre')).toHaveText('Dizaines'); // v8.6 : plus de commentaire entre parenthèses
+  await expect(page.locator('#dizaines-titre')).toHaveText('Dizaines'); // v8.5 : plus de commentaire entre parenthèses
   await expect(page.locator('#centaines')).toBeHidden();
   await expect(page.locator('#milliers')).toBeHidden();
   // Il faut un signe et au moins un nombre (plus de minimum de 4).

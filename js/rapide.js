@@ -6,7 +6,7 @@
 //  - Maths : signes et nombres du niveau ;
 //  - Français : orthographe, conjugaison ou grammaire (une chance sur trois, v6.55) ; orthographe : tous les thèmes,
 //    mots et questions du niveau ; conjugaison : temps et groupes du niveau ; grammaire : tous les jeux, au niveau.
-//  - Géographie et Histoire (v8.6, demande du 13/11/2026) : tous les jeux de la matière jouables dans le mode choisi
+//  - Géographie et Histoire (v8.5, demande du 13/11/2026) : tous les jeux de la matière jouables dans le mode choisi
 //    (Quiz ou Normal, choix visible seulement quand l'une des deux est cochée), au niveau choisi.
 // Aventure : Facile → facile, Moyen → moyenne, Difficile et Expert → difficile (des aventures « Expert » viendront plus tard).
 // Partie logique (sans interface) utilisable dans les tests Node ; l'écran est construit plus bas, dans la page seulement.
@@ -24,7 +24,7 @@
   var MATIERES = [{ id: 'maths', nom: 'Maths' }, { id: 'francais', nom: 'Français' },
     { id: 'geographie', nom: 'Géographie' }, { id: 'histoire', nom: 'Histoire' }];
   var IDS = MATIERES.map(function (m) { return m.id; });
-  // Mode des cartes de Géographie et d'Histoire (v8.6) : les mêmes que dans la partie libre (js/savoirs.js).
+  // Mode des cartes de Géographie et d'Histoire (v8.5) : les mêmes que dans la partie libre (js/savoirs.js).
   var MODES = [{ id: 'quiz', nom: 'Quiz' }, { id: 'normal', nom: 'Normal' }];
   function modeValide(m) { return m === 'normal' ? 'normal' : 'quiz'; }
   function avecSavoir(matieres) { return (matieres || []).some(function (m) { return m === 'geographie' || m === 'histoire'; }); }
@@ -125,8 +125,8 @@
       h += '<label class="pack"><input type="radio" name="rapide-niveau" value="' + n.id + '"' + (choix.niveau === n.id ? ' checked' : '') + '><span>' + n.nom + '</span></label>';
     });
     h += '</div></fieldset>';
-    // v8.6 : mode Quiz / Normal, seulement si Géographie ou Histoire est cochée (choix de l'utilisateur).
-    // v8.6 : plus de petit commentaire sous les choix (demande de l'utilisateur).
+    // v8.5 : mode Quiz / Normal, seulement si Géographie ou Histoire est cochée (choix de l'utilisateur).
+    // v8.5 : plus de petit commentaire sous les choix (demande de l'utilisateur).
     if (avecSavoir(choix.matieres)) {
       h += '<fieldset class="defi-choix"><legend>Mode</legend><div class="packs">';
       MODES.forEach(function (m) {

@@ -203,7 +203,7 @@ test('écran des réglages : Géographie, son niveau, le mode Quiz / Normal (v8.
   await expect(page.locator('#reglage-niveau-savoir')).toBeVisible();
   await expect(page.locator('#reglage-mode-savoir')).toBeVisible();
   await expect(page.locator('#mode-savoir input[value="quiz"]')).toBeChecked();
-  await expect(page.locator('#mode-savoir-aide, #niveau-savoir-aide')).toHaveCount(0); // v8.6 : plus de commentaires
+  await expect(page.locator('#mode-savoir-aide, #niveau-savoir-aide')).toHaveCount(0); // v8.5 : plus de commentaires
   await page.locator('#mode-savoir label', { hasText: 'Normal' }).click();
   await expect(page.locator('#mode-savoir input[value="normal"]')).toBeChecked();
   await page.locator('#niveau-savoir label', { hasText: 'Expert' }).click();

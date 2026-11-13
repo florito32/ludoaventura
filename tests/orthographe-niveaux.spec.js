@@ -66,7 +66,7 @@ test('le niveau d\'orthographe se choisit sur l\'écran de la matière, et Exper
   await page.locator('#francais input[value="orthographe"]').check();
   await expect(page.locator('#niveau-ortho input')).toHaveCount(4);
   await expect(page.locator('#niveau-ortho input[value="facile"]')).toBeChecked();
-  await expect(page.locator('#niveau-ortho-aide')).toHaveCount(0); // v8.6
+  await expect(page.locator('#niveau-ortho-aide')).toHaveCount(0); // v8.5
   await expect(page.locator('#niveau-conj')).toBeHidden();
   await page.locator('#niveau-ortho label', { hasText: 'Expert' }).click();
   await expect(page.locator('#niveau-ortho input[value="expert"]')).toBeChecked();

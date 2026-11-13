@@ -142,7 +142,7 @@ test('écran des réglages : Grammaire, niveau avec exemples, jeux tous cochés 
   await page.locator('#matieres input[value="francais"]').check();
   await page.locator('#francais input[value="grammaire"]').check();
   await expect(page.locator('#reglage-niveau-gram')).toBeVisible();
-  await expect(page.locator('#niveau-gram-aide')).toHaveCount(0); // v8.6
+  await expect(page.locator('#niveau-gram-aide')).toHaveCount(0); // v8.5
   await page.locator('#niveau-gram input[value="expert"]').check();
   await expect(page.locator('#niveau-gram input[value="expert"]')).toBeChecked();
   await valider(page);

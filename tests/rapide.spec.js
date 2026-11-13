@@ -90,7 +90,7 @@ test('accueil → Partie rapide solo : matières (« Tout » / « Aucune » à c
   await page.getByRole('checkbox', { name: 'Maths' }).uncheck();
   await page.getByRole('checkbox', { name: 'Géographie' }).uncheck();
   await page.getByRole('checkbox', { name: 'Histoire' }).uncheck();
-  // v8.6 : sans Géographie ni Histoire, pas de choix Quiz / Normal.
+  // v8.5 : sans Géographie ni Histoire, pas de choix Quiz / Normal.
   await expect(page.locator('input[name="rapide-mode"]')).toHaveCount(0);
   // Niveau : Facile par défaut, 4 choix.
   await expect(page.getByRole('radio', { name: 'Facile' })).toBeChecked();

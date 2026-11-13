@@ -930,7 +930,7 @@
     if (partie.rapide && window.Rapide) {
       var t = window.Rapide.carte(partie.rapide.matieres, partie.rapide.niveau, null, partie.rapide.mode);
       mat = t.matiere; if (t.maths) mr = t.maths; if (t.conj) cr = t.conj; if (t.gram) gr = t.gram;
-      // v8.6 : Géographie et Histoire en partie rapide : tous les jeux de la matière jouables dans le mode choisi.
+      // v8.5 : Géographie et Histoire en partie rapide : tous les jeux de la matière jouables dans le mode choisi.
       if (t.savoir) return SV.generer({ jeux: jeuxProposes(mat, t.savoir.mode).map(function (x) { return x.id; }), niveau: t.savoir.niveau, mode: t.savoir.mode }, mat);
     }
     // Géographie et Histoire (v7.0) : un jeu choisi par le joueur, une série et un format tirés au hasard.
@@ -1309,7 +1309,7 @@
       $('carte-piochee').hidden = true;
       // Pas de commentaire visible (v4.3) : seulement pour les lecteurs d'écran.
       annoncer(j.nom + ' pioche une carte dans son tas.');
-      // v8.6 (demande du 13/11/2026) : la toute première question de la partie (premier joueur, première croix)
+      // v8.5 (demande du 13/11/2026) : la toute première question de la partie (premier joueur, première croix)
       // s'appelle « Première question ».
       bouton(r.manche === 1 && r.joueur === 0 ? 'Première question' : 'Question suivante', 'btn-principal', function () {
         partie.carte = piocherCarte(j);

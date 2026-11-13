@@ -107,7 +107,7 @@ test('conjugaison en 2 écrans : matière et niveau → modes, groupes et temps 
   // Écran 1 : le niveau apparaît tout de suite sous Orthographe / Conjugaison, Facile coché, avec une aide.
   await expect(page.locator('#niveau-conj input')).toHaveCount(4);
   await expect(page.locator('#niveau-conj input[value="facile"]')).toBeChecked();
-  await expect(page.locator('#niveau-conj-aide')).toHaveCount(0); // v8.6 : plus de commentaire sous le niveau
+  await expect(page.locator('#niveau-conj-aide')).toHaveCount(0); // v8.5 : plus de commentaire sous le niveau
   await page.locator('#niveau-conj label', { hasText: 'Expert' }).click();
   await expect(page.locator('#niveau-conj input[value="expert"]')).toBeChecked();
   await tient(page);

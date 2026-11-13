@@ -1,4 +1,4 @@
-// v8.6 (demande du 13/11/2026, BACKLOG lignes 337 à 340) :
+// v8.5 (demande du 13/11/2026, BACKLOG lignes 337 à 340) :
 //  - plus de petits commentaires sous les niveaux, sous le mode et dans les titres des réglages ;
 //  - partie rapide solo : Géographie et Histoire, avec le choix Quiz / Normal (visible seulement si l'une des deux est cochée) ;
 //  - la toute première question de la partie s'appelle « Première question ».
