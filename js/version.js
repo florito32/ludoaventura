@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '8.1';
+  var VERSION = '8.2';
 
   var HISTORY = [
+    { v: '8.2', date: '2026-11-13', changes: [
+      "Géographie : « Climats et paysages » passe à environ 45 questions par niveau — paysages, animaux et leurs milieux, climats des villes de France, météo, vents, saisons et vocabulaire. Tous les thèmes de géographie ont maintenant leur grand choix de questions."
+    ] },
     { v: '8.1', date: '2026-11-13', changes: [
       "Géographie : environ 50 questions différentes par niveau dans chaque thème, de plus en plus difficiles — Pays et capitales (184 pays), Drapeaux (195 pays), Pays voisins (frontières de tous les pays), Monuments du monde (200 monuments), Fleuves et rivières, Montagnes et sommets, Records de la Terre.",
       "Drapeaux : deux drapeaux qui se ressemblent (Tchad et Roumanie, Monaco et Indonésie…) ne sont jamais proposés ensemble.",

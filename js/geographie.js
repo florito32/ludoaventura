@@ -1099,47 +1099,206 @@
       { k: 'ordre', consigne: "Range ces cascades de la moins haute à la plus haute.", sens: ["la moins haute", "la plus haute"], niveaux: { expert: [["Le Salto Ángel", 979.0, ""], ["La chute de Tugela", 948.0, ""], ["Les chutes de Yosemite", 739.0, ""], ["Les chutes Victoria", 108.0, ""], ["Les chutes du Niagara", 51.0, ""]] } },
       { k: 'ordre', consigne: "Range ces capitales de la plus basse à la plus haute.", sens: ["la plus basse", "la plus haute"], niveaux: { expert: [["La Paz", 3640.0, ""], ["Quito", 2850.0, ""], ["Bogota", 2640.0, ""], ["Addis-Abeba", 2355.0, ""], ["Mexico", 2240.0, ""], ["Paris", 35.0, ""]] } }
     ] },
+    // v8.2 : environ 45 éléments par niveau (paysages, animaux et milieux, climats de France, météo, vents, vocabulaire).
     { id: 'g17', matiere: 'geographie', famille: 'nature', nom: 'Climats et paysages', court: 'Climats', icone: '🌦️', series: [
-      { k: 'paires', gauche: 'Paysage', droite: 'Description', consigneR: 'Relie chaque paysage à sa description.',
-        q: 'Quel paysage : {b} ?', ouverte: false, inverseSeul: true, niveaux: {
-          facile: [['Le désert', 'Très sec, très chaud le jour'], ['La banquise', 'De la glace sur la mer, très froid'],
-            ['La forêt équatoriale', 'Chaud et humide toute l’année'], ['La savane', 'De hautes herbes, une saison sèche et une saison des pluies'],
-            ['La haute montagne', 'Plus on monte, plus il fait froid'], ['La toundra', 'Un sol gelé et de petites plantes']]
-        } },
-      { k: 'paires', gauche: 'Animal', droite: 'Milieu', consigneR: 'Relie chaque animal au milieu où il vit.',
-        q: 'Où vit cet animal : {a} ?', ouverte: false, niveaux: {
-          moyen: [['L’ours polaire', 'La banquise'], ['Le dromadaire', 'Le désert'], ['Le lion', 'La savane'],
-            ['L’orang-outan', 'La forêt équatoriale'], ['Le chamois', 'La montagne'], ['Le renne', 'La toundra']]
-        } },
-      { k: 'paires', gauche: 'Lieu', droite: 'Paysage', consigneR: 'Relie chaque lieu à son paysage.',
-        q: 'Quel paysage trouve-t-on ici : {a} ?', ouverte: false, niveaux: {
-          difficile: [['Le Sahara', 'Un désert chaud'], ['L’Amazonie', 'Une forêt équatoriale'], ['L’Antarctique', 'Un désert de glace'],
-            ['Le Serengeti', 'Une savane'], ['La Sibérie du Nord', 'La toundra'], ['Le Groenland', 'Une calotte de glace']]
-        } },
-      { k: 'paires', gauche: 'Ville', droite: 'Climat', consigneR: 'Relie chaque ville de France à son climat.',
-        q: 'Quel est le climat de cette ville : {a} ?', ouverte: false, niveaux: {
-          expert: [['Brest', 'Océanique'], ['Paris', 'Océanique dégradé'], ['Strasbourg', 'Semi-continental'],
-            ['Marseille', 'Méditerranéen'], ['Chamonix', 'Montagnard']]
-        } },
+      { k: 'paires', gauche: 'Description', droite: 'Paysage', ouverte: false, consigneR: 'Relie chaque description à son paysage.', q: 'Quel paysage correspond à cette description : {a} ?', niveaux: {
+        facile: [
+          ["Très sec, très chaud le jour", "Le désert"],
+          ["De la glace sur la mer, très froid", "La banquise"],
+          ["Chaud et humide toute l’année, des arbres immenses", "La forêt équatoriale"],
+          ["De hautes herbes, une saison sèche et une saison des pluies", "La savane"],
+          ["Un sol gelé et de petites plantes, près des pôles", "La toundra"],
+          ["Des sommets, de la neige et des glaciers", "La haute montagne"],
+          ["Du sable, des vagues et la mer", "La plage"],
+          ["De grands champs de blé à perte de vue", "La plaine agricole"]]
+      } },
+      { k: 'paires', gauche: 'Animal', droite: 'Milieu', ouverte: false, consigneR: 'Relie chaque animal au milieu où il vit.', q: 'Où vit cet animal : {a} ?', qi: 'Quel animal vit ici : {b} ?', niveaux: {
+        facile: [
+          ["L’ours polaire", "La banquise"],
+          ["Le dromadaire", "Le désert"],
+          ["Le lion", "La savane"],
+          ["L’orang-outan", "La forêt équatoriale"],
+          ["Le chamois", "La montagne"],
+          ["Le renne", "La toundra"],
+          ["Le zèbre", "La savane"],
+          ["Le fennec", "Le désert"],
+          ["La marmotte", "La montagne"],
+          ["Le phoque", "La banquise"],
+          ["Le koala", "La forêt d’eucalyptus"]]
+      } },
+      { k: 'paires', gauche: 'Lieu', droite: 'Paysage', ouverte: false, consigneR: 'Relie chaque lieu à son paysage.', q: 'Quel paysage trouve-t-on ici : {a} ?', qi: 'Quel lieu correspond à ce paysage : {b} ?', niveaux: {
+        moyen: [
+          ["Le Sahara", "Un désert chaud"],
+          ["L’Amazonie", "Une forêt équatoriale"],
+          ["L’Antarctique", "Un désert de glace"],
+          ["Le Serengeti", "Une savane"],
+          ["Le nord de la Sibérie", "La toundra"],
+          ["Le Groenland", "Une calotte de glace"],
+          ["La Beauce", "Une plaine de grandes cultures"],
+          ["La Camargue", "Une zone humide de marais"],
+          ["Les Landes de Gascogne", "Une grande forêt de pins plantée"],
+          ["La Bretagne", "Un littoral rocheux découpé"],
+          ["Le désert de Gobi", "Un désert froid"],
+          ["La taïga canadienne", "Une forêt de conifères"],
+          ["La pampa argentine", "Une prairie immense"],
+          ["Les Pays-Bas", "Des polders gagnés sur la mer"]],
+        difficile: [
+          ["Le désert d’Atacama", "Un désert côtier très sec"],
+          ["Le Namib", "Un désert de dunes au bord de l’océan"],
+          ["Le bassin du Congo", "Une forêt équatoriale d’Afrique"],
+          ["Le Sahel", "Une bande de steppes au sud du Sahara"],
+          ["L’Altiplano", "Un haut plateau des Andes"],
+          ["Le plateau du Tibet", "Le « toit du monde »"],
+          ["Le delta du Mékong", "Des rizières inondées"],
+          ["La Patagonie", "Des steppes froides et venteuses"],
+          ["L’outback australien", "L’intérieur aride de l’Australie"],
+          ["Les fjords de Norvège", "Des vallées glaciaires envahies par la mer"],
+          ["Le Pantanal", "Une immense zone humide d’Amérique du Sud"],
+          ["L’Okavango", "Un delta qui se perd dans le désert"],
+          ["Les Everglades", "Des marais subtropicaux en Floride"],
+          ["La baie d’Along", "Des pitons calcaires dans la mer"]],
+        expert: [
+          ["Le désert de Danakil", "L’un des endroits les plus chauds de la planète"],
+          ["Les Tsingy de Bemaraha", "Une forêt d’aiguilles de calcaire"],
+          ["Le salar d’Uyuni", "Le plus grand désert de sel du monde"],
+          ["Le Rub al-Khali", "Le « quart vide », mer de dunes d’Arabie"],
+          ["Le Taklamakan", "Un désert entouré de montagnes, en Chine"],
+          ["Le Karakoum", "Un désert de sable noir d’Asie centrale"],
+          ["Le Kalahari", "Un désert de sable rouge d’Afrique australe"],
+          ["Le Sundarbans", "La plus grande mangrove du monde"],
+          ["Le plateau de Guyane", "Des tepuys, montagnes tabulaires"],
+          ["Les dolomites", "Des montagnes calcaires aux falaises pâles"],
+          ["Les cheminées de fée de Cappadoce", "Des colonnes de roche volcanique sculptées par l’érosion"]]
+      } },
+      { k: 'paires', gauche: 'Ville', droite: 'Climat', ouverte: false, consigneR: 'Relie chaque ville à son climat.', q: 'Quel est le climat de cette ville : {a} ?', qi: 'Quelle ville a ce climat : {b} ?', niveaux: {
+        moyen: [
+          ["Brest", "Océanique"],
+          ["Marseille", "Méditerranéen"],
+          ["Strasbourg", "Semi-continental"],
+          ["Chamonix", "Montagnard"]],
+        difficile: [
+          ["Lille", "Océanique"],
+          ["Montpellier", "Méditerranéen"],
+          ["Briançon", "Montagnard"],
+          ["Fort-de-France", "Tropical"]],
+        expert: [
+          ["Perpignan", "Méditerranéen"],
+          ["Colmar", "Semi-continental"],
+          ["Cayenne", "Équatorial"],
+          ["Saint-Denis de La Réunion", "Tropical humide"],
+          ["Saint-Pierre-et-Miquelon", "Subarctique"]]
+      } },
+      { k: 'qcm', niveaux: {
+        facile: [
+          ["Quel est le paysage le plus sec ?", "Le désert", ["La forêt équatoriale", "La toundra", "La prairie"]],
+          ["Où fait-il le plus froid ?", "Aux pôles", ["À l’équateur", "Dans le désert", "Dans la savane"]],
+          ["Où fait-il chaud toute l’année ?", "Près de l’équateur", ["Près des pôles", "En haute montagne", "En Sibérie"]],
+          ["Comment s’appelle la partie de l’année où il fait le plus chaud en France ?", "L’été", ["L’hiver", "L’automne", "Le printemps"]],
+          ["En France, en quelle saison les feuilles des arbres tombent-elles ?", "En automne", ["Au printemps", "En été", "En hiver"]],
+          ["Quel instrument mesure la température ?", "Le thermomètre", ["Le baromètre", "La boussole", "L’anémomètre"]],
+          ["Quel instrument mesure la pluie tombée ?", "Le pluviomètre", ["Le thermomètre", "La girouette", "Le sismographe"]],
+          ["Quel objet indique d’où vient le vent ?", "La girouette", ["Le thermomètre", "Le pluviomètre", "La boussole"]],
+          ["Comment appelle-t-on l’eau qui tombe des nuages en flocons ?", "La neige", ["La grêle", "La pluie", "La rosée"]],
+          ["Comment appelle-t-on les petites boules de glace qui tombent pendant un orage ?", "La grêle", ["La neige", "Le givre", "Le brouillard"]],
+          ["Comment appelle-t-on un nuage posé au sol qui empêche de voir loin ?", "Le brouillard", ["La rosée", "La grêle", "L’arc-en-ciel"]],
+          ["Que voit-on dans le ciel quand le soleil brille pendant la pluie ?", "Un arc-en-ciel", ["Un éclair", "Une aurore", "Une éclipse"]],
+          ["Quel est le grand désert d’Afrique du Nord ?", "Le Sahara", ["Le Gobi", "L’Atacama", "Le Kalahari"]],
+          ["Quelle grande forêt se trouve autour de l’Amazone ?", "La forêt amazonienne", ["La forêt des Landes", "La taïga", "La forêt de Brocéliande"]],
+          ["Sur quel continent se trouve le pôle Sud ?", "L’Antarctique", ["L’Arctique", "L’Afrique", "L’Océanie"]],
+          ["Dans quelle région du monde vivent les ours polaires ?", "L’Arctique", ["L’Antarctique", "L’Afrique", "L’Amazonie"]],
+          ["Quel climat a la Côte d’Azur, avec des étés chauds et secs ?", "Le climat méditerranéen", ["Le climat polaire", "Le climat équatorial", "Le climat montagnard"]],
+          ["Qu’est-ce qu’une oasis ?", "Un endroit avec de l’eau dans le désert", ["Une montagne de sable", "Une île de glace", "Un volcan éteint"]],
+          ["Comment s’appelle une très grande colline de sable ?", "Une dune", ["Une falaise", "Un récif", "Une vallée"]],
+          ["Comment s’appelle un morceau de glace géant qui flotte sur la mer ?", "Un iceberg", ["Un glacier", "Une banquise", "Un geyser"]]],
+        moyen: [
+          ["Quel climat a des étés chauds et secs et des hivers doux et pluvieux ?", "Le climat méditerranéen", ["Le climat océanique", "Le climat continental", "Le climat polaire"]],
+          ["Quel climat a des hivers doux, des étés frais et de la pluie toute l’année ?", "Le climat océanique", ["Le climat méditerranéen", "Le climat continental", "Le climat désertique"]],
+          ["Quel climat a des hivers très froids et des étés chauds, loin de la mer ?", "Le climat continental", ["Le climat océanique", "Le climat méditerranéen", "Le climat équatorial"]],
+          ["Quel climat a la Bretagne ?", "Le climat océanique", ["Le climat méditerranéen", "Le climat continental", "Le climat montagnard"]],
+          ["Comment s’appelle la grande forêt de conifères du nord de la Russie et du Canada ?", "La taïga", ["La toundra", "La savane", "La steppe"]],
+          ["Comment s’appelle une plaine d’herbes sèches, sans arbres, en Asie centrale ?", "La steppe", ["La taïga", "La toundra", "La jungle"]],
+          ["Comment s’appelle la saison des grandes pluies en Inde ?", "La mousson", ["Le mistral", "Le sirocco", "La canicule"]],
+          ["Comment s’appelle le vent froid et sec qui descend la vallée du Rhône ?", "Le mistral", ["La tramontane", "Le sirocco", "Le foehn"]],
+          ["Comment s’appelle le vent chaud qui vient du Sahara ?", "Le sirocco", ["Le mistral", "La bise", "Le blizzard"]],
+          ["Comment s’appelle une très forte tempête tropicale de l’Atlantique ?", "Un ouragan", ["Une mousson", "Un mistral", "Une canicule"]],
+          ["Comment s’appelle une longue période de grosse chaleur ?", "Une canicule", ["Une mousson", "Une avalanche", "Une crue"]],
+          ["Comment s’appelle une longue période sans pluie ?", "Une sécheresse", ["Une inondation", "Une crue", "Une tempête"]],
+          ["Quand un cours d’eau déborde et recouvre les terres, c’est…", "Une inondation", ["Une sécheresse", "Une avalanche", "Un séisme"]],
+          ["Comment s’appelle la neige qui dévale brutalement une pente ?", "Une avalanche", ["Une coulée de lave", "Un glissement de terrain", "Une crue"]],
+          ["Comment s’appellent les lumières colorées dans le ciel près des pôles ?", "Les aurores polaires", ["Les arcs-en-ciel", "Les étoiles filantes", "Les éclairs"]],
+          ["Quel continent est le plus froid ?", "L’Antarctique", ["L’Europe", "L’Asie", "L’Amérique du Nord"]],
+          ["Quelle ligne imaginaire partage la Terre en hémisphère Nord et hémisphère Sud ?", "L’équateur", ["Le méridien de Greenwich", "Le tropique du Cancer", "Le cercle polaire"]],
+          ["Quand c’est l’été en France, quelle saison est-ce en Australie ?", "L’hiver", ["L’été", "Le printemps", "L’automne"]]],
+        difficile: [
+          ["Comment s’appelle le climat chaud et humide toute l’année, près de l’équateur ?", "Le climat équatorial", ["Le climat tropical", "Le climat méditerranéen", "Le climat continental"]],
+          ["Quel climat a une saison sèche et une saison des pluies, avec de fortes chaleurs ?", "Le climat tropical", ["Le climat équatorial", "Le climat océanique", "Le climat polaire"]],
+          ["Comment s’appelle le vent froid du nord-ouest qui souffle en Languedoc et en Roussillon ?", "La tramontane", ["Le mistral", "Le sirocco", "Le foehn"]],
+          ["Comment s’appelle un vent chaud et sec qui descend des montagnes, comme dans les Alpes ?", "Le foehn", ["La bise", "Le mistral", "L’alizé"]],
+          ["Comment s’appellent les vents réguliers qui soufflent vers l’équateur, dans les tropiques ?", "Les alizés", ["Les moussons", "Les blizzards", "Les mistrals"]],
+          ["Comment s’appelle un ouragan dans l’océan Pacifique Ouest (Asie) ?", "Un typhon", ["Une tornade", "Un blizzard", "Un mistral"]],
+          ["Comment s’appelle une tempête de neige avec un vent glacial ?", "Un blizzard", ["Un typhon", "Un sirocco", "Un orage"]],
+          ["Comment s’appelle le sol gelé en permanence des régions froides ?", "Le pergélisol (permafrost)", ["La toundra", "La banquise", "Le glacier"]],
+          ["Comment s’appelle le courant marin chaud qui adoucit le climat de l’Europe de l’Ouest ?", "Le Gulf Stream", ["El Niño", "Le courant du Labrador", "Le courant de Humboldt"]],
+          ["Quel phénomène réchauffe une partie de l’océan Pacifique tous les quelques années ?", "El Niño", ["Le Gulf Stream", "La mousson", "Le blizzard"]],
+          ["Comment s’appelle la ligne imaginaire qui passe à environ 23° au nord de l’équateur ?", "Le tropique du Cancer", ["Le tropique du Capricorne", "Le cercle polaire arctique", "Le méridien de Greenwich"]],
+          ["Comment s’appelle la ligne imaginaire qui passe à environ 23° au sud de l’équateur ?", "Le tropique du Capricorne", ["Le tropique du Cancer", "Le cercle polaire antarctique", "L’équateur"]],
+          ["Comment s’appelle la période où le jour est le plus long de l’année ?", "Le solstice d’été", ["L’équinoxe de printemps", "Le solstice d’hiver", "L’équinoxe d’automne"]],
+          ["Comment s’appelle le jour où le jour et la nuit durent presque autant ?", "L’équinoxe", ["Le solstice", "L’éclipse", "Le zénith"]],
+          ["Comment appelle-t-on le gaz qui, en trop grande quantité, réchauffe la planète ?", "Le dioxyde de carbone (CO₂)", ["L’oxygène", "L’azote", "L’hélium"]],
+          ["Comment s’appelle le phénomène naturel qui garde la chaleur autour de la Terre ?", "L’effet de serre", ["La photosynthèse", "L’érosion", "La marée"]],
+          ["Comment s’appelle la transformation lente d’un sol fertile en désert ?", "La désertification", ["La déforestation", "L’érosion marine", "La fonte des glaces"]],
+          ["Comment s’appelle la destruction des forêts par l’homme ?", "La déforestation", ["La désertification", "L’urbanisation", "La reforestation"]]],
+        expert: [
+          ["Dans quel désert a-t-on mesuré la plus haute température de l’air officielle ?", "La Vallée de la Mort", ["Le Sahara", "Le désert de Lut", "Le désert d’Atacama"]],
+          ["Dans quel désert a-t-on mesuré les surfaces de sol les plus chaudes par satellite ?", "Le désert de Lut", ["La Vallée de la Mort", "Le Sahara", "Le Kalahari"]],
+          ["Quelle classification des climats est la plus utilisée dans le monde ?", "La classification de Köppen", ["L’échelle de Beaufort", "L’échelle de Richter", "L’échelle de Saffir-Simpson"]],
+          ["Quelle échelle mesure la force du vent ?", "L’échelle de Beaufort", ["L’échelle de Richter", "L’échelle de Köppen", "L’échelle de Mohs"]],
+          ["Quelle échelle classe les ouragans de 1 à 5 ?", "L’échelle de Saffir-Simpson", ["L’échelle de Beaufort", "L’échelle de Richter", "L’échelle de Fujita"]],
+          ["Quelle échelle classe la force des tornades ?", "L’échelle de Fujita", ["L’échelle de Saffir-Simpson", "L’échelle de Beaufort", "L’échelle de Mercalli"]],
+          ["Quel instrument mesure la pression de l’air ?", "Le baromètre", ["L’hygromètre", "L’anémomètre", "Le pluviomètre"]],
+          ["Quel instrument mesure l’humidité de l’air ?", "L’hygromètre", ["Le baromètre", "L’héliographe", "Le thermomètre"]],
+          ["Quel instrument mesure la vitesse du vent ?", "L’anémomètre", ["La girouette", "Le baromètre", "L’hygromètre"]],
+          ["Comment s’appelle la frontière entre une masse d’air chaud et une masse d’air froid ?", "Un front", ["Un anticyclone", "Un isobare", "Un cyclone"]],
+          ["Comment s’appelle une zone de hautes pressions, souvent synonyme de beau temps ?", "Un anticyclone", ["Une dépression", "Un front froid", "Une tornade"]],
+          ["Comment s’appelle l’anticyclone qui apporte souvent le beau temps en France l’été ?", "L’anticyclone des Açores", ["L’anticyclone de Sibérie", "La dépression d’Islande", "L’anticyclone du Groenland"]],
+          ["Comment s’appelle la courbe qui relie les points de même pression sur une carte météo ?", "Une isobare", ["Une isotherme", "Une courbe de niveau", "Un méridien"]],
+          ["Comment s’appelle la forêt claire de petits arbres et d’arbustes du climat méditerranéen, sur sol calcaire ?", "La garrigue", ["Le maquis", "La taïga", "La lande"]],
+          ["Comment s’appelle la végétation dense d’arbustes méditerranéens sur sol siliceux, comme en Corse ?", "Le maquis", ["La garrigue", "La steppe", "La toundra"]],
+          ["Comment s’appelle une forêt d’arbres qui poussent dans l’eau salée des côtes tropicales ?", "La mangrove", ["La ripisylve", "La taïga", "Le bocage"]],
+          ["Comment s’appelle un paysage de champs entourés de haies, comme en Normandie ?", "Le bocage", ["L’openfield", "La garrigue", "La lande"]],
+          ["Comment s’appelle un paysage de grands champs ouverts, sans haies ?", "L’openfield", ["Le bocage", "Le maquis", "La ripisylve"]]]
+      } },
       { k: 'vf', niveaux: {
-        moyen: [['Dans la forêt équatoriale, il pleut presque tous les jours.', true, ''],
-          ['Dans le désert, il fait toujours chaud, même la nuit.', false, 'La nuit, il peut faire très froid dans le désert.']],
-        difficile: [['La toundra se trouve près de l’équateur.', false, 'La toundra se trouve près des pôles, là où le sol reste gelé.'],
-          ['Le climat méditerranéen a des étés chauds et secs.', true, '']]
+        facile: [
+          ["Dans la forêt équatoriale, il pleut presque tous les jours.", true, ""],
+          ["Dans le désert, il fait toujours chaud, même la nuit.", false, "La nuit, il peut faire très froid dans le désert."],
+          ["Les ours polaires vivent au pôle Sud.", false, "Les ours polaires vivent dans l’Arctique, au nord ; les manchots vivent au sud."],
+          ["Plus on monte en montagne, plus il fait froid.", true, ""],
+          ["Il neige souvent dans la savane.", false, "La savane a un climat chaud, avec une saison sèche et une saison des pluies."],
+          ["Les cactus poussent bien dans le désert.", true, ""]],
+        moyen: [
+          ["La Beauce est une grande région de cultures de céréales.", true, ""],
+          ["Le climat continental a des hivers doux.", false, "Le climat continental a des hivers froids."],
+          ["La taïga est une forêt de palmiers.", false, "La taïga est une forêt de conifères (sapins, épicéas, mélèzes)."],
+          ["Le mistral souffle surtout en Bretagne.", false, "Le mistral souffle dans la vallée du Rhône et en Provence."],
+          ["Les saisons sont inversées entre l’hémisphère Nord et l’hémisphère Sud.", true, ""]],
+        difficile: [
+          ["Il ne pleut presque jamais dans certaines parties du désert d’Atacama.", true, ""],
+          ["Le Gulf Stream refroidit le climat de l’Europe.", false, "Il l’adoucit : c’est un courant chaud."],
+          ["Le Sahel se trouve au nord du Sahara.", false, "Le Sahel se trouve au sud du Sahara."],
+          ["Un typhon et un ouragan sont le même genre de tempête, dans des océans différents.", true, ""],
+          ["Le tropique du Cancer est dans l’hémisphère Sud.", false, "Il est dans l’hémisphère Nord."],
+          ["La Martinique a un climat tropical.", true, ""]],
+        expert: [
+          ["Le désert de Lut se trouve en Iran.", true, ""],
+          ["L’échelle de Richter mesure la force du vent.", false, "Elle mesure la magnitude des séismes ; le vent se mesure sur l’échelle de Beaufort."],
+          ["Le salar d’Uyuni se trouve en Bolivie.", true, ""],
+          ["La garrigue pousse surtout en Bretagne.", false, "La garrigue pousse dans le Midi méditerranéen."],
+          ["Perpignan est l’une des villes les plus ensoleillées de France métropolitaine.", true, ""],
+          ["Les Sundarbans se trouvent entre l’Inde et le Bangladesh.", true, ""]]
       } }
     ] }
   ];
-
-  // Paires dont on ne pose la question que dans un sens (« Quel massif : … ? ») : a et b inversés pour le moteur.
-  JEUX.forEach(function (j) {
-    j.series.forEach(function (s) {
-      if (!s.inverseSeul) return;
-      Object.keys(s.niveaux).forEach(function (n) { s.niveaux[n] = s.niveaux[n].map(function (p) { return [p[1], p[0]]; }); });
-      var g = s.gauche; s.gauche = s.droite; s.droite = g;
-      s.q = s.q.replace('{b}', '{a}');
-      // Relier : les descriptions à gauche, les noms à droite.
-    });
-  });
 
   // Familles de l'écran de réglage (icône, nom, jeux dans l'ordre).
   var FAMILLES = [
