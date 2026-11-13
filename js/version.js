@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '8.5';
+  var VERSION = '8.6';
 
   var HISTORY = [
+    { v: '8.6', date: '2026-11-13', changes: [
+      "Histoire, Moyen Âge : les 8 petits jeux sont regroupés en 3, avec environ 35 à 40 questions par niveau chacun, jouables en Quiz et en Normal — Rois, batailles et frise ; Châteaux, chevaliers et paysans ; Églises, croisades et Vikings (les Vikings sont de nouveau jouables en Quiz)."
+    ] },
     { v: '8.5', date: '2026-11-13', changes: [
       "Partie rapide solo : on peut aussi choisir la Géographie et l’Histoire, et, avec l’une des deux, le mode « Quiz » ou « Normal ».",
       "Le tout premier bouton de la partie s’appelle « Première question ».",
