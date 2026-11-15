@@ -156,10 +156,29 @@ test.describe('contenu d\'histoire', () => {
     expect(vues).toBeGreaterThan(0);
   });
 
-  test('Temps modernes (v7.9) : 4 jeux, chacun a du contenu à chaque niveau', () => {
+  test('Temps modernes (v8.8) : 4 jeux regroupés en 2, au moins 35 éléments par niveau, jouables en Quiz et en Normal', () => {
     const mod = S.jeuxDe('histoire').filter((j) => j.famille === 'mod');
-    expect(mod.map((j) => j.id)).toEqual(['t01', 't04', 't05', 't09']);
-    for (const j of mod) for (const n of NIVEAUX) expect(j.series.some((s) => S.utilisable(s, n)), j.id + ' ' + n).toBe(true);
+    expect(mod.map((j) => j.id)).toEqual(['t01', 't05']);
+    for (const j of mod) {
+      for (const n of NIVEAUX) {
+        for (const mode of ['quiz', 'normal']) expect(j.series.some((s) => S.utilisable(s, n, mode)), j.id + ' ' + n + ' ' + mode).toBe(true);
+        for (const s of j.series) expect(S.utilisable(s, n, 'quiz'), j.id + ' ' + s.k + ' ' + n).toBe(true);
+        const total = j.series.reduce((a, s) => a + (s.k === 'classer' ? (s.niveaux[n] || []).reduce((x, g) => x + g.items.length, 0) : (s.niveaux[n] || []).length), 0);
+        expect(total, j.id + ' ' + n).toBeGreaterThanOrEqual(35);
+        for (let k = 0; k < 150; k++) {
+          const c = S.generer({ jeux: [j.id], niveau: n, mode: 'quiz' }, 'histoire');
+          expect(c.options).toHaveLength(4);
+          expect(new Set(c.options).size, c.consigne).toBe(4);
+          expect(c.options).toContain(c.bonne);
+        }
+      }
+      for (const s of j.series.filter((x) => x.k === 'ordre')) for (const n of NIVEAUX) {
+        const annees = (s.niveaux[n] || []).map((x) => x[1]);
+        expect(new Set(annees).size, j.id + ' ' + n).toBe(annees.length);
+      }
+      // QCM : la bonne réponse n'est jamais aussi parmi les fausses.
+      for (const s of j.series.filter((x) => x.k === 'qcm')) for (const n of NIVEAUX) for (const x of s.niveaux[n]) expect(x[2], x[0]).not.toContain(x[1]);
+    }
   });
 
   test('Révolution et XIXe siècle (v7.10) : 9 jeux, chacun a du contenu à chaque niveau', () => {
@@ -246,7 +265,7 @@ test('écran des réglages : la matière Histoire, son niveau, ses jeux rangés 
   await expect(familles.nth(3).locator('.famille-nom')).toContainText('Renaissance');
   await expect(familles.nth(3).locator('input')).toHaveCount(2);
   await expect(familles.nth(4).locator('.famille-nom')).toContainText('Temps modernes');
-  await expect(familles.nth(4).locator('input')).toHaveCount(4);
+  await expect(familles.nth(4).locator('input')).toHaveCount(2);
   await expect(familles.nth(5).locator('.famille-nom')).toContainText('Révolution et XIXe');
   await expect(familles.nth(5).locator('input')).toHaveCount(9);
   await expect(familles.nth(6).locator('.famille-nom')).toContainText('XXe siècle');
@@ -272,7 +291,7 @@ test('écran des réglages : la matière Histoire, son niveau, ses jeux rangés 
       dehors: n.left < r.left + 1 || n.right > r.right - 1 || n.top < r.top || n.bottom > r.bottom,
       lignes: Math.round(n.height / parseFloat(getComputedStyle(el.querySelector('.pack-nom')).lineHeight)) };
   }));
-  expect(pb).toHaveLength(33);
+  expect(pb).toHaveLength(31);
   for (const x of pb) { expect(x.debord, x.nom).toBe(false); expect(x.dehors, x.nom).toBe(false); expect(x.lignes, x.nom).toBeLessThanOrEqual(1); }
   await pasDeDebordement(page);
   await valider(page);

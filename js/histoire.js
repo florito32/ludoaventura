@@ -1,7 +1,7 @@
 // Histoire (v7.1) : la matière Histoire, rangée par périodes (BACKLOG lignes 270 et 275).
 // Choix de l'utilisateur du 12/11/2026 : 7 périodes, 51 jeux, 4 niveaux, et chaque niveau n'a QUE son
 // propre contenu (Expert = seulement du contenu expert). Livraison par période : l'Antiquité d'abord (12
-// jeux, regroupés en 6 en v8.4), puis la Préhistoire (v7.6, 5 jeux), le Moyen Âge (v7.7, 8 jeux, regroupés en 3 en v8.5), la Renaissance (v7.8, 6 jeux, regroupés en 2 en v8.7), les Temps modernes (v7.9, 4 jeux), la Révolution et le XIXe siècle (v7.10, 9 jeux) et le XXe siècle (v7.11, 7 jeux).
+// jeux, regroupés en 6 en v8.4), puis la Préhistoire (v7.6, 5 jeux), le Moyen Âge (v7.7, 8 jeux, regroupés en 3 en v8.5), la Renaissance (v7.8, 6 jeux, regroupés en 2 en v8.7), les Temps modernes (v7.9, 4 jeux, regroupés en 2 en v8.8), la Révolution et le XIXe siècle (v7.10, 9 jeux) et le XXe siècle (v7.11, 7 jeux).
 // Format des séries : voir js/savoirs.js. « A|B » = A s'affiche, B est aussi accepté en question ouverte.
 (function (racine) {
   'use strict';
@@ -1590,106 +1590,255 @@
             ['L’édit de Nantes', 1], ['La victoire d’Ivry', 1], ['« Paris vaut bien une messe »', 1], ['Sully aux Finances', 1], ['L’achèvement du Pont-Neuf', 1]] }]
       } }
     ] },
-    // ---------- Temps modernes (v7.9, BACKLOG ligne 295 : 4 jeux, hypothèse à valider) ----------
-    { id: 't01', matiere: 'histoire', famille: 'mod', nom: 'Louis XIV et Versailles', court: 'Louis XIV', icone: '☀️', series: [
+    // ---------- Temps modernes (v7.9 ; v8.8 : 4 jeux regroupés en 2, choix de l'utilisateur du 13/11/2026, BACKLOG lignes 330 et 334) ----------
+    // Louis XIV et son temps = anciens « Louis XIV et Versailles » + « Frise des Temps modernes » (+ Louis XIII, Louis XV, Louis XVI, Nouvelle-France) ;
+    // Écrivains et Lumières = anciens « Écrivains classiques » + « Les Lumières ».
+    { id: 't01', matiere: 'histoire', famille: 'mod', nom: 'Louis XIV et son temps', court: 'Louis XIV', icone: '☀️', series: [
       { k: 'paires', gauche: 'Personnage', droite: 'Son rôle', consigneR: 'Relie chaque personnage à son rôle.', q: 'Quel est le rôle de {a} ?', qi: 'Qui est-ce : {b} ?', ouverte: false, niveaux: {
-        facile: [['Louis XIV', 'Le Roi-Soleil'], ['Colbert', 'Ministre des finances de Louis XIV'], ['André Le Nôtre', 'Dessine les jardins de Versailles']],
-        moyen: [['Mazarin', 'Ministre pendant l’enfance de Louis XIV'], ['Richelieu', 'Ministre de Louis XIII'], ['Vauban', 'Construit des forteresses aux frontières'],
-          ['Lully', 'Compose la musique de la cour']],
+        facile: [['Louis XIV', 'Le Roi-Soleil'], ['Colbert', 'Ministre des finances de Louis XIV'], ['André Le Nôtre', 'Dessine les jardins de Versailles'],
+          ['Louis XIII', 'Le père de Louis XIV'], ['Richelieu', 'Cardinal, ministre de Louis XIII'], ['Marie-Antoinette', 'Reine, épouse de Louis XVI']],
+        moyen: [['Mazarin', 'Ministre pendant l’enfance de Louis XIV'], ['Vauban', 'Construit des forteresses aux frontières'],
+          ['Lully', 'Compose la musique de la cour'], ['Louis XV', 'Arrière-petit-fils et successeur de Louis XIV'], ['Louis XVI', 'Roi quand commence la Révolution'],
+          ['Champlain', 'Fonde Québec en 1608']],
         difficile: [['Fouquet', 'Arrêté en 1661, après une fête à Vaux-le-Vicomte'], ['Louvois', 'Ministre de la Guerre de Louis XIV'], ['Charles Le Brun', 'Peint le plafond de la galerie des Glaces'],
-          ['Jules Hardouin-Mansart', 'Architecte de la galerie des Glaces'], ['Anne d’Autriche', 'Mère de Louis XIV, régente du royaume']],
+          ['Jules Hardouin-Mansart', 'Architecte de la galerie des Glaces'], ['Anne d’Autriche', 'Mère de Louis XIV, régente du royaume'],
+          ['D’Artagnan', 'Mousquetaire gascon qui arrête Fouquet'], ['Madame de Pompadour', 'Favorite de Louis XV']],
         expert: [['Marie-Thérèse d’Autriche', 'Épouse Louis XIV en 1660'], ['Madame de Montespan', 'Favorite, mère de sept enfants du roi'], ['Saint-Simon', 'Raconte la vie de la cour dans ses Mémoires'],
-          ['Louis Le Vau', 'Premier architecte des agrandissements de Versailles'], ['Pierre-Paul Riquet', 'Fait creuser le canal du Midi'], ['Le Grand Dauphin', 'Fils de Louis XIV, mort avant lui']]
+          ['Louis Le Vau', 'Premier architecte des agrandissements de Versailles'], ['Pierre-Paul Riquet', 'Fait creuser le canal du Midi'], ['Le Grand Dauphin', 'Fils de Louis XIV, mort avant lui'],
+          ['Philippe d’Orléans', 'Régent pendant l’enfance de Louis XV'], ['Turgot', 'Ministre des finances de Louis XVI de 1774 à 1776']]
       } },
       { k: 'qcm', niveaux: {
-        facile: [['Quel surnom donne-t-on à Louis XIV ?', 'Le Roi-Soleil', ['Le Bien-Aimé', 'Le Bon Roi']],
-          ['Dans quel château Louis XIV installe-t-il sa cour ?', 'Versailles', ['Chambord', 'Chenonceau']]],
-        moyen: [['Combien de temps a duré le règne de Louis XIV ?', '72 ans', ['12 ans', '40 ans', '100 ans']],
-          ['Quelle salle de Versailles est couverte de miroirs ?', 'La galerie des Glaces', ['La salle du Trône', 'La chapelle royale', 'L’Orangerie']]],
-        difficile: [['Qui a dessiné les jardins de Versailles ?', 'André Le Nôtre', ['Louis Le Vau', 'Jules Hardouin-Mansart', 'Charles Le Brun', 'Vauban']],
-          ['Quel ministre gouverne pendant l’enfance de Louis XIV ?', 'Mazarin', ['Richelieu', 'Colbert', 'Fouquet', 'Sully']]],
-        expert: [['En quelle année la cour s’installe-t-elle à Versailles ?', '1682', ['1643', '1661', '1685', '1700', '1715']],
-          ['Quelle révolte des nobles et du parlement de Paris a marqué l’enfance de Louis XIV ?', 'La Fronde', ['La Jacquerie', 'La Ligue', 'Les camisards', 'La conjuration d’Amboise', 'La guerre des Paysans']]]
+        facile: [
+          ['Quel surnom donne-t-on à Louis XIV ?', 'Le Roi-Soleil', ['Le Bien-Aimé', 'Le Bon Roi', 'Le Hardi']],
+          ['Dans quel château Louis XIV installe-t-il sa cour ?', 'Versailles', ['Chambord', 'Chenonceau', 'Amboise']],
+          ['Quel astre Louis XIV a-t-il choisi comme emblème ?', 'Le Soleil', ['La Lune', 'Une étoile', 'Une comète']],
+          ['Quel âge avait Louis XIV quand il est devenu roi ?', '4 ans', ['12 ans', '20 ans', '40 ans']],
+          ['Combien de temps a duré le règne de Louis XIV ?', '72 ans', ['12 ans', '40 ans', '100 ans']],
+          ['Quelle salle de Versailles est couverte de miroirs ?', 'La galerie des Glaces', ['La salle du Trône', 'La chapelle royale', 'L’Orangerie']],
+          ['Comment s’appelaient les soldats de la garde du roi, rendus célèbres par Alexandre Dumas ?', 'Les mousquetaires', ['Les chevaliers', 'Les gladiateurs', 'Les samouraïs']],
+          ['Qui était roi de France quand la Révolution a commencé, en 1789 ?', 'Louis XVI', ['Louis XIV', 'Henri IV', 'Napoléon']],
+          ['Quelle reine était l’épouse de Louis XVI ?', 'Marie-Antoinette', ['Catherine de Médicis', 'Anne de Bretagne', 'Aliénor d’Aquitaine']],
+          ['Que portaient sur la tête les hommes de la cour de Louis XIV ?', 'Une perruque', ['Une casquette', 'Un casque', 'Un bonnet de bain']],
+          ['Comment appelle-t-on le jardin de Versailles, aux allées droites et aux formes régulières ?', 'Un jardin à la française', ['Un jardin anglais', 'Un jardin japonais', 'Un potager']],
+          ['Qui était le père de Louis XIV ?', 'Louis XIII', ['Henri IV', 'Louis XV', 'François Ier']],
+          ['Quel roi a succédé à Louis XIV ?', 'Louis XV', ['Louis XVI', 'Louis XIII', 'Napoléon']]],
+        moyen: [
+          ['Quel ministre gouverne pendant l’enfance de Louis XIV ?', 'Mazarin', ['Richelieu', 'Colbert', 'Fouquet']],
+          ['Quel cardinal était le ministre de Louis XIII ?', 'Richelieu', ['Mazarin', 'Colbert', 'Sully']],
+          ['Qui a dessiné les jardins de Versailles ?', 'André Le Nôtre', ['Louis Le Vau', 'Charles Le Brun', 'Vauban']],
+          ['Quelle ville du Canada Champlain a-t-il fondée en 1608 ?', 'Québec', ['Montréal', 'Ottawa', 'Toronto']],
+          ['Comment s’appelait la colonie française d’Amérique du Nord ?', 'La Nouvelle-France', ['La Nouvelle-Angleterre', 'La Nouvelle-Espagne', 'La Nouvelle-Calédonie']],
+          ['Quel roi était surnommé « le Bien-Aimé » ?', 'Louis XV', ['Louis XIV', 'Louis XVI', 'Louis XIII']],
+          ['Qui a construit des forteresses tout autour des frontières de la France ?', 'Vauban', ['Colbert', 'Le Nôtre', 'Lully']],
+          ['Quel musicien composait la musique des fêtes de Louis XIV ?', 'Lully', ['Mozart', 'Bach', 'Beethoven']],
+          ['De quelle famille de rois Louis XIV fait-il partie ?', 'Les Bourbons', ['Les Valois', 'Les Carolingiens', 'Les Mérovingiens']],
+          ['Quelle phrase célèbre attribue-t-on à Louis XIV ?', '« L’État, c’est moi »', ['« Paris vaut bien une messe »', '« Je pense, donc je suis »', '« Après moi, le déluge »']],
+          ['Dans quelle ville Louis XVI a-t-il été sacré, comme la plupart des rois de France ?', 'Reims', ['Paris', 'Versailles', 'Orléans']],
+          ['Quel pays a pris le Canada à la France, en 1763 ?', 'La Grande-Bretagne', ['L’Espagne', 'Le Portugal', 'Les Pays-Bas']]],
+        difficile: [
+          ['Quel ministre de Louis XIV a développé les manufactures, comme celle des Gobelins ?', 'Colbert', ['Louvois', 'Fouquet', 'Mazarin']],
+          ['Quel surintendant des finances Louis XIV fait-il arrêter en 1661 ?', 'Fouquet', ['Colbert', 'Mazarin', 'Louvois']],
+          ['Quel château Fouquet avait-il fait construire, au grand déplaisir du roi ?', 'Vaux-le-Vicomte', ['Chambord', 'Fontainebleau', 'Chantilly']],
+          ['Que font beaucoup de protestants après la révocation de l’édit de Nantes, en 1685 ?', 'Ils quittent la France', ['Ils partent en croisade', 'Ils deviennent ministres', 'Ils construisent Versailles']],
+          ['Quelle révolte des nobles et du parlement de Paris a marqué l’enfance de Louis XIV ?', 'La Fronde', ['La Jacquerie', 'La Ligue', 'Les camisards']],
+          ['Qui a peint le plafond de la galerie des Glaces ?', 'Charles Le Brun', ['André Le Nôtre', 'Hyacinthe Rigaud', 'Nicolas Poussin']],
+          ['Quel peintre a fait le célèbre portrait de Louis XIV en manteau royal, en 1701 ?', 'Hyacinthe Rigaud', ['Charles Le Brun', 'Nicolas Poussin', 'Georges de La Tour']],
+          ['Quelle région d’Amérique, explorée par Cavelier de La Salle, porte le nom de Louis XIV ?', 'La Louisiane', ['La Floride', 'Le Québec', 'La Californie']],
+          ['Quel traité de 1763 fait perdre le Canada à la France ?', 'Le traité de Paris', ['Le traité des Pyrénées', 'Le traité de Versailles', 'Le traité d’Utrecht']],
+          ['Quelle guerre, de 1756 à 1763, fait perdre à la France l’essentiel de ses colonies d’Amérique ?', 'La guerre de Sept Ans', ['La guerre de Cent Ans', 'La guerre de Trente Ans', 'La guerre de Succession d’Espagne']],
+          ['Quel ministre de la Guerre a réorganisé l’armée de Louis XIV ?', 'Louvois', ['Colbert', 'Vauban', 'Fouquet']],
+          ['Quelle favorite de Louis XV protégeait les artistes et les philosophes ?', 'Madame de Pompadour', ['Madame de Maintenon', 'Madame de Sévigné', 'Marie-Antoinette']],
+          ['Où se trouve le Hameau de la Reine, où Marie-Antoinette jouait à la fermière ?', 'À Versailles', ['À Fontainebleau', 'Aux Tuileries', 'À Chambord']]],
+        expert: [
+          ['En quelle année la cour s’installe-t-elle à Versailles ?', '1682', ['1643', '1661', '1715']],
+          ['Comment appelle-t-on le texte de 1685 qui révoque l’édit de Nantes ?', 'L’édit de Fontainebleau', ['L’édit de Saint-Germain', 'L’ordonnance de Villers-Cotterêts', 'Le traité des Pyrénées']],
+          ['Quels protestants des Cévennes se sont révoltés à partir de 1702 ?', 'Les camisards', ['Les frondeurs', 'Les ligueurs', 'Les chouans']],
+          ['Quel traité de 1659 met fin à la guerre avec l’Espagne et prévoit le mariage de Louis XIV ?', 'Le traité des Pyrénées', ['Le traité d’Utrecht', 'Le traité de Westphalie', 'Le traité de Nimègue']],
+          ['Quelle guerre se termine par les traités d’Utrecht, en 1713 ?', 'La guerre de Succession d’Espagne', ['La guerre de Sept Ans', 'La guerre de Hollande', 'La guerre de Trente Ans']],
+          ['Quel petit-fils de Louis XIV devient roi d’Espagne en 1700 ?', 'Philippe V', ['Charles II', 'Philippe II', 'Ferdinand VII']],
+          ['Quel canal, creusé sous Louis XIV, relie la Garonne à la Méditerranée ?', 'Le canal du Midi', ['Le canal de Suez', 'Le canal de Briare', 'Le canal de l’Ourcq']],
+          ['Quel scandale d’empoisonnements a touché la cour entre 1679 et 1682 ?', 'L’affaire des Poisons', ['L’affaire du Collier', 'L’affaire des Placards', 'L’affaire Calas']],
+          ['Quel scandale de 1785 a terni l’image de Marie-Antoinette ?', 'L’affaire du Collier', ['L’affaire des Poisons', 'L’affaire Calas', 'L’affaire des Placards']],
+          ['Qui gouverne comme Régent après la mort de Louis XIV ?', 'Philippe d’Orléans', ['Le Grand Dauphin', 'Mazarin', 'Le cardinal de Fleury']],
+          ['Quel prisonnier mystérieux du règne de Louis XIV cachait son visage ?', 'L’Homme au masque de fer', ['Le comte de Monte-Cristo', 'Cyrano de Bergerac', 'Le chevalier d’Éon']],
+          ['Quel ministre de Louis XVI a voulu supprimer la corvée, en 1776 ?', 'Turgot', ['Necker', 'Colbert', 'Calonne']],
+          ['Quel financier écossais a créé sous la Régence une banque qui a fait faillite en 1720 ?', 'John Law', ['Necker', 'Adam Smith', 'Turgot']]]
       } },
       { k: 'vf', niveaux: {
-        facile: [['Louis XIV est devenu roi à 4 ans.', true, '']],
-        moyen: [['La galerie des Glaces se trouve au Louvre.', false, 'Elle se trouve au château de Versailles.']],
-        difficile: [['Louis XIV a révoqué l’édit de Nantes en 1685.', true, '']],
-        expert: [['Louis XV était le fils de Louis XIV.', false, 'Louis XV était son arrière-petit-fils.']]
+        facile: [['Louis XIV est devenu roi à 4 ans.', true, ''], ['Le château de Versailles se trouve près de Paris.', true, ''],
+          ['Louis XVI était roi de France en 1789.', true, ''],
+          ['La galerie des Glaces se trouve au Louvre.', false, 'Elle se trouve au château de Versailles.'],
+          ['Louis XIV a été roi pendant seulement 2 ans.', false, 'Il a régné 72 ans, de 1643 à 1715.'],
+          ['Les mousquetaires étaient des marins.', false, 'C’étaient des soldats de la garde du roi.']],
+        moyen: [['Avant Versailles, Louis XIII avait un pavillon de chasse à cet endroit.', true, ''], ['Champlain a fondé Québec.', true, ''],
+          ['Vauban a construit des forteresses en forme d’étoile.', true, ''],
+          ['Louis XV était le fils de Louis XIV.', false, 'Louis XV était son arrière-petit-fils.'],
+          ['Richelieu était le ministre de Louis XIV.', false, 'Il était le ministre de Louis XIII ; il est mort en 1642.'],
+          ['Marie-Antoinette était née en France.', false, 'Elle était née à Vienne, en Autriche.']],
+        difficile: [['Louis XIV a révoqué l’édit de Nantes en 1685.', true, ''], ['Fouquet a été arrêté par d’Artagnan.', true, 'À Nantes, en 1661.'],
+          ['La Louisiane doit son nom à Louis XIV.', true, ''],
+          ['Colbert était ministre de la Guerre.', false, 'Il s’occupait des finances, de l’industrie et de la marine ; la Guerre, c’était Louvois.'],
+          ['Mazarin était né en France.', false, 'Il était né en Italie.'],
+          ['La France a gardé le Canada après la guerre de Sept Ans.', false, 'Elle l’a perdu au traité de Paris, en 1763.']],
+        expert: [['Louis XIV a épousé Madame de Maintenon en secret.', true, ''], ['Le Grand Dauphin, fils de Louis XIV, n’a jamais régné.', true, 'Il est mort en 1711, avant son père.'],
+          ['Le canal du Midi a été creusé sous Louis XIV.', true, ''],
+          ['Louis XIV est mort au Louvre, à Paris.', false, 'Il est mort à Versailles, le 1er septembre 1715.'],
+          ['Les traités d’Utrecht ont réuni la France et l’Espagne en un seul royaume.', false, 'Un petit-fils de Louis XIV garde le trône d’Espagne, mais les deux couronnes ne doivent jamais être réunies.'],
+          ['Mazarin a fondé l’Académie française.', false, 'C’est Richelieu, en 1635.']]
       } },
       { k: 'indices', consigne: 'Qui suis-je ? Trouve le personnage.', niveaux: {
-        facile: [{ r: 'Louis XIV', i: ['Je suis roi de France au XVIIe siècle.', 'Je suis devenu roi à 4 ans.', 'J’ai installé ma cour à Versailles.', 'J’ai régné 72 ans, plus que tous les autres rois de France.', 'On m’appelle le Roi-Soleil.'] }],
-        moyen: [{ r: 'Colbert', i: ['Je suis un ministre de Louis XIV.', 'Je suis né à Reims, fils d’un marchand de draps.', 'J’ai développé les manufactures, comme celle des Gobelins.', 'J’ai fait construire une grande marine royale.', 'Je m’occupais des finances du royaume après l’arrestation de Fouquet.'] }],
-        difficile: [{ r: 'André Le Nôtre', i: ['Je travaille pour Louis XIV.', 'Mon père était déjà jardinier aux Tuileries.', 'J’ai dessiné les jardins de Vaux-le-Vicomte.', 'J’ai fait creuser le Grand Canal de Versailles.', 'On m’appelle le père du jardin à la française.'] }],
-        expert: [{ r: 'Madame de Maintenon', i: ['Je suis née dans la prison de Niort.', 'Mon grand-père était le poète Agrippa d’Aubigné.', 'J’ai d’abord épousé le poète Scarron.', 'J’ai élevé les enfants du roi et de Madame de Montespan.', 'J’ai épousé Louis XIV en secret.'] }]
-      } }
-    ] },
-    { id: 't04', matiere: 'histoire', famille: 'mod', nom: 'Écrivains classiques', court: 'Écrivains', icone: '🎭', series: [
-      { k: 'paires', gauche: 'Auteur', droite: 'Œuvre', consigneR: 'Relie chaque auteur à son œuvre.', q: 'Quelle œuvre a écrite {a} ?', qi: 'Qui a écrit : {b} ?', ouverte: false, niveaux: {
-        facile: [['Molière', 'Le Malade imaginaire'], ['Jean de La Fontaine', 'Le Corbeau et le Renard'], ['Charles Perrault', 'Le Petit Chaperon rouge']],
-        moyen: [['Pierre Corneille', 'Le Cid'], ['Jean Racine', 'Phèdre'], ['Molière', 'Le Bourgeois gentilhomme'], ['Charles Perrault', 'Le Chat botté']],
-        difficile: [['Madame de La Fayette', 'La Princesse de Clèves'], ['Boileau', 'L’Art poétique'], ['Madame de Sévigné', 'Les Lettres à sa fille'],
-          ['Blaise Pascal', 'Les Pensées'], ['René Descartes', 'Le Discours de la méthode']],
-        expert: [['La Bruyère', 'Les Caractères'], ['Fénelon', 'Les Aventures de Télémaque'], ['Bossuet', 'Les Oraisons funèbres'],
-          ['La Rochefoucauld', 'Les Maximes'], ['Scarron', 'Le Roman comique'], ['Cyrano de Bergerac', 'Les États et Empires de la Lune']]
+        facile: [{ r: 'Louis XIV', i: ['Je suis roi de France au XVIIe siècle.', 'Je suis devenu roi à 4 ans.', 'J’ai installé ma cour à Versailles.', 'J’ai régné 72 ans, plus que tous les autres rois de France.', 'On m’appelle le Roi-Soleil.'] },
+          { r: 'Marie-Antoinette', i: ['Je suis née à Vienne, en Autriche.', 'Ma mère était l’impératrice Marie-Thérèse.', 'J’ai épousé le futur Louis XVI en 1770.', 'J’aimais jouer à la fermière dans mon hameau de Versailles.', 'Je suis reine de France quand la Révolution commence.'] }],
+        moyen: [{ r: 'Colbert', i: ['Je suis un ministre de Louis XIV.', 'Je suis né à Reims, fils d’un marchand de draps.', 'J’ai développé les manufactures, comme celle des Gobelins.', 'J’ai fait construire une grande marine royale.', 'Je m’occupais des finances du royaume après l’arrestation de Fouquet.'] },
+          { r: 'Vauban', i: ['Je suis né en Bourgogne, en 1633.', 'Je suis ingénieur militaire.', 'J’ai dirigé des dizaines de sièges.', 'J’ai fortifié les frontières du royaume.', 'Mes forteresses en forme d’étoile sont inscrites au patrimoine mondial.'] }],
+        difficile: [{ r: 'André Le Nôtre', i: ['Je travaille pour Louis XIV.', 'Mon père était déjà jardinier aux Tuileries.', 'J’ai dessiné les jardins de Vaux-le-Vicomte.', 'J’ai fait creuser le Grand Canal de Versailles.', 'On m’appelle le père du jardin à la française.'] },
+          { r: 'Richelieu', i: ['Je suis un homme d’Église, cardinal.', 'Je suis le principal ministre de Louis XIII.', 'J’ai combattu le pouvoir des grands nobles.', 'J’ai pris La Rochelle, ville protestante, après un long siège.', 'J’ai créé l’Académie française en 1635.'] }],
+        expert: [{ r: 'Madame de Maintenon', i: ['Je suis née dans la prison de Niort.', 'Mon grand-père était le poète Agrippa d’Aubigné.', 'J’ai d’abord épousé le poète Scarron.', 'J’ai élevé les enfants du roi et de Madame de Montespan.', 'J’ai épousé Louis XIV en secret.'] },
+          { r: 'Champlain', i: ['Je suis né en Saintonge.', 'Je suis navigateur et dessinateur de cartes.', 'J’ai exploré le fleuve Saint-Laurent.', 'Un grand lac porte mon nom, entre les États-Unis et le Canada.', 'J’ai fondé Québec en 1608.'] }]
       } },
-      { k: 'qcm', niveaux: {
-        facile: [['Qui a écrit Le Corbeau et le Renard ?', 'Jean de La Fontaine', ['Molière', 'Victor Hugo']]],
-        moyen: [['Quel était le vrai nom de Molière ?', 'Jean-Baptiste Poquelin', ['François-Marie Arouet', 'Jean Racine', 'Charles Perrault']]],
-        difficile: [['Quelle académie, créée par Richelieu en 1635, veille sur la langue française ?', 'L’Académie française', ['L’Académie des sciences', 'La Sorbonne', 'Le Collège de France', 'L’Académie Goncourt']]],
-        expert: [['Quelle règle du théâtre classique demande une seule action, en un seul lieu, en une seule journée ?', 'La règle des trois unités', ['La règle de trois', 'La bienséance', 'La vraisemblance', 'L’alexandrin', 'La catharsis']]]
-      } },
-      { k: 'vf', niveaux: {
-        facile: [['Dans les Fables de La Fontaine, les personnages sont souvent des animaux.', true, '']],
-        moyen: [['Charles Perrault a écrit La Belle au bois dormant.', true, '']],
-        difficile: [['Molière est mort sur scène.', false, 'Il a eu un malaise sur scène en jouant Le Malade imaginaire, puis il est mort chez lui quelques heures après.']],
-        expert: [['Le Cid de Corneille a déclenché une grande querelle en 1637.', true, '']]
-      } },
-      { k: 'indices', consigne: 'Qui suis-je ? Trouve l’écrivain.', niveaux: {
-        facile: [{ r: 'Molière', i: ['Je suis un auteur de théâtre du XVIIe siècle.', 'Je suis aussi comédien et chef de troupe.', 'J’aime faire rire en me moquant des défauts des gens.', 'J’ai écrit L’Avare et Le Bourgeois gentilhomme.', 'Mon vrai nom est Jean-Baptiste Poquelin.'] }],
-        moyen: [{ r: 'Jean de La Fontaine', i: ['Je suis né à Château-Thierry.', 'Fouquet m’a protégé avant son arrestation.', 'Je m’inspire souvent du Grec Ésope.', 'Mes personnages sont souvent des animaux.', 'J’ai écrit La Cigale et la Fourmi.'] }],
-        difficile: [{ r: 'Jean Racine', i: ['Je suis né à La Ferté-Milon.', 'J’ai été élevé par les religieux de Port-Royal.', 'J’écris des tragédies en alexandrins.', 'Je suis devenu historiographe de Louis XIV.', 'J’ai écrit Andromaque et Phèdre.'] }],
-        expert: [{ r: 'Madame de Sévigné', i: ['Je suis une marquise du XVIIe siècle.', 'Je suis née à Paris, place Royale, aujourd’hui place des Vosges.', 'Ma fille est partie vivre en Provence.', 'Je lui ai écrit des centaines de lettres.', 'Mes lettres racontent la vie de la cour de Louis XIV.'] }]
-      } }
-    ] },
-    { id: 't05', matiere: 'histoire', famille: 'mod', nom: 'Les Lumières', court: 'Lumières', icone: '💡', series: [
-      { k: 'paires', gauche: 'Personnage', droite: 'Ce qui le rend célèbre', consigneR: 'Relie chaque personnage à ce qui le rend célèbre.', q: 'Qu’est-ce qui rend {a} célèbre ?', qi: 'Qui est-ce : {b} ?', ouverte: false, niveaux: {
-        facile: [['Voltaire', 'Écrit Candide'], ['Jean-Jacques Rousseau', 'Écrit Du contrat social'], ['Diderot', 'Dirige l’Encyclopédie']],
-        moyen: [['Montesquieu', 'Veut séparer les trois pouvoirs'], ['D’Alembert', 'Dirige l’Encyclopédie avec Diderot'], ['Beaumarchais', 'Écrit Le Mariage de Figaro'],
-          ['Buffon', 'Écrit une grande Histoire naturelle']],
-        difficile: [['Condorcet', 'Défend l’école pour tous, filles comprises'], ['Émilie du Châtelet', 'Traduit Newton en français'], ['Marivaux', 'Écrit Le Jeu de l’amour et du hasard'],
-          ['Lavoisier', 'Fonde la chimie moderne'], ['Kant', 'Écrit : « Ose savoir ! »']],
-        expert: [['Madame Geoffrin', 'Reçoit les philosophes dans son salon'], ['Jean Calas', 'Protestant condamné à tort, défendu par Voltaire'], ['Frédéric II de Prusse', 'Roi qui accueille Voltaire à sa cour'],
-          ['Catherine II de Russie', 'Impératrice qui achète la bibliothèque de Diderot'], ['Malesherbes', 'Protège l’Encyclopédie de la censure'], ['L’abbé Prévost', 'Écrit Manon Lescaut']]
-      } },
-      { k: 'qcm', niveaux: {
-        facile: [['Avec quoi les philosophes des Lumières veulent-ils éclairer les gens ?', 'La raison', ['La magie', 'La force']]],
-        moyen: [['Quel grand ouvrage, dirigé par Diderot, rassemble les connaissances de son temps ?', 'L’Encyclopédie', ['Le Dictionnaire de l’Académie', 'Les Fables', 'Les Essais']]],
-        difficile: [['Quel était le vrai nom de Voltaire ?', 'François-Marie Arouet', ['Jean-Baptiste Poquelin', 'Charles de Secondat', 'Denis Diderot', 'Jean de La Fontaine']]],
-        expert: [['Où les philosophes se retrouvaient-ils pour discuter, chez de riches hôtesses ?', 'Dans les salons', ['Dans les monastères', 'À la cour de Versailles', 'Dans les universités', 'Dans les tribunaux', 'Aux états généraux']]]
-      } },
-      { k: 'vf', niveaux: {
-        facile: [['Les philosophes des Lumières critiquent l’injustice.', true, '']],
-        moyen: [['Voltaire a été enfermé à la Bastille.', true, '']],
-        difficile: [['Jean-Jacques Rousseau est né à Genève.', true, '']],
-        expert: [['L’Encyclopédie a été publiée en un seul volume.', false, 'Elle compte 17 volumes de texte et 11 volumes de planches, publiés de 1751 à 1772.']]
-      } },
-      { k: 'indices', consigne: 'Qui suis-je ? Trouve le philosophe.', niveaux: {
-        facile: [{ r: 'Voltaire', i: ['Je suis un philosophe des Lumières.', 'J’ai été enfermé deux fois à la Bastille.', 'J’ai vécu longtemps à Ferney, près de la Suisse.', 'J’ai défendu Jean Calas, condamné à tort.', 'J’ai écrit Candide.'] }],
-        moyen: [{ r: 'Jean-Jacques Rousseau', i: ['Je suis né à Genève en 1712.', 'J’ai écrit sur l’éducation des enfants dans Émile.', 'J’aime la nature et les longues promenades.', 'Je pense que l’homme naît bon.', 'J’ai écrit Du contrat social.'] }],
-        difficile: [{ r: 'Montesquieu', i: ['Je suis né au château de La Brède, près de Bordeaux.', 'J’ai été magistrat au parlement de Bordeaux.', 'J’ai fait parler deux Persans qui découvrent la France.', 'Pour moi, le pouvoir doit arrêter le pouvoir.', 'J’ai écrit De l’esprit des lois.'] }],
-        expert: [{ r: 'Diderot', i: ['Je suis né à Langres.', 'Mon père était coutelier.', 'J’ai été enfermé au donjon de Vincennes en 1749.', 'Catherine II de Russie a acheté ma bibliothèque.', 'J’ai dirigé l’Encyclopédie avec d’Alembert.'] }]
-      } }
-    ] },
-    { id: 't09', matiere: 'histoire', famille: 'mod', nom: 'Frise des Temps modernes', court: 'Frise', icone: '📏', series: [
       { k: 'ordre', consigne: 'Range ces événements des Temps modernes du plus ancien au plus récent.', q: 'En quelle année : {a} ?', niveaux: {
-        facile: [['Assassinat d’Henri IV', 1610, '1610'], ['Louis XIV devient roi', 1643, '1643'], ['Mort de Louis XIV', 1715, '1715'], ['Prise de la Bastille', 1789, '1789']],
-        moyen: [['Richelieu crée l’Académie française', 1635, '1635'], ['La cour s’installe à Versailles', 1682, '1682'], ['Révocation de l’édit de Nantes', 1685, '1685'],
-          ['Louis XVI devient roi', 1774, '1774'], ['Premier vol en montgolfière avec des passagers', 1783, '1783']],
-        difficile: [['Champlain fonde Québec', 1608, '1608'], ['Début de la Fronde', 1648, '1648'], ['Mort de Mazarin : Louis XIV gouverne seul', 1661, '1661'],
-          ['Mort de Molière', 1673, '1673'], ['Premier volume de l’Encyclopédie', 1751, '1751']],
-        expert: [['Corneille fait jouer Le Cid', 1637, '1637'], ['Traité des Pyrénées', 1659, '1659'], ['Newton publie sa loi de la gravitation', 1687, '1687'],
-          ['Début de la guerre de Sept Ans', 1756, '1756'], ['Traité de Paris : la France perd le Canada', 1763, '1763'], ['Déclaration d’indépendance des États-Unis', 1776, '1776']]
+        facile: [['Assassinat d’Henri IV', 1610, '1610'], ['Louis XIV devient roi', 1643, '1643'], ['La cour s’installe à Versailles', 1682, '1682'],
+          ['Mort de Louis XIV', 1715, '1715'], ['Louis XVI devient roi', 1774, '1774'], ['Prise de la Bastille', 1789, '1789']],
+        moyen: [['Champlain fonde Québec', 1608, '1608'], ['Richelieu crée l’Académie française', 1635, '1635'], ['Révocation de l’édit de Nantes', 1685, '1685'],
+          ['Louis XV devient roi', 1715, '1715'], ['Mariage du futur Louis XVI et de Marie-Antoinette', 1770, '1770'], ['Premier vol en montgolfière avec des passagers', 1783, '1783']],
+        difficile: [['Richelieu prend La Rochelle', 1628, '1628'], ['Mort de Richelieu', 1642, '1642'], ['Début de la Fronde', 1648, '1648'],
+          ['Mort de Mazarin : Louis XIV gouverne seul', 1661, '1661'], ['Cavelier de La Salle nomme la Louisiane', 1682, '1682'],
+          ['Premier volume de l’Encyclopédie', 1751, '1751'], ['Traité de Paris : la France perd le Canada', 1763, '1763']],
+        expert: [['Traité des Pyrénées', 1659, '1659'], ['Arrestation de Fouquet', 1661, '1661'], ['Traités d’Utrecht', 1713, '1713'],
+          ['Faillite de la banque de Law', 1720, '1720'], ['Début de la guerre de Sept Ans', 1756, '1756'], ['Déclaration d’indépendance des États-Unis', 1776, '1776'],
+          ['Affaire du Collier de la reine', 1785, '1785']]
+      } },
+      { k: 'classer', niveaux: {
+        facile: [{ q: 'Range : à la cour de Louis XIV ou de nos jours ?', colonnes: ['Sous Louis XIV', 'De nos jours'],
+          items: [['Voyager en carrosse', 0], ['Porter une perruque poudrée', 0], ['S’éclairer à la bougie', 0], ['Écrire à la plume d’oie', 0],
+            ['Voyager en voiture', 1], ['Téléphoner', 1], ['S’éclairer à l’ampoule électrique', 1], ['Écrire sur un ordinateur', 1]] }],
+        moyen: [{ q: 'Range : règne de Louis XIII ou de Louis XIV ?', colonnes: ['Louis XIII', 'Louis XIV'],
+          items: [['Le cardinal de Richelieu', 0], ['Le siège de La Rochelle', 0], ['La création de l’Académie française', 0], ['Le mariage avec Anne d’Autriche', 0],
+            ['Colbert', 1], ['La galerie des Glaces', 1], ['La révocation de l’édit de Nantes', 1], ['Les forteresses de Vauban', 1], ['La cour à Versailles', 1]] }],
+        difficile: [{ q: 'Range : règne de Louis XIV ou de Louis XV ?', colonnes: ['Louis XIV', 'Louis XV'],
+          items: [['La Fronde', 0], ['Colbert', 0], ['La révocation de l’édit de Nantes', 0], ['L’affaire des Poisons', 0], ['Le canal du Midi', 0],
+            ['Madame de Pompadour', 1], ['La guerre de Sept Ans', 1], ['La perte du Canada', 1], ['La place Louis-XV, aujourd’hui place de la Concorde', 1], ['Le premier volume de l’Encyclopédie', 1]] }],
+        expert: [{ q: 'Range ces ministres : de Louis XIV ou de Louis XVI ?', colonnes: ['Louis XIV', 'Louis XVI'],
+          items: [['Colbert', 0], ['Louvois', 0], ['Fouquet', 0], ['Mazarin', 0],
+            ['Turgot', 1], ['Necker', 1], ['Calonne', 1], ['Vergennes', 1]] }]
+      } }
+    ] },
+    { id: 't05', matiere: 'histoire', famille: 'mod', nom: 'Écrivains et Lumières', court: 'Écrivains', icone: '💡', series: [
+      { k: 'paires', gauche: 'Auteur', droite: 'Œuvre', consigneR: 'Relie chaque auteur à son œuvre.', q: 'Quelle œuvre a écrite {a} ?', qi: 'Qui a écrit : {b} ?', ouverte: false, niveaux: {
+        facile: [['Molière', 'Le Malade imaginaire'], ['Jean de La Fontaine', 'Le Corbeau et le Renard'], ['Charles Perrault', 'Le Petit Chaperon rouge'],
+          ['Voltaire', 'Candide'], ['Pierre Corneille', 'Le Cid']],
+        moyen: [['Jean Racine', 'Phèdre'], ['Molière', 'Le Bourgeois gentilhomme'], ['Charles Perrault', 'Le Chat botté'], ['Beaumarchais', 'Le Barbier de Séville'],
+          ['Jean-Jacques Rousseau', 'Émile ou De l’éducation'], ['Montesquieu', 'Les Lettres persanes'], ['Jean de La Fontaine', 'La Cigale et la Fourmi']],
+        difficile: [['Madame de La Fayette', 'La Princesse de Clèves'], ['Boileau', 'L’Art poétique'], ['Madame de Sévigné', 'Les Lettres à sa fille'],
+          ['Blaise Pascal', 'Les Pensées'], ['René Descartes', 'Le Discours de la méthode'], ['Marivaux', 'Le Jeu de l’amour et du hasard'], ['Montesquieu', 'De l’esprit des lois']],
+        expert: [['La Bruyère', 'Les Caractères'], ['Fénelon', 'Les Aventures de Télémaque'], ['Bossuet', 'Les Oraisons funèbres'],
+          ['La Rochefoucauld', 'Les Maximes'], ['Scarron', 'Le Roman comique'], ['Cyrano de Bergerac', 'Les États et Empires de la Lune'],
+          ['L’abbé Prévost', 'Manon Lescaut'], ['Bernardin de Saint-Pierre', 'Paul et Virginie']]
+      } },
+      { k: 'paires', gauche: 'Personnage', droite: 'Ce qui le rend célèbre', consigneR: 'Relie chaque personnage à ce qui le rend célèbre.', q: 'Qu’est-ce qui rend {a} célèbre ?', qi: 'Qui est-ce : {b} ?', ouverte: false, niveaux: {
+        facile: [['Voltaire', 'Se moque des injustices et défend la tolérance'], ['Jean-Jacques Rousseau', 'Pense que l’homme naît bon'], ['Diderot', 'Dirige l’Encyclopédie'],
+          ['Montesquieu', 'Veut séparer les trois pouvoirs']],
+        moyen: [['D’Alembert', 'Dirige l’Encyclopédie avec Diderot'], ['Beaumarchais', 'Écrit Le Mariage de Figaro'], ['Buffon', 'Écrit une grande Histoire naturelle'],
+          ['Lavoisier', 'Fonde la chimie moderne'], ['Les frères Montgolfier', 'Font voler le premier ballon à air chaud']],
+        difficile: [['Condorcet', 'Défend l’école pour tous, filles comprises'], ['Émilie du Châtelet', 'Traduit Newton en français'], ['Kant', 'Écrit : « Ose savoir ! »'],
+          ['Benjamin Franklin', 'Invente le paratonnerre'], ['Linné', 'Classe et nomme les plantes et les animaux'], ['Isaac Newton', 'Explique la gravitation universelle']],
+        expert: [['Madame Geoffrin', 'Reçoit les philosophes dans son salon'], ['Jean Calas', 'Protestant condamné à tort, défendu par Voltaire'], ['Frédéric II de Prusse', 'Roi qui accueille Voltaire à sa cour'],
+          ['Catherine II de Russie', 'Impératrice qui achète la bibliothèque de Diderot'], ['Malesherbes', 'Protège l’Encyclopédie de la censure'],
+          ['Parmentier', 'Fait connaître la pomme de terre en France'], ['Marivaux', 'Donne son nom au « marivaudage »']]
+      } },
+      { k: 'qcm', niveaux: {
+        facile: [
+          ['Avec quoi les philosophes des Lumières veulent-ils éclairer les gens ?', 'La raison', ['La magie', 'La force', 'La peur']],
+          ['Qui a écrit Le Corbeau et le Renard ?', 'Jean de La Fontaine', ['Molière', 'Victor Hugo', 'Charles Perrault']],
+          ['Quel était le métier de Molière ?', 'Auteur de théâtre et comédien', ['Peintre', 'Explorateur', 'Médecin']],
+          ['Qui a écrit les contes Cendrillon et Le Petit Poucet ?', 'Charles Perrault', ['Molière', 'Jean Racine', 'Voltaire']],
+          ['Dans la fable, quel animal se fait voler son fromage ?', 'Le corbeau', ['Le renard', 'La cigale', 'Le loup']],
+          ['Que fait la cigale tout l’été, dans la fable ?', 'Elle chante', ['Elle travaille', 'Elle dort', 'Elle nage']],
+          ['Quel grand ouvrage, dirigé par Diderot, rassemble les connaissances de son temps ?', 'L’Encyclopédie', ['Le Dictionnaire de l’Académie', 'Les Fables', 'Le Petit Prince']],
+          ['Quel siècle appelle-t-on le « siècle des Lumières » ?', 'Le XVIIIe siècle', ['Le XIIe siècle', 'Le XVe siècle', 'Le XXe siècle']],
+          ['Molière est surtout célèbre pour ses… ?', 'Comédies', ['Romans policiers', 'Bandes dessinées', 'Chansons']],
+          ['Qui a écrit Candide ?', 'Voltaire', ['Molière', 'Jean de La Fontaine', 'Victor Hugo']],
+          ['Quelle fable commence par « Rien ne sert de courir ; il faut partir à point » ?', 'Le Lièvre et la Tortue', ['Le Corbeau et le Renard', 'La Cigale et la Fourmi', 'Le Loup et l’Agneau']]],
+        moyen: [
+          ['Quel était le vrai nom de Molière ?', 'Jean-Baptiste Poquelin', ['François-Marie Arouet', 'Jean Racine', 'Charles Perrault']],
+          ['Quel était le vrai nom de Voltaire ?', 'François-Marie Arouet', ['Jean-Baptiste Poquelin', 'Charles de Secondat', 'Denis Diderot']],
+          ['Qui a écrit Le Cid ?', 'Pierre Corneille', ['Jean Racine', 'Molière', 'Boileau']],
+          ['De quel auteur grec La Fontaine s’inspire-t-il souvent ?', 'Ésope', ['Homère', 'Platon', 'Socrate']],
+          ['Dans quelle pièce de Molière Harpagon aime-t-il trop son argent ?', 'L’Avare', ['Le Malade imaginaire', 'Le Bourgeois gentilhomme', 'Le Misanthrope']],
+          ['Dans quelle pièce de Molière Monsieur Jourdain veut-il devenir un homme de qualité ?', 'Le Bourgeois gentilhomme', ['L’Avare', 'Tartuffe', 'Le Misanthrope']],
+          ['Dans quelle ville Jean-Jacques Rousseau est-il né ?', 'Genève', ['Paris', 'Lyon', 'Bruxelles']],
+          ['Comment s’appelle le valet malin du Barbier de Séville ?', 'Figaro', ['Sganarelle', 'Scapin', 'Arlequin']],
+          ['Quels philosophes ont dirigé l’Encyclopédie ?', 'Diderot et d’Alembert', ['Voltaire et Rousseau', 'Molière et Racine', 'Montesquieu et Buffon']],
+          ['Quel philosophe a écrit Du contrat social ?', 'Jean-Jacques Rousseau', ['Voltaire', 'Diderot', 'Montesquieu']]],
+        difficile: [
+          ['Quelle académie, créée par Richelieu en 1635, veille sur la langue française ?', 'L’Académie française', ['L’Académie des sciences', 'La Sorbonne', 'Le Collège de France']],
+          ['À qui La Fontaine a-t-il dédié son premier recueil de Fables ?', 'Au Dauphin, fils de Louis XIV', ['À Fouquet', 'À Colbert', 'À Richelieu']],
+          ['Qui a écrit « Je pense, donc je suis » ?', 'René Descartes', ['Blaise Pascal', 'Voltaire', 'Montaigne']],
+          ['Dans quel village près de la Suisse Voltaire s’est-il installé en 1759 ?', 'Ferney', ['Montbard', 'La Brède', 'Ermenonville']],
+          ['Quelle pièce de Molière se moque d’un faux dévot ?', 'Tartuffe', ['L’Avare', 'Le Misanthrope', 'Les Fourberies de Scapin']],
+          ['Quel grand ouvrage Buffon a-t-il écrit ?', 'L’Histoire naturelle', ['L’Encyclopédie', 'Les Caractères', 'Les Pensées']],
+          ['Quel auteur de tragédies a écrit Andromaque et Phèdre ?', 'Jean Racine', ['Pierre Corneille', 'Molière', 'Marivaux']],
+          ['Quelle pièce Molière jouait-il le soir de son malaise, en 1673 ?', 'Le Malade imaginaire', ['L’Avare', 'Tartuffe', 'Dom Juan']],
+          ['Quel chimiste a donné son nom à l’oxygène ?', 'Lavoisier', ['Newton', 'Buffon', 'Pascal']],
+          ['Quel philosophe a écrit De l’esprit des lois ?', 'Montesquieu', ['Voltaire', 'Rousseau', 'Diderot']],
+          ['Comment s’appelle la machine à calculer inventée par Pascal ?', 'La pascaline', ['La calculette', 'L’ordinateur', 'Le boulier']]],
+        expert: [
+          ['Quelle règle du théâtre classique demande une seule action, en un seul lieu, en une seule journée ?', 'La règle des trois unités', ['La règle de trois', 'La bienséance', 'La vraisemblance']],
+          ['Où les philosophes se retrouvaient-ils pour discuter, chez de riches hôtesses ?', 'Dans les salons', ['Dans les monastères', 'À la cour de Versailles', 'Dans les universités']],
+          ['Quelle abbaye, près de Paris, a formé Racine et soutenu les jansénistes ?', 'Port-Royal', ['Cluny', 'Cîteaux', 'Saint-Denis']],
+          ['Quel personnage de Candide répète que tout est au mieux ?', 'Pangloss', ['Cunégonde', 'Cacambo', 'Martin']],
+          ['Quel tremblement de terre de 1755 a inspiré un long poème à Voltaire ?', 'Celui de Lisbonne', ['Celui de Naples', 'Celui de Messine', 'Celui de Lima']],
+          ['Combien de volumes de texte compte l’Encyclopédie ?', '17', ['1', '5', '50']],
+          ['Comment appelle-t-on la dispute entre les admirateurs des auteurs antiques et ceux des auteurs de leur temps ?', 'La querelle des Anciens et des Modernes', ['La querelle du Cid', 'La querelle des Bouffons', 'L’affaire Calas']],
+          ['Quel roi de Prusse a accueilli Voltaire à sa cour ?', 'Frédéric II', ['Guillaume Ier', 'Frédéric-Guillaume Ier', 'Louis XV']],
+          ['Dans quel château Voltaire a-t-il longtemps vécu avec Émilie du Châtelet ?', 'Cirey', ['Ferney', 'Chambord', 'Vaux-le-Vicomte']],
+          ['Quel conte de Voltaire raconte la visite d’un géant venu de l’étoile Sirius ?', 'Micromégas', ['Zadig', 'Candide', 'L’Ingénu']],
+          ['Dans quel village Rousseau est-il mort, en 1778 ?', 'Ermenonville', ['Ferney', 'Genève', 'Montmorency']]]
+      } },
+      { k: 'vf', niveaux: {
+        facile: [['Dans les Fables de La Fontaine, les personnages sont souvent des animaux.', true, ''], ['Les philosophes des Lumières critiquent l’injustice.', true, ''],
+          ['Charles Perrault a écrit Cendrillon.', true, ''],
+          ['Molière a écrit Le Petit Chaperon rouge.', false, 'C’est Charles Perrault ; Molière écrivait des comédies.'],
+          ['La Fontaine a écrit Candide.', false, 'C’est Voltaire ; La Fontaine a écrit des fables.'],
+          ['Les philosophes des Lumières voulaient interdire les livres.', false, 'Ils voulaient au contraire répandre les connaissances, par exemple avec l’Encyclopédie.']],
+        moyen: [['Charles Perrault a écrit La Belle au bois dormant.', true, ''], ['Voltaire a été enfermé à la Bastille.', true, ''],
+          ['Jean-Jacques Rousseau est né à Genève.', true, ''],
+          ['Le Cid a été écrit par Jean Racine.', false, 'Il a été écrit par Pierre Corneille, et joué pour la première fois en 1637.'],
+          ['Diderot a écrit l’Encyclopédie tout seul.', false, 'Il l’a dirigée, d’abord avec d’Alembert ; de nombreux auteurs y ont écrit.'],
+          ['Les Fables de La Fontaine sont écrites sans aucun vers.', false, 'Elles sont écrites en vers.']],
+        difficile: [['Le Cid de Corneille a déclenché une grande querelle en 1637.', true, ''], ['Madame de Sévigné a écrit des centaines de lettres à sa fille.', true, ''],
+          ['Montesquieu voulait séparer les pouvoirs.', true, ''],
+          ['Molière est mort sur scène.', false, 'Il a eu un malaise sur scène en jouant Le Malade imaginaire, puis il est mort chez lui quelques heures après.'],
+          ['Rousseau a dirigé l’Encyclopédie.', false, 'C’est Diderot, avec d’Alembert ; Rousseau y a écrit des articles sur la musique.'],
+          ['Pascal a écrit le Discours de la méthode.', false, 'C’est Descartes ; Pascal a écrit Les Pensées.']],
+        expert: [['Racine a été nommé historiographe de Louis XIV.', true, ''], ['Émilie du Châtelet a traduit en français le grand livre de Newton.', true, ''],
+          ['Voltaire et Rousseau sont morts la même année.', true, 'En 1778.'], ['La Fontaine a été élu à l’Académie française.', true, 'En 1684.'],
+          ['L’Encyclopédie a été publiée en un seul volume.', false, 'Elle compte 17 volumes de texte et 11 volumes de planches, publiés de 1751 à 1772.'],
+          ['Voltaire a signé Candide de son vrai nom.', false, 'Candide a paru en 1759 sous un faux nom : « Monsieur le docteur Ralph ».']]
+      } },
+      { k: 'indices', consigne: 'Qui suis-je ? Trouve l’écrivain ou le philosophe.', niveaux: {
+        facile: [{ r: 'Molière', i: ['Je suis un auteur de théâtre du XVIIe siècle.', 'Je suis aussi comédien et chef de troupe.', 'J’aime faire rire en me moquant des défauts des gens.', 'J’ai écrit L’Avare et Le Bourgeois gentilhomme.', 'Mon vrai nom est Jean-Baptiste Poquelin.'] },
+          { r: 'Voltaire', i: ['Je suis un philosophe des Lumières.', 'J’ai été enfermé deux fois à la Bastille.', 'J’ai vécu longtemps à Ferney, près de la Suisse.', 'J’ai défendu Jean Calas, condamné à tort.', 'J’ai écrit Candide.'] }],
+        moyen: [{ r: 'Jean de La Fontaine', i: ['Je suis né à Château-Thierry.', 'Fouquet m’a protégé avant son arrestation.', 'Je m’inspire souvent du Grec Ésope.', 'Mes personnages sont souvent des animaux.', 'J’ai écrit La Cigale et la Fourmi.'] },
+          { r: 'Jean-Jacques Rousseau', i: ['Je suis né à Genève en 1712.', 'J’ai écrit sur l’éducation des enfants dans Émile.', 'J’aime la nature et les longues promenades.', 'Je pense que l’homme naît bon.', 'J’ai écrit Du contrat social.'] }],
+        difficile: [{ r: 'Jean Racine', i: ['Je suis né à La Ferté-Milon.', 'J’ai été élevé par les religieux de Port-Royal.', 'J’écris des tragédies en alexandrins.', 'Je suis devenu historiographe de Louis XIV.', 'J’ai écrit Andromaque et Phèdre.'] },
+          { r: 'Montesquieu', i: ['Je suis né au château de La Brède, près de Bordeaux.', 'J’ai été magistrat au parlement de Bordeaux.', 'J’ai fait parler deux Persans qui découvrent la France.', 'Pour moi, le pouvoir doit arrêter le pouvoir.', 'J’ai écrit De l’esprit des lois.'] }],
+        expert: [{ r: 'Madame de Sévigné', i: ['Je suis une marquise du XVIIe siècle.', 'Je suis née à Paris, place Royale, aujourd’hui place des Vosges.', 'Ma fille est partie vivre en Provence.', 'Je lui ai écrit des centaines de lettres.', 'Mes lettres racontent la vie de la cour de Louis XIV.'] },
+          { r: 'Diderot', i: ['Je suis né à Langres.', 'Mon père était coutelier.', 'J’ai été enfermé au donjon de Vincennes en 1749.', 'Catherine II de Russie a acheté ma bibliothèque.', 'J’ai dirigé l’Encyclopédie avec d’Alembert.'] }]
+      } },
+      { k: 'classer', niveaux: {
+        facile: [{ q: 'Range : fable de La Fontaine ou conte de Perrault ?', colonnes: ['Fable de La Fontaine', 'Conte de Perrault'],
+          items: [['Le Corbeau et le Renard', 0], ['La Cigale et la Fourmi', 0], ['Le Lièvre et la Tortue', 0], ['Le Loup et l’Agneau', 0],
+            ['Le Petit Chaperon rouge', 1], ['Cendrillon', 1], ['Le Chat botté', 1], ['Le Petit Poucet', 1]] }],
+        moyen: [{ q: 'Range ces écrivains : XVIIe siècle ou XVIIIe siècle, celui des Lumières ?', colonnes: ['XVIIe siècle', 'XVIIIe siècle'],
+          items: [['Molière', 0], ['Jean Racine', 0], ['Pierre Corneille', 0], ['Jean de La Fontaine', 0], ['Charles Perrault', 0],
+            ['Voltaire', 1], ['Jean-Jacques Rousseau', 1], ['Diderot', 1], ['Montesquieu', 1], ['Beaumarchais', 1]] }],
+        difficile: [{ q: 'Range ces pièces : comédie ou tragédie ?', colonnes: ['Comédie', 'Tragédie'],
+          items: [['L’Avare', 0], ['Tartuffe', 0], ['Le Bourgeois gentilhomme', 0], ['Le Jeu de l’amour et du hasard', 0], ['Le Mariage de Figaro', 0],
+            ['Phèdre', 1], ['Andromaque', 1], ['Britannicus', 1], ['Horace', 1], ['Bérénice', 1]] }],
+        expert: [{ q: 'Range ces œuvres : de Voltaire ou de Rousseau ?', colonnes: ['Voltaire', 'Rousseau'],
+          items: [['Candide', 0], ['Zadig', 0], ['Micromégas', 0], ['Les Lettres philosophiques', 0], ['Le Traité sur la tolérance', 0],
+            ['Émile', 1], ['Du contrat social', 1], ['Les Confessions', 1], ['Julie ou la Nouvelle Héloïse', 1], ['Les Rêveries du promeneur solitaire', 1]] }]
       } }
     ] },
     // ---------- Révolution et XIXe siècle (v7.10, BACKLOG ligne 295 : 9 jeux, hypothèse à valider) ----------

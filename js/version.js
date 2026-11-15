@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '8.7';
+  var VERSION = '8.8';
 
   var HISTORY = [
+    { v: '8.8', date: '2026-11-15', changes: [
+      "Histoire, Temps modernes : les 4 petits jeux sont regroupés en 2, avec environ 36 à 48 questions par niveau chacun, jouables en Quiz et en Normal — Louis XIV et son temps (Louis XIII, Louis XIV, Louis XV, Louis XVI, Nouvelle-France, frise) ; Écrivains et Lumières (écrivains classiques, fables et contes, philosophes et savants des Lumières)."
+    ] },
     { v: '8.7', date: '2026-11-15', changes: [
       "Histoire, Renaissance : les 6 petits jeux sont regroupés en 2, avec environ 37 à 56 questions par niveau chacun, jouables en Quiz et en Normal — Arts, découvertes et châteaux ; Rois et guerres de Religion (les artistes et les châteaux de la Loire sont de nouveau jouables en Quiz)."
     ] },
