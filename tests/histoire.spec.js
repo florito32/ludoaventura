@@ -128,10 +128,32 @@ test.describe('contenu d\'histoire', () => {
     expect(vues).toBeGreaterThan(0);
   });
 
-  test('Renaissance (v7.8) : 6 jeux, chacun a du contenu à chaque niveau', () => {
+  test('Renaissance (v8.7) : 6 jeux regroupés en 2, au moins 35 éléments par niveau, jouables en Quiz et en Normal', () => {
     const ren = S.jeuxDe('histoire').filter((j) => j.famille === 'ren');
-    expect(ren.map((j) => j.id)).toEqual(['r01', 'r02', 'r04', 'r05', 'r06', 'r07']);
-    for (const j of ren) for (const n of NIVEAUX) expect(j.series.some((s) => S.utilisable(s, n)), j.id + ' ' + n).toBe(true);
+    expect(ren.map((j) => j.id)).toEqual(['r01', 'r05']);
+    for (const j of ren) {
+      for (const n of NIVEAUX) {
+        for (const mode of ['quiz', 'normal']) expect(j.series.some((s) => S.utilisable(s, n, mode)), j.id + ' ' + n + ' ' + mode).toBe(true);
+        const total = j.series.reduce((a, s) => a + (s.k === 'classer' ? (s.niveaux[n] || []).reduce((x, g) => x + g.items.length, 0) : (s.niveaux[n] || []).length), 0);
+        expect(total, j.id + ' ' + n).toBeGreaterThanOrEqual(35);
+        for (let k = 0; k < 150; k++) {
+          const c = S.generer({ jeux: [j.id], niveau: n, mode: 'quiz' }, 'histoire');
+          expect(c.options).toHaveLength(4);
+          expect(new Set(c.options).size, c.consigne).toBe(4);
+        }
+      }
+      for (const s of j.series.filter((x) => x.k === 'ordre')) for (const n of NIVEAUX) {
+        const annees = (s.niveaux[n] || []).map((x) => x[1]);
+        expect(new Set(annees).size, j.id + ' ' + n).toBe(annees.length);
+      }
+    }
+    // « Qui a… ? » : la question donne le fait, les 4 choix sont des noms (et non 4 descriptions).
+    let vues = 0;
+    for (let k = 0; k < 400; k++) {
+      const c = S.generer({ jeux: ['r05'], niveau: 'facile', mode: 'quiz' }, 'histoire');
+      if (/^Qui a gagné|^Qui a signé|^Qui était une reine/.test(c.consigne)) { vues++; for (const o of c.options) expect(['François Ier', 'Henri IV', 'Catherine de Médicis', 'Martin Luther', 'Jean Calvin']).toContain(o); }
+    }
+    expect(vues).toBeGreaterThan(0);
   });
 
   test('Temps modernes (v7.9) : 4 jeux, chacun a du contenu à chaque niveau', () => {
@@ -222,7 +244,7 @@ test('écran des réglages : la matière Histoire, son niveau, ses jeux rangés 
   await expect(familles.nth(2).locator('.famille-nom')).toContainText('Moyen Âge');
   await expect(familles.nth(2).locator('input')).toHaveCount(3);
   await expect(familles.nth(3).locator('.famille-nom')).toContainText('Renaissance');
-  await expect(familles.nth(3).locator('input')).toHaveCount(6);
+  await expect(familles.nth(3).locator('input')).toHaveCount(2);
   await expect(familles.nth(4).locator('.famille-nom')).toContainText('Temps modernes');
   await expect(familles.nth(4).locator('input')).toHaveCount(4);
   await expect(familles.nth(5).locator('.famille-nom')).toContainText('Révolution et XIXe');
@@ -250,7 +272,7 @@ test('écran des réglages : la matière Histoire, son niveau, ses jeux rangés 
       dehors: n.left < r.left + 1 || n.right > r.right - 1 || n.top < r.top || n.bottom > r.bottom,
       lignes: Math.round(n.height / parseFloat(getComputedStyle(el.querySelector('.pack-nom')).lineHeight)) };
   }));
-  expect(pb).toHaveLength(37);
+  expect(pb).toHaveLength(33);
   for (const x of pb) { expect(x.debord, x.nom).toBe(false); expect(x.dehors, x.nom).toBe(false); expect(x.lignes, x.nom).toBeLessThanOrEqual(1); }
   await pasDeDebordement(page);
   await valider(page);

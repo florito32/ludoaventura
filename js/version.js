@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '8.6';
+  var VERSION = '8.7';
 
   var HISTORY = [
+    { v: '8.7', date: '2026-11-15', changes: [
+      "Histoire, Renaissance : les 6 petits jeux sont regroupés en 2, avec environ 37 à 56 questions par niveau chacun, jouables en Quiz et en Normal — Arts, découvertes et châteaux ; Rois et guerres de Religion (les artistes et les châteaux de la Loire sont de nouveau jouables en Quiz)."
+    ] },
     { v: '8.6', date: '2026-11-13', changes: [
       "Histoire, Moyen Âge : les 8 petits jeux sont regroupés en 3, avec environ 35 à 40 questions par niveau chacun, jouables en Quiz et en Normal — Rois, batailles et frise ; Châteaux, chevaliers et paysans ; Églises, croisades et Vikings (les Vikings sont de nouveau jouables en Quiz)."
     ] },
