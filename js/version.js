@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '9.1';
+  var VERSION = '9.2';
 
   var HISTORY = [
+    { v: '9.2', date: '2026-11-16', changes: [
+      "Baby jeux : réglages en deux pages qui tiennent chacune sur l’écran, sans défiler. Page 1 : Lettres ou Chiffres (l’un ou l’autre), l’écriture (majuscules, minuscules ou les deux) et les lettres ou les chiffres à travailler ; page 2 : la liste des petits jeux.",
+      "« Modifier les choix » pendant une partie de Baby jeux ou une partie rapide solo ramène à ses propres réglages (et plus à la préparation de l’aventure) ; « Reprendre la partie » garde l’aventure, l’aventurier et les points, « ← Partie » revient au plateau sans rien changer."
+    ] },
     { v: '9.1', date: '2026-11-16', changes: [
       "Nouveau bouton « Baby jeux » sur l’accueil : 20 petits jeux pour les tout-petits, joués sur le plateau comme une partie rapide (aventure, dés, étoiles).",
       "Lettres : Attrape la lettre (les lettres se baladent), Grandes et petites, L’alphabet dans l’ordre, La lettre qui manque, J’entends la lettre, La première lettre, Voyelle ou consonne, La fabrique à mots (la voix lit le mot fabriqué), Les syllabes, Un son et ses écritures (IN, AIN, UN…).",

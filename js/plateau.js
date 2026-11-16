@@ -2280,6 +2280,14 @@
     document.querySelector('input[name="aventure"][value="' + d.aventure + '"]').checked = true;
     var autres = P.LISTE.map(function (a) { return a.id; }).filter(function (id) { return d.aventuriers.indexOf(id) < 0; });
     partie.choix = d.aventuriers.concat(autres).slice(0, 4);
+    reglagesRapide(d);
+    partie.etapePrepa = 4; partie.sousEtape = 'matiere'; partie.actif = 0;
+    majDetail(); majAventuriers();
+    lancerPartie();
+  }
+  // Réglages des cartes d'une partie rapide ou de Baby jeux (matières, niveau, mode, réglages baby) :
+  // au lancement, et quand on les modifie en cours de partie (v9.2).
+  function reglagesRapide(d) {
     var R2 = window.Rapide, premiere = d.matieres.indexOf('maths') >= 0 ? 'maths' : 'orthographe';
     // v6.45 : orthographe = tous les thèmes, avec les mots et les questions du niveau choisi.
     var o = R2.ortho(d.niveau, TOUS_TYPES);
@@ -2296,9 +2304,23 @@
     }
     partie.rapide = { matieres: d.matieres.slice(), niveau: d.niveau, mode: d.mode || 'quiz' };
     if (d.baby) partie.rapide.baby = d.baby; // Baby jeux (v9.1) : réglages de js/baby-ecran.js
-    partie.etapePrepa = 4; partie.sousEtape = 'matiere'; partie.actif = 0;
-    majDetail(); majAventuriers();
-    lancerPartie();
+  }
+  // « Modifier les choix » d'une partie rapide ou de Baby jeux (v9.2, demande du 16/11/2026) : on revient à leur
+  // écran de réglages (pas à la préparation de l'aventure), puis « Reprendre la partie » garde l'aventure, l'aventurier
+  // et les points ; les nouveaux réglages valent dès la carte suivante (une carte pas encore répondue est repiochée).
+  function modifierRapide() {
+    partie.modif = true;
+    afficher(partie.rapide.baby ? 'ecran-baby' : 'ecran-rapide');
+  }
+  function reprendreRapide(d) {
+    if (!partie.rapide || !partie.regles) return;
+    reglagesRapide(d);
+    reprendreApresModif();
+  }
+  // « ← Partie » sur l'écran des réglages : retour au plateau, rien ne change.
+  function annulerModif() {
+    partie.modif = false;
+    reprendreLePlateau(partie.vue);
   }
 
   // ---------- Fin de partie ----------
@@ -2379,7 +2401,9 @@
     var d;
     try { d = JSON.parse(sessionStorage.getItem(CLE) || 'null'); } catch (e) { d = null; }
     // Écrans des étoiles (v6.36) : ils s'ouvrent depuis l'accueil, on y revient.
-    if (!d || !d.ecran || d.ecran === 'ecran-accueil' || PAGES_ACCUEIL.indexOf(d.ecran) >= 0) return false;
+    // Exception (v9.2) : réglages d'une partie rapide ou de Baby jeux ouverts par « Modifier les choix » : la partie est reprise.
+    var modifRapide = d && d.modif && d.jeu && d.rapide && (d.ecran === 'ecran-rapide' || d.ecran === 'ecran-baby');
+    if (!d || !d.ecran || d.ecran === 'ecran-accueil' || (PAGES_ACCUEIL.indexOf(d.ecran) >= 0 && !modifRapide)) return false;
     try {
       // Préparation : nombre de joueurs, aventure, aventuriers et réglages des cartes.
       var nb = document.querySelector('input[name="nb"][value="' + d.nb + '"]');
@@ -2440,6 +2464,7 @@
         preparerPlateau(false);
       }
       if (d.ecran !== 'ecran-plateau' || !d.jeu) {
+        if (d.jeu) partie.vue = d.jeu.vue;
         afficher(d.ecran);
         montrerEtape(partie.etapePrepa); // même écran de la préparation, même joueur
         return true;
@@ -2565,7 +2590,8 @@
     // Changer les réglages d'un défi en fait une partie libre (v6.37, hypothèse à valider) : on garde ceux du défi.
     if (partie.defi && window.Recompenses) window.Recompenses.compte.marquerQuitte(partie.defi.type); // défi quitté (v6.47)
     if (partie.defi) { partie.defi = null; partie.avantDefi = null; partie.mots = [null, null, null, null]; }
-    if (partie.rapide) { partie.rapide = null; partie.avantDefi = null; } // idem pour une partie rapide (v6.43) : partie libre, réglages « tout coché »
+    // Partie rapide ou Baby jeux (v9.2) : retour à leurs propres réglages, la partie garde son mode.
+    if (partie.rapide) { modifierRapide(); return; }
     preparer(1);
   });
   $('btn-accueil').addEventListener('click', function () {
@@ -2670,7 +2696,7 @@
     }, { once: true });
   });
 
-  window.Aventura = { afficher: afficher, lancerDefi: lancerDefi, lancerRapide: lancerRapide, piocherCarte: piocherCarte, cases: CASES, route: ROUTE, trajet: trajet, decalages: DECALAGES, partie: partie, cartesDuJoueur: cartesDuJoueur, majConstruction: majConstruction,
+  window.Aventura = { afficher: afficher, lancerDefi: lancerDefi, lancerRapide: lancerRapide, reprendreRapide: reprendreRapide, annulerModif: annulerModif, piocherCarte: piocherCarte, cases: CASES, route: ROUTE, trajet: trajet, decalages: DECALAGES, partie: partie, cartesDuJoueur: cartesDuJoueur, majConstruction: majConstruction,
     // Tests : lancer le dé sans attendre le lancer automatique (il n'y a plus de bouton depuis v4.3).
     lancerDe: function () { lancerDe(partie.regles.de); } };
 })();

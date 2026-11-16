@@ -108,8 +108,18 @@
   try { var lu = JSON.parse(localStorage.getItem(CLE) || 'null'); if (lu) { if (lu.matieres) choix.matieres = lu.matieres; if (lu.niveau) choix.niveau = niveauValide(lu.niveau); if (lu.mode) choix.mode = modeValide(lu.mode); } } catch (e) { /* */ }
   function garder() { try { localStorage.setItem(CLE, JSON.stringify(choix)); } catch (e) { /* */ } }
 
+  // « Modifier les choix » pendant une partie rapide (v9.2, demande du 16/11/2026) : on revient sur cet écran avec les
+  // réglages de la partie ; « Reprendre la partie » les applique dès la carte suivante (aventure, aventurier et points gardés),
+  // « ← Partie » ramène au plateau sans rien changer.
+  function enModif() {
+    var p = window.Aventura && window.Aventura.partie;
+    return !!(p && p.modif && p.regles && p.rapide && !p.rapide.baby);
+  }
+
   // v6.45 : plus de choix du nombre de joueurs (solo) ; niveau ajouté ; « Tout » / « Aucune » à côté du mot « Matières ».
   function page() {
+    var modif = enModif();
+    $('ecran-rapide').querySelector('.btn-retour').innerHTML = '<span aria-hidden="true">←</span> ' + (modif ? 'Partie' : 'Accueil');
     var tout = choix.matieres.length === MATIERES.length;
     // Le titre « Matières » n'est pas une <legend> pour pouvoir mettre le bouton sur la même ligne
     // sans qu'il fasse partie du nom du groupe (aria-labelledby).
@@ -135,7 +145,7 @@
       h += '</div></fieldset>';
     }
     h += '<p class="reglage-alerte" id="rapide-alerte" role="status" aria-live="polite"></p>';
-    h += '<button type="button" class="btn btn-principal" id="btn-lancer-rapide">Lancer la partie</button></section>';
+    h += '<button type="button" class="btn btn-principal" id="btn-lancer-rapide">' + (modif ? 'Reprendre la partie' : 'Lancer la partie') + '</button></section>';
     $('rapide-corps').innerHTML = h;
   }
 
@@ -163,10 +173,30 @@
     }
     if (e.target.closest('#btn-lancer-rapide')) {
       if (!choix.matieres.length) { $('rapide-alerte').textContent = 'Choisis au moins une matière.'; return; }
+      if (enModif()) { window.Aventura.reprendreRapide({ matieres: choix.matieres.slice(), niveau: choix.niveau, mode: choix.mode }); return; }
       window.Aventura.lancerRapide(generer(choix));
     }
   });
   // « Recommencer la partie » en fin de partie rapide (v6.45) passe par js/plateau.js.
   $('btn-rapide').addEventListener('click', function () { window.Aventura.afficher('ecran-rapide'); });
-  document.addEventListener('aventura-ecran', function (e) { if (e.detail === 'ecran-rapide') page(); });
+  // « ← Partie » pendant une modification (v9.2) : écouteur en phase de capture, avant le retour à l'accueil (js/recompenses.js).
+  $('ecran-rapide').addEventListener('click', function (e) {
+    if (!enModif() || !e.target.closest('.btn-retour')) return;
+    e.stopPropagation();
+    window.Aventura.annulerModif();
+  }, true);
+  function ouvrir() {
+    if (enModif()) {
+      var r = window.Aventura.partie.rapide;
+      choix = { matieres: r.matieres.slice(), niveau: niveauValide(r.niveau), mode: modeValide(r.mode) };
+    }
+    page();
+  }
+  document.addEventListener('aventura-ecran', function (e) {
+    if (e.detail !== 'ecran-rapide') return;
+    // Reprise après un rechargement : la partie est rendue avant que window.Aventura n'existe, on attend un instant.
+    if (!window.Aventura) setTimeout(ouvrir, 0); else ouvrir();
+  });
+  // Partie reprise sur cet écran avant que ce fichier ne soit chargé (rechargement pendant « Modifier les choix »).
+  if (!$('ecran-rapide').hidden) ouvrir();
 })(this);

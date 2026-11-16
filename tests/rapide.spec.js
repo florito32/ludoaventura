@@ -171,3 +171,45 @@ test('fin de partie rapide : « Recommencer la partie » et « Retour à l’acc
   await page.waitForFunction(() => window.Aventura && window.Aventura.partie);
   expect(await page.evaluate(() => ({ rapide: window.Aventura.partie.rapide, regles: !!window.Aventura.partie.regles }))).toEqual({ rapide: null, regles: false });
 });
+
+// « Modifier les choix » en cours de partie rapide (v9.2, demande du 16/11/2026) : retour aux réglages de la partie rapide.
+test('partie rapide : « Modifier les choix » revient aux réglages de la partie rapide, « Reprendre la partie » garde l’aventure et les points', async ({ page }) => {
+  test.skip(test.info().project.name !== 'ordinateur' && test.info().project.name !== 'telephone', 'deux formats suffisent');
+  await rapide(page);
+  await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); localStorage.setItem('ludoaventura-rapide-choix', JSON.stringify({ matieres: ['maths'], niveau: 'moyen' })); } catch (e) { /* */ } });
+  await page.goto('./');
+  await page.getByRole('button', { name: 'Partie rapide solo' }).click();
+  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  // Sur ordinateur, une carte est piochée avant de modifier (elle sera repiochée) ; sur téléphone la question
+  // prend tout l'écran (v9.0), on passe par le menu avant de piocher.
+  if (test.info().project.name === 'ordinateur') {
+    await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
+    await page.waitForFunction(() => window.Aventura.partie.carte);
+  }
+  const avant = await page.evaluate(() => { const p = window.Aventura.partie; p.regles.points = 9; return { av: p.aventure.id, perso: p.choix[0] }; });
+  await page.getByRole('button', { name: 'Menu' }).click();
+  await page.getByRole('button', { name: 'Modifier les choix' }).click();
+  await expect(page.locator('#ecran-rapide')).toBeVisible();
+  await expect(page.locator('#ecran-preparation')).toBeHidden();
+  await expect(page.getByRole('radio', { name: 'Moyen' })).toBeChecked();
+  await expect(page.getByRole('checkbox', { name: 'Maths' })).toBeChecked();
+  await expect(page.locator('#ecran-rapide .btn-retour')).toHaveText(/Partie/);
+  // « ← Partie » : retour au plateau sans changement.
+  await page.locator('#ecran-rapide .btn-retour').click();
+  await expect(page.locator('#ecran-plateau')).toBeVisible();
+  expect(await page.evaluate(() => window.Aventura.partie.rapide)).toEqual({ matieres: ['maths'], niveau: 'moyen', mode: 'quiz' });
+  // Modifier : Français, Difficile, puis reprendre.
+  await page.getByRole('button', { name: 'Menu' }).click();
+  await page.getByRole('button', { name: 'Modifier les choix' }).click();
+  await page.getByRole('checkbox', { name: 'Français' }).check();
+  await page.getByRole('checkbox', { name: 'Maths' }).uncheck();
+  await page.getByRole('radio', { name: 'Difficile' }).check();
+  await page.getByRole('button', { name: 'Reprendre la partie' }).click();
+  await expect(page.locator('#ecran-plateau')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Partie rapide' })).toBeVisible();
+  const apres = await page.evaluate(() => { const p = window.Aventura.partie; return { av: p.aventure.id, perso: p.choix[0], pts: p.regles.points, rapide: p.rapide, modif: p.modif }; });
+  expect(apres).toEqual({ av: avant.av, perso: avant.perso, pts: 9, rapide: { matieres: ['francais'], niveau: 'difficile', mode: 'quiz' }, modif: false });
+  // La carte non répondue est repiochée avec les nouveaux réglages.
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
+  expect(await page.evaluate(() => window.Aventura.partie.carte.type)).not.toBe('calcul');
+});

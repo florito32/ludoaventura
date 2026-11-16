@@ -1,4 +1,4 @@
-// Baby jeux (v9.1, demande du 16/11/2026, backlog lignes 355 à 362) : bouton de l'accueil, réglages,
+// Baby jeux (v9.1, demande du 16/11/2026, backlog lignes 355 à 362 ; v9.2 : lignes 368 à 372) : bouton de l'accueil, réglages,
 // 20 petits jeux de lettres et de chiffres joués sur le plateau comme une partie rapide.
 const { test, expect } = require('@playwright/test');
 const B = require('../js/baby.js');
@@ -128,26 +128,58 @@ async function ouvrirBaby(page, choix) {
   await expect(page.getByRole('heading', { name: 'Baby jeux' })).toBeVisible();
 }
 
-test('accueil → Baby jeux : réglages (catégories, lettres, écriture, chiffres, jeux), puis le plateau @smoke', async ({ page }) => {
+// Rien ne dépasse et rien n'est caché sous le bas de l'écran : la page ne défile pas (v9.2).
+async function tientSurUnEcran(page) {
+  return page.evaluate(() => {
+    const h = window.innerHeight, w = window.innerWidth, out = [];
+    if (document.documentElement.scrollHeight > h + 1) out.push('page haute : ' + document.documentElement.scrollHeight + ' > ' + h);
+    if (document.documentElement.scrollWidth > w + 1) out.push('page large');
+    const cadre = document.querySelector('#baby-corps .baby-reglages').getBoundingClientRect();
+    document.querySelectorAll('#ecran-baby button, #ecran-baby label').forEach((e) => {
+      const r = e.getBoundingClientRect(), dedans = !e.closest('.baby-reglages') || (r.bottom <= cadre.bottom + 1 && r.right <= cadre.right + 1);
+      if (r.width && (r.bottom > h + 1 || r.right > w + 1 || !dedans)) out.push((e.id || e.textContent.trim()).slice(0, 20) + ' en dehors');
+    });
+    return out.slice(0, 5);
+  });
+}
+
+test('Baby jeux, page 1 : Lettres OU Chiffres, écriture, lettres ou chiffres ; page 2 : les jeux ; tout tient sur un écran @smoke', async ({ page }) => {
   await ouvrirBaby(page);
-  // Le bouton est sous « Partie rapide solo » et tient dans l'écran.
-  await expect(page.getByRole('checkbox', { name: /Lettres/ })).toBeChecked();
-  await expect(page.getByRole('checkbox', { name: /Chiffres/ })).toBeChecked();
-  await expect(page.locator('input[name="baby-lettre"]')).toHaveCount(26);
-  await expect(page.locator('input[name="baby-chiffre"]')).toHaveCount(10);
+  // Lettres ou Chiffres : boutons radio, un seul choix possible.
+  await expect(page.locator('input[name="baby-cat"]')).toHaveCount(2);
+  await expect(page.locator('input[name="baby-cat"][type="radio"]')).toHaveCount(2);
+  await expect(page.getByRole('radio', { name: /Lettres/ })).toBeChecked();
   await expect(page.locator('input[name="baby-ecriture"]')).toHaveCount(3);
-  await expect(page.locator('input[name="baby-jeu"]')).toHaveCount(20);
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-  // Aucun chiffre : on ne peut pas lancer.
+  await expect(page.locator('input[name="baby-lettre"]')).toHaveCount(26);
+  await expect(page.locator('input[name="baby-chiffre"]')).toHaveCount(0);
+  await expect(page.locator('input[name="baby-jeu"]')).toHaveCount(0);
+  expect(await tientSurUnEcran(page)).toEqual([]);
+  // Les lettres s'affichent dans l'écriture choisie.
+  await page.getByRole('radio', { name: 'Les deux' }).check();
+  await expect(page.locator('.baby-grille.lettres .pack').first()).toHaveText('A a');
+  expect(await tientSurUnEcran(page)).toEqual([]);
+  // Chiffres : l'écriture et les lettres disparaissent, les chiffres 1 à 10 apparaissent.
+  await page.getByRole('radio', { name: /Chiffres/ }).check();
+  await expect(page.getByRole('radio', { name: /Lettres/ })).not.toBeChecked();
+  await expect(page.locator('input[name="baby-ecriture"]')).toHaveCount(0);
+  await expect(page.locator('input[name="baby-lettre"]')).toHaveCount(0);
+  await expect(page.locator('input[name="baby-chiffre"]')).toHaveCount(10);
+  expect(await tientSurUnEcran(page)).toEqual([]);
+  // Aucun chiffre : on ne passe pas aux jeux.
   await page.locator('[data-tout="chiffres"]').click();
-  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await page.getByRole('button', { name: 'Choisir les jeux' }).click();
   await expect(page.locator('#baby-alerte')).toHaveText('Choisis au moins un chiffre.');
   await page.locator('input[name="baby-chiffre"][value="2"]').check();
   await page.locator('input[name="baby-chiffre"][value="3"]').check();
-  // Lettres décochées : leurs réglages disparaissent.
-  await page.getByRole('checkbox', { name: /Lettres/ }).uncheck();
-  await expect(page.locator('input[name="baby-lettre"]')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Choisir les jeux' }).click();
+  // Page 2 : les 10 jeux de chiffres seulement.
   await expect(page.locator('input[name="baby-jeu"]')).toHaveCount(10);
+  await expect(page.getByRole('checkbox', { name: /Attrape le chiffre/ })).toBeVisible();
+  expect(await tientSurUnEcran(page)).toEqual([]);
+  // Retour à la page 1 et de nouveau la page 2.
+  await page.getByRole('button', { name: 'Chiffres', exact: false }).filter({ hasText: '←' }).click();
+  await expect(page.locator('input[name="baby-chiffre"]')).toHaveCount(10);
+  await page.getByRole('button', { name: 'Choisir les jeux' }).click();
   await page.getByRole('button', { name: 'Lancer la partie' }).click();
   await expect(page.getByRole('heading', { name: 'Baby jeux' })).toBeVisible();
   const p = await page.evaluate(() => ({ nb: window.Aventura.partie.joueurs.length, baby: window.Aventura.partie.rapide.baby, diff: window.Aventura.partie.aventure.difficulte }));
@@ -164,16 +196,54 @@ test('accueil → Baby jeux : réglages (catégories, lettres, écriture, chiffr
   expect((await page.evaluate(() => window.Aventura.partie.rapide.baby)).chiffres).toEqual([2, 3]);
 });
 
+// « Modifier les choix » en cours de partie (v9.2) : retour aux réglages de Baby jeux, pas à la préparation de l'aventure.
+test('Baby jeux : « Modifier les choix » revient aux réglages Baby jeux, puis « Reprendre la partie » garde l’aventure et les points', async ({ page }) => {
+  test.skip(test.info().project.name !== 'ordinateur' && test.info().project.name !== 'telephone', 'deux formats suffisent');
+  await ouvrirBaby(page, { categories: ['lettres'], lettres: ['A', 'B'], ecriture: 'maj' });
+  await page.getByRole('button', { name: 'Choisir les jeux' }).click();
+  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await expect(page.getByRole('button', { name: /^(Première question|Question suivante)$/ })).toBeVisible();
+  const avant = await page.evaluate(() => { const p = window.Aventura.partie; p.regles.points = 7; return { av: p.aventure.id, perso: p.choix[0] }; });
+  await page.getByRole('button', { name: 'Menu' }).click();
+  await page.getByRole('button', { name: 'Modifier les choix' }).click();
+  await expect(page.locator('#ecran-baby')).toBeVisible();
+  await expect(page.locator('#ecran-preparation')).toBeHidden();
+  await expect(page.getByRole('radio', { name: /Lettres/ })).toBeChecked();
+  await expect(page.locator('input[name="baby-lettre"]:checked')).toHaveCount(2);
+  await expect(page.locator('#ecran-baby .btn-retour')).toHaveText(/Partie/);
+  // « ← Partie » : retour au plateau, la carte est toujours là.
+  await page.locator('#ecran-baby .btn-retour').click();
+  await expect(page.locator('#ecran-plateau')).toBeVisible();
+  await expect(page.getByRole('button', { name: /^(Première question|Question suivante)$/ })).toBeVisible();
+  // De nouveau : on passe aux chiffres, et on reprend.
+  await page.getByRole('button', { name: 'Menu' }).click();
+  await page.getByRole('button', { name: 'Modifier les choix' }).click();
+  await page.getByRole('radio', { name: /Chiffres/ }).check();
+  // Un rechargement pendant la modification garde la partie.
+  await page.reload();
+  await expect(page.locator('#ecran-baby')).toBeVisible();
+  await expect(page.locator('#ecran-baby .btn-retour')).toHaveText(/Partie/);
+  await page.getByRole('radio', { name: /Chiffres/ }).check();
+  await page.getByRole('button', { name: 'Choisir les jeux' }).click();
+  await page.getByRole('button', { name: 'Reprendre la partie' }).click();
+  await expect(page.locator('#ecran-plateau')).toBeVisible();
+  const apres = await page.evaluate(() => { const p = window.Aventura.partie; return { av: p.aventure.id, perso: p.choix[0], pts: p.regles.points, cat: p.rapide.baby.categories, modif: p.modif }; });
+  expect(apres).toEqual({ av: avant.av, perso: avant.perso, pts: 7, cat: ['chiffres'], modif: false });
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
+  expect(await page.evaluate(() => window.Aventura.partie.carte.cat)).toBe('chiffres');
+});
+
 test('les 20 baby jeux se jouent au toucher, sans déborder, et la bonne réponse donne le dé FORT', async ({ page }) => {
   test.setTimeout(240000);
   await ouvrirBaby(page);
+  await page.getByRole('button', { name: 'Choisir les jeux' }).click();
   await page.getByRole('button', { name: 'Lancer la partie' }).click();
   await expect(page.getByRole('heading', { name: 'Baby jeux' })).toBeVisible();
   for (const id of B.IDS) {
     const suivante = page.getByRole('button', { name: /^(Première question|Question suivante)$/ });
     await expect(page.locator('#fin').or(suivante).first()).toBeVisible();
     if (await page.locator('#fin').isVisible()) await page.getByRole('button', { name: 'Recommencer la partie' }).click();
-    await page.evaluate((x) => { window.Aventura.partie.rapide.baby.jeux = [x]; }, id);
+    await page.evaluate(([x, k]) => { const b = window.Aventura.partie.rapide.baby; b.jeux = [x]; b.categories = [k]; }, [id, B.jeu(id).cat]);
     await suivante.click();
     await expect(page.locator('#carte-gram .baby')).toBeVisible();
     expect(await page.evaluate(() => window.Aventura.partie.carte.jeu)).toBe(id);
@@ -201,6 +271,7 @@ test('les 20 baby jeux se jouent au toucher, sans déborder, et la bonne répons
 test('attrape la lettre : une mauvaise lettre se grise ; 2 erreurs → dé FAIBLE après « J’ai compris »', async ({ page }) => {
   test.skip(test.info().project.name !== 'ordinateur' && test.info().project.name !== 'telephone', 'deux formats suffisent');
   await ouvrirBaby(page, { categories: ['lettres'], lettres: ['L'], ecriture: 'maj', jeux: ['attrape-lettre'] });
+  await page.getByRole('button', { name: 'Choisir les jeux' }).click();
   await page.getByRole('button', { name: 'Lancer la partie' }).click();
   await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   const c = await page.evaluate(() => window.Aventura.partie.carte);
@@ -220,6 +291,7 @@ test('les jetons se baladent (animation) quand l’appareil n’a pas demandé m
   await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); localStorage.setItem('ludoaventura-baby-choix', JSON.stringify({ categories: ['chiffres'], jeux: ['attrape-chiffre'] })); } catch (e) { /* */ } });
   await page.goto('./');
   await page.getByRole('button', { name: 'Baby jeux' }).click();
+  await page.getByRole('button', { name: 'Choisir les jeux' }).click();
   await page.getByRole('button', { name: 'Lancer la partie' }).click();
   await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await expect(page.locator('.baby-modele .baby-de').first()).toBeVisible(); // le dé classique
