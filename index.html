@@ -212,6 +212,15 @@
               <label class="pack"><input type="radio" name="francais" value="phonemes"><span>Phonèmes</span></label>
             </div>
           </div>
+          <!-- v9.0 (demande du 16/11/2026) : Mathématiques → « Calcul mental » ou « Problèmes » (l'un ou l'autre).
+               Les problèmes racontent le calcul tiré avec les mêmes réglages (js/problemes.js). -->
+          <div class="reglage-ligne" id="reglage-type-maths" hidden>
+            <p class="reglage-titre" id="type-maths-titre">En mathématiques :</p>
+            <div class="packs" id="type-maths" role="radiogroup" aria-labelledby="type-maths-titre">
+              <label class="pack"><input type="radio" name="type-maths" value="calcul"><span>Calcul mental</span></label>
+              <label class="pack"><input type="radio" name="type-maths" value="probleme"><span>Problèmes</span></label>
+            </div>
+          </div>
           <!-- Mathématiques : le niveau se choisit tout de suite, sur cet écran (v5.9). Facile = les tables. -->
           <div class="reglage-ligne" id="reglage-niveau-maths" hidden>
             <p class="reglage-titre" id="niveau-maths-titre">Niveau</p>
@@ -477,6 +486,23 @@
                 <input id="reponse-joueur" name="reponse" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done">
                 <button type="submit" class="btn btn-principal" id="btn-valider-reponse">OK</button>
               </div>
+              <!-- v9.0 (demande du 16/11/2026) : pavé numérique pour toute réponse en nombre (maths, « combien de lettres »…) :
+                   plus besoin du clavier du téléphone ni de l'ordinateur (le clavier physique marche toujours). -->
+              <div class="pave" id="pave" hidden>
+                <button type="button" class="touche" data-touche="7">7</button>
+                <button type="button" class="touche" data-touche="8">8</button>
+                <button type="button" class="touche" data-touche="9">9</button>
+                <button type="button" class="touche touche-outil" data-touche="retour" aria-label="Effacer le dernier chiffre"><span aria-hidden="true">⌫</span></button>
+                <button type="button" class="touche" data-touche="4">4</button>
+                <button type="button" class="touche" data-touche="5">5</button>
+                <button type="button" class="touche" data-touche="6">6</button>
+                <button type="button" class="touche touche-outil touche-tout" data-touche="tout" aria-label="Tout effacer"><span aria-hidden="true">C</span></button>
+                <button type="button" class="touche" data-touche="1">1</button>
+                <button type="button" class="touche" data-touche="2">2</button>
+                <button type="button" class="touche" data-touche="3">3</button>
+                <button type="button" class="touche touche-zero" data-touche="0">0</button>
+                <button type="button" class="touche" data-touche="," aria-label="Virgule">,</button>
+              </div>
             </form>
             <div class="carte-correction">
               <p class="carte-reponse" id="carte-reponse" hidden></p>
@@ -651,6 +677,7 @@
 <script src="js/cartes.js"></script>
 <script src="js/questions.js"></script>
 <script src="js/calcul.js"></script>
+<script src="js/problemes.js"></script>
 <script src="js/conjugaison.js"></script>
 <script src="js/grammaire.js"></script>
 <script src="js/phonemes.js"></script>

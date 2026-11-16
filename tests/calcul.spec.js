@@ -223,7 +223,9 @@ test('partie en mathématiques : bonne réponse → dé FORT, mauvaise → corre
   for (const [bonne, min, max] of [[true, 4, 6], [false, 1, 3]]) {
     await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
     await expect(page.locator('#carte-mot')).toHaveText(/^\d+\s[+×]\s\d+\s[+×]\s\d+\s=\s\?$/);
-    await expect(page.getByLabel('Ta réponse')).toBeFocused();
+    // v9.0 : pavé numérique ; sur écran tactile la case n'a plus le curseur (aucun clavier ne s'ouvre).
+    if (!(await page.evaluate(() => matchMedia('(pointer: coarse)').matches))) await expect(page.getByLabel('Ta réponse')).toBeFocused();
+    await expect(page.locator('#pave')).toBeVisible();
     // Plus de boutons « Bonne / Mauvaise réponse » : le jeu corrige.
     await expect(page.getByRole('button', { name: 'Bonne réponse' })).toHaveCount(0);
     const res = await page.evaluate(() => window.Aventura.partie.carte.resultatTexte);
@@ -288,7 +290,7 @@ test('un joueur en mathématiques, l\'autre en orthographe ; « Mêmes réglages
   const p = await page.evaluate(() => window.Aventura.partie);
   for (let k = 1; k < 3; k++) {
     expect(p.matiere[k]).toBe('maths');
-    expect(p.maths[k]).toEqual({ signes: ['plus'], nbSignes: [3, 4], nombres: [1], dizaines: [], centaines: [], milliers: [], niveau: 'expert' });
+    expect(p.maths[k]).toEqual({ type: 'calcul', signes: ['plus'], nbSignes: [3, 4], nombres: [1], dizaines: [], centaines: [], milliers: [], niveau: 'expert' });
   }
 });
 

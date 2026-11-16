@@ -83,7 +83,8 @@
   }
   // Séries de mots piochées à chaque niveau d'orthographe (v6.50) : les mêmes que la partie rapide et les défis.
   function motsDuNiveau(niveau) { return (window.Defis.ORTHO[niveau] || window.Defis.ORTHO.facile).mots.slice(); }
-  function mathsVides() { return { signes: [], nbSignes: [1], nombres: [], dizaines: [], centaines: [], milliers: [], niveau: 'facile' }; }
+  // type (v9.0) : 'calcul' (calcul mental) ou 'probleme' (le calcul raconté comme un problème, js/problemes.js).
+  function mathsVides() { return { type: 'calcul', signes: [], nbSignes: [1], nombres: [], dizaines: [], centaines: [], milliers: [], niveau: 'facile' }; }
   function conjVide() { return { modes: [], temps: [], groupes: [], niveau: 'facile' }; }
   // Grammaire (v6.54) : niveau et petits jeux, tous cochés au départ (hypothèse à valider).
   function gramVide() { return { niveau: 'facile', jeux: TOUS_JEUX.slice() }; }
@@ -144,6 +145,7 @@
     if (id !== 'ecran-accueil') quitter = false;
     if (id !== 'ecran-accueil') armerRetour(navigator.userActivation ? navigator.userActivation.isActive : true);
     document.querySelectorAll('.ecran').forEach(function (s) { s.hidden = s.id !== id; });
+    if (id !== 'ecran-plateau') document.body.classList.remove('question-plein'); // v9.0
     // Écran affiché : js/recompenses.js remplit les écrans des étoiles et met l'accueil à jour (v6.36).
     document.dispatchEvent(new CustomEvent('aventura-ecran', { detail: id }));
     var titre = $(id).querySelector('h1, h2');
@@ -267,6 +269,11 @@
       });
     });
     K.NIVEAUX.forEach(function (nv) { choix($('niveau-maths'), 'radio', 'niveau-maths', nv.id, nv.nom); });
+    // v9.0 : « Calcul mental » ou « Problèmes » (l'un ou l'autre, choix de l'utilisateur).
+    $('type-maths').addEventListener('change', function () {
+      partie.maths[partie.actif].type = valeursCochees($('type-maths'))[0] || 'calcul';
+      majAventuriers();
+    });
     // Conjugaison : temps rangés par mode (une ligne par mode), groupes de verbes, niveau.
     // Les modes d'abord : seuls les temps des modes choisis apparaissent dessous.
     V.MODES.forEach(function (m) { choix($('modes-conj'), 'checkbox', 'mode-conj', m.id, m.nom); });
@@ -754,6 +761,8 @@
     $('reglage-francais').hidden = !fr;
     $('reglages-maths').hidden = mat !== 'maths';
     $('reglage-niveau-maths').hidden = mat !== 'maths';
+    $('reglage-type-maths').hidden = mat !== 'maths';
+    $('type-maths').querySelectorAll('input').forEach(function (i) { i.checked = i.value === (partie.maths[a].type || 'calcul'); });
     // Niveau de calcul : une phrase d'aide sous les choix ; au niveau Facile, les nombres deviennent des tables.
     var nvm = partie.maths[a].niveau;
     // v6.14 : le niveau décide des groupes de nombres et des nombres de signes proposés.
@@ -942,6 +951,12 @@
     if (mat === 'maths') {
       var m = mr, f = K.generer(m);
       f.type = 'calcul';
+      // v9.0 : problème = le même calcul, raconté sur un thème tiré au hasard (même réponse).
+      if (m.type === 'probleme' && window.Problemes) {
+        window.Problemes.habiller(f);
+        f.packNom = 'Problème · ' + K.niveau(m.niveau).nom;
+        return f;
+      }
       f.packNom = 'Calcul · ' + K.niveau(m.niveau).nom + (f.table ? ' · table de ' + f.table : '');
       return f;
     }
@@ -1318,7 +1333,8 @@
         montrerCarte(j);
         rendre();
         // Calcul : le curseur est mis dans la case de réponse (sans faire défiler la page).
-        if (aSaisir(partie.carte)) $('reponse-joueur').focus({ preventScroll: true });
+        // v9.0 : avec le pavé numérique sur écran tactile, pas de curseur (aucun clavier ne doit s'ouvrir).
+        if (aSaisir(partie.carte) && !($('pave').hidden === false && tactile.matches)) $('reponse-joueur').focus({ preventScroll: true });
         // Dictée (v6.31) : le mot est caché, la voix le lit tout de suite (« Écouter » le relit).
         var q = partie.carte.question;
         if (q && q.dictee) window.Voix.lire(window.Voix.texteCarte(partie.carte));
@@ -1382,6 +1398,7 @@
       annoncer(gain + ' ' + suite);
       bandeau(gain + ' ' + suite);
     }
+    majPlein(); // v9.0 : question en plein écran sur téléphone et tablette
     ajusterTour();
     sauver();
   }
@@ -1518,6 +1535,7 @@
     var corrigee = c.reponseDonnee != null;
     saisie.hidden = corrigee;
     champ.setAttribute('inputmode', q.saisie === 'nombre' ? 'numeric' : 'text');
+    pave(q.saisie === 'nombre' && !q.lettres); // v9.0 : réponse en nombre → pavé numérique
     champ.value = corrigee ? c.reponseDonnee : '';
     champ.disabled = corrigee;
     $('btn-valider-reponse').disabled = corrigee;
@@ -1570,6 +1588,13 @@
       $('carte-consigne').innerHTML = 'Conjugue <strong>' + c.verbe + '</strong> <span class="temps-carte">' + c.mode + ' · ' + c.tempsNom.toLowerCase() + '</span>';
       mot.className = 'carte-mot conj';
       mot.textContent = c.pronom + ' …';
+    } else if (c.probleme) {
+      // v9.0 : problème : l'énoncé seul (la formule n'apparaît qu'à la correction).
+      $('carte-consigne').innerHTML = '<span class="probleme-theme">' + c.theme + '</span> ' + c.probleme;
+      $('carte-consigne').className = 'carte-consigne probleme';
+      mot.className = 'carte-mot calcul';
+      mot.hidden = true;
+      mot.textContent = '';
     } else {
       $('carte-consigne').textContent = 'Combien font :';
       mot.className = 'carte-mot calcul';
@@ -1582,6 +1607,7 @@
     // Une fois la réponse corrigée, la case disparaît : la correction rappelle ce qui a été écrit (v6.2, gain de place).
     saisie.hidden = c.reponseDonnee != null;
     champ.setAttribute('inputmode', conj ? 'text' : 'decimal');
+    pave(!conj); // v9.0 : pavé numérique pour le calcul et les problèmes
     var corrigee = c.reponseDonnee != null;
     champ.value = corrigee ? c.reponseDonnee : '';
     champ.disabled = corrigee;
@@ -1606,6 +1632,10 @@
             return '<li' + (l.personne === c.personne ? ' class="demande"' : '') + '>' + l.texte + '</li>';
           }).join('');
         }
+      } else if (c.probleme) {
+        // Problème : la correction donne la réponse et le calcul qui y mène.
+        rep.textContent = c.juste ? 'Bonne réponse ! ' + c.resultatTexte + ' (' + c.formule + ' = ' + c.resultatTexte + ')'
+          : 'Ce n\u2019est pas ça (tu as écrit « ' + c.reponseDonnee + ' »). La bonne réponse est ' + c.resultatTexte + ' : ' + c.formule + ' = ' + c.resultatTexte + '.';
       } else {
         rep.textContent = c.juste ? 'Bonne réponse ! ' + c.formule + ' = ' + c.resultatTexte
           : 'Ce n\u2019est pas ça (tu as écrit « ' + c.reponseDonnee + ' »). La bonne réponse est ' + c.formule + ' = ' + c.resultatTexte + '.';
@@ -1678,6 +1708,7 @@
       $('carte-saisie').hidden = fait;
       champ.setAttribute('inputmode', 'text');
       champ.setAttribute('autocapitalize', 'words');
+      pave(attenduNombre(c)); // v9.0 : une année, un nombre → pavé numérique
       champ.value = fait ? c.reponseDonnee : '';
       champ.disabled = fait;
       $('btn-valider-reponse').disabled = fait;
@@ -1735,6 +1766,8 @@
     $('carte-lettres').hidden = true;
     $('carte-gram').hidden = true;
     $('carte-mot').hidden = false;
+    $('carte-consigne').className = 'carte-consigne';
+    pave(false);
     $('reponse-joueur').setAttribute('autocapitalize', 'off');
     $('carte-savoir').hidden = true;
     if (estCarteSavoir(c)) { $('carte-titre').textContent = c.packNom; montrerSavoir(c); return; }
@@ -1930,6 +1963,17 @@
 
   function brancherCarte() {
     $('carte-saisie').addEventListener('submit', validerSaisie);
+    // v9.0 : pavé numérique (chiffres, virgule, ⌫ dernier chiffre, C tout effacer).
+    $('pave').addEventListener('click', function (e) {
+      var b = e.target.closest('.touche'), champ = $('reponse-joueur');
+      if (!b || champ.disabled) return;
+      champ.value = touchePave(champ.value, b.dataset.touche);
+      champ.removeAttribute('aria-invalid');
+      var rep = $('carte-reponse');
+      if (rep.classList.contains('alerte')) rep.hidden = true; // « Écris ta réponse… » disparaît dès qu'on tape
+      // Ordinateur : le curseur reste dans la case (le clavier physique marche aussi). Écran tactile : pas de curseur.
+      if (!window.matchMedia('(pointer: coarse)').matches) champ.focus({ preventScroll: true });
+    });
     // Mot mélangé (v6.52) : lettres à toucher.
     $('lettres-melangees').addEventListener('click', function (e) {
       var b = e.target.closest('.lettre-tuile'); if (b) poserLettre(Number(b.dataset.t));
@@ -1977,10 +2021,51 @@
     table.classList.remove('tour-monte');
     if (deEnCours || $('ecran-plateau').hidden) return; // tous les écrans depuis la v6.8
     if (document.body.classList.contains('saisie-clavier')) return; // la carte occupe déjà tout l'écran visible (v6.13)
+    if (document.body.classList.contains('question-plein')) return; // v9.0 : la question occupe déjà tout l'écran
     if (tour.scrollHeight > tour.clientHeight + 1) table.classList.add('tour-monte');
   }
   window.addEventListener('resize', ajusterTour);
   window.addEventListener('resize', degagerDe);
+
+  // ---------- Pavé numérique (v9.0, demande du 16/11/2026) ----------
+  // Toute réponse en nombre se tape sur le pavé de la carte : plus besoin du clavier du téléphone ni de l'ordinateur.
+  // Sur écran tactile, la case ne fait plus apparaître le clavier du système (inputmode="none", Safari iOS 13 et plus,
+  // Chrome Android) ; sur ordinateur, le clavier physique reste utilisable.
+  function pave(oui) {
+    $('pave').hidden = !oui;
+    $('carte-saisie').classList.toggle('avec-pave', !!oui);
+    if (oui && window.matchMedia('(pointer: coarse)').matches) $('reponse-joueur').setAttribute('inputmode', 'none');
+  }
+  // Une touche appliquée à la réponse en cours : « 0 » de tête remplacé, une seule virgule, 12 caractères au plus.
+  function touchePave(v, t) {
+    v = v || '';
+    if (t === 'retour') return v.slice(0, -1);
+    if (t === 'tout') return '';
+    if (t === ',') return /[.,]/.test(v) ? v : (v || '0') + ',';
+    if (v.length >= 12) return v;
+    return v === '0' ? t : v + t;
+  }
+  // Question ouverte (Géographie, Histoire) dont la réponse est un nombre (une année…).
+  function attenduNombre(c) {
+    return String(c.attendu).split('|').every(function (a) { return /^\d+([.,]\d+)?$/.test(a.trim()); });
+  }
+
+  // ---------- Question en plein écran sur téléphone et tablette (v9.0, demande du 16/11/2026) ----------
+  // Dès qu'une question apparaît, elle prend tout l'écran (plus de plateau) ; la correction reste en plein écran,
+  // le plateau revient quand le dé se lance (choix de l'utilisateur). L'ordinateur garde le plateau à côté.
+  var ecranPlein = window.matchMedia('(pointer: coarse), (max-width: 899px)');
+  function majPlein() {
+    var r = partie.regles, c = partie.carte;
+    var question = !!(r && c && !$('ecran-plateau').hidden && !$('carte-piochee').hidden &&
+      (r.etape === 'repondre' || (r.etape === 'lancer' && !partie.roule) || ((r.etape === 'suivant' || r.etape === 'fin') && c.attente)));
+    var oui = question && ecranPlein.matches;
+    if (oui === document.body.classList.contains('question-plein')) return;
+    document.body.classList.toggle('question-plein', oui);
+    var table = document.querySelector('.table');
+    if (oui && table) table.classList.remove('tour-monte');
+    if (!oui) ajusterTour();
+  }
+  if (ecranPlein.addEventListener) ecranPlein.addEventListener('change', majPlein);
 
   // ---------- Saisie au clavier sur écran tactile (v6.13, lignes 106-107 du backlog) ----------
   // Quand le joueur écrit sa réponse, le clavier du téléphone couvre une bonne partie de l'écran.
@@ -2081,6 +2166,7 @@
     if (r.etape !== 'lancer' || r.de !== type || partie.roule) return;
     clearTimeout(minuteurDe); minuteurDe = null; // lancé (par les tests) avant le lancer automatique
     partie.roule = true;
+    majPlein(); // v9.0 : le plateau revient pour le dé
     $('tour-actions').innerHTML = '';
     var v = window.Des.lancer(type);
     var faces = window.Des.FACES[type];

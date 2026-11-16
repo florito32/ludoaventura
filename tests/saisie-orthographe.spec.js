@@ -74,7 +74,9 @@ test('voyelles : bonne réponse écrite → « Bonne réponse », le dé FORT se
 
 test('nombre de syllabes faux → correction avec le découpage, « J’ai compris » lance le dé FAIBLE', async ({ page }) => {
   const mot = await partieAvec(page, ['syllabes']);
-  await expect(page.locator('#reponse-joueur')).toHaveAttribute('inputmode', 'numeric');
+  // v9.0 : réponse en nombre → pavé numérique ; sur écran tactile, la case ne demande plus le clavier du téléphone.
+  await expect(page.locator('#reponse-joueur')).toHaveAttribute('inputmode', /^(numeric|none)$/);
+  await expect(page.locator('#pave')).toBeVisible();
   const n = C.INFOS[mot].syllabes.split(/[\s-]+/).filter((m) => /\p{L}/u.test(m)).length;
   await page.getByLabel('Ta réponse').fill(String(n + 1));
   await page.getByRole('button', { name: 'OK', exact: true }).click();
