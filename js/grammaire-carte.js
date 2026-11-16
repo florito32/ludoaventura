@@ -17,7 +17,10 @@
 
   var G = racine.Grammaire;
   // Moteur de la carte : phonèmes ou grammaire (v7.3).
-  function moteur(c) { return c && c.module === 'phonemes' ? racine.Phonemes : G; }
+  // Baby jeux (v8.11) : contenu dans js/baby.js, dessin et gestes propres dans js/baby-carte.js.
+  function moteur(c) { return c && c.module === 'phonemes' ? racine.Phonemes : c && c.module === 'baby' ? racine.Baby : G; }
+  // « Relier » : le jeu de grammaire et de phonèmes, et les baby jeux qui relient (grandes / petites lettres, dés / chiffres).
+  function estRelier(c) { return !!c && (c.jeu === 'relier' || c.meca === 'relier'); }
   // Symbole d'un son entre crochets et son mot d'exemple (lettres du son en gras), pour les boutons.
   // mode 'plat' : mot d'exemple sans les lettres en gras (elles donneraient la réponse dans « Quel son ? ») ;
   // mode 'seul' : le symbole seul (« Relier son ↔ écriture » : le mot montrerait l'écriture à relier).
@@ -54,7 +57,8 @@
     var h = '';
     boite.dataset.jeu = c.jeu;
     boite.dataset.module = c.module || 'grammaire';
-    if (c.module === 'phonemes') h += phonemes(c, fait);
+    if (c.module === 'baby') h += racine.BabyCarte.html(c, fait, { boutons: boutons, relier: relier });
+    else if (c.module === 'phonemes') h += phonemes(c, fait);
     else if (c.jeu === 'contraires') {
       h += '<p class="gram-mot">' + echapper(c.mot) + '</p>' + boutons(c, c.choix, fait);
     } else if (c.jeu === 'homophones') {
@@ -80,6 +84,11 @@
     }
     boite.innerHTML = h;
     traits();
+    // Baby jeux : la consigne est lue une fois toute seule à l'arrivée de la carte (les petits ne lisent pas encore).
+    if (c.module === 'baby' && !fait && !c.consigneLue && racine.Voix && racine.Voix.disponible()) {
+      c.consigneLue = true;
+      setTimeout(function () { if (rappels.carte() === c) racine.Voix.lire(c.oral); }, 300);
+    }
   }
 
   // ---------- Phonèmes (v7.3) ----------
@@ -210,7 +219,7 @@
     if (!boite || boite.hidden) return;
     var zone = boite.querySelector('.gram-relier'), svg = boite.querySelector('.gram-traits');
     var c = rappels && rappels.carte();
-    if (!zone || !svg || !c || c.jeu !== 'relier') return;
+    if (!zone || !svg || !c || !estRelier(c)) return;
     var z = zone.getBoundingClientRect();
     if (!z.width) return;
     svg.setAttribute('viewBox', '0 0 ' + z.width + ' ' + z.height);
@@ -236,6 +245,7 @@
     if (!c || c.type !== 'grammaire' || c.reponseDonnee != null || !actif()) return;
     var b;
     if ((b = e.target.closest('.gram-bouton'))) { repondre(c, b.dataset.v, texteChoix(c, b.dataset.v)); return; }
+    if (c.module === 'baby' && racine.BabyCarte.toucher(c, e, outilsBaby(c))) return;
     if (c.module === 'phonemes' && c.jeu === 'trier') { trierToucher(c, e); return; }
     if (c.jeu === 'erreur' && (b = e.target.closest('.gram-bulle'))) { var k = Number(b.dataset.k); repondre(c, k, c.mots[k]); return; }
     if (c.jeu === 'phrase') {
@@ -243,7 +253,25 @@
       if ((b = e.target.closest('.gram-bulle[data-p]'))) { retirer(c, Number(b.dataset.p)); return; }
       if (e.target.closest('.gram-remettre')) { c.placees = []; afficher(c); focus('.gram-bulle[data-t]'); rappels.sauver(); return; }
     }
-    if (c.jeu === 'relier' && (b = e.target.closest('.gram-mot-relier'))) { relierMot(c, b.dataset.cote, Number(b.dataset.i)); }
+    if (estRelier(c) && (b = e.target.closest('.gram-mot-relier'))) { relierMot(c, b.dataset.cote, Number(b.dataset.i)); }
+  }
+  // Outils donnés aux gestes des baby jeux : redessiner, répondre, sauver, et corriger après une courte pause
+  // (le temps de voir le dernier geste), comme « Remettre la phrase ».
+  function outilsBaby(c) {
+    return {
+      afficher: function () { afficher(c); },
+      repondre: function (reponse, texte) { repondre(c, reponse, texte); },
+      sauver: function () { rappels.sauver(); },
+      focus: focus,
+      attendre: function (fn) {
+        enCorrection = true;
+        setTimeout(function () {
+          enCorrection = false;
+          if (rappels.carte() !== c || c.reponseDonnee != null) return;
+          fn();
+        }, 450);
+      }
+    };
   }
   // Texte de la réponse choisie, pour la correction (« tu as choisi … »).
   function texteChoix(c, v) {
@@ -253,6 +281,7 @@
       if (c.jeu === 'position') return P.nomPosition(v);
       return v;
     }
+    if (c.module === 'baby' && c.jeu === 'plus') return 'le panier de ' + (v === 'g' ? 'gauche' : 'droite');
     return c.jeu === 'nature' ? G.NATURES[v] : v;
   }
 

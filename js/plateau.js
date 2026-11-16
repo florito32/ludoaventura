@@ -936,6 +936,12 @@
     var mat = partie.matiere[j.index], mr = partie.maths[j.index], cr = partie.conj[j.index], gr = partie.gram[j.index];
     // Partie rapide (v6.43) : chaque carte tire sa matière parmi celles choisies, avec des réglages du niveau
     // choisi (v6.45) tirés pour cette carte (orthographe : thèmes, mots et questions du niveau, déjà dans le tas du joueur).
+    // Baby jeux (v8.11) : chaque carte est un petit jeu de lettres ou de chiffres (js/baby.js), tiré parmi ceux cochés.
+    if (partie.rapide && partie.rapide.baby && window.Baby) {
+      var bc = window.Baby.carte(partie.rapide.baby, Math.random, j.babyDernier);
+      j.babyDernier = bc.jeu;
+      return bc;
+    }
     if (partie.rapide && window.Rapide) {
       var t = window.Rapide.carte(partie.rapide.matieres, partie.rapide.niveau, null, partie.rapide.mode);
       mat = t.matiere; if (t.maths) mr = t.maths; if (t.conj) cr = t.conj; if (t.gram) gr = t.gram;
@@ -1124,7 +1130,7 @@
     $('rouleau-img').alt = 'Aventure ' + av.nom;
     $('rouleau-nom').textContent = av.nom;
     // Défi du jour (v6.37) : le titre du plateau le rappelle.
-    $('titre-plateau').textContent = partie.defi ? (partie.defi.type === 'solo' ? 'Défi solo du jour' : 'Défi en équipe du jour') : partie.rapide ? 'Partie rapide' : 'Le plateau';
+    $('titre-plateau').textContent = partie.defi ? (partie.defi.type === 'solo' ? 'Défi solo du jour' : 'Défi en équipe du jour') : partie.rapide ? (partie.rapide.baby ? 'Baby jeux' : 'Partie rapide') : 'Le plateau';
     $('titre-points').textContent = av.objet.titre; // « Pierres taillées » plutôt que « Points de l'équipe »
     $('objectif').textContent = partie.objectif;
     $('objectif-texte').textContent = libelleObjectif(av, partie.nbJoueurs);
@@ -1480,7 +1486,7 @@
   // Carte de grammaire (v6.54) : réponse touchée dans la carte (js/grammaire-carte.js), corrigée par le jeu.
   function estGram(c) { return !!(c && c.type === 'grammaire'); }
   // Moteur d'une telle carte : la grammaire, ou les phonèmes (v7.3, même affichage, mêmes gestes).
-  function moduleGram(c) { return c && c.module === 'phonemes' ? PH : G; }
+  function moduleGram(c) { return c && c.module === 'phonemes' ? PH : c && c.module === 'baby' ? window.Baby : G; }
 
   function montrerGram(c) {
     $('carte-titre').textContent = c.packNom;
@@ -1498,6 +1504,8 @@
     rep.hidden = false;
     rep.className = 'carte-reponse ' + (c.juste ? 'juste' : 'fausse');
     var sol = moduleGram(c).solution(c);
+    // Baby jeux (v8.11) : correction courte et douce (jamais « tu as choisi … »).
+    if (c.module === 'baby') { rep.textContent = (c.juste ? 'Bravo ! ' : 'Presque ! ') + sol; return; }
     if (c.jeu === 'relier' || c.jeu === 'trier') {
       rep.textContent = c.juste ? 'Bonne réponse ! ' + (c.jeu === 'trier' ? 'Tous les mots sont bien rangés.' : 'Toutes les paires sont justes.')
         : 'Ce n\u2019est pas ça : ' + c.reponseDonnee + '. ' + (c.jeu === 'trier' ? 'Les bonnes colonnes : ' : 'Les bonnes paires : ') + sol;
@@ -2287,6 +2295,7 @@
       partie.gram[i] = R2.gramTout(d.niveau); // v6.55
     }
     partie.rapide = { matieres: d.matieres.slice(), niveau: d.niveau, mode: d.mode || 'quiz' };
+    if (d.baby) partie.rapide.baby = d.baby; // Baby jeux (v8.11) : réglages de js/baby-ecran.js
     partie.etapePrepa = 4; partie.sousEtape = 'matiere'; partie.actif = 0;
     majDetail(); majAventuriers();
     lancerPartie();
@@ -2325,7 +2334,7 @@
   // sessionStorage : « survit aux rechargements et restaurations de la page ; fermer l'onglet efface les données »
   // (MDN, Window.sessionStorage). Les objets (aventure, aventuriers, questions) sont enregistrés par leur identifiant.
   var CLE = 'ludoaventura-partie';
-  var PAGES_ACCUEIL = ['ecran-etoiles', 'ecran-progression', 'ecran-defi', 'ecran-rapide']; // écrans ouverts depuis l'accueil (v6.36)
+  var PAGES_ACCUEIL = ['ecran-etoiles', 'ecran-progression', 'ecran-defi', 'ecran-rapide', 'ecran-baby']; // écrans ouverts depuis l'accueil (v6.36)
   var pretASauver = false; // pas de sauvegarde pendant la construction initiale de la page
 
   function carteVersDonnees(c) {

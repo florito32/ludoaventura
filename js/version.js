@@ -4,9 +4,15 @@
 (function () {
   'use strict';
 
-  var VERSION = '9.0';
+  var VERSION = '9.1';
 
   var HISTORY = [
+    { v: '9.1', date: '2026-11-16', changes: [
+      "Nouveau bouton « Baby jeux » sur l’accueil : 20 petits jeux pour les tout-petits, joués sur le plateau comme une partie rapide (aventure, dés, étoiles).",
+      "Lettres : Attrape la lettre (les lettres se baladent), Grandes et petites, L’alphabet dans l’ordre, La lettre qui manque, J’entends la lettre, La première lettre, Voyelle ou consonne, La fabrique à mots (la voix lit le mot fabriqué), Les syllabes, Un son et ses écritures (IN, AIN, UN…).",
+      "Chiffres : Attrape le chiffre (avec un dé), Compte les objets, Du plus petit au plus grand, Le chiffre qui manque, Où y en a-t-il le plus ?, Les doigts, Relier dés et chiffres, Les bulles, J’entends le chiffre, Encore un !",
+      "On choisit les lettres et les chiffres (1 à 10) travaillés, l’écriture (majuscules, minuscules ou les deux) et les jeux ; la consigne est lue à voix haute."
+    ] },
     { v: '9.0', date: '2026-11-16', changes: [
       "Mathématiques : deux choix, « Calcul mental » ou « Problèmes ». Un problème raconte le calcul tiré avec tes réglages habituels (niveau, signes, nombres), sur un thème tiré au hasard parmi 58 (château fort, ruche, épave, vaisseau spatial…).",
       "Pavé numérique à l’écran pour toute réponse en nombre (chiffres, virgule, ⌫ pour effacer le dernier chiffre, C pour tout effacer, OK) : plus besoin du clavier du téléphone ni de l’ordinateur.",
