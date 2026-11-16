@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '8.8';
+  var VERSION = '8.9';
 
   var HISTORY = [
+    { v: '8.9', date: '2026-11-16', changes: [
+      "Histoire, Révolution et XIXe siècle : les 9 petits jeux sont regroupés en 3, avec environ 38 à 48 questions par niveau chacun, jouables en Quiz et en Normal — Révolution, Napoléon et République (avec les symboles de la République, les régimes et les grandes lois) ; Industrie, inventions et monuments ; Arts et lettres du XIXe (écrivains, peintres, compositeurs)."
+    ] },
     { v: '8.8', date: '2026-11-15', changes: [
       "Histoire, Temps modernes : les 4 petits jeux sont regroupés en 2, avec environ 36 à 48 questions par niveau chacun, jouables en Quiz et en Normal — Louis XIV et son temps (Louis XIII, Louis XIV, Louis XV, Louis XVI, Nouvelle-France, frise) ; Écrivains et Lumières (écrivains classiques, fables et contes, philosophes et savants des Lumières)."
     ] },

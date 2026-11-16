@@ -1,7 +1,7 @@
 // Histoire (v7.1) : la matière Histoire, rangée par périodes (BACKLOG lignes 270 et 275).
 // Choix de l'utilisateur du 12/11/2026 : 7 périodes, 51 jeux, 4 niveaux, et chaque niveau n'a QUE son
 // propre contenu (Expert = seulement du contenu expert). Livraison par période : l'Antiquité d'abord (12
-// jeux, regroupés en 6 en v8.4), puis la Préhistoire (v7.6, 5 jeux), le Moyen Âge (v7.7, 8 jeux, regroupés en 3 en v8.5), la Renaissance (v7.8, 6 jeux, regroupés en 2 en v8.7), les Temps modernes (v7.9, 4 jeux, regroupés en 2 en v8.8), la Révolution et le XIXe siècle (v7.10, 9 jeux) et le XXe siècle (v7.11, 7 jeux).
+// jeux, regroupés en 6 en v8.4), puis la Préhistoire (v7.6, 5 jeux), le Moyen Âge (v7.7, 8 jeux, regroupés en 3 en v8.5), la Renaissance (v7.8, 6 jeux, regroupés en 2 en v8.7), les Temps modernes (v7.9, 4 jeux, regroupés en 2 en v8.8), la Révolution et le XIXe siècle (v7.10, 9 jeux, regroupés en 3 en v8.9) et le XXe siècle (v7.11, 7 jeux).
 // Format des séries : voir js/savoirs.js. « A|B » = A s'affiche, B est aussi accepté en question ouverte.
 (function (racine) {
   'use strict';
@@ -1841,208 +1841,408 @@
             ['Émile', 1], ['Du contrat social', 1], ['Les Confessions', 1], ['Julie ou la Nouvelle Héloïse', 1], ['Les Rêveries du promeneur solitaire', 1]] }]
       } }
     ] },
-    // ---------- Révolution et XIXe siècle (v7.10, BACKLOG ligne 295 : 9 jeux, hypothèse à valider) ----------
-    { id: 'x01', matiere: 'histoire', famille: 'xix', nom: 'La Révolution française', court: 'Révolution', icone: '🏰', series: [
-      { k: 'ordre', consigne: 'Range ces événements de la Révolution du plus ancien au plus récent.', q: 'En quelle année : {a} ?', niveaux: {
-        facile: [['Prise de la Bastille', 1789, '1789'], ['Proclamation de la République', 1792, '1792'], ['Exécution de Louis XVI', 1793, '1793'],
-          ['Bonaparte prend le pouvoir', 1799, '1799']],
-        moyen: [['Le roi en fuite est arrêté à Varennes', 1791, '1791'], ['Exécution de Marie-Antoinette', 1793, '1793'], ['Chute de Robespierre', 1794, '1794'],
-          ['Début du Directoire', 1795, '1795'], ['Bonaparte part en Égypte', 1798, '1798']],
-        difficile: [['Serment du Jeu de paume', 1789, '1789'], ['Fête de la Fédération', 1790, '1790'], ['Victoire de Valmy', 1792, '1792'],
-          ['Loi des suspects : début de la Terreur', 1793, '1793'], ['Coup d’État du 18 Brumaire', 1799, '1799']],
-        expert: [['Abolition des privilèges, la nuit du 4 août', 1789, '1789'], ['Constitution civile du clergé', 1790, '1790'], ['Première Constitution écrite de la France', 1791, '1791'],
-          ['La France déclare la guerre à l’Autriche', 1792, '1792'], ['Première abolition de l’esclavage', 1794, '1794'], ['Loi qui crée le mètre et le gramme', 1795, '1795']]
+    // ---------- Révolution et XIXe siècle (v7.10 ; v8.9 : 9 jeux regroupés en 3, choix de l'utilisateur du 13/11/2026, BACKLOG lignes 331 et 334) ----------
+    // Révolution, Napoléon et République = anciens « La Révolution française » + « Symboles de la République » + « Napoléon » + « Les régimes politiques » + « Grandes lois » ;
+    // Industrie, inventions et monuments = anciens « Inventions de la révolution industrielle » + « Monuments du XIXe siècle » ;
+    // Arts et lettres du XIXe = anciens « Écrivains du XIXe siècle » + « Peintres impressionnistes » (+ compositeurs et sculpteurs).
+    { id: 'x01', matiere: 'histoire', famille: 'xix', nom: 'Révolution, Napoléon et République', court: 'Révolution', icone: '🇫🇷', series: [
+      { k: 'paires', gauche: 'Personnage', droite: 'Son rôle', consigneR: 'Relie chaque personnage à son rôle.', q: 'Quel est le rôle de {a} ?', qi: 'Qui est-ce : {b} ?', ouverte: false, niveaux: {
+        facile: [['Louis XVI', 'Roi guillotiné en 1793'], ['Napoléon Ier', 'Empereur des Français sacré en 1804'], ['Jules Ferry', 'Rend l’école gratuite et obligatoire'],
+          ['Victor Schœlcher', 'Fait abolir l’esclavage en 1848'], ['Rouget de Lisle', 'Compose La Marseillaise'], ['Marie-Antoinette', 'Reine guillotinée en 1793']],
+        moyen: [['Robespierre', 'Révolutionnaire surnommé « l’Incorruptible »'], ['Marat', 'Journaliste tué dans sa baignoire en 1793'], ['La Fayette', 'Commande la garde nationale de Paris en 1789'],
+          ['Joséphine de Beauharnais', 'Première épouse de Napoléon'], ['Louis-Philippe', 'Roi des Français de 1830 à 1848'], ['Napoléon III', 'Dernier empereur des Français']],
+        difficile: [['Charlotte Corday', 'Poignarde Marat en 1793'], ['Olympe de Gouges', 'Écrit la Déclaration des droits de la femme'], ['Louis XVIII', 'Frère de Louis XVI, roi en 1814'],
+          ['Charles X', 'Dernier roi sacré à Reims, en 1825'], ['Danton', 'Grand orateur, guillotiné en avril 1794'], ['Gambetta', 'Quitte Paris assiégé en ballon, en 1870']],
+        expert: [['Sieyès', 'Écrit « Qu’est-ce que le tiers état ? »'], ['Saint-Just', 'Ami de Robespierre, guillotiné avec lui'], ['Talleyrand', 'Ministre des Relations extérieures de Napoléon'],
+          ['Fouché', 'Ministre de la Police de Napoléon'], ['Cambacérès', 'Deuxième consul, a travaillé au Code civil'], ['Mac Mahon', 'Maréchal, président de la République de 1873 à 1879']]
       } },
-      { k: 'qcm', niveaux: {
-        facile: [['Quelle prison le peuple de Paris prend-il le 14 juillet 1789 ?', 'La Bastille', ['Le Louvre', 'Versailles']],
-          ['Quel roi est exécuté en 1793 ?', 'Louis XVI', ['Louis XIV', 'Henri IV']]],
-        moyen: [['Où le roi est-il arrêté pendant sa fuite, en 1791 ?', 'À Varennes', ['À Versailles', 'À Reims', 'À Marseille']],
-          ['Quel texte de 1789 dit que les hommes naissent libres et égaux en droits ?', 'La Déclaration des droits de l’homme', ['Le Code civil', 'L’édit de Nantes', 'La Marseillaise']]],
-        difficile: [['Comment appelle-t-on la période de 1793-1794 où beaucoup d’opposants sont guillotinés ?', 'La Terreur', ['La Fronde', 'La Restauration', 'Le Directoire', 'La Commune']],
-          ['Quel révolutionnaire est surnommé « l’Incorruptible » ?', 'Robespierre', ['Danton', 'Marat', 'Mirabeau', 'La Fayette']]],
-        expert: [['Quels sont les trois ordres réunis aux états généraux de 1789 ?', 'Clergé, noblesse, tiers état', ['Roi, reine, peuple', 'Paysans, ouvriers, bourgeois', 'Députés, sénateurs, ministres', 'Nobles, chevaliers, moines', 'Paris, provinces, colonies']],
-          ['Qui a écrit la Déclaration des droits de la femme et de la citoyenne, en 1791 ?', 'Olympe de Gouges', ['Madame Roland', 'Charlotte Corday', 'Marie-Antoinette', 'Madame de Staël', 'Théroigne de Méricourt']]]
-      } },
-      { k: 'vf', niveaux: {
-        facile: [['Le 14 juillet 1789, le peuple de Paris prend la Bastille.', true, '']],
-        moyen: [['Marie-Antoinette était la femme de Louis XVI.', true, '']],
-        difficile: [['La République a été proclamée en 1789.', false, 'Elle a été proclamée en septembre 1792.']],
-        expert: [['Pendant la Révolution, la France adopte le mètre pour mesurer les longueurs.', true, '']]
-      } }
-    ] },
-    { id: 'x02', matiere: 'histoire', famille: 'xix', nom: 'Symboles de la République', court: 'Symboles', icone: '🇫🇷', series: [
       { k: 'paires', gauche: 'Symbole ou lieu', droite: 'Ce que c’est', consigneR: 'Relie chaque symbole ou lieu à ce qu’il est.', q: 'Qu’est-ce que {a} ?', qi: 'Qu’est-ce qui est : {b} ?', ouverte: false, niveaux: {
-        facile: [['Marianne', 'Une femme qui représente la République'], ['Le drapeau', 'Bleu, blanc, rouge'], ['La Marseillaise', 'L’hymne national']],
-        moyen: [['La devise', 'Liberté, Égalité, Fraternité'], ['Le 14 juillet', 'La fête nationale'], ['Le bonnet phrygien', 'Le bonnet rouge de Marianne'],
-          ['Le coq', 'Un animal qui représente souvent la France']],
+        facile: [['Marianne', 'Une femme qui représente la République'], ['Le drapeau', 'Bleu, blanc, rouge'], ['La Marseillaise', 'L’hymne national'], ['Le 14 juillet', 'La fête nationale']],
+        moyen: [['La devise', 'Liberté, Égalité, Fraternité'], ['Le bonnet phrygien', 'Le bonnet rouge de Marianne'], ['Le coq', 'Un animal qui représente souvent la France'],
+          ['La cocarde', 'Un rond bleu, blanc, rouge']],
         difficile: [['L’Élysée', 'Le palais du président de la République'], ['Le palais Bourbon', 'Là où siège l’Assemblée nationale'], ['Le palais du Luxembourg', 'Là où siège le Sénat'],
           ['Matignon', 'L’hôtel du Premier ministre'], ['Le Panthéon', 'Là où reposent de grands personnages']],
         expert: [['Le faisceau de licteur', 'Symbole de l’autorité, venu de la Rome antique'], ['La Semeuse', 'Femme qui sème, sur des pièces et des timbres'], ['Le sceau de la République', 'Montre la Liberté assise'],
-          ['Rouget de Lisle', 'Compose La Marseillaise en 1792'], ['L’article 2 de la Constitution', 'Cite le drapeau, l’hymne et la devise'], ['La loi du 6 juillet 1880', 'Fait du 14 juillet la fête nationale']]
+          ['L’article 2 de la Constitution', 'Cite le drapeau, l’hymne et la devise'], ['La loi du 6 juillet 1880', 'Fait du 14 juillet la fête nationale']]
       } },
       { k: 'qcm', niveaux: {
-        facile: [['Quelles sont les couleurs du drapeau français ?', 'Bleu, blanc, rouge', ['Bleu, blanc, vert', 'Rouge, jaune, noir']]],
-        moyen: [['Qui a composé La Marseillaise ?', 'Rouget de Lisle', ['Victor Hugo', 'Napoléon', 'Louis XVI']]],
-        difficile: [['Dans quelle ville La Marseillaise a-t-elle été composée, en 1792 ?', 'Strasbourg', ['Marseille', 'Paris', 'Lyon', 'Bordeaux']]],
-        expert: [['Depuis quelle année le 14 juillet est-il la fête nationale ?', '1880', ['1789', '1792', '1848', '1871', '1945']]]
+        facile: [
+          ['Quelle prison le peuple de Paris prend-il le 14 juillet 1789 ?', 'La Bastille', ['Le Louvre', 'Versailles', 'La tour Eiffel']],
+          ['Quel roi est exécuté en 1793 ?', 'Louis XVI', ['Louis XIV', 'Henri IV', 'Napoléon']],
+          ['Sur quelle île Napoléon est-il né ?', 'La Corse', ['La Sicile', 'La Réunion', 'La Martinique']],
+          ['Quelle bataille Napoléon a-t-il perdue en 1815 ?', 'Waterloo', ['Austerlitz', 'Iéna', 'Marengo']],
+          ['Quelles sont les couleurs du drapeau français ?', 'Bleu, blanc, rouge', ['Bleu, blanc, vert', 'Rouge, jaune, noir', 'Vert, blanc, rouge']],
+          ['Comment s’appelle l’hymne national de la France ?', 'La Marseillaise', ['La Carmagnole', 'Frère Jacques', 'Au clair de la lune']],
+          ['Quelle est la devise de la République française ?', 'Liberté, Égalité, Fraternité', ['Paix, Travail, Justice', 'Force et Honneur', 'Unité, Courage, Patrie']],
+          ['Quel jour est la fête nationale française ?', 'Le 14 juillet', ['Le 1er janvier', 'Le 11 novembre', 'Le 25 décembre']],
+          ['Grâce aux lois de Jules Ferry, comment devient l’école ?', 'Gratuite et obligatoire', ['Payante', 'Interdite aux filles', 'Réservée aux riches']],
+          ['Quel titre Napoléon se donne-t-il en 1804 ?', 'Empereur', ['Roi', 'Pape', 'Président']],
+          ['Quelle femme représente la République française ?', 'Marianne', ['Jeanne d’Arc', 'Marie-Antoinette', 'Joséphine']],
+          ['Quel bonnet rouge porte Marianne ?', 'Le bonnet phrygien', ['Le béret', 'Le bonnet de nuit', 'La casquette']],
+          ['Avec quelle machine coupait-on la tête des condamnés pendant la Révolution ?', 'La guillotine', ['La catapulte', 'Le bélier', 'L’arbalète']]],
+        moyen: [
+          ['Où le roi est-il arrêté pendant sa fuite, en 1791 ?', 'À Varennes', ['À Versailles', 'À Reims', 'À Marseille']],
+          ['Quel texte de 1789 dit que les hommes naissent libres et égaux en droits ?', 'La Déclaration des droits de l’homme et du citoyen', ['Le Code civil', 'L’édit de Nantes', 'La Marseillaise']],
+          ['Qui a composé La Marseillaise ?', 'Rouget de Lisle', ['Victor Hugo', 'Napoléon', 'Louis XVI']],
+          ['Dans quelle cathédrale Napoléon est-il sacré empereur ?', 'Notre-Dame de Paris', ['Notre-Dame de Reims', 'La basilique Saint-Denis', 'La cathédrale de Chartres']],
+          ['Sur quelle île Napoléon meurt-il, en 1821 ?', 'Sainte-Hélène', ['L’île d’Elbe', 'La Corse', 'La Réunion']],
+          ['Quelle bataille de 1805 est la plus célèbre victoire de Napoléon ?', 'Austerlitz', ['Waterloo', 'Trafalgar', 'Leipzig']],
+          ['Qui a fait abolir l’esclavage dans les colonies françaises, en 1848 ?', 'Victor Schœlcher', ['Jules Ferry', 'Napoléon', 'Victor Hugo']],
+          ['Qui dirige le Second Empire ?', 'Napoléon III', ['Napoléon Ier', 'Louis-Philippe', 'Charles X']],
+          ['Quelle nouvelle unité de longueur la Révolution a-t-elle créée ?', 'Le mètre', ['Le pied', 'Le pouce', 'La lieue']],
+          ['Pendant la Révolution, en quoi le territoire est-il découpé à partir de 1790 ?', 'En départements', ['En duchés', 'En royaumes', 'En comtés']],
+          ['Comment appelle-t-on la période de 1793-1794 où beaucoup d’opposants sont guillotinés ?', 'La Terreur', ['La Fronde', 'La Restauration', 'La Commune']],
+          ['Quel recueil de lois, voulu par Napoléon, est publié en 1804 ?', 'Le Code civil', ['La Déclaration des droits de l’homme', 'Le Concordat', 'L’Encyclopédie']],
+          ['Quelle décoration Napoléon crée-t-il en 1802 ?', 'La Légion d’honneur', ['La croix de guerre', 'La médaille militaire', 'L’ordre national du Mérite']]],
+        difficile: [
+          ['Quel révolutionnaire est surnommé « l’Incorruptible » ?', 'Robespierre', ['Danton', 'Marat', 'Mirabeau']],
+          ['Dans quelle salle les députés jurent-ils, le 20 juin 1789, de donner une Constitution à la France ?', 'La salle du Jeu de paume', ['La galerie des Glaces', 'La salle du Trône', 'L’Opéra royal']],
+          ['Quelle victoire de septembre 1792 arrête les armées prussiennes ?', 'Valmy', ['Austerlitz', 'Waterloo', 'Marengo']],
+          ['Quel coup d’État permet à Bonaparte de prendre le pouvoir, en 1799 ?', 'Le 18 Brumaire', ['Le 9 Thermidor', 'Le 10 Août', 'Le 2 Décembre']],
+          ['Quel roi règne pendant la monarchie de Juillet ?', 'Louis-Philippe', ['Louis XVIII', 'Charles X', 'Napoléon III']],
+          ['Quel gouvernement révolutionnaire dirige Paris au printemps 1871 ?', 'La Commune', ['Le Directoire', 'Le Consulat', 'La Convention']],
+          ['En 1848, qui obtient le droit de voter ?', 'Tous les hommes de 21 ans et plus', ['Toutes les femmes', 'Seulement les riches', 'Seulement les nobles']],
+          ['Où Napoléon est-il exilé une première fois, en 1814 ?', 'L’île d’Elbe', ['Sainte-Hélène', 'La Corse', 'Malte']],
+          ['Comment appelle-t-on le retour de Napoléon au pouvoir, en 1815 ?', 'Les Cent-Jours', ['La Restauration', 'Le Consulat', 'Les Trois Glorieuses']],
+          ['Quel pays Napoléon envahit-il en 1812, avant une terrible retraite ?', 'La Russie', ['L’Espagne', 'L’Angleterre', 'L’Égypte']],
+          ['Comment appelle-t-on les trois journées de révolution de juillet 1830 ?', 'Les Trois Glorieuses', ['Les Cent-Jours', 'La Grande Peur', 'Les journées de Juin']],
+          ['Dans quel monument de Paris repose Napoléon ?', 'Les Invalides', ['Le Panthéon', 'La basilique Saint-Denis', 'Notre-Dame de Paris']],
+          ['Qui a écrit la Déclaration des droits de la femme et de la citoyenne, en 1791 ?', 'Olympe de Gouges', ['Madame Roland', 'Charlotte Corday', 'Madame de Staël']]],
+        expert: [
+          ['Quels sont les trois ordres réunis aux états généraux de 1789 ?', 'Clergé, noblesse, tiers état', ['Roi, reine, peuple', 'Paysans, ouvriers, bourgeois', 'Nobles, chevaliers, moines']],
+          ['Quel calendrier la Révolution adopte-t-elle en 1793 ?', 'Le calendrier républicain', ['Le calendrier grégorien', 'Le calendrier julien', 'Le calendrier lunaire']],
+          ['Quel est le premier mois du calendrier républicain ?', 'Vendémiaire', ['Brumaire', 'Thermidor', 'Germinal']],
+          ['Quelle loi de 1884 permet aux ouvriers de créer des syndicats ?', 'La loi Waldeck-Rousseau', ['La loi Le Chapelier', 'La loi Falloux', 'La loi Guizot']],
+          ['Qui est élu en 1848 premier président de la République ?', 'Louis-Napoléon Bonaparte', ['Adolphe Thiers', 'Lamartine', 'Jules Grévy']],
+          ['Quel accord Bonaparte signe-t-il avec le pape, en 1801 ?', 'Le Concordat', ['Le Code civil', 'Le traité d’Amiens', 'L’édit de Nantes']],
+          ['Quel jour du calendrier républicain Robespierre est-il renversé, en 1794 ?', 'Le 9 Thermidor', ['Le 18 Brumaire', 'Le 10 Août', 'Le 14 Juillet']],
+          ['Quelle défaite de 1870 entraîne la chute de Napoléon III ?', 'Sedan', ['Waterloo', 'Leipzig', 'Trafalgar']],
+          ['Quelle région la France perd-elle en 1871, avec une partie de la Lorraine ?', 'L’Alsace', ['La Savoie', 'La Bretagne', 'La Corse']],
+          ['Quel ministre populaire Louis XVI renvoie-t-il le 11 juillet 1789 ?', 'Necker', ['Turgot', 'Calonne', 'Colbert']],
+          ['Quelle bataille navale de 1805 voit la flotte franco-espagnole battue par Nelson ?', 'Trafalgar', ['Aboukir', 'Lépante', 'L’Écluse']],
+          ['Quelle ville Bonaparte reprend-il aux Anglais, en 1793 ?', 'Toulon', ['Marseille', 'Brest', 'Calais']],
+          ['Quelle loi de 1791 interdit les corporations et les grèves ?', 'La loi Le Chapelier', ['La loi Waldeck-Rousseau', 'La loi Falloux', 'La loi Ferry']]]
       } },
       { k: 'vf', niveaux: {
-        facile: [['La devise de la République est « Liberté, Égalité, Fraternité ».', true, '']],
-        moyen: [['La Marseillaise a été écrite à Marseille.', false, 'Elle a été écrite à Strasbourg en 1792 ; des soldats venus de Marseille l’ont chantée en arrivant à Paris.']],
-        difficile: [['La fête du 14 juillet rappelle aussi la fête de la Fédération de 1790.', true, '']],
-        expert: [['Le drapeau tricolore est cité dans la Constitution de 1958.', true, '']]
-      } }
-    ] },
-    { id: 'x03', matiere: 'histoire', famille: 'xix', nom: 'Napoléon', court: 'Napoléon', icone: '🎖️', series: [
-      { k: 'ordre', consigne: 'Range ces événements de la vie de Napoléon du plus ancien au plus récent.', q: 'En quelle année : {a} ?', niveaux: {
-        facile: [['Naissance de Napoléon en Corse', 1769, '1769'], ['Napoléon est sacré empereur', 1804, '1804'], ['Bataille d’Austerlitz', 1805, '1805'],
-          ['Bataille de Waterloo', 1815, '1815']],
-        moyen: [['Bonaparte devient Premier consul', 1799, '1799'], ['Le Code civil est publié', 1804, '1804'], ['Campagne de Russie', 1812, '1812'],
-          ['Premier exil, sur l’île d’Elbe', 1814, '1814'], ['Mort à Sainte-Hélène', 1821, '1821']],
-        difficile: [['Bonaparte reprend Toulon aux Anglais', 1793, '1793'], ['Victoire d’Arcole, en Italie', 1796, '1796'], ['Expédition d’Égypte', 1798, '1798'],
-          ['Création de la Légion d’honneur', 1802, '1802'], ['Mariage avec Marie-Louise d’Autriche', 1810, '1810']],
-        expert: [['Bonaparte sort de l’École militaire de Paris', 1785, '1785'], ['Victoire de Marengo', 1800, '1800'], ['Concordat avec le pape', 1801, '1801'],
-          ['Victoire d’Iéna', 1806, '1806'], ['Défaite de Leipzig', 1813, '1813'], ['Ses cendres sont ramenées aux Invalides', 1840, '1840']]
-      } },
-      { k: 'qcm', niveaux: {
-        facile: [['Sur quelle île Napoléon est-il né ?', 'La Corse', ['La Sicile', 'La Réunion']]],
-        moyen: [['Quelle bataille Napoléon a-t-il perdue en 1815 ?', 'Waterloo', ['Austerlitz', 'Iéna', 'Wagram']]],
-        difficile: [['Quel recueil de lois, voulu par Napoléon, est publié en 1804 ?', 'Le Code civil', ['La Déclaration des droits de l’homme', 'Le Concordat', 'La Constitution de 1958', 'L’Encyclopédie']]],
-        expert: [['Quelle décoration Napoléon crée-t-il en 1802 ?', 'La Légion d’honneur', ['La croix de guerre', 'L’ordre du Saint-Esprit', 'La médaille militaire', 'L’ordre national du Mérite', 'La croix de Saint-Louis']]]
+        facile: [['Le 14 juillet 1789, le peuple de Paris prend la Bastille.', true, ''], ['La devise de la République est « Liberté, Égalité, Fraternité ».', true, ''],
+          ['Napoléon est né en Corse.', true, ''],
+          ['Napoléon a gagné la bataille de Waterloo.', false, 'Il l’a perdue, en 1815.'],
+          ['Le drapeau français est vert, blanc, rouge.', false, 'Il est bleu, blanc, rouge.'],
+          ['Louis XIV était roi quand la Révolution a commencé.', false, 'C’était Louis XVI.']],
+        moyen: [['Marie-Antoinette était la femme de Louis XVI.', true, ''], ['Avec Jules Ferry, l’école publique devient gratuite.', true, ''],
+          ['Joséphine a été la première épouse de Napoléon.', true, ''],
+          ['La Marseillaise a été écrite à Marseille.', false, 'Elle a été écrite à Strasbourg en 1792 ; des soldats venus de Marseille l’ont chantée en arrivant à Paris.'],
+          ['En 1848, les femmes obtiennent le droit de vote.', false, 'En 1848, seuls les hommes votent ; les femmes votent pour la première fois en 1945.'],
+          ['Napoléon est mort à Paris.', false, 'Il est mort en exil, sur l’île de Sainte-Hélène, en 1821.']],
+        difficile: [['L’esclavage a été aboli une première fois en 1794, puis rétabli par Bonaparte en 1802.', true, ''],
+          ['La fête du 14 juillet rappelle aussi la fête de la Fédération de 1790.', true, ''],
+          ['Lors de son sacre, Napoléon s’est posé lui-même la couronne sur la tête.', true, ''],
+          ['La République a été proclamée en 1789.', false, 'Elle a été proclamée en septembre 1792.'],
+          ['Robespierre est mort de vieillesse.', false, 'Il a été guillotiné en juillet 1794.'],
+          ['Louis-Philippe était le frère de Louis XVI.', false, 'Il était un cousin éloigné, de la branche d’Orléans ; les frères de Louis XVI sont Louis XVIII et Charles X.']],
+        expert: [['Pendant la Révolution, la France adopte le mètre pour mesurer les longueurs.', true, ''], ['Le drapeau tricolore est cité dans la Constitution de 1958.', true, ''],
+          ['Le maréchal Ney a été fusillé en 1815.', true, ''],
+          ['Le Code civil de 1804 donnait les mêmes droits aux femmes qu’aux hommes.', false, 'Il plaçait la femme mariée sous l’autorité de son mari.'],
+          ['Le calendrier républicain a été utilisé jusqu’en 1850.', false, 'Napoléon l’a abandonné le 1er janvier 1806.'],
+          ['Napoléon III était le fils de Napoléon Ier.', false, 'Il était son neveu.']]
       } },
       { k: 'indices', consigne: 'Qui suis-je ? Trouve le personnage.', niveaux: {
-        facile: [{ r: 'Napoléon Bonaparte', i: ['Je suis né en Corse en 1769.', 'Je suis un général de la Révolution.', 'Je me suis fait sacrer empereur en 1804.', 'J’ai gagné la bataille d’Austerlitz.', 'J’ai perdu à Waterloo et je suis mort à Sainte-Hélène.'] }],
-        moyen: [{ r: 'Joséphine de Beauharnais', i: ['Je suis née en Martinique.', 'Mon premier mari a été guillotiné pendant la Terreur.', 'J’ai épousé Bonaparte en 1796.', 'J’ai été sacrée impératrice en 1804.', 'Napoléon a divorcé de moi car nous n’avions pas d’enfant ensemble.'] }],
-        difficile: [{ r: 'Le roi de Rome', i: ['Je suis né en 1811, au palais des Tuileries.', 'Ma mère est Marie-Louise d’Autriche.', 'J’ai reçu mon titre de roi dès ma naissance.', 'J’ai grandi à Vienne, chez mon grand-père l’empereur d’Autriche.', 'Je suis le fils de Napoléon.'] }],
-        expert: [{ r: 'Le maréchal Ney', i: ['Je suis né à Sarrelouis en 1769.', 'Mon père était tonnelier.', 'Napoléon m’a fait maréchal d’Empire en 1804.', 'On m’a appelé « le brave des braves » pendant la retraite de Russie.', 'J’ai été fusillé à Paris en 1815.'] }]
-      } }
-    ] },
-    { id: 'x04', matiere: 'histoire', famille: 'xix', nom: 'Les régimes politiques', court: 'Régimes', icone: '📏', series: [
-      { k: 'ordre', consigne: 'Range ces régimes et gouvernements du plus ancien au plus récent.', q: 'En quelle année commence : {a} ?', niveaux: {
-        facile: [['Le règne de Louis XVI', 1774, '1774'], ['La Ire République', 1792, '1792'], ['Le Premier Empire', 1804, '1804'], ['La IIIe République', 1870, '1870']],
-        moyen: [['Le Consulat', 1799, '1799'], ['La Restauration', 1814, '1814'], ['La IIe République', 1848, '1848'], ['Le Second Empire', 1852, '1852']],
-        difficile: [['La monarchie constitutionnelle', 1791, '1791'], ['Le Directoire', 1795, '1795'], ['Les Cent-Jours', 1815, '1815'],
-          ['La monarchie de Juillet', 1830, '1830'], ['La Commune de Paris', 1871, '1871']],
-        expert: [['La Convention', 1792, '1792'], ['Le Consulat à vie', 1802, '1802'], ['Le règne de Charles X', 1824, '1824'],
-          ['Le gouvernement de la Défense nationale', 1870, '1870'], ['La IVe République', 1946, '1946'], ['La Ve République', 1958, '1958']]
+        facile: [{ r: 'Napoléon Bonaparte', i: ['Je suis né en Corse en 1769.', 'Je suis un général de la Révolution.', 'Je me suis fait sacrer empereur en 1804.', 'J’ai gagné la bataille d’Austerlitz.', 'J’ai perdu à Waterloo et je suis mort à Sainte-Hélène.'] },
+          { r: 'Louis XVI', i: ['Je suis devenu roi en 1774.', 'J’ai épousé Marie-Antoinette.', 'J’aimais la chasse et la serrurerie.', 'J’ai été arrêté à Varennes en essayant de fuir.', 'J’ai été guillotiné en 1793.'] }],
+        moyen: [{ r: 'Joséphine de Beauharnais', i: ['Je suis née en Martinique.', 'Mon premier mari a été guillotiné pendant la Terreur.', 'J’ai épousé Bonaparte en 1796.', 'J’ai été sacrée impératrice en 1804.', 'Napoléon a divorcé de moi car nous n’avions pas d’enfant ensemble.'] },
+          { r: 'Robespierre', i: ['Je suis né à Arras en 1758.', 'Je suis avocat.', 'Je suis député du tiers état en 1789.', 'On m’appelle « l’Incorruptible ».', 'Je suis l’un des chefs de la Terreur, et je suis guillotiné en 1794.'] }],
+        difficile: [{ r: 'Le roi de Rome', i: ['Je suis né en 1811, au palais des Tuileries.', 'Ma mère est Marie-Louise d’Autriche.', 'J’ai reçu mon titre de roi dès ma naissance.', 'J’ai grandi à Vienne, chez mon grand-père l’empereur d’Autriche.', 'Je suis le fils de Napoléon.'] },
+          { r: 'Jules Ferry', i: ['Je suis né dans les Vosges, à Saint-Dié.', 'J’ai été maire de Paris pendant le siège de 1870-1871.', 'J’ai été plusieurs fois ministre de l’Instruction publique.', 'J’ai aussi été président du Conseil.', 'Mes lois de 1881 et 1882 rendent l’école gratuite, obligatoire et laïque.'] }],
+        expert: [{ r: 'Le maréchal Ney', i: ['Je suis né à Sarrelouis en 1769.', 'Mon père était tonnelier.', 'Napoléon m’a fait maréchal d’Empire en 1804.', 'On m’a appelé « le brave des braves » pendant la retraite de Russie.', 'J’ai été fusillé à Paris en 1815.'] },
+          { r: 'Victor Schœlcher', i: ['Je suis né à Paris en 1804.', 'Mon père fabriquait de la porcelaine.', 'J’ai voyagé aux Antilles et j’y ai vu l’esclavage.', 'En 1848, je suis sous-secrétaire d’État à la Marine.', 'J’ai fait abolir l’esclavage dans les colonies françaises.'] }]
       } },
-      { k: 'qcm', niveaux: {
-        facile: [['Qui dirige le Premier Empire ?', 'Napoléon Ier', ['Louis XVI', 'Charles de Gaulle']]],
-        moyen: [['Qui dirige le Second Empire ?', 'Napoléon III', ['Napoléon Ier', 'Louis-Philippe', 'Charles X']]],
-        difficile: [['Quel roi règne pendant la monarchie de Juillet ?', 'Louis-Philippe', ['Louis XVIII', 'Charles X', 'Louis XVI', 'Napoléon III']]],
-        expert: [['Qui est élu en 1848 premier président de la République, par tous les hommes ?', 'Louis-Napoléon Bonaparte', ['Adolphe Thiers', 'Lamartine', 'Jules Grévy', 'Mac Mahon', 'Gambetta']]]
+      { k: 'ordre', consigne: 'Range ces événements du plus ancien au plus récent.', q: 'En quelle année : {a} ?', niveaux: {
+        facile: [['Prise de la Bastille', 1789, '1789'], ['Proclamation de la République', 1792, '1792'], ['Exécution de Louis XVI', 1793, '1793'],
+          ['Napoléon est sacré empereur', 1804, '1804'], ['Bataille de Waterloo', 1815, '1815'], ['Abolition de l’esclavage par Schœlcher', 1848, '1848'],
+          ['L’école devient gratuite', 1881, '1881']],
+        moyen: [['Le roi en fuite est arrêté à Varennes', 1791, '1791'], ['Chute de Robespierre', 1794, '1794'], ['Bonaparte devient Premier consul', 1799, '1799'],
+          ['Campagne de Russie', 1812, '1812'], ['Mort de Napoléon à Sainte-Hélène', 1821, '1821'], ['Début du Second Empire', 1852, '1852'],
+          ['Début de la IIIe République', 1870, '1870'], ['L’école devient obligatoire et laïque', 1882, '1882']],
+        difficile: [['Serment du Jeu de paume', 1789, '1789'], ['Fête de la Fédération', 1790, '1790'], ['Victoire de Valmy', 1792, '1792'],
+          ['Le Code civil est publié', 1804, '1804'], ['Les Trois Glorieuses chassent Charles X', 1830, '1830'], ['Révolution de février et IIe République', 1848, '1848'],
+          ['La Commune de Paris', 1871, '1871'], ['Droit de créer des syndicats', 1884, '1884']],
+        expert: [['Abolition des privilèges, la nuit du 4 août', 1789, '1789'], ['Constitution civile du clergé', 1790, '1790'], ['Première Constitution écrite de la France', 1791, '1791'],
+          ['Première abolition de l’esclavage', 1794, '1794'], ['Concordat avec le pape', 1801, '1801'], ['Bonaparte rétablit l’esclavage', 1802, '1802'],
+          ['Les cendres de Napoléon sont ramenées aux Invalides', 1840, '1840'], ['Droit de grève', 1864, '1864']]
+      } },
+      { k: 'classer', niveaux: {
+        facile: [{ q: 'Range : symbole de la République ou de la royauté ?', colonnes: ['La République', 'La royauté'],
+          items: [['Marianne', 0], ['Le drapeau bleu, blanc, rouge', 0], ['La devise « Liberté, Égalité, Fraternité »', 0], ['La Marseillaise', 0],
+            ['La couronne', 1], ['Le sceptre', 1], ['La fleur de lys', 1], ['Le sacre à Reims', 1]] }],
+        moyen: [{ q: 'Range : pendant la Révolution ou sous l’Empire de Napoléon Ier ?', colonnes: ['La Révolution', 'L’Empire'],
+          items: [['La prise de la Bastille', 0], ['La Déclaration des droits de l’homme', 0], ['La Terreur', 0], ['L’exécution de Louis XVI', 0],
+            ['Le sacre de 1804', 1], ['La victoire d’Austerlitz', 1], ['La campagne de Russie', 1], ['La victoire d’Iéna', 1]] }],
+        difficile: [{ q: 'Range : roi ou empereur ?', colonnes: ['Roi', 'Empereur'],
+          items: [['Louis XVI', 0], ['Louis XVIII', 0], ['Charles X', 0], ['Louis-Philippe', 0], ['Napoléon Ier', 1], ['Napoléon III', 1]] }],
+        expert: [{ q: 'Range ces régimes : monarchie ou république ?', colonnes: ['Monarchie', 'République'],
+          items: [['La monarchie constitutionnelle de 1791', 0], ['La Restauration', 0], ['La monarchie de Juillet', 0],
+            ['La Convention', 1], ['Le Directoire', 1], ['La IIe République', 1], ['Le gouvernement de la Défense nationale', 1], ['La IIIe République', 1]] }]
       } }
     ] },
-    { id: 'x05', matiere: 'histoire', famille: 'xix', nom: 'Inventions de la révolution industrielle', court: 'Inventions', icone: '🚂', series: [
+    { id: 'x05', matiere: 'histoire', famille: 'xix', nom: 'Industrie, inventions et monuments', court: 'Inventions', icone: '🚂', series: [
       { k: 'paires', gauche: 'Invention', droite: 'Inventeur', consigneR: 'Relie chaque invention à son inventeur.', q: 'Qui a inventé : {a} ?', qi: 'Qu’a inventé {b} ?', ouverte: false, niveaux: {
-        facile: [['Le téléphone', 'Graham Bell'], ['L’ampoule électrique', 'Thomas Edison'], ['Le cinématographe', 'Les frères Lumière']],
-        moyen: [['Le vaccin contre la rage', 'Louis Pasteur'], ['La photographie', 'Nicéphore Niépce'], ['L’écriture pour les aveugles', 'Louis Braille'],
-          ['La machine à vapeur améliorée', 'James Watt']],
-        difficile: [['Le phonographe', 'Thomas Edison'], ['Le télégraphe et son code', 'Samuel Morse'], ['La dynamite', 'Alfred Nobel'],
-          ['Le moteur diesel', 'Rudolf Diesel'], ['La pasteurisation', 'Louis Pasteur']],
-        expert: [['Le métier à tisser à cartes perforées', 'Joseph-Marie Jacquard'], ['Le pneu démontable', 'Les frères Michelin'], ['La radio sans fil', 'Guglielmo Marconi'],
-          ['La machine à coudre', 'Barthélemy Thimonnier'], ['La pile électrique', 'Alessandro Volta'], ['Le stéthoscope', 'René Laennec']]
+        facile: [['Le téléphone', 'Graham Bell'], ['L’ampoule électrique', 'Thomas Edison'], ['Le cinématographe', 'Les frères Lumière'],
+          ['Le vaccin contre la rage', 'Louis Pasteur'], ['L’écriture pour les aveugles', 'Louis Braille']],
+        moyen: [['La photographie', 'Nicéphore Niépce'], ['La machine à vapeur améliorée', 'James Watt'], ['Le phonographe', 'Thomas Edison'],
+          ['La dynamite', 'Alfred Nobel'], ['Le télégraphe et son code', 'Samuel Morse'], ['La pasteurisation', 'Louis Pasteur']],
+        difficile: [['Le moteur diesel', 'Rudolf Diesel'], ['La pile électrique', 'Alessandro Volta'], ['Le stéthoscope', 'René Laennec'],
+          ['La radio sans fil', 'Guglielmo Marconi'], ['Le daguerréotype', 'Louis Daguerre'], ['La locomotive Rocket', 'George Stephenson']],
+        expert: [['Le métier à tisser à cartes perforées', 'Joseph-Marie Jacquard'], ['Le pneu démontable', 'Les frères Michelin'], ['La machine à coudre', 'Barthélemy Thimonnier'],
+          ['L’avion Éole', 'Clément Ader'], ['Le bateau à vapeur Clermont', 'Robert Fulton'], ['La conserve en bocal', 'Nicolas Appert']]
       } },
-      { k: 'qcm', niveaux: {
-        facile: [['Quelle machine fait avancer les premiers trains ?', 'La machine à vapeur', ['Le moteur électrique', 'Le moulin à vent']]],
-        moyen: [['Quel savant a mis au point le vaccin contre la rage en 1885 ?', 'Louis Pasteur', ['Marie Curie', 'Thomas Edison', 'Louis Braille']]],
-        difficile: [['Quels frères ont présenté la première séance de cinéma payante, en 1895 ?', 'Les frères Lumière', ['Les frères Montgolfier', 'Les frères Wright', 'Les frères Michelin', 'Les frères Grimm']]],
-        expert: [['Quel combustible fait tourner les machines à vapeur des usines du XIXe siècle ?', 'Le charbon', ['Le pétrole', 'Le gaz naturel', 'L’uranium', 'L’huile d’olive', 'L’alcool']]]
-      } },
-      { k: 'ordre', consigne: 'Range ces inventions de la plus ancienne à la plus récente.', q: 'En quelle année : {a} ?', niveaux: {
-        facile: [['Première locomotive à vapeur sur des rails', 1804, '1804'], ['Première photographie', 1826, 'vers 1826'], ['Invention du téléphone', 1876, '1876'],
-          ['Première séance de cinéma', 1895, '1895']],
-        moyen: [['Louis Braille publie son écriture pour les aveugles', 1829, '1829'], ['Morse envoie un message par télégraphe', 1844, '1844'],
-          ['Edison met au point son ampoule', 1879, '1879'], ['Pasteur vaccine un enfant contre la rage', 1885, '1885']],
-        difficile: [['Laennec invente le stéthoscope', 1816, '1816'], ['La Rocket de Stephenson gagne un concours de locomotives', 1829, '1829'], ['Daguerre présente le daguerréotype', 1839, '1839'],
-          ['Nobel invente la dynamite', 1867, '1867'], ['Marconi envoie un message radio à travers la Manche', 1899, '1899']],
-        expert: [['Volta invente la pile électrique', 1800, '1800'], ['Jacquard présente son métier à tisser', 1801, '1801'], ['Thimonnier dépose le brevet de la machine à coudre', 1830, '1830'],
-          ['Première Exposition universelle, à Londres', 1851, '1851'], ['Clément Ader fait décoller l’Éole', 1890, '1890'], ['Les frères Michelin déposent le brevet du pneu démontable', 1891, '1891']]
-      } }
-    ] },
-    { id: 'x06', matiere: 'histoire', famille: 'xix', nom: 'Écrivains du XIXe siècle', court: 'Écrivains', icone: '📚', series: [
-      { k: 'paires', gauche: 'Écrivain', droite: 'Livre', consigneR: 'Relie chaque écrivain à son livre.', q: 'Quel livre a écrit {a} ?', qi: 'Qui a écrit : {b} ?', ouverte: false, niveaux: {
-        facile: [['Victor Hugo', 'Les Misérables'], ['Jules Verne', 'Le Tour du monde en quatre-vingts jours'], ['Alexandre Dumas', 'Les Trois Mousquetaires']],
-        moyen: [['Émile Zola', 'Germinal'], ['Hector Malot', 'Sans famille'], ['La comtesse de Ségur', 'Les Malheurs de Sophie'], ['Alphonse Daudet', 'Les Lettres de mon moulin']],
-        difficile: [['Gustave Flaubert', 'Madame Bovary'], ['Honoré de Balzac', 'Le Père Goriot'], ['Stendhal', 'Le Rouge et le Noir'],
-          ['George Sand', 'La Petite Fadette'], ['Charles Baudelaire', 'Les Fleurs du mal']],
-        expert: [['Guy de Maupassant', 'Le Horla'], ['Arthur Rimbaud', 'Le Bateau ivre'], ['Alfred de Musset', 'Lorenzaccio'],
-          ['Prosper Mérimée', 'Colomba'], ['Edmond Rostand', 'Cyrano de Bergerac'], ['Paul Verlaine', 'Poèmes saturniens']]
-      } },
-      { k: 'qcm', niveaux: {
-        facile: [['Qui a écrit Vingt Mille Lieues sous les mers ?', 'Jules Verne', ['Victor Hugo', 'Molière']]],
-        moyen: [['Quel écrivain a raconté l’histoire de Jean Valjean et de Cosette ?', 'Victor Hugo', ['Émile Zola', 'Jules Verne', 'Alexandre Dumas']]],
-        difficile: [['Quel écrivain a publié « J’accuse… ! » pour défendre le capitaine Dreyfus ?', 'Émile Zola', ['Victor Hugo', 'Gustave Flaubert', 'Jules Verne', 'Alphonse Daudet']]],
-        expert: [['Sous quel nom d’homme Aurore Dupin a-t-elle publié ses romans ?', 'George Sand', ['Stendhal', 'Colette', 'Gérard de Nerval', 'Pierre Loti', 'Anatole France']]]
-      } }
-    ] },
-    { id: 'x07', matiere: 'histoire', famille: 'xix', nom: 'Peintres impressionnistes', court: 'Peintres', icone: '🎨', series: [
-      { k: 'paires', gauche: 'Peintre', droite: 'Tableau', consigneR: 'Relie chaque peintre à son tableau.', q: 'Quel tableau a peint {a} ?', qi: 'Qui a peint : {b} ?', ouverte: false, niveaux: {
-        facile: [['Claude Monet', 'Impression, soleil levant'], ['Vincent van Gogh', 'Les Tournesols'], ['Auguste Renoir', 'Bal du moulin de la Galette']],
-        moyen: [['Edgar Degas', 'La Classe de danse'], ['Édouard Manet', 'Le Déjeuner sur l’herbe'], ['Paul Cézanne', 'Les Joueurs de cartes'],
-          ['Georges Seurat', 'Un dimanche à la Grande Jatte']],
-        difficile: [['Berthe Morisot', 'Le Berceau'], ['Camille Pissarro', 'Boulevard Montmartre, effet de nuit'], ['Gustave Caillebotte', 'Les Raboteurs de parquet'],
-          ['Alfred Sisley', 'L’Inondation à Port-Marly'], ['Paul Gauguin', 'La Vision après le sermon']],
-        expert: [['Frédéric Bazille', 'Réunion de famille'], ['Claude Monet', 'Les Nymphéas'], ['Henri de Toulouse-Lautrec', 'Au Moulin Rouge'],
-          ['Edgar Degas', 'L’Absinthe'], ['Mary Cassatt', 'Le Thé'], ['Camille Pissarro', 'Les Toits rouges']]
-      } },
-      { k: 'qcm', niveaux: {
-        facile: [['Quel tableau de Monet a donné son nom aux impressionnistes ?', 'Impression, soleil levant', ['La Joconde', 'Les Tournesols']]],
-        moyen: [['Quel peintre aimait peindre les danseuses de l’Opéra ?', 'Edgar Degas', ['Claude Monet', 'Vincent van Gogh', 'Paul Cézanne']]],
-        difficile: [['Où les impressionnistes aiment-ils peindre ?', 'En plein air', ['Dans les églises', 'Seulement dans leur atelier', 'Dans des grottes', 'Dans les châteaux']]],
-        expert: [['Dans quel village Claude Monet a-t-il peint son jardin et ses nymphéas ?', 'Giverny', ['Barbizon', 'Auvers-sur-Oise', 'Argenteuil', 'Arles', 'Pont-Aven']]]
-      } },
-      { k: 'indices', consigne: 'Qui suis-je ? Trouve le peintre.', niveaux: {
-        facile: [{ r: 'Claude Monet', i: ['Je suis un peintre français.', 'J’ai grandi au Havre.', 'J’aime peindre en plein air.', 'Un de mes tableaux a donné son nom à l’impressionnisme.', 'J’ai peint les nymphéas de mon jardin de Giverny.'] }],
-        moyen: [{ r: 'Vincent van Gogh', i: ['Je suis né aux Pays-Bas.', 'Mon frère Theo m’a toujours aidé.', 'J’ai peint à Arles, dans le sud de la France.', 'Je me suis coupé l’oreille.', 'J’ai peint Les Tournesols et La Nuit étoilée.'] }],
-        difficile: [{ r: 'Edgar Degas', i: ['Je suis né à Paris en 1834.', 'J’ai exposé avec les impressionnistes.', 'Je peins aussi les courses de chevaux.', 'J’ai sculpté une Petite Danseuse de quatorze ans.', 'J’aime peindre les danseuses de l’Opéra.'] }],
-        expert: [{ r: 'Berthe Morisot', i: ['Je suis une femme peintre.', 'J’ai exposé dès la première exposition des impressionnistes, en 1874.', 'Édouard Manet a fait plusieurs portraits de moi.', 'J’ai épousé Eugène Manet, son frère.', 'J’ai peint Le Berceau.'] }]
-      } }
-    ] },
-    { id: 'x08', matiere: 'histoire', famille: 'xix', nom: 'Monuments du XIXe siècle', court: 'Monuments', icone: '🗼', series: [
       { k: 'paires', gauche: 'Monument', droite: 'Architecte ou constructeur', consigneR: 'Relie chaque monument à celui qui l’a dessiné ou construit.', q: 'Qui a dessiné ou construit {a} ?', qi: 'Quel monument doit-on à {b} ?', ouverte: false, niveaux: {
-        facile: [['La tour Eiffel', 'Gustave Eiffel'], ['L’Opéra Garnier', 'Charles Garnier'], ['La statue de la Liberté', 'Auguste Bartholdi']],
+        facile: [['La tour Eiffel', 'Gustave Eiffel'], ['L’Opéra Garnier', 'Charles Garnier'], ['La statue de la Liberté', 'Auguste Bartholdi'], ['Les grands boulevards de Paris', 'Le baron Haussmann']],
         moyen: [['L’Arc de triomphe de l’Étoile', 'Jean-François Chalgrin'], ['Le Lion de Belfort', 'Auguste Bartholdi'], ['La basilique du Sacré-Cœur', 'Paul Abadie'],
-          ['Les grands boulevards de Paris', 'Le baron Haussmann']],
+          ['Le Palais idéal', 'Le facteur Cheval']],
         difficile: [['Le viaduc de Garabit', 'Gustave Eiffel'], ['Les Halles de Paris', 'Victor Baltard'], ['Notre-Dame de la Garde', 'Henri-Jacques Espérandieu'],
-          ['La restauration de la cité de Carcassonne', 'Viollet-le-Duc'], ['Le Palais idéal', 'Le facteur Cheval']],
+          ['La restauration de la cité de Carcassonne', 'Viollet-le-Duc']],
         expert: [['La bibliothèque Sainte-Geneviève', 'Henri Labrouste'], ['La gare d’Orsay', 'Victor Laloux'], ['La fontaine Saint-Michel', 'Gabriel Davioud'],
           ['L’église de la Madeleine', 'Pierre-Alexandre Vignon'], ['Le Petit Palais', 'Charles Girault'], ['Le palais Longchamp, à Marseille', 'Henri-Jacques Espérandieu']]
       } },
       { k: 'qcm', niveaux: {
-        facile: [['Pour quelle grande fête la tour Eiffel a-t-elle été construite, en 1889 ?', 'L’Exposition universelle', ['Les Jeux olympiques', 'Le sacre de Napoléon']]],
-        moyen: [['Quel pays a offert la statue de la Liberté aux États-Unis ?', 'La France', ['L’Angleterre', 'L’Espagne', 'L’Italie']]],
-        difficile: [['Quel empereur a commandé l’Arc de triomphe de l’Étoile ?', 'Napoléon Ier', ['Napoléon III', 'Louis XIV', 'Charlemagne', 'Louis-Philippe']]],
-        expert: [['Sous quel empereur l’Opéra Garnier a-t-il été commandé ?', 'Napoléon III', ['Napoléon Ier', 'Louis-Philippe', 'Charles X', 'Louis XVIII', 'Henri IV']]]
+        facile: [
+          ['Pour quelle grande fête la tour Eiffel a-t-elle été construite, en 1889 ?', 'L’Exposition universelle', ['Les Jeux olympiques', 'Le sacre de Napoléon', 'La fête de la musique']],
+          ['Quelle machine fait avancer les premiers trains ?', 'La machine à vapeur', ['Le moteur électrique', 'Le moulin à vent', 'La voile']],
+          ['Que brûle-t-on dans les machines à vapeur des usines du XIXe siècle ?', 'Du charbon', ['Du sable', 'Du sel', 'De la neige']],
+          ['Dans quelle ville se trouve la tour Eiffel ?', 'Paris', ['Lyon', 'Marseille', 'Londres']],
+          ['Quel pays a offert la statue de la Liberté aux États-Unis ?', 'La France', ['L’Angleterre', 'L’Espagne', 'L’Italie']],
+          ['Dans quelle ville se trouve la statue de la Liberté ?', 'New York', ['Paris', 'Londres', 'Washington']],
+          ['Quel savant a mis au point le vaccin contre la rage ?', 'Louis Pasteur', ['Marie Curie', 'Thomas Edison', 'Louis Braille']],
+          ['Où les mineurs vont-ils chercher le charbon ?', 'Sous la terre, dans la mine', ['Au fond de la mer', 'Dans les arbres', 'Dans les nuages']],
+          ['Quel moyen de transport se développe partout en France au XIXe siècle ?', 'Le chemin de fer', ['L’avion', 'La fusée', 'L’hélicoptère']],
+          ['Que permet l’écriture inventée par Louis Braille ?', 'Lire avec les doigts', ['Écrire en secret', 'Compter très vite', 'Dessiner des cartes']],
+          ['Avant l’électricité, avec quoi éclairait-on les rues de Paris au XIXe siècle ?', 'Des becs de gaz', ['Des néons', 'Des ampoules LED', 'Des lampes de poche']],
+          ['Quelle invention des frères Lumière permet de projeter des films ?', 'Le cinématographe', ['Le téléphone', 'Le phonographe', 'La télévision']],
+          ['Que fabrique-t-on dans une usine textile ?', 'Des tissus', ['Des voitures', 'Du pain', 'Des fusées']]],
+        moyen: [
+          ['Dans quel pays commence la révolution industrielle ?', 'Le Royaume-Uni', ['La France', 'L’Allemagne', 'Les États-Unis']],
+          ['Quel savant a donné son nom à une façon de conserver le lait en le chauffant ?', 'Louis Pasteur', ['Louis Braille', 'Gustave Eiffel', 'Thomas Edison']],
+          ['En quel métal la tour Eiffel est-elle construite ?', 'En fer', ['En or', 'En cuivre', 'En aluminium']],
+          ['Combien de temps la tour Eiffel devait-elle rester debout, au départ ?', '20 ans', ['1 an', '5 ans', '100 ans']],
+          ['Qui a dessiné l’Opéra de Paris ?', 'Charles Garnier', ['Gustave Eiffel', 'Le baron Haussmann', 'Auguste Bartholdi']],
+          ['Quel préfet a transformé Paris avec de grands boulevards, sous Napoléon III ?', 'Le baron Haussmann', ['Gustave Eiffel', 'Jules Ferry', 'Charles Garnier']],
+          ['Dans quelle région de France y a-t-il beaucoup de mines de charbon au XIXe siècle ?', 'Le Nord', ['La Corse', 'La Bretagne', 'La Provence']],
+          ['Quel objet Thomas Edison a-t-il rendu pratique en 1879 ?', 'L’ampoule électrique', ['Le téléphone', 'La radio', 'L’appareil photo']],
+          ['Que permet d’enregistrer le phonographe d’Edison ?', 'Les sons', ['Les images', 'Les odeurs', 'Les températures']],
+          ['Quel Français a réalisé la plus ancienne photographie connue, vers 1826 ?', 'Nicéphore Niépce', ['Louis Daguerre', 'Louis Lumière', 'Louis Braille']],
+          ['Quel code, fait de points et de traits, sert à envoyer des messages par télégraphe ?', 'Le morse', ['Le braille', 'Le code de la route', 'Le Code civil']],
+          ['Quelle basilique blanche domine Paris depuis la butte Montmartre ?', 'Le Sacré-Cœur', ['Notre-Dame de Paris', 'La Madeleine', 'Le Panthéon']],
+          ['Quel véhicule à deux roues et à pédales se répand à la fin du XIXe siècle ?', 'La bicyclette', ['La trottinette électrique', 'Le skateboard', 'Le gyropode']]],
+        difficile: [
+          ['Dans quelle ville a lieu la première séance de cinéma payante des frères Lumière, en 1895 ?', 'Paris', ['Lyon', 'La Ciotat', 'Marseille']],
+          ['Quel ingénieur a construit le viaduc de Garabit, avant sa célèbre tour ?', 'Gustave Eiffel', ['Charles Garnier', 'Viollet-le-Duc', 'Le baron Haussmann']],
+          ['Quel architecte a construit les pavillons de fer et de verre des Halles de Paris ?', 'Victor Baltard', ['Charles Garnier', 'Gustave Eiffel', 'Henri Labrouste']],
+          ['À partir de quel âge la loi de 1841 permet-elle de faire travailler un enfant à l’usine ?', '8 ans', ['4 ans', '12 ans', '16 ans']],
+          ['Quelle ville accueille la première Exposition universelle, en 1851 ?', 'Londres', ['Paris', 'Vienne', 'New York']],
+          ['Dans quel bâtiment de verre se tient l’Exposition universelle de Londres, en 1851 ?', 'Le Crystal Palace', ['Le Grand Palais', 'Le palais de Westminster', 'La tour de Londres']],
+          ['Quelle locomotive de George Stephenson gagne le concours de Rainhill, en 1829 ?', 'La Rocket', ['La Comète', 'La Flèche', 'L’Éclair']],
+          ['Quel Suédois a inventé la dynamite et créé des prix célèbres ?', 'Alfred Nobel', ['Rudolf Diesel', 'Thomas Edison', 'Samuel Morse']],
+          ['Quel architecte a restauré Notre-Dame de Paris et la cité de Carcassonne ?', 'Viollet-le-Duc', ['Charles Garnier', 'Gustave Eiffel', 'Victor Baltard']],
+          ['Quel sculpteur a fait la statue de la Liberté et le Lion de Belfort ?', 'Auguste Bartholdi', ['Auguste Rodin', 'Gustave Eiffel', 'Camille Claudel']],
+          ['Quel Américain a mis au point le télégraphe électrique et son code ?', 'Samuel Morse', ['Graham Bell', 'Thomas Edison', 'Benjamin Franklin']],
+          ['Quel monument le facteur Cheval a-t-il bâti seul, avec des pierres ramassées pendant ses tournées ?', 'Le Palais idéal', ['Le Petit Palais', 'Le palais Garnier', 'Le palais Longchamp']],
+          ['Quel matériau, plus solide, remplace peu à peu le fer à la fin du XIXe siècle ?', 'L’acier', ['Le plastique', 'Le bronze', 'Le bois']]],
+        expert: [
+          ['Sous quel empereur l’Opéra Garnier a-t-il été commandé ?', 'Napoléon III', ['Napoléon Ier', 'Louis-Philippe', 'Charles X']],
+          ['Quel empereur a commandé l’Arc de triomphe de l’Étoile ?', 'Napoléon Ier', ['Napoléon III', 'Louis XIV', 'Louis-Philippe']],
+          ['Quel ingénieur a conçu la charpente intérieure de la statue de la Liberté ?', 'Gustave Eiffel', ['Charles Garnier', 'Viollet-le-Duc', 'Victor Baltard']],
+          ['Quelle ville la première ligne de chemin de fer partant de Paris relie-t-elle, en 1837 ?', 'Saint-Germain-en-Laye', ['Versailles', 'Lyon', 'Rouen']],
+          ['Quel engin de Clément Ader a décollé de quelques centimètres, en 1890 ?', 'L’Éole', ['Le Concorde', 'La Demoiselle', 'Le Spirit of St. Louis']],
+          ['Quel physicien italien a inventé la pile électrique, en 1800 ?', 'Alessandro Volta', ['Guglielmo Marconi', 'Luigi Galvani', 'André-Marie Ampère']],
+          ['Quel Lyonnais a inventé un métier à tisser commandé par des cartes perforées ?', 'Joseph-Marie Jacquard', ['Barthélemy Thimonnier', 'Louis Daguerre', 'Nicéphore Niépce']],
+          ['Comment appelle-t-on la révolte des ouvriers de la soie de Lyon, en 1831 ?', 'La révolte des canuts', ['La Commune', 'La Fronde', 'La Jacquerie']],
+          ['Quel savant découvre en 1896 que l’uranium émet des rayons invisibles ?', 'Henri Becquerel', ['Pierre Curie', 'Louis Pasteur', 'Marie Curie']],
+          ['Quel Allemand fait rouler en 1886 l’une des premières automobiles à essence ?', 'Carl Benz', ['Rudolf Diesel', 'Alfred Nobel', 'Werner von Siemens']],
+          ['Quelle gare parisienne, construite pour l’Exposition de 1900, est devenue un musée ?', 'La gare d’Orsay', ['La gare du Nord', 'La gare de Lyon', 'La gare Saint-Lazare']],
+          ['Quel canal, ouvert en 1869, relie la Méditerranée à la mer Rouge ?', 'Le canal de Suez', ['Le canal de Panama', 'Le canal du Midi', 'Le canal de Corinthe']],
+          ['Quel Français a dirigé le percement du canal de Suez ?', 'Ferdinand de Lesseps', ['Gustave Eiffel', 'Le baron Haussmann', 'Clément Ader']]]
       } },
       { k: 'vf', niveaux: {
-        facile: [['La tour Eiffel a été construite pour l’Exposition universelle de 1889.', true, '']],
-        moyen: [['La tour Eiffel devait être démontée au bout de 20 ans.', true, '']],
-        difficile: [['La statue de la Liberté a été construite en Amérique.', false, 'Elle a été construite à Paris, puis démontée et envoyée en bateau à New York en 1885.']],
-        expert: [['Napoléon a vu l’Arc de triomphe de l’Étoile terminé.', false, 'Il a été inauguré en 1836, quinze ans après sa mort.']]
+        facile: [['La tour Eiffel a été construite pour l’Exposition universelle de 1889.', true, ''], ['Au XIXe siècle, beaucoup d’enfants travaillaient dans les usines.', true, ''],
+          ['Les premiers trains roulaient grâce à la vapeur.', true, ''],
+          ['La statue de la Liberté a été offerte par l’Angleterre.', false, 'Elle a été offerte par la France aux États-Unis, en 1886.'],
+          ['Louis Pasteur a inventé le téléphone.', false, 'C’est Graham Bell ; Pasteur a mis au point le vaccin contre la rage.'],
+          ['La tour Eiffel est en bois.', false, 'Elle est en fer.']],
+        moyen: [['La tour Eiffel devait être démontée au bout de 20 ans.', true, ''], ['Louis Braille était lui-même aveugle.', true, ''],
+          ['La révolution industrielle a commencé au Royaume-Uni.', true, ''],
+          ['La statue de la Liberté a été construite en Amérique.', false, 'Elle a été construite à Paris, puis démontée et envoyée en bateau à New York en 1885.'],
+          ['Le Sacré-Cœur se trouve à Marseille.', false, 'Il se trouve à Paris, sur la butte Montmartre.'],
+          ['La pasteurisation consiste à congeler le lait.', false, 'Elle consiste à le chauffer pour tuer les microbes.']],
+        difficile: [['Gustave Eiffel a aussi construit le viaduc de Garabit.', true, ''], ['Le facteur Cheval a construit son Palais idéal tout seul.', true, ''],
+          ['Alfred Nobel a inventé la dynamite.', true, ''],
+          ['Napoléon a vu l’Arc de triomphe de l’Étoile terminé.', false, 'Il a été inauguré en 1836, quinze ans après sa mort.'],
+          ['La première Exposition universelle a eu lieu à Paris.', false, 'Elle a eu lieu à Londres, en 1851.'],
+          ['Le baron Haussmann a dessiné la tour Eiffel.', false, 'Il était préfet de la Seine : il a fait percer de grands boulevards dans Paris.']],
+        expert: [['La gare d’Orsay a été construite pour l’Exposition universelle de 1900.', true, ''], ['Le canal de Suez a été inauguré en 1869.', true, ''],
+          ['Henri Becquerel a partagé le prix Nobel de physique avec Pierre et Marie Curie.', true, 'C’était en 1903.'],
+          ['Le Sacré-Cœur a été terminé avant la tour Eiffel.', false, 'Commencé en 1875, il n’a été achevé qu’en 1914 ; la tour Eiffel était finie en 1889.'],
+          ['Les canuts étaient des mineurs du Nord.', false, 'C’étaient les ouvriers de la soie de Lyon.'],
+          ['L’Éole de Clément Ader a volé pendant plusieurs kilomètres.', false, 'En 1890, il n’a fait qu’un bond d’une cinquantaine de mètres, à quelques centimètres du sol.']]
+      } },
+      { k: 'indices', consigne: 'Qui suis-je ? Trouve le personnage.', niveaux: {
+        facile: [{ r: 'Gustave Eiffel', i: ['Je suis né à Dijon en 1832.', 'Je suis ingénieur.', 'Je construis des ponts en fer.', 'J’ai conçu la charpente de la statue de la Liberté.', 'Ma tour a été construite pour l’Exposition universelle de 1889.'] },
+          { r: 'Louis Pasteur', i: ['Je suis né à Dole, dans le Jura, en 1822.', 'Je suis chimiste et biologiste.', 'J’ai étudié les microbes.', 'J’ai donné mon nom à une façon de conserver le lait.', 'J’ai sauvé un enfant mordu par un chien enragé, en 1885.'] }],
+        moyen: [{ r: 'Louis Braille', i: ['Je suis né à Coupvray en 1809.', 'Je suis devenu aveugle après un accident dans l’atelier de mon père.', 'J’ai été élève, puis professeur, à l’Institution des jeunes aveugles.', 'J’ai inventé une écriture faite de points en relief.', 'Grâce à moi, les aveugles lisent avec leurs doigts.'] },
+          { r: 'Thomas Edison', i: ['Je suis né aux États-Unis en 1847.', 'J’ai déposé plus de mille brevets.', 'J’ai inventé le phonographe.', 'On m’appelle le « magicien de Menlo Park ».', 'J’ai mis au point une ampoule électrique qui dure longtemps.'] }],
+        difficile: [{ r: 'Les frères Lumière', i: ['Nous sommes nés à Besançon.', 'Notre père avait une usine de plaques photographiques à Lyon.', 'Nous avons filmé la sortie de notre usine.', 'Nous avons inventé une photographie en couleurs, l’autochrome.', 'Notre cinématographe a fait sa première séance payante en 1895.'] },
+          { r: 'Le baron Haussmann', i: ['Je suis né à Paris en 1809.', 'Je suis préfet de la Seine.', 'Je travaille pour Napoléon III.', 'J’ai fait construire des égouts, des parcs et des squares.', 'J’ai percé de grands boulevards dans Paris.'] }],
+        expert: [{ r: 'Nicéphore Niépce', i: ['Je suis né à Chalon-sur-Saône en 1765.', 'J’ai inventé avec mon frère un moteur, le pyréolophore.', 'J’ai travaillé avec Louis Daguerre.', 'J’ai fixé l’image vue de la fenêtre de ma maison.', 'J’ai réalisé la plus ancienne photographie connue.'] },
+          { r: 'Clément Ader', i: ['Je suis né à Muret, près de Toulouse.', 'J’ai travaillé sur le téléphone.', 'Mon engin volant ressemblait à une chauve-souris.', 'On me doit le mot « avion ».', 'Mon Éole a décollé de quelques centimètres en 1890.'] }]
+      } },
+      { k: 'ordre', consigne: 'Range ces inventions et ces constructions de la plus ancienne à la plus récente.', q: 'En quelle année : {a} ?', niveaux: {
+        facile: [['Première locomotive à vapeur sur des rails', 1804, '1804'], ['Première photographie', 1826, 'vers 1826'], ['Invention du téléphone', 1876, '1876'],
+          ['Edison met au point son ampoule', 1879, '1879'], ['La tour Eiffel est terminée', 1889, '1889'], ['Première séance de cinéma', 1895, '1895']],
+        moyen: [['Louis Braille publie son écriture pour les aveugles', 1829, '1829'], ['Morse envoie un message par télégraphe', 1844, '1844'], ['Nobel invente la dynamite', 1867, '1867'],
+          ['Inauguration de l’Opéra Garnier', 1875, '1875'], ['Pasteur vaccine un enfant contre la rage', 1885, '1885'], ['Inauguration de la statue de la Liberté à New York', 1886, '1886']],
+        difficile: [['Laennec invente le stéthoscope', 1816, '1816'], ['La Rocket de Stephenson gagne un concours de locomotives', 1829, '1829'], ['Daguerre présente le daguerréotype', 1839, '1839'],
+          ['Première Exposition universelle, à Londres', 1851, '1851'], ['Ouverture du canal de Suez', 1869, '1869'], ['Marconi envoie un message radio à travers la Manche', 1899, '1899']],
+        expert: [['Volta invente la pile électrique', 1800, '1800'], ['Jacquard présente son métier à tisser', 1801, '1801'], ['Thimonnier dépose le brevet de la machine à coudre', 1830, '1830'],
+          ['Première ligne de chemin de fer au départ de Paris', 1837, '1837'], ['Clément Ader fait décoller l’Éole', 1890, '1890'], ['Les frères Michelin déposent le brevet du pneu démontable', 1891, '1891'],
+          ['Becquerel découvre la radioactivité', 1896, '1896']]
+      } },
+      { k: 'classer', niveaux: {
+        facile: [{ q: 'Range : cela existait-il déjà en 1900 ?', colonnes: ['Déjà en 1900', 'Pas encore'],
+          items: [['Le train', 0], ['Le téléphone', 0], ['L’ampoule électrique', 0], ['L’appareil photo', 0],
+            ['La télévision', 1], ['L’ordinateur', 1], ['Le téléphone portable', 1], ['La fusée spatiale', 1]] }],
+        moyen: [{ q: 'Range : invention d’un Français ou d’un étranger ?', colonnes: ['Française', 'Étrangère'],
+          items: [['Le cinématographe', 0], ['L’écriture braille', 0], ['La photographie', 0], ['Le vaccin contre la rage', 0],
+            ['Le téléphone de Bell', 1], ['L’ampoule d’Edison', 1], ['La dynamite', 1], ['Le télégraphe de Morse', 1]] }],
+        difficile: [{ q: 'Range : construit surtout en fer ou surtout en pierre ?', colonnes: ['Surtout en fer', 'Surtout en pierre'],
+          items: [['La tour Eiffel', 0], ['Les Halles de Baltard', 0], ['Le viaduc de Garabit', 0], ['La charpente de la statue de la Liberté', 0],
+            ['L’Arc de triomphe de l’Étoile', 1], ['L’église de la Madeleine', 1], ['La basilique du Sacré-Cœur', 1], ['Notre-Dame de la Garde', 1]] }],
+        expert: [{ q: 'Range : inventé avant ou après 1850 ?', colonnes: ['Avant 1850', 'Après 1850'],
+          items: [['La pile électrique', 0], ['Le stéthoscope', 0], ['Le métier Jacquard', 0], ['Le daguerréotype', 0],
+            ['La dynamite', 1], ['Le téléphone', 1], ['Le phonographe', 1], ['Le pneu démontable', 1]] }]
       } }
     ] },
-    { id: 'x09', matiere: 'histoire', famille: 'xix', nom: 'Grandes lois', court: 'Lois', icone: '⚖️', series: [
-      { k: 'qcm', niveaux: {
-        facile: [['Grâce aux lois de Jules Ferry, comment devient l’école ?', 'Gratuite et obligatoire', ['Payante', 'Interdite aux filles']]],
-        moyen: [['Qui a fait abolir l’esclavage dans les colonies françaises, en 1848 ?', 'Victor Schœlcher', ['Jules Ferry', 'Napoléon', 'Victor Hugo']]],
-        difficile: [['En 1848, qui obtient le droit de voter ?', 'Tous les hommes de 21 ans et plus', ['Toutes les femmes', 'Seulement les riches', 'Seulement les nobles', 'Les enfants']]],
-        expert: [['Quelle loi de 1884 permet aux ouvriers de créer des syndicats ?', 'La loi Waldeck-Rousseau', ['La loi Le Chapelier', 'La loi Falloux', 'La loi Guizot', 'La loi Naquet', 'La loi Ferry']]]
+    { id: 'x06', matiere: 'histoire', famille: 'xix', nom: 'Arts et lettres du XIXe', court: 'Arts', icone: '🎨', series: [
+      { k: 'paires', gauche: 'Écrivain', droite: 'Livre', consigneR: 'Relie chaque écrivain à son livre.', q: 'Quel livre a écrit {a} ?', qi: 'Qui a écrit : {b} ?', ouverte: false, niveaux: {
+        facile: [['Victor Hugo', 'Les Misérables'], ['Jules Verne', 'Le Tour du monde en quatre-vingts jours'], ['Alexandre Dumas', 'Les Trois Mousquetaires'],
+          ['Hector Malot', 'Sans famille'], ['La comtesse de Ségur', 'Les Malheurs de Sophie']],
+        moyen: [['Émile Zola', 'Germinal'], ['Alphonse Daudet', 'Les Lettres de mon moulin'], ['Jules Verne', 'Vingt Mille Lieues sous les mers'],
+          ['Victor Hugo', 'Notre-Dame de Paris'], ['Alexandre Dumas', 'Le Comte de Monte-Cristo'], ['Edmond Rostand', 'Cyrano de Bergerac']],
+        difficile: [['Gustave Flaubert', 'Madame Bovary'], ['Honoré de Balzac', 'Le Père Goriot'], ['Stendhal', 'Le Rouge et le Noir'],
+          ['George Sand', 'La Petite Fadette'], ['Charles Baudelaire', 'Les Fleurs du mal'], ['Guy de Maupassant', 'Bel-Ami']],
+        expert: [['Guy de Maupassant', 'Le Horla'], ['Arthur Rimbaud', 'Le Bateau ivre'], ['Alfred de Musset', 'Lorenzaccio'],
+          ['Prosper Mérimée', 'Colomba'], ['Paul Verlaine', 'Poèmes saturniens'], ['Chateaubriand', 'Mémoires d’outre-tombe']]
       } },
-      { k: 'ordre', consigne: 'Range ces lois du plus ancien au plus récent.', q: 'En quelle année : {a} ?', niveaux: {
-        facile: [['Déclaration des droits de l’homme', 1789, '1789'], ['Abolition de l’esclavage par Schœlcher', 1848, '1848'], ['L’école devient gratuite', 1881, '1881'],
-          ['L’école devient obligatoire et laïque', 1882, '1882']],
-        moyen: [['Première abolition de l’esclavage', 1794, '1794'], ['Le Code civil', 1804, '1804'], ['Suffrage universel masculin', 1848, '1848'], ['Droit de grève', 1864, '1864']],
-        difficile: [['Loi Guizot : une école de garçons dans chaque commune', 1833, '1833'], ['Loi interdisant le travail à l’usine avant 8 ans', 1841, '1841'],
-          ['Loi Falloux sur l’enseignement', 1850, '1850'], ['Loi sur la liberté de la presse', 1881, '1881'], ['Droit de créer des syndicats', 1884, '1884']],
-        expert: [['Loi Le Chapelier : les corporations sont interdites', 1791, '1791'], ['Bonaparte rétablit l’esclavage', 1802, '1802'], ['Loi Duruy : des écoles de filles dans les communes de 500 habitants', 1867, '1867'],
-          ['Loi Camille Sée : des lycées pour les filles', 1880, '1880'], ['Loi Naquet : retour du divorce', 1884, '1884'], ['Loi sur les accidents du travail', 1898, '1898']]
+      { k: 'paires', gauche: 'Peintre', droite: 'Tableau', consigneR: 'Relie chaque peintre à son tableau.', q: 'Quel tableau a peint {a} ?', qi: 'Qui a peint : {b} ?', ouverte: false, niveaux: {
+        facile: [['Claude Monet', 'Impression, soleil levant'], ['Vincent van Gogh', 'Les Tournesols'], ['Auguste Renoir', 'Bal du moulin de la Galette'], ['Edgar Degas', 'La Classe de danse']],
+        moyen: [['Édouard Manet', 'Le Déjeuner sur l’herbe'], ['Paul Cézanne', 'Les Joueurs de cartes'], ['Georges Seurat', 'Un dimanche à la Grande Jatte'],
+          ['Vincent van Gogh', 'La Nuit étoilée'], ['Eugène Delacroix', 'La Liberté guidant le peuple']],
+        difficile: [['Berthe Morisot', 'Le Berceau'], ['Camille Pissarro', 'Boulevard Montmartre, effet de nuit'], ['Gustave Caillebotte', 'Les Raboteurs de parquet'],
+          ['Alfred Sisley', 'L’Inondation à Port-Marly'], ['Paul Gauguin', 'La Vision après le sermon'], ['Théodore Géricault', 'Le Radeau de la Méduse'], ['Jean-François Millet', 'L’Angélus']],
+        expert: [['Frédéric Bazille', 'Réunion de famille'], ['Claude Monet', 'Les Nymphéas'], ['Henri de Toulouse-Lautrec', 'Au Moulin Rouge'],
+          ['Edgar Degas', 'L’Absinthe'], ['Mary Cassatt', 'Le Thé'], ['Camille Pissarro', 'Les Toits rouges'], ['Gustave Courbet', 'Un enterrement à Ornans'], ['Ingres', 'La Grande Odalisque']]
+      } },
+      { k: 'qcm', niveaux: {
+        facile: [
+          ['Qui a écrit Vingt Mille Lieues sous les mers ?', 'Jules Verne', ['Victor Hugo', 'Molière', 'Émile Zola']],
+          ['Quel tableau de Monet a donné son nom aux impressionnistes ?', 'Impression, soleil levant', ['La Joconde', 'Les Tournesols', 'La Nuit étoilée']],
+          ['Quel capitaine commande le sous-marin Nautilus, dans le roman de Jules Verne ?', 'Le capitaine Nemo', ['Le capitaine Haddock', 'Le capitaine Crochet', 'Le capitaine Fracasse']],
+          ['Quel jeune Gascon rejoint les trois mousquetaires, dans le roman de Dumas ?', 'D’Artagnan', ['Cyrano', 'Robin des Bois', 'Jean Valjean']],
+          ['Quelle petite fille est recueillie par Jean Valjean, dans Les Misérables ?', 'Cosette', ['Sophie', 'Heidi', 'Alice']],
+          ['Où les peintres impressionnistes aiment-ils peindre ?', 'En plein air', ['Dans les églises', 'Dans des grottes', 'Seulement la nuit']],
+          ['Quel peintre s’est coupé l’oreille ?', 'Vincent van Gogh', ['Claude Monet', 'Edgar Degas', 'Auguste Renoir']],
+          ['Quel peintre aimait peindre les danseuses de l’Opéra ?', 'Edgar Degas', ['Claude Monet', 'Vincent van Gogh', 'Paul Cézanne']],
+          ['Dans quel pays Van Gogh est-il né ?', 'Les Pays-Bas', ['La France', 'L’Espagne', 'L’Italie']],
+          ['En combien de jours Phileas Fogg doit-il faire le tour du monde ?', '80 jours', ['8 jours', '365 jours', '1 000 jours']],
+          ['Comment s’appelle le héros de Sans famille, d’Hector Malot ?', 'Rémi', ['Oliver', 'Tom Sawyer', 'Pinocchio']],
+          ['Quelle grande fleur jaune Van Gogh a-t-il peinte plusieurs fois ?', 'Le tournesol', ['La rose', 'La tulipe', 'Le coquelicot']],
+          ['Dans quelle cathédrale vit Quasimodo, le héros de Victor Hugo ?', 'Notre-Dame de Paris', ['Notre-Dame de Reims', 'La cathédrale de Chartres', 'Le Sacré-Cœur']]],
+        moyen: [
+          ['Quel écrivain a raconté l’histoire de Jean Valjean et de Cosette ?', 'Victor Hugo', ['Émile Zola', 'Jules Verne', 'Alexandre Dumas']],
+          ['Quel roman de Zola raconte la vie des mineurs du Nord ?', 'Germinal', ['Les Misérables', 'Madame Bovary', 'Sans famille']],
+          ['Quel est le métier de Quasimodo, à Notre-Dame ?', 'Sonneur de cloches', ['Boulanger', 'Soldat', 'Marin']],
+          ['Dans quelle ville du sud de la France Van Gogh a-t-il peint ses Tournesols ?', 'Arles', ['Nice', 'Marseille', 'Bordeaux']],
+          ['Quel héros d’Edmond Rostand a un très grand nez ?', 'Cyrano de Bergerac', ['Pinocchio', 'D’Artagnan', 'Gavroche']],
+          ['Dans quel roman de Dumas Edmond Dantès s’évade-t-il du château d’If ?', 'Le Comte de Monte-Cristo', ['Les Trois Mousquetaires', 'La Reine Margot', 'Vingt Ans après']],
+          ['Quel gamin de Paris meurt sur une barricade, dans Les Misérables ?', 'Gavroche', ['Rémi', 'Oliver', 'Tom Pouce']],
+          ['Comment s’appelle la façon de peindre avec de petits points de couleur, comme Seurat ?', 'Le pointillisme', ['Le cubisme', 'Le surréalisme', 'Le fauvisme']],
+          ['Quel peintre a peint de très nombreuses fois la montagne Sainte-Victoire ?', 'Paul Cézanne', ['Claude Monet', 'Edgar Degas', 'Auguste Renoir']],
+          ['Sur quelle île Victor Hugo a-t-il vécu longtemps en exil ?', 'Guernesey', ['Sainte-Hélène', 'La Corse', 'L’île d’Elbe']],
+          ['Sur quelle île du Pacifique Paul Gauguin est-il parti peindre ?', 'Tahiti', ['La Réunion', 'La Corse', 'Madagascar']],
+          ['Quel compositeur français a écrit l’opéra Carmen ?', 'Georges Bizet', ['Mozart', 'Verdi', 'Beethoven']],
+          ['Quel écrivain a imaginé un voyage De la Terre à la Lune, en 1865 ?', 'Jules Verne', ['Victor Hugo', 'Alexandre Dumas', 'Émile Zola']]],
+        difficile: [
+          ['Quel écrivain a publié « J’accuse… ! » pour défendre le capitaine Dreyfus ?', 'Émile Zola', ['Victor Hugo', 'Gustave Flaubert', 'Jules Verne']],
+          ['Quel événement montre La Liberté guidant le peuple, de Delacroix ?', 'La révolution de juillet 1830', ['La prise de la Bastille', 'La Commune de 1871', 'La bataille de Waterloo']],
+          ['Quel tableau de Manet a fait scandale au Salon des refusés de 1863 ?', 'Le Déjeuner sur l’herbe', ['Olympia', 'Le Fifre', 'Un bar aux Folies Bergère']],
+          ['Dans quel port normand Monet a-t-il peint Impression, soleil levant ?', 'Le Havre', ['Rouen', 'Cherbourg', 'Honfleur']],
+          ['Dans quel village près de Paris Van Gogh a-t-il passé ses derniers mois ?', 'Auvers-sur-Oise', ['Giverny', 'Barbizon', 'Argenteuil']],
+          ['Quel sculpteur a fait Le Penseur ?', 'Auguste Rodin', ['Auguste Bartholdi', 'Camille Claudel', 'Edgar Degas']],
+          ['Comment s’appelle l’ensemble des romans de Balzac ?', 'La Comédie humaine', ['Les Rougon-Macquart', 'Les Contemplations', 'Les Châtiments']],
+          ['Quelle famille Zola suit-il dans vingt romans ?', 'Les Rougon-Macquart', ['Les Thénardier', 'Les Bovary', 'Les Fenouillard']],
+          ['Quel compositeur polonais a vécu à Paris et aimé George Sand ?', 'Frédéric Chopin', ['Franz Liszt', 'Mozart', 'Beethoven']],
+          ['Dans quel quartier de Paris se trouve le Moulin Rouge, peint par Toulouse-Lautrec ?', 'Montmartre', ['Le Marais', 'Montparnasse', 'Saint-Germain-des-Prés']],
+          ['Quel recueil Victor Hugo a-t-il écrit en pensant à sa fille Léopoldine ?', 'Les Contemplations', ['Les Châtiments', 'Les Fleurs du mal', 'Les Méditations poétiques']],
+          ['Qui a peint Les Glaneuses, en 1857 ?', 'Jean-François Millet', ['Gustave Courbet', 'Claude Monet', 'Édouard Manet']],
+          ['Quel mouvement de peinture fait sa première exposition à Paris, en 1874 ?', 'L’impressionnisme', ['Le cubisme', 'Le romantisme', 'Le surréalisme']]],
+        expert: [
+          ['Sous quel nom d’homme Aurore Dupin a-t-elle publié ses romans ?', 'George Sand', ['Stendhal', 'Gérard de Nerval', 'Pierre Loti']],
+          ['Dans quel village Claude Monet a-t-il peint son jardin et ses nymphéas ?', 'Giverny', ['Barbizon', 'Auvers-sur-Oise', 'Argenteuil']],
+          ['Quel est le vrai nom de Stendhal ?', 'Henri Beyle', ['François-Marie Arouet', 'Aurore Dupin', 'Julien Viaud']],
+          ['Chez quel photographe a lieu la première exposition des impressionnistes, en 1874 ?', 'Nadar', ['Louis Daguerre', 'Nicéphore Niépce', 'Eugène Atget']],
+          ['Quel peintre réaliste a refusé la Légion d’honneur et soutenu la Commune ?', 'Gustave Courbet', ['Édouard Manet', 'Claude Monet', 'Eugène Delacroix']],
+          ['Quel poète a blessé Rimbaud d’un coup de revolver, à Bruxelles, en 1873 ?', 'Paul Verlaine', ['Charles Baudelaire', 'Stéphane Mallarmé', 'Alfred de Musset']],
+          ['Quelle école de peintres de paysages porte le nom d’un village de la forêt de Fontainebleau ?', 'L’école de Barbizon', ['L’école de Pont-Aven', 'L’école de Paris', 'L’école de Nancy']],
+          ['Quel peintre est la grande figure de l’école de Pont-Aven, en Bretagne ?', 'Paul Gauguin', ['Claude Monet', 'Paul Cézanne', 'Georges Seurat']],
+          ['Quel compositeur a écrit la Symphonie fantastique, en 1830 ?', 'Hector Berlioz', ['Georges Bizet', 'Claude Debussy', 'Camille Saint-Saëns']],
+          ['Quel compositeur a écrit Le Carnaval des animaux ?', 'Camille Saint-Saëns', ['Hector Berlioz', 'Georges Bizet', 'Claude Debussy']],
+          ['Quelle exposition présente en 1863 les tableaux rejetés par le Salon officiel ?', 'Le Salon des refusés', ['Le Salon d’automne', 'L’Exposition universelle', 'Le Salon des indépendants']],
+          ['Quel roman a valu à Flaubert un procès, en 1857 ?', 'Madame Bovary', ['Salammbô', 'L’Éducation sentimentale', 'Bouvard et Pécuchet']],
+          ['Quel peintre a fait Le Sacre de Napoléon ?', 'Jacques-Louis David', ['Ingres', 'Eugène Delacroix', 'Théodore Géricault']]]
       } },
       { k: 'vf', niveaux: {
-        facile: [['Avec Jules Ferry, l’école publique devient gratuite.', true, '']],
-        moyen: [['En 1848, les femmes obtiennent le droit de vote.', false, 'En 1848, seuls les hommes votent ; les femmes votent pour la première fois en 1945.']],
-        difficile: [['L’esclavage a été aboli une première fois en 1794, puis rétabli par Bonaparte en 1802.', true, '']],
-        expert: [['Le Code civil de 1804 donnait les mêmes droits aux femmes qu’aux hommes.', false, 'Il plaçait la femme mariée sous l’autorité de son mari.']]
+        facile: [['Victor Hugo a écrit Les Misérables.', true, ''], ['Claude Monet était un peintre impressionniste.', true, ''],
+          ['Dans Vingt Mille Lieues sous les mers, le Nautilus est un sous-marin.', true, ''],
+          ['Jules Verne a écrit Les Trois Mousquetaires.', false, 'C’est Alexandre Dumas.'],
+          ['Les impressionnistes peignaient seulement dans leur atelier.', false, 'Ils aimaient peindre en plein air.'],
+          ['Van Gogh était français.', false, 'Il était néerlandais, né aux Pays-Bas ; il a peint en France.']],
+        moyen: [['Cosette est un personnage des Misérables.', true, ''], ['Van Gogh a peint à Arles.', true, ''],
+          ['Edgar Degas a aussi fait des sculptures.', true, ''],
+          ['Germinal raconte la vie des marins.', false, 'Il raconte la vie des mineurs du Nord.'],
+          ['Cyrano de Bergerac a été écrit par Victor Hugo.', false, 'C’est Edmond Rostand, en 1897.'],
+          ['Alexandre Dumas a écrit Les Malheurs de Sophie.', false, 'C’est la comtesse de Ségur.']],
+        difficile: [['Zola a défendu le capitaine Dreyfus.', true, ''], ['George Sand était une femme.', true, 'Son vrai nom était Aurore Dupin.'],
+          ['Berthe Morisot a exposé avec les impressionnistes.', true, ''],
+          ['Le Penseur a été sculpté par Bartholdi.', false, 'Il est d’Auguste Rodin.'],
+          ['Balzac a écrit Les Rougon-Macquart.', false, 'C’est Zola ; les romans de Balzac forment La Comédie humaine.'],
+          ['Victor Hugo est mort en exil.', false, 'Il est rentré en France en 1870 et il est mort à Paris en 1885 ; il repose au Panthéon.']],
+        expert: [['Stendhal est un nom de plume.', true, 'Son vrai nom était Henri Beyle.'], ['Verlaine a blessé Rimbaud d’un coup de revolver.', true, ''],
+          ['La première exposition des impressionnistes a eu lieu chez le photographe Nadar.', true, ''],
+          ['Baudelaire a été acquitté au procès des Fleurs du mal.', false, 'Il a été condamné en 1857 et six poèmes ont été interdits.'],
+          ['Madame Bovary a été écrit par Balzac.', false, 'C’est Flaubert.'],
+          ['Monet a peint ses nymphéas dans un jardin d’Arles.', false, 'C’était dans son jardin de Giverny.']]
+      } },
+      { k: 'indices', consigne: 'Qui suis-je ? Trouve l’artiste.', niveaux: {
+        facile: [{ r: 'Claude Monet', i: ['Je suis un peintre français.', 'J’ai grandi au Havre.', 'J’aime peindre en plein air.', 'Un de mes tableaux a donné son nom à l’impressionnisme.', 'J’ai peint les nymphéas de mon jardin de Giverny.'] },
+          { r: 'Victor Hugo', i: ['Je suis né à Besançon en 1802.', 'J’ai écrit des poèmes, des pièces de théâtre et des romans.', 'J’ai vécu en exil sur l’île de Guernesey.', 'J’ai créé Quasimodo et Esmeralda.', 'J’ai écrit Les Misérables.'] }],
+        moyen: [{ r: 'Vincent van Gogh', i: ['Je suis né aux Pays-Bas.', 'Mon frère Theo m’a toujours aidé.', 'J’ai peint à Arles, dans le sud de la France.', 'Je me suis coupé l’oreille.', 'J’ai peint Les Tournesols et La Nuit étoilée.'] },
+          { r: 'Jules Verne', i: ['Je suis né à Nantes en 1828.', 'Mon éditeur s’appelait Hetzel.', 'J’ai longtemps vécu à Amiens.', 'J’ai imaginé des voyages extraordinaires.', 'J’ai créé le capitaine Nemo et Phileas Fogg.'] }],
+        difficile: [{ r: 'Edgar Degas', i: ['Je suis né à Paris en 1834.', 'J’ai exposé avec les impressionnistes.', 'Je peins aussi les courses de chevaux.', 'J’ai sculpté une Petite Danseuse de quatorze ans.', 'J’aime peindre les danseuses de l’Opéra.'] },
+          { r: 'Émile Zola', i: ['Je suis né à Paris et j’ai grandi à Aix-en-Provence.', 'J’étais l’ami d’enfance de Paul Cézanne.', 'J’ai raconté l’histoire de la famille Rougon-Macquart.', 'J’ai écrit Germinal.', 'J’ai défendu le capitaine Dreyfus dans « J’accuse… ! ».'] }],
+        expert: [{ r: 'Berthe Morisot', i: ['Je suis une femme peintre.', 'J’ai exposé dès la première exposition des impressionnistes, en 1874.', 'Édouard Manet a fait plusieurs portraits de moi.', 'J’ai épousé Eugène Manet, son frère.', 'J’ai peint Le Berceau.'] },
+          { r: 'George Sand', i: ['Mon vrai nom est Aurore Dupin.', 'J’ai grandi à Nohant, dans le Berry.', 'Je m’habillais parfois en homme.', 'J’ai vécu une histoire d’amour avec Chopin.', 'J’ai écrit La Mare au diable et La Petite Fadette.'] }]
+      } },
+      { k: 'classer', niveaux: {
+        facile: [{ q: 'Range : écrivain ou peintre ?', colonnes: ['Écrivain', 'Peintre'],
+          items: [['Victor Hugo', 0], ['Jules Verne', 0], ['Alexandre Dumas', 0], ['Hector Malot', 0],
+            ['Claude Monet', 1], ['Vincent van Gogh', 1], ['Auguste Renoir', 1], ['Edgar Degas', 1]] }],
+        moyen: [{ q: 'Range : roman de Victor Hugo ou de Jules Verne ?', colonnes: ['Victor Hugo', 'Jules Verne'],
+          items: [['Les Misérables', 0], ['Notre-Dame de Paris', 0], ['Quatrevingt-treize', 0], ['Les Travailleurs de la mer', 0],
+            ['Michel Strogoff', 1], ['Cinq Semaines en ballon', 1], ['L’Île mystérieuse', 1], ['De la Terre à la Lune', 1]] }],
+        difficile: [{ q: 'Range : peintre ou compositeur ?', colonnes: ['Peintre', 'Compositeur'],
+          items: [['Paul Cézanne', 0], ['Édouard Manet', 0], ['Camille Pissarro', 0], ['Eugène Delacroix', 0],
+            ['Georges Bizet', 1], ['Hector Berlioz', 1], ['Frédéric Chopin', 1], ['Camille Saint-Saëns', 1]] }],
+        expert: [{ q: 'Range : roman de Balzac ou de Zola ?', colonnes: ['Balzac', 'Zola'],
+          items: [['Eugénie Grandet', 0], ['Illusions perdues', 0], ['La Peau de chagrin', 0], ['Le Colonel Chabert', 0],
+            ['L’Assommoir', 1], ['Au Bonheur des Dames', 1], ['La Bête humaine', 1], ['Nana', 1]] }]
       } }
     ] },
     // ---------- XXe siècle (v7.11, BACKLOG ligne 295 : 7 jeux, hypothèse à valider) ----------
