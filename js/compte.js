@@ -299,4 +299,4 @@
   majPage();
   if (!lireRetour() && session) synchroniser(); // ouverture du jeu : on récupère ce qui a été gagné ailleurs
   window.Compte = Object.assign(C, { synchroniser: synchroniser, session: function () { return session; }, etat: etat });
-})(typeof window !== 'undefined' ? window : this);
+})(typeof window !== 'undefined' ? window : globalThis);
