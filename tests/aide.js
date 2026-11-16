@@ -49,7 +49,7 @@ async function repondre(page, juste = true) {
     return j ? a : 'ZZZ';
   }, juste);
   await page.locator('#reponse-joueur').fill(texte);
-  await page.getByRole('button', { name: 'OK', exact: true }).click();
+  await page.getByRole('button', { name: /^(OK|Valider)$/ }).click();
 }
 
 // Écran 3 : Mathématiques avec les signes, nombres et niveau donnés.

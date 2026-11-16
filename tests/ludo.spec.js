@@ -101,7 +101,7 @@ test('didacticiel : préparation et premier tour, flèche et bulle à chaque ét
   await flecheSur(page, '#tour-actions .btn');
   await bulleSansBouton(page);
   await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
-  await expect(texte(page)).toContainText('écris ta réponse');
+  await expect(texte(page)).toContainText(/écris ta réponse|touche les lettres de ta réponse/); // v9.3 : clavier à lettres
   await bulleSansBouton(page);
   await A.repondre(page, false);
   await expect(texte(page)).toContainText('J’ai compris');

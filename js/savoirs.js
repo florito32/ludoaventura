@@ -139,6 +139,9 @@
     return res;
   }
 
+  // Réponse trop longue pour une question ouverte (plus de 4 mots, ou plus de 32 signes) : une phrase, pas un nom.
+  function phrase(x) { var t = affiche(x).trim(); return t.split(/\s+/).length > 4 || t.length > 32; }
+
   // Une paire tirée pour une question : dans un sens (q : on donne a, on cherche b) ou dans l'autre (qi).
   function sens(s) { return !!s.qi && !s.image && hasard() < 0.5; }
 
@@ -151,6 +154,14 @@
       var format = auHasard(formats);
       var choix = pairesDistinctes(contenu(s, niveau), 4, false, s.sosies);
       if (choix.length < 4) return null;
+      // v9.3 (clavier à lettres) : une question ouverte attend un nom, jamais une phrase entière (ex. une définition) ;
+      // sinon la question se pose dans l'autre sens, ou devient « Relie » (hypothèse à valider).
+      var p = choix[0], inverse = s.qiOuverte !== false && sens(s);
+      var autreSens = !!s.qi && !s.image && s.qiOuverte !== false;
+      if (format === 'O' && phrase(inverse ? p[0] : p[1])) {
+        if (autreSens && !phrase(inverse ? p[1] : p[0])) inverse = !inverse;
+        else format = 'R';
+      }
       if (format === 'R') {
         return {
           format: 'R', consigne: s.consigneR || ('Relie chaque ' + s.gauche.toLowerCase() + ' à son ' + s.droite.toLowerCase() + '.'),
@@ -159,7 +170,6 @@
         };
       }
       // qiOuverte: false → la question ouverte ne se pose que dans le sens q (on n'écrit pas un nom de monument).
-      var p = choix[0], inverse = s.qiOuverte !== false && sens(s);
       return {
         format: 'O', consigne: remplir(inverse ? s.qi : s.q, p[0], p[1]), image: inverse ? null : s.image || null, sujet: inverse ? affiche(p[1]) : p[0],
         attendu: inverse ? p[0] : p[1], bonne: affiche(inverse ? p[0] : p[1])

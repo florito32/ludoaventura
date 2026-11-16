@@ -60,31 +60,27 @@ async function clavier(page, part) {
 }
 
 test('la case de réponse et « Valider » restent dans le cadre de couleur de la carte', async ({ page }) => {
+  // v9.3 : la réponse en lettres se donne au clavier à lettres : ses cases et « Valider » restent dans le cadre.
   await rapide(page);
   await page.goto('./');
   await versReglages(page, 1);
   await conjugaison(page, { temps: ['indicatif.present'], groupes: [3], niveau: 'moyen' });
   await lancer(page);
   await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
-  await expect(page.getByLabel('Ta réponse')).toBeFocused();
-  // Clavier ouvert sur écran tactile (carte en grand), sinon carte normale.
-  const tactile = await page.evaluate(() => matchMedia('(pointer: coarse)').matches);
-  if (tactile) await clavier(page, 0.55);
-  // Le focus au clavier montre le contour (comme sur le téléphone de la capture).
-  await page.getByLabel('Ta réponse').blur();
-  await page.getByLabel('Ta réponse').focus();
+  await expect(page.locator('#clavier')).toBeVisible();
+  // Ordinateur : le curseur est dans la case cachée ; son contour s'affiche autour des cases.
   const r = await page.evaluate(() => {
     const carte = document.getElementById('carte-piochee').getBoundingClientRect();
     const cadre = 3 + 5; // bord de 3 px + cadre de couleur de 5 px (ombre intérieure)
     const dedans = { top: carte.top + cadre, bottom: carte.bottom - cadre, left: carte.left + cadre, right: carte.right - cadre };
-    const input = document.getElementById('reponse-joueur'), cs = getComputedStyle(input);
-    const o = cs.outlineStyle === 'none' ? 0 : parseFloat(cs.outlineWidth) + parseFloat(cs.outlineOffset);
-    const i = input.getBoundingClientRect();
-    const v = document.getElementById('btn-valider-reponse').getBoundingClientRect();
+    const cases = document.getElementById('cases-reponse'), cs = getComputedStyle(cases);
+    const o = cs.outlineStyle === 'none' ? 0 : parseFloat(cs.outlineWidth) + Math.max(0, parseFloat(cs.outlineOffset) || 0);
+    const i = cases.getBoundingClientRect();
+    const v = document.getElementById('btn-valider-lettres').getBoundingClientRect();
     return {
       dedans,
       case: { top: i.top - o, bottom: i.bottom + o, left: i.left - o, right: i.right + o },
-      valider: { top: v.top, bottom: v.bottom + 4, left: v.left, right: v.right } // + l'ombre de 4 px sous le bouton
+      valider: { top: v.top, bottom: v.bottom + 3, left: v.left, right: v.right } // + l'ombre de 3 px sous la touche
     };
   });
   for (const [nom, b] of [['case de réponse', r.case], ['Valider', r.valider]]) {

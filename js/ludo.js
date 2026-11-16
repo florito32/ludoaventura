@@ -158,8 +158,11 @@
     }
     var saisie = c && (c.type === 'calcul' || c.type === 'conjugaison' || (c.question && c.question.saisie));
     if (r.etape === 'repondre' && saisie) {
-      return { cle: cle, cible: $('reponse-joueur'),
-        texte: j.nom + ', écris ta réponse dans la case, puis touche « OK ». « Écouter » lit la question à voix haute.' };
+      // v9.3 : réponse en lettres → clavier à lettres (la case de réponse est cachée, Ludo montre le clavier).
+      var lettresVues = !$('clavier').hidden;
+      return { cle: cle, cible: lettresVues ? $('clavier') : $('reponse-joueur'),
+        texte: lettresVues ? j.nom + ', touche les lettres de ta réponse, puis « Valider ». « Écouter » lit la question à voix haute.'
+          : j.nom + ', écris ta réponse dans la case, puis touche « OK ». « Écouter » lit la question à voix haute.' };
     }
     if (r.etape === 'repondre' && c && c.type === 'grammaire') {
       return { cle: cle, cible: $('carte-gram'),

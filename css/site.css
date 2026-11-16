@@ -1232,6 +1232,52 @@ body:not(.question-plein) .carte-saisie.avec-pave #reponse-joueur { min-height: 
 .touche[data-touche="0"] { grid-area: k0; } .touche[data-touche=","] { grid-area: virg; }
 .touche[data-touche="retour"] { grid-area: ret; } .touche[data-touche="tout"] { grid-area: eff; }
 
+/* ---------- Clavier à lettres (v9.3, js/plateau.js → clavier, js/clavier-lettres.js) ----------
+   Réponse en lettres : une case par signe de la réponse, puis 18 lettres (ou plus) sur 6 colonnes,
+   la rangée é è ê / - / ’, puis ⌫ / Tout effacer / espace / Valider. La vraie case de réponse reste
+   dans la page (lecteurs d'écran, clavier physique) mais ne se voit plus. */
+.carte-saisie.avec-clavier { display: flex; flex-direction: column; gap: 6px; max-width: 460px; width: 100%; margin-inline: auto; }
+.carte-saisie.avec-clavier label,
+.carte-saisie.avec-clavier .saisie-ligne { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.carte-saisie.avec-clavier #btn-valider-reponse { display: none; }
+.clavier[hidden] { display: none !important; }
+.clavier { display: flex; flex-direction: column; gap: 6px; }
+.cases-reponse {
+  display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 10px; min-height: 44px;
+  padding: 4px; border-radius: 10px; text-transform: uppercase;
+}
+.carte-saisie:has(#reponse-joueur:focus) .cases-reponse { outline: 3px solid var(--jaune); box-shadow: 0 0 0 5px var(--encre); }
+.cases-mot { display: flex; gap: 3px; }
+/* Largeur d'une case : calculée par js/plateau.js (--case) pour que le mot le plus long tienne sur une ligne. */
+.case-l {
+  width: var(--case, 30px); height: calc(var(--case, 30px) * 1.3); display: grid; place-items: center;
+  border: 2px solid var(--encre); border-radius: 6px; background: #fff; color: var(--encre);
+  font: 800 calc(var(--case, 30px) * .62)/1 system-ui, sans-serif;
+}
+.case-sep { width: calc(var(--case, 30px) * .62); border-style: dashed; background: var(--parchemin); }
+.case-l.active { border-color: var(--rouge); box-shadow: 0 0 0 2px var(--rouge); }
+.espace-tape { color: var(--encre-douce); font-weight: 400; }
+.ligne-reponse {
+  min-width: 8em; min-height: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 4px 12px;
+  border: 2px solid var(--encre); border-radius: 10px; background: #fff; font: 800 1.45rem/1 system-ui, sans-serif;
+}
+.curseur-lettres { display: inline-block; width: 2px; height: 1.1em; margin-left: 2px; background: var(--rouge); animation: curseur-lettres 1s steps(1) infinite; }
+@keyframes curseur-lettres { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .curseur-lettres { animation: none; } }
+/* Les touches prennent leur taille de texte sur la largeur du clavier (unités cqi), pas sur celle de l'écran :
+   le même clavier tient dans le panneau étroit de l'ordinateur et en plein écran sur téléphone. */
+.clavier { container-type: inline-size; }
+.clavier-grille { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.clavier-rangee { display: flex; gap: 6px; }
+.clavier-rangee .touche { flex: 1 1 0; min-width: 0; padding: 0 2px; }
+.clavier .touche { min-height: clamp(40px, 6vh, 54px); font-size: clamp(1rem, 6.4cqi, 1.45rem); }
+.clavier .touche-outil { font-size: clamp(.9rem, 5cqi, 1.2rem); }
+.clavier .touche-petit { font-size: clamp(.68rem, 3.5cqi, .95rem); line-height: 1.1; }
+.clavier .touche-espace { flex-grow: 2; font-size: clamp(.8rem, 4.2cqi, 1rem); font-weight: 700; }
+.clavier .touche-valider { flex-grow: 2; background: var(--vert); color: #fff; font-size: clamp(.85rem, 4.8cqi, 1.15rem); }
+body:not(.question-plein) .clavier .touche { min-height: clamp(36px, 5vh, 46px); }
+body:not(.question-plein) .carte-saisie.avec-clavier { gap: 5px; }
+
 /* ---------- Question en plein écran sur téléphone et tablette (v9.0, js/plateau.js → majPlein) ----------
    Dès qu'une question apparaît, l'encadré du tour de jeu couvre tout l'écran (plus de plateau) ;
    il le rend quand le dé se lance. Le bloc « saisie au clavier » ci-dessous garde la priorité
@@ -1251,16 +1297,22 @@ body.question-plein:not(.saisie-clavier) .tour .carte-mot:not(.cache) { font-siz
 body.question-plein:not(.saisie-clavier) .tour .carte-consigne.probleme { font-size: clamp(1.05rem, 4.4vw, 1.45rem); }
 /* Le pavé descend en bas de la carte, sous la question. */
 body.question-plein:not(.saisie-clavier) .carte-saisie.avec-pave { margin-top: auto; padding-top: 8px; }
+body.question-plein:not(.saisie-clavier) .carte-saisie.avec-clavier { margin-top: auto; padding-top: 8px; }
 body.question-plein:not(.saisie-clavier) .tour .carte-reponse { font-size: clamp(1rem, 3.6vw, 1.25rem); }
 /* Écran large ou carré (tablette en paysage, téléphone carré) : la question à gauche, le pavé à droite. */
 @media (min-aspect-ratio: 1/1) {
-  body.question-plein:not(.saisie-clavier) .tour .carte-piochee:has(.carte-saisie.avec-pave:not([hidden])) {
+  body.question-plein:not(.saisie-clavier) .tour .carte-piochee:has(.carte-saisie.avec-pave:not([hidden])),
+  body.question-plein:not(.saisie-clavier) .tour .carte-piochee:has(.carte-saisie.avec-clavier:not([hidden])) {
     display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 14px; align-content: start;
   }
   body.question-plein:not(.saisie-clavier) .tour .carte-piochee:has(.carte-saisie.avec-pave:not([hidden])) > * { grid-column: 1; }
+  body.question-plein:not(.saisie-clavier) .tour .carte-piochee:has(.carte-saisie.avec-clavier:not([hidden])) > * { grid-column: 1; }
   body.question-plein:not(.saisie-clavier) .tour .carte-piochee:has(.carte-saisie.avec-pave:not([hidden])) > .carte-entete { grid-column: 1 / -1; }
+  body.question-plein:not(.saisie-clavier) .tour .carte-piochee:has(.carte-saisie.avec-clavier:not([hidden])) > .carte-entete { grid-column: 1 / -1; }
   body.question-plein:not(.saisie-clavier) .tour .carte-piochee:has(.carte-saisie.avec-pave:not([hidden])) > .carte-saisie { grid-column: 2; grid-row: 2 / span 12; margin: 0; align-self: center; }
+  body.question-plein:not(.saisie-clavier) .tour .carte-piochee:has(.carte-saisie.avec-clavier:not([hidden])) > .carte-saisie { grid-column: 2; grid-row: 2 / span 12; margin: 0; align-self: center; }
   body.question-plein:not(.saisie-clavier) .carte-saisie.avec-pave .touche { min-height: clamp(40px, 11vh, 62px); }
+  body.question-plein:not(.saisie-clavier) .clavier .touche { min-height: clamp(32px, 8vh, 50px); }
 }
 /* Écran large et bas (téléphone carré ou en paysage) : pavé resserré, « Ta réponse » seulement pour les lecteurs d'écran. */
 @media (min-aspect-ratio: 1/1) and (max-height: 560px) {
@@ -1270,6 +1322,9 @@ body.question-plein:not(.saisie-clavier) .tour .carte-reponse { font-size: clamp
   body.question-plein:not(.saisie-clavier) .carte-saisie.avec-pave { grid-template-areas: "champ champ champ champ" "k7 k8 k9 ret" "k4 k5 k6 eff" "k1 k2 k3 ok" "k0 k0 virg ok"; }
   body.question-plein:not(.saisie-clavier) .carte-saisie.avec-pave #reponse-joueur { min-height: 40px; font-size: 1.35rem; }
   body.question-plein:not(.saisie-clavier) .tour .carte-consigne.probleme { font-size: clamp(.95rem, 2.1vw, 1.15rem); line-height: 1.35; }
+  body.question-plein:not(.saisie-clavier) .clavier, body.question-plein:not(.saisie-clavier) .carte-saisie.avec-clavier { gap: 4px; }
+  body.question-plein:not(.saisie-clavier) .clavier .touche { min-height: clamp(30px, 7.4vh, 44px); }
+  body.question-plein:not(.saisie-clavier) .case-l { height: min(calc(var(--case, 30px) * 1.3), 7vh); }
 }
 
 /* ---------- Saisie au clavier sur écran tactile (v6.13, js/plateau.js → majSaisie) ----------

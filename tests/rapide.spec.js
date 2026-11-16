@@ -149,7 +149,7 @@ test('fin de partie rapide : « Recommencer la partie » et « Retour à l’acc
       expect(c.type).toBe('calcul');
       expect(c.packNom).toContain('Moyen');
       await page.locator('#reponse-joueur').fill(c.resultatTexte);
-      await page.getByRole('button', { name: 'OK', exact: true }).click();
+      await page.getByRole('button', { name: /^(OK|Valider)$/ }).click();
       await page.waitForFunction(() => window.Aventura.partie.regles.etape === 'lancer');
       await page.evaluate(() => window.Aventura.lancerDe());
     }

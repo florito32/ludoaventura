@@ -38,7 +38,7 @@ test('conjugaison fausse puis « ? » : tout reste à l\'écran, l\'encadré rem
   await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await tient(page, 'carte');
   await page.getByLabel('Ta réponse').fill('faux');
-  await page.getByRole('button', { name: 'OK', exact: true }).click();
+  await page.getByRole('button', { name: /^(OK|Valider)$/ }).click();
   await tient(page, 'correction');
   await page.locator('#btn-tableau').click();
   await expect(page.locator('#carte-tableau li')).toHaveCount(6);
@@ -60,7 +60,7 @@ test('calcul faux (niveau Expert) : correction et « J\'ai compris » à l\'écr
   await tient(page, 'carte');
   await expect(page.getByLabel('Ta réponse')).toBeInViewport();
   await page.getByLabel('Ta réponse').fill('1');
-  await page.getByRole('button', { name: 'OK', exact: true }).click();
+  await page.getByRole('button', { name: /^(OK|Valider)$/ }).click();
   await expect(page.locator('#carte-reponse')).toContainText('tu as écrit « 1 »');
   await tient(page, 'correction');
   await expect(page.locator('#carte-reponse')).toBeInViewport();
@@ -71,7 +71,7 @@ test('orthographe : carte, case de réponse et mauvaise réponse sans défiler',
   await partie(page, (p) => cocherJoueur(p));
   await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await tient(page, 'carte');
-  await expect(page.getByRole('button', { name: 'OK', exact: true })).toBeInViewport();
+  await expect(page.getByRole('button', { name: /^(OK|Valider)$/ })).toBeInViewport();
   await repondre(page, false);
   await tient(page, 'après une mauvaise réponse');
   await expect(page.getByRole('button', { name: 'J’ai compris' })).toBeInViewport();

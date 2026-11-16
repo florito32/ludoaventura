@@ -100,7 +100,7 @@ test.describe('Calcul mental ou Problèmes', () => {
     await expect(page.locator('#carte-mot')).toBeHidden();
     await taper(page, c.resultatTexte);
     await expect(page.getByLabel('Ta réponse')).toHaveValue(c.resultatTexte);
-    await page.getByRole('button', { name: 'OK', exact: true }).click();
+    await page.getByRole('button', { name: /^(OK|Valider)$/ }).click();
     await expect(page.locator('#carte-reponse')).toContainText('Bonne réponse ! ' + c.resultatTexte + ' (' + c.formule + ' = ' + c.resultatTexte + ')');
   });
 
@@ -176,7 +176,7 @@ test.describe('question en plein écran', () => {
     }
     const c = await page.evaluate(() => window.Aventura.partie.carte);
     await taper(page, c.resultatTexte);
-    await page.getByRole('button', { name: 'OK', exact: true }).click();
+    await page.getByRole('button', { name: /^(OK|Valider)$/ }).click();
     // La correction reste en plein écran jusqu'au dé.
     await expect(page.locator('#carte-reponse')).toBeVisible();
     if (plein) await expect(page.locator('body')).toHaveClass(/question-plein/);

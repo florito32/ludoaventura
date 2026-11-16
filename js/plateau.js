@@ -68,6 +68,7 @@
   var MATIERES = ['maths', 'orthographe', 'conjugaison', 'grammaire', 'phonemes', 'geographie', 'histoire']; // matières jouables (Français → Orthographe, Conjugaison ou Grammaire ; Géographie, Histoire)
   // Géographie et Histoire (v7.0) : jeux et niveau de chaque joueur, pour chacune des deux matières (js/savoirs.js).
   var SV = window.Savoirs;
+  var CL = window.ClavierLettres; // v9.3 : clavier à lettres (js/clavier-lettres.js)
   var MATIERES_SAVOIR = ['geographie', 'histoire'];
   function estSavoir(m) { return MATIERES_SAVOIR.indexOf(m) >= 0; }
   // v8.0 : mode « quiz » (4 choix) ou « normal » (tout sauf le QCM) ; Quiz présélectionné (hypothèse à valider).
@@ -1339,8 +1340,8 @@
         montrerCarte(j);
         rendre();
         // Calcul : le curseur est mis dans la case de réponse (sans faire défiler la page).
-        // v9.0 : avec le pavé numérique sur écran tactile, pas de curseur (aucun clavier ne doit s'ouvrir).
-        if (aSaisir(partie.carte) && !($('pave').hidden === false && tactile.matches)) $('reponse-joueur').focus({ preventScroll: true });
+        // v9.0 : avec le pavé numérique sur écran tactile, pas de curseur (aucun clavier ne doit s'ouvrir) ; v9.3 : idem avec le clavier à lettres.
+        if (aSaisir(partie.carte) && !(($('pave').hidden === false || $('clavier').hidden === false) && tactile.matches)) $('reponse-joueur').focus({ preventScroll: true });
         // Dictée (v6.31) : le mot est caché, la voix le lit tout de suite (« Écouter » le relit).
         var q = partie.carte.question;
         if (q && q.dictee) window.Voix.lire(window.Voix.texteCarte(partie.carte));
@@ -1548,6 +1549,7 @@
     champ.disabled = corrigee;
     $('btn-valider-reponse').disabled = corrigee;
     champ.removeAttribute('aria-invalid');
+    clavier(q.saisie === 'nombre' || q.lettres ? null : modeleOrtho(c)); // v9.3 : réponse en lettres → clavier à lettres
     $('carte-lettres').hidden = true;
     $('carte-mot').hidden = false;
     if (!corrigee && q.lettres) {
@@ -1619,6 +1621,8 @@
     var corrigee = c.reponseDonnee != null;
     champ.value = corrigee ? c.reponseDonnee : '';
     champ.disabled = corrigee;
+    // v9.3 : conjugaison → clavier à lettres ; les cases suivent la forme attendue, sans le pronom (déjà écrit sur la carte).
+    clavier(conj ? { modele: CL.tapable(V.formes(c.verbe, c.temps, c.personne)[0]) } : null);
     $('btn-valider-reponse').disabled = corrigee;
     champ.removeAttribute('aria-invalid');
     var rep = $('carte-reponse');
@@ -1671,7 +1675,7 @@
     if (!texte || illisible) {
       rep.hidden = false;
       rep.className = 'carte-reponse alerte';
-      rep.textContent = !texte ? 'Écris ta réponse dans la case.'
+      rep.textContent = !texte ? ($('clavier').hidden ? 'Écris ta réponse dans la case.' : 'Touche les lettres de ta réponse.')
         : ortho ? ({ nombre: 'Écris un nombre, par exemple 5.', mot: 'Écris le mot en lettres.',
           article: C.INFOS[c.mot].elision ? 'Écris « un » ou « une ».' : 'Écris « le » ou « la ».' }[c.question.saisie] || 'Écris des lettres, par exemple : a, e.')
         : 'Écris un nombre, par exemple 12 ou 3,5.';
@@ -1719,6 +1723,7 @@
       pave(attenduNombre(c)); // v9.0 : une année, un nombre → pavé numérique
       champ.value = fait ? c.reponseDonnee : '';
       champ.disabled = fait;
+      clavier(attenduNombre(c) ? null : { modele: CL.tapable(SV.affiche(c.attendu)) }); // v9.3 : un nom → clavier à lettres
       $('btn-valider-reponse').disabled = fait;
       champ.removeAttribute('aria-invalid');
       var rep = $('carte-reponse');
@@ -1776,6 +1781,7 @@
     $('carte-mot').hidden = false;
     $('carte-consigne').className = 'carte-consigne';
     pave(false);
+    clavier(null);
     $('reponse-joueur').setAttribute('autocapitalize', 'off');
     $('carte-savoir').hidden = true;
     if (estCarteSavoir(c)) { $('carte-titre').textContent = c.packNom; montrerSavoir(c); return; }
@@ -1998,6 +2004,18 @@
       sauver: sauver
     });
     document.addEventListener('keydown', clavierLettres);
+    // v9.3 : clavier à lettres (lettres proposées, é è ê, - ’, ⌫, Tout effacer, espace ; Valider envoie le formulaire).
+    $('clavier').addEventListener('click', function (e) {
+      var b = e.target.closest('[data-cl]'), champ = $('reponse-joueur');
+      if (!b || champ.disabled || !clavierEtat) return;
+      changerReponse(CL.toucher(champ.value, b.dataset.cl, clavierEtat.max));
+      if (!window.matchMedia('(pointer: coarse)').matches) champ.focus({ preventScroll: true });
+    });
+    // Ordinateur : le clavier physique écrit dans la case (cachée) ; on garde seulement les signes permis.
+    $('reponse-joueur').addEventListener('input', function () {
+      if (clavierEtat) changerReponse(this.value);
+    });
+    document.addEventListener('keydown', clavierPhysique);
     $('btn-tableau').addEventListener('click', basculerTableau);
     $('btn-voir-mot').addEventListener('click', function () { if (partie.vue === 'mot') cacherMot(); else montrerMotSeul(); });
     $('btn-voir').addEventListener('click', function () { if (partie.vue === 'reponse') cacherMot(); else montrerReponse(); });
@@ -2044,6 +2062,78 @@
     $('carte-saisie').classList.toggle('avec-pave', !!oui);
     if (oui && window.matchMedia('(pointer: coarse)').matches) $('reponse-joueur').setAttribute('inputmode', 'none');
   }
+  // ---------- Clavier à lettres (v9.3, demande du 16/11/2026) ----------
+  // Toute réponse écrite en lettres se donne en touchant les lettres proposées (js/clavier-lettres.js) :
+  // une case par signe de la réponse attendue (lettre, espace, tiret, apostrophe), au moins 18 lettres proposées.
+  // o = { modele: réponse tapable } ou { modele: null, base: lettres à proposer } (pas de cases : le / la / un / une).
+  var clavierEtat = null;
+  function clavier(o) {
+    var box = $('clavier'), champ = $('reponse-joueur');
+    clavierEtat = o || null;
+    box.hidden = !o;
+    $('carte-saisie').classList.toggle('avec-clavier', !!o);
+    if (!o) return;
+    clavierEtat.max = o.modele ? o.modele.length : 12;
+    $('clavier-grille').innerHTML = CL.lettres(o.modele || o.base).map(function (l) {
+      return '<button type="button" class="touche" data-cl="' + l + '">' + l.toUpperCase() + '</button>';
+    }).join('');
+    champ.setAttribute('autocapitalize', 'off');
+    if (window.matchMedia('(pointer: coarse)').matches) champ.setAttribute('inputmode', 'none');
+    majCases();
+  }
+  function majCases() {
+    if (!clavierEtat) return;
+    var champ = $('reponse-joueur'), el = $('cases-reponse');
+    if (clavierEtat.modele) CL.dessinerCases(el, clavierEtat.modele, champ.value, !champ.disabled);
+    else CL.dessinerLigne(el, champ.value, !champ.disabled);
+    tailleCases();
+  }
+  // Largeur des cases : le mot le plus long (jusqu'à son tiret ou son espace) tient sur une ligne, 34 px au plus.
+  function tailleCases() {
+    var el = $('cases-reponse');
+    if (!clavierEtat || !clavierEtat.modele || $('clavier').hidden) return;
+    var long = Math.max.apply(null, clavierEtat.modele.match(/[^ \-\u2019]*[ \-\u2019]?/g).map(function (g) { return g.length; }));
+    var dispo = (el.clientWidth || 300) - 12;
+    el.style.setProperty('--case', Math.max(14, Math.min(34, Math.floor((dispo - 3 * (long - 1)) / Math.max(1, long)))) + 'px');
+  }
+  // La place du clavier change après coup (question en plein écran, écran carré : clavier à droite) : on remesure.
+  if (window.ResizeObserver) new ResizeObserver(function () { tailleCases(); }).observe($('cases-reponse'));
+  else window.addEventListener('resize', tailleCases);
+  function changerReponse(v) {
+    var champ = $('reponse-joueur');
+    champ.value = CL.nettoyer(v, clavierEtat.max);
+    champ.removeAttribute('aria-invalid');
+    var rep = $('carte-reponse');
+    if (rep.classList.contains('alerte')) rep.hidden = true; // « Touche les lettres… » disparaît dès qu'on touche
+    majCases();
+  }
+  // Clavier physique quand la case n'a pas le curseur (ex. après un clic sur une lettre à l'écran) : il marche aussi.
+  function clavierPhysique(e) {
+    var champ = $('reponse-joueur');
+    if (!clavierEtat || $('clavier').hidden || champ.disabled || e.ctrlKey || e.metaKey || e.altKey) return;
+    var cible = e.target;
+    if (cible && /^(INPUT|TEXTAREA|SELECT)$/.test(cible.tagName)) return;
+    if (document.querySelector('dialog[open]')) return;
+    var k = e.key, t = null;
+    if (k === 'Backspace') t = 'retour';
+    else if (k === 'Enter' || k === ' ') { if (cible && cible.tagName === 'BUTTON') return; if (k === 'Enter') { e.preventDefault(); $('carte-saisie').requestSubmit(); return; } t = 'espace'; }
+    else if (k.length === 1 && CL.nettoyer(k)) t = CL.nettoyer(k);
+    if (!t) return;
+    e.preventDefault();
+    changerReponse(CL.toucher(champ.value, t, clavierEtat.max));
+  }
+  // Cases de l'orthographe : le mot attendu ; les lettres à trouver (une case par lettre différente) ; le / la : pas de cases.
+  function modeleOrtho(c) {
+    var q = c.question, att = q.attendu(c.mot, C.INFOS[c.mot], c.params);
+    if (q.saisie === 'article') return { modele: null, base: 'le la un une' };
+    if (Array.isArray(att)) {
+      var vues = [];
+      att.forEach(function (l) { CL.sansAccent(CL.tapable(l)).split('').forEach(function (x) { if (/[a-z]/.test(x) && vues.indexOf(x) < 0) vues.push(x); }); });
+      return { modele: vues.join('') };
+    }
+    return { modele: CL.tapable(att) };
+  }
+
   // Une touche appliquée à la réponse en cours : « 0 » de tête remplacé, une seule virgule, 12 caractères au plus.
   function touchePave(v, t) {
     v = v || '';

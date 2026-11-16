@@ -286,7 +286,7 @@ test('question ouverte : le joueur écrit la capitale, sans accent → juste', a
   await expect(page.locator('#carte-saisie')).toBeVisible();
   const texte = c.bonne.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
   await page.getByLabel('Ta réponse').fill(texte);
-  await page.getByRole('button', { name: 'OK', exact: true }).click();
+  await page.getByRole('button', { name: /^(OK|Valider)$/ }).click();
   await expect(page.locator('#carte-reponse')).toContainText('Bonne réponse');
   expect(await page.evaluate(() => window.Aventura.partie.regles.de)).toBe('fort');
 });
