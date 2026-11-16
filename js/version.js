@@ -4,9 +4,14 @@
 (function () {
   'use strict';
 
-  var VERSION = '8.10';
+  var VERSION = '9.0';
 
   var HISTORY = [
+    { v: '9.0', date: '2026-11-16', changes: [
+      "Mathématiques : deux choix, « Calcul mental » ou « Problèmes ». Un problème raconte le calcul tiré avec tes réglages habituels (niveau, signes, nombres), sur un thème tiré au hasard parmi 58 (château fort, ruche, épave, vaisseau spatial…).",
+      "Pavé numérique à l’écran pour toute réponse en nombre (chiffres, virgule, ⌫ pour effacer le dernier chiffre, C pour tout effacer, OK) : plus besoin du clavier du téléphone ni de l’ordinateur.",
+      "Sur téléphone et tablette, la question prend tout l’écran ; le plateau revient quand le dé se lance."
+    ] },
     { v: '8.10', date: '2026-11-16', changes: [
       "Histoire, XXe siècle : les 7 petits jeux sont regroupés en 3, avec environ 38 à 50 questions par niveau chacun, jouables en Quiz et en Normal — Le XXe siècle en dates (présidents, construction européenne, frise, vie en France) ; Sciences et espace (conquête spatiale, inventions) ; Grandes figures (femmes qui ont marqué l’histoire, grandes figures du monde)."
     ] },

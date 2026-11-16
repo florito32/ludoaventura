@@ -54,27 +54,33 @@ test('conjugaison : clavier ouvert, la carte prend toute la zone visible, rien n
   await page.screenshot({ path: 'test-results/saisie-' + info.project.name + '.png' });
 });
 
-test('calcul : réponse validée, le clavier se ferme et le plateau revient (dé visible)', async ({ page }, info) => {
+// v9.0 : le calcul se tape au pavé numérique (tests/problemes.spec.js) ; le clavier du téléphone ne sert plus
+// qu'aux réponses en lettres : ces deux tests passent en conjugaison.
+const CONJ = (p) => conjugaison(p, { temps: ['indicatif.futur'], groupes: [3], niveau: 'facile' });
+
+test('conjugaison : réponse validée, le clavier se ferme, la correction et « J\'ai compris » sont visibles', async ({ page }, info) => {
   test.skip(info.project.name === 'ordinateur', 'pas de clavier virtuel sur ordinateur');
-  await partie(page, (p) => maths(p, { signes: ['plus'], nombres: [2], niveau: 'facile' }));
+  await partie(page, CONJ);
   await clavier(page, 0.5);
-  await toutVisible(page, 'calcul');
-  await page.getByLabel('Ta réponse').fill('0');
+  await toutVisible(page, 'conjugaison');
+  await page.getByLabel('Ta réponse').fill('zzz');
   await page.getByRole('button', { name: 'OK', exact: true }).click();
+  await clavier(page, 1);
   await expect(page.locator('body')).not.toHaveClass(/saisie-clavier/);
-  await expect(page.locator('#carte-reponse')).toContainText('tu as écrit « 0 »');
+  await expect(page.locator('#carte-reponse')).toContainText('tu as écrit « zzz »');
   await expect(page.getByRole('button', { name: 'J’ai compris' })).toBeInViewport();
 });
 
-test('clavier refermé par le joueur : la carte rend la place au plateau', async ({ page }, info) => {
+test('clavier refermé par le joueur : la carte reprend tout l\'écran (v9.0), la case reste visible', async ({ page }, info) => {
   test.skip(info.project.name === 'ordinateur', 'pas de clavier virtuel sur ordinateur');
-  await partie(page, (p) => maths(p, { signes: ['plus'], nombres: [3], niveau: 'facile' }));
+  await partie(page, CONJ);
   await clavier(page, 0.5);
   await expect(page.locator('body')).toHaveClass(/saisie-clavier/);
   await clavier(page, 1);
   await expect(page.locator('body')).not.toHaveClass(/saisie-clavier/);
-  await expect(page.locator('#plateau-image, .plateau').first()).toBeInViewport();
-  // Toucher la case rouvre le clavier, et la carte repasse en grand.
+  await expect(page.locator('body')).toHaveClass(/question-plein/);
+  await expect(page.getByLabel('Ta réponse')).toBeInViewport();
+  // Toucher la case rouvre le clavier, et la carte se cale au-dessus.
   await page.getByLabel('Ta réponse').tap();
   await clavier(page, 0.5);
   await expect(page.locator('body')).toHaveClass(/saisie-clavier/);

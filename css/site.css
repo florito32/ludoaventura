@@ -1198,6 +1198,80 @@ body:has(#ecran-plateau:not([hidden])) .pied { padding-block: 2px calc(2px + env
   .tour .carte-entete .btn-ecouter { min-height: 40px; padding: 4px 10px; }
 }
 
+/* ---------- Problèmes de mathématiques (v9.0, js/problemes.js) ----------
+   L'énoncé remplace la formule : texte lisible, thème en petit au-dessus. */
+.carte-consigne.probleme { font-weight: 500; font-size: clamp(1rem, 3.9vw, 1.25rem); line-height: 1.45; text-align: left; }
+.probleme-theme { display: block; font-size: .78em; font-weight: 800; letter-spacing: .03em; color: var(--encre-douce); text-transform: uppercase; margin-bottom: 2px; }
+
+/* ---------- Pavé numérique (v9.0, js/plateau.js → pave) ----------
+   Toute réponse en nombre se tape ici : case de réponse en haut, puis 7 8 9 ⌫ / 4 5 6 C / 1 2 3 OK / 0 , OK.
+   Les conteneurs .saisie-ligne et .pave s'effacent (display: contents) : leurs boutons se rangent dans la grille. */
+.carte-saisie.avec-pave {
+  display: grid; gap: 6px; grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-areas: "lab lab lab lab" "champ champ champ champ" "k7 k8 k9 ret" "k4 k5 k6 eff" "k1 k2 k3 ok" "k0 k0 virg ok";
+  max-width: 420px; width: 100%; margin-inline: auto;
+}
+.carte-saisie.avec-pave label { grid-area: lab; margin: 0; }
+.carte-saisie.avec-pave .saisie-ligne, .carte-saisie.avec-pave .pave { display: contents; }
+.carte-saisie.avec-pave #reponse-joueur { grid-area: champ; width: 100%; text-align: center; font-size: 1.6rem; caret-color: var(--rouge); }
+.carte-saisie.avec-pave #btn-valider-reponse { grid-area: ok; min-height: 0; height: 100%; padding: 4px; font-size: 1.3rem; }
+.pave[hidden] { display: none !important; }
+.touche {
+  font: 800 clamp(1.25rem, 4.5vw, 1.6rem)/1 system-ui, sans-serif; color: var(--encre); cursor: pointer;
+  min-height: clamp(44px, 7.2vh, 62px); border-radius: 10px; border: 2px solid var(--encre);
+  background: #fff; box-shadow: 0 3px 0 var(--encre); touch-action: manipulation; -webkit-user-select: none; user-select: none;
+}
+body:not(.question-plein) .touche { min-height: clamp(40px, 5.2vh, 50px); }
+body:not(.question-plein) .carte-saisie.avec-pave { gap: 5px; max-width: 340px; }
+body:not(.question-plein) .carte-saisie.avec-pave #reponse-joueur { min-height: 42px; font-size: 1.4rem; }
+.touche:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--encre); }
+.touche-outil { background: var(--parchemin); }
+.touche[data-touche="7"] { grid-area: k7; } .touche[data-touche="8"] { grid-area: k8; } .touche[data-touche="9"] { grid-area: k9; }
+.touche[data-touche="4"] { grid-area: k4; } .touche[data-touche="5"] { grid-area: k5; } .touche[data-touche="6"] { grid-area: k6; }
+.touche[data-touche="1"] { grid-area: k1; } .touche[data-touche="2"] { grid-area: k2; } .touche[data-touche="3"] { grid-area: k3; }
+.touche[data-touche="0"] { grid-area: k0; } .touche[data-touche=","] { grid-area: virg; }
+.touche[data-touche="retour"] { grid-area: ret; } .touche[data-touche="tout"] { grid-area: eff; }
+
+/* ---------- Question en plein écran sur téléphone et tablette (v9.0, js/plateau.js → majPlein) ----------
+   Dès qu'une question apparaît, l'encadré du tour de jeu couvre tout l'écran (plus de plateau) ;
+   il le rend quand le dé se lance. Le bloc « saisie au clavier » ci-dessous garde la priorité
+   (un clavier ouvert pour une réponse en lettres réduit la zone visible). */
+body.question-plein { overflow: hidden; }
+body.question-plein:not(.saisie-clavier) .panneau {
+  position: fixed; z-index: 40; inset: 0; height: 100dvh; width: auto; max-height: none; margin: 0;
+  display: flex; flex-direction: column;
+  padding: max(6px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  background: var(--vert);
+}
+body.question-plein:not(.saisie-clavier) .panneau .tour { flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; width: min(100%, 820px); margin-inline: auto; box-shadow: none; padding: 8px; }
+body.question-plein:not(.saisie-clavier) .tour-joueur img { width: 34px; height: 38px; }
+body.question-plein:not(.saisie-clavier) .tour-joueur p { font-size: .95rem; }
+body.question-plein:not(.saisie-clavier) .tour .carte-piochee { flex: 1 0 auto; margin-top: 6px; display: flex; flex-direction: column; padding: 10px 12px 12px; }
+body.question-plein:not(.saisie-clavier) .tour .carte-mot:not(.cache) { font-size: clamp(1.6rem, 7vw, 2.6rem); margin: 8px 0 !important; }
+body.question-plein:not(.saisie-clavier) .tour .carte-consigne.probleme { font-size: clamp(1.05rem, 4.4vw, 1.45rem); }
+/* Le pavé descend en bas de la carte, sous la question. */
+body.question-plein:not(.saisie-clavier) .carte-saisie.avec-pave { margin-top: auto; padding-top: 8px; }
+body.question-plein:not(.saisie-clavier) .tour .carte-reponse { font-size: clamp(1rem, 3.6vw, 1.25rem); }
+/* Écran large ou carré (tablette en paysage, téléphone carré) : la question à gauche, le pavé à droite. */
+@media (min-aspect-ratio: 1/1) {
+  body.question-plein:not(.saisie-clavier) .tour .carte-piochee:has(.carte-saisie.avec-pave:not([hidden])) {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 14px; align-content: start;
+  }
+  body.question-plein:not(.saisie-clavier) .tour .carte-piochee:has(.carte-saisie.avec-pave:not([hidden])) > * { grid-column: 1; }
+  body.question-plein:not(.saisie-clavier) .tour .carte-piochee:has(.carte-saisie.avec-pave:not([hidden])) > .carte-entete { grid-column: 1 / -1; }
+  body.question-plein:not(.saisie-clavier) .tour .carte-piochee:has(.carte-saisie.avec-pave:not([hidden])) > .carte-saisie { grid-column: 2; grid-row: 2 / span 12; margin: 0; align-self: center; }
+  body.question-plein:not(.saisie-clavier) .carte-saisie.avec-pave .touche { min-height: clamp(40px, 11vh, 62px); }
+}
+/* Écran large et bas (téléphone carré ou en paysage) : pavé resserré, « Ta réponse » seulement pour les lecteurs d'écran. */
+@media (min-aspect-ratio: 1/1) and (max-height: 560px) {
+  body.question-plein:not(.saisie-clavier) .carte-saisie.avec-pave { gap: 5px; }
+  body.question-plein:not(.saisie-clavier) .carte-saisie.avec-pave .touche { min-height: clamp(34px, 9vh, 48px); }
+  body.question-plein:not(.saisie-clavier) .carte-saisie.avec-pave label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  body.question-plein:not(.saisie-clavier) .carte-saisie.avec-pave { grid-template-areas: "champ champ champ champ" "k7 k8 k9 ret" "k4 k5 k6 eff" "k1 k2 k3 ok" "k0 k0 virg ok"; }
+  body.question-plein:not(.saisie-clavier) .carte-saisie.avec-pave #reponse-joueur { min-height: 40px; font-size: 1.35rem; }
+  body.question-plein:not(.saisie-clavier) .tour .carte-consigne.probleme { font-size: clamp(.95rem, 2.1vw, 1.15rem); line-height: 1.35; }
+}
+
 /* ---------- Saisie au clavier sur écran tactile (v6.13, js/plateau.js → majSaisie) ----------
    Pendant que le joueur écrit sa réponse, la carte se pose par-dessus le plateau et occupe exactement
    la partie de l'écran visible au-dessus du clavier (--vv-haut, --vv-h, lus par l'API Visual Viewport).
