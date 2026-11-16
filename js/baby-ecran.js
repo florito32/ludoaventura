@@ -1,4 +1,4 @@
-// Écran « Baby jeux » (v8.11, demande de l'utilisateur du 16/11/2026, backlog lignes 355 à 362).
+// Écran « Baby jeux » (v9.1, demande de l'utilisateur du 16/11/2026, backlog lignes 355 à 362).
 // Réglages, gardés pour la fois suivante : catégories (Lettres, Chiffres), lettres travaillées (A à Z) et écriture
 // (MAJUSCULES, minuscules, les deux), chiffres travaillés (1 à 10), jeux cochés.
 // « Lancer la partie » : comme la partie rapide solo (choix de l'utilisateur) — aventure facile et aventurier

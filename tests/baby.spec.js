@@ -1,4 +1,4 @@
-// Baby jeux (v8.11, demande du 16/11/2026, backlog lignes 355 à 362) : bouton de l'accueil, réglages,
+// Baby jeux (v9.1, demande du 16/11/2026, backlog lignes 355 à 362) : bouton de l'accueil, réglages,
 // 20 petits jeux de lettres et de chiffres joués sur le plateau comme une partie rapide.
 const { test, expect } = require('@playwright/test');
 const B = require('../js/baby.js');

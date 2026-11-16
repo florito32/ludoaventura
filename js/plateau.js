@@ -936,7 +936,7 @@
     var mat = partie.matiere[j.index], mr = partie.maths[j.index], cr = partie.conj[j.index], gr = partie.gram[j.index];
     // Partie rapide (v6.43) : chaque carte tire sa matière parmi celles choisies, avec des réglages du niveau
     // choisi (v6.45) tirés pour cette carte (orthographe : thèmes, mots et questions du niveau, déjà dans le tas du joueur).
-    // Baby jeux (v8.11) : chaque carte est un petit jeu de lettres ou de chiffres (js/baby.js), tiré parmi ceux cochés.
+    // Baby jeux (v9.1) : chaque carte est un petit jeu de lettres ou de chiffres (js/baby.js), tiré parmi ceux cochés.
     if (partie.rapide && partie.rapide.baby && window.Baby) {
       var bc = window.Baby.carte(partie.rapide.baby, Math.random, j.babyDernier);
       j.babyDernier = bc.jeu;
@@ -1504,7 +1504,7 @@
     rep.hidden = false;
     rep.className = 'carte-reponse ' + (c.juste ? 'juste' : 'fausse');
     var sol = moduleGram(c).solution(c);
-    // Baby jeux (v8.11) : correction courte et douce (jamais « tu as choisi … »).
+    // Baby jeux (v9.1) : correction courte et douce (jamais « tu as choisi … »).
     if (c.module === 'baby') { rep.textContent = (c.juste ? 'Bravo ! ' : 'Presque ! ') + sol; return; }
     if (c.jeu === 'relier' || c.jeu === 'trier') {
       rep.textContent = c.juste ? 'Bonne réponse ! ' + (c.jeu === 'trier' ? 'Tous les mots sont bien rangés.' : 'Toutes les paires sont justes.')
@@ -2295,7 +2295,7 @@
       partie.gram[i] = R2.gramTout(d.niveau); // v6.55
     }
     partie.rapide = { matieres: d.matieres.slice(), niveau: d.niveau, mode: d.mode || 'quiz' };
-    if (d.baby) partie.rapide.baby = d.baby; // Baby jeux (v8.11) : réglages de js/baby-ecran.js
+    if (d.baby) partie.rapide.baby = d.baby; // Baby jeux (v9.1) : réglages de js/baby-ecran.js
     partie.etapePrepa = 4; partie.sousEtape = 'matiere'; partie.actif = 0;
     majDetail(); majAventuriers();
     lancerPartie();

@@ -1,4 +1,4 @@
-// Affichage et gestes des cartes « Baby jeux » (v8.11) dans la carte piochée.
+// Affichage et gestes des cartes « Baby jeux » (v9.1) dans la carte piochée.
 // Contenu des cartes : js/baby.js. Ce fichier est appelé par js/grammaire-carte.js (carte.module === 'baby'),
 // qui garde les gestes communs : boutons de réponse (.gram-bouton) et « Relier » (mêmes colonnes et traits).
 // Ici : l'image de la question (dé, doigts, objets, suite…), l'arène où les jetons se baladent (attrape, bulles),

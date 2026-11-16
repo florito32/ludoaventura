@@ -1809,7 +1809,7 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .carte-quiz svg { max-height: min(44vh, 460px); }
 @media (max-height: 600px) { .carte-quiz svg { max-height: 38vh; } }
 
-/* ---------- Baby jeux (v8.11 : js/baby.js, js/baby-carte.js, js/baby-ecran.js) ---------- */
+/* ---------- Baby jeux (v9.1 : js/baby.js, js/baby-carte.js, js/baby-ecran.js) ---------- */
 /* Bouton de l'accueil : jaune, texte brun foncé (contraste élevé), sous « Partie rapide solo ». */
 .btn-baby { background: var(--jaune); color: var(--encre); box-shadow: 0 4px 0 var(--encre); }
 .btn-baby:hover { filter: brightness(1.05); }

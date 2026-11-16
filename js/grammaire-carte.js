@@ -17,7 +17,7 @@
 
   var G = racine.Grammaire;
   // Moteur de la carte : phonèmes ou grammaire (v7.3).
-  // Baby jeux (v8.11) : contenu dans js/baby.js, dessin et gestes propres dans js/baby-carte.js.
+  // Baby jeux (v9.1) : contenu dans js/baby.js, dessin et gestes propres dans js/baby-carte.js.
   function moteur(c) { return c && c.module === 'phonemes' ? racine.Phonemes : c && c.module === 'baby' ? racine.Baby : G; }
   // « Relier » : le jeu de grammaire et de phonèmes, et les baby jeux qui relient (grandes / petites lettres, dés / chiffres).
   function estRelier(c) { return !!c && (c.jeu === 'relier' || c.meca === 'relier'); }

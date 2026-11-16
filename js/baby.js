@@ -1,4 +1,4 @@
-// Baby jeux (v8.11, demande de l'utilisateur du 16/11/2026, backlog lignes 355 à 362).
+// Baby jeux (v9.1, demande de l'utilisateur du 16/11/2026, backlog lignes 355 à 362).
 // Petits jeux pour les tout-petits, en deux catégories, Lettres et Chiffres (10 jeux chacune).
 // Ils se jouent comme une partie rapide solo (choix de l'utilisateur) : chaque carte piochée sur le plateau
 // est un baby jeu ; bonne réponse = dé FORT, sinon dé FAIBLE (on gagne toujours des points).
