@@ -1808,3 +1808,105 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .carte-quiz + .savoir-options { margin-top: 8px; }
 .carte-quiz svg { max-height: min(44vh, 460px); }
 @media (max-height: 600px) { .carte-quiz svg { max-height: 38vh; } }
+
+/* ---------- Baby jeux (v9.1 : js/baby.js, js/baby-carte.js, js/baby-ecran.js) ---------- */
+/* Bouton de l'accueil : jaune, texte brun foncé (contraste élevé), sous « Partie rapide solo ». */
+.btn-baby { background: var(--jaune); color: var(--encre); box-shadow: 0 4px 0 var(--encre); }
+.btn-baby:hover { filter: brightness(1.05); }
+.btn-baby:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--encre); }
+/* Écran des réglages : lettres et chiffres en petites pastilles, jeux en liste. */
+.baby-grille { gap: 6px !important; }
+.baby-grille .pack span { min-width: 2.9em; justify-content: center; padding: 4px 8px; font-weight: 800; gap: 3px; }
+.baby-min { font-weight: 600; opacity: .8; }
+.baby-jeux .pack span { font-weight: 600; }
+
+/* Carte d'un baby jeu */
+.baby { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.baby .gram-bouton { min-width: 64px; min-height: 60px; }
+.baby-gros { font: 800 clamp(1.6rem, 6vw, 2.1rem)/1 system-ui, sans-serif; }
+.baby-de { width: 54px; height: 54px; }
+.baby-de rect { fill: #fff; stroke: var(--encre); stroke-width: 3; }
+.baby-de circle { fill: var(--encre); }
+.baby-des { display: inline-flex; gap: 6px; }
+.baby-main { height: 92px; width: auto; }
+.baby-main rect { fill: #f3cfa6; stroke: var(--encre); stroke-width: 2.5; }
+.baby-main rect.plie { fill: #e3b083; }
+.baby-mains { display: inline-flex; gap: 8px; }
+.baby-objets { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 6px; max-width: 15em; font-size: clamp(1.5rem, 6vw, 2rem); line-height: 1.15; }
+.baby-encore { margin: 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; }
+.baby-encore .baby-objets { max-width: 9em; }
+.baby-plus { font: 800 2rem/1 system-ui, sans-serif; }
+.baby-objets.arrive { animation: baby-arrive 1s ease-out; }
+@keyframes baby-arrive { from { transform: translateX(60px); opacity: 0; } }
+.baby-panier .baby-objets { font-size: 1.25rem; max-width: 6.5em; }
+.baby-suite { margin: 0; display: flex; gap: 8px; justify-content: center; }
+.baby-case { display: inline-flex; align-items: center; justify-content: center; min-width: 52px; height: 58px; padding: 0 6px;
+  border: 3px solid var(--encre); border-radius: 12px; background: #fff; font: 800 1.8rem/1 system-ui, sans-serif; }
+.baby-case.trou { border-style: dashed; border-color: var(--bleu); color: var(--bleu); background: #eef2fb; }
+.baby-case.juste { border: 3px solid #1e7b45; color: #1f5a2f; background: #e3f3e6; }
+.baby-case.fausse { border: 3px solid #1e7b45; color: #1f5a2f; background: #e3f3e6; }
+.baby-oreille { margin: 0; font-size: 3rem; line-height: 1; }
+.baby-image { margin: 0; font-size: clamp(3.5rem, 14vw, 4.5rem); line-height: 1; }
+.baby-motimage { margin: 0; font-size: 1.5rem; }
+.baby-modele { margin: 0; font: 800 clamp(2.2rem, 8vw, 2.8rem)/1 system-ui, sans-serif; display: flex; align-items: center; gap: 8px; }
+.baby-modele.baby-son { font-size: 1.5rem; flex-wrap: wrap; justify-content: center; }
+.baby-modele small { font-size: .95rem; font-weight: 600; color: var(--encre-douce); }
+.baby-compte { margin: 0; font-weight: 700; color: var(--encre-douce); }
+/* Arène : les jetons se baladent un peu autour de leur place, penchés. */
+.baby-arene { position: relative; width: 100%; height: clamp(190px, 32vh, 290px); border: 3px dashed var(--parchemin-bord); border-radius: 16px;
+  background: #fffbef; overflow: hidden; touch-action: manipulation; }
+.baby-jeton {
+  position: absolute; left: calc(34px + (100% - 68px) * var(--x)); top: calc(30px + (100% - 60px) * var(--y));
+  transform: translate(-50%, -50%) rotate(var(--rot)); animation: baby-balade var(--dur) ease-in-out infinite alternate;
+  min-width: 46px; height: 46px; padding: 0 6px; border-radius: 12px; border: 3px solid var(--encre); background: #fff; color: var(--encre);
+  font: 800 1.5rem/1 system-ui, sans-serif; cursor: pointer; box-shadow: 0 3px 0 var(--encre);
+}
+@keyframes baby-balade { to { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) rotate(var(--rot)); } }
+.baby-jeton.trouve { background: #e3f3e6; border-color: #1e7b45; color: #1f5a2f; box-shadow: 0 0 0 4px #1e7b45; animation: none; cursor: default; }
+.baby-jeton.rate { opacity: .4; animation: none; cursor: default; text-decoration: line-through; }
+.baby-jeton.souligne { text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 4px; }
+.baby-arene.bulles .baby-jeton { width: 58px; height: 58px; border-radius: 50%; border-color: var(--bleu); color: var(--bleu);
+  background: radial-gradient(circle at 32% 30%, #fff 0 18%, #cfe8ff 60%, #9cc9f2); box-shadow: none; }
+.baby-jeton.secoue { animation: baby-secoue .4s; }
+@keyframes baby-secoue { 0%, 100% { transform: translate(-50%, -50%); } 25% { transform: translate(calc(-50% - 8px), -50%); } 75% { transform: translate(calc(-50% + 8px), -50%); } }
+/* Remettre dans l'ordre et ranger dans les paniers */
+.baby-rangee { width: 100%; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; min-height: 60px; }
+.baby-ligne { padding-top: 10px; border-top: 2px dashed var(--parchemin-bord); }
+.baby-tuile { min-width: 56px; height: 56px; padding: 0 8px; border-radius: 12px; border: 3px solid var(--encre); background: #fff; color: var(--encre);
+  font: 800 1.6rem/1 system-ui, sans-serif; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 3px 0 var(--encre); }
+.baby-tuile.vide { visibility: hidden; }
+.baby-tuile.attente { border-style: dashed; border-color: var(--bleu); box-shadow: none; background: transparent; cursor: default; }
+.baby-tuile.posee { background: var(--parchemin); }
+.baby-tuile.choisi { background: var(--jaune); box-shadow: 0 0 0 3px var(--bleu); }
+.baby-tuile.juste { background: #e3f3e6; border-color: #1e7b45; color: #1f5a2f; box-shadow: none; }
+.baby-tuile.fausse { background: #fbe6e6; border-color: var(--rouge-texte); color: var(--rouge-texte); box-shadow: none; }
+.baby-tuile.petite { min-width: 44px; height: 44px; font-size: 1.3rem; }
+.baby-paniers { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.baby-panier-col { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.baby-panier-tete { min-height: 48px; border-radius: 12px; border: 3px solid var(--encre); background: #fff; color: var(--encre); font: 800 1rem/1.1 system-ui, sans-serif; cursor: pointer; }
+.baby-panier-tete:disabled { cursor: default; opacity: .75; }
+.baby-panier-dedans { min-height: 56px; display: flex; flex-wrap: wrap; justify-content: center; align-content: flex-start; gap: 6px; padding: 6px; border: 2px dashed var(--parchemin-bord); border-radius: 12px; }
+.baby-aide { margin: 0; color: var(--encre-douce); font-weight: 600; }
+/* Fabrique à mots : voyelles (rouge) à gauche, consonnes (bleu) à droite, sons (jaune) dessous. */
+.baby-mot { margin: 0; min-height: 58px; width: 100%; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 2px;
+  padding: 4px 8px; border-bottom: 3px solid var(--encre); font: 800 clamp(1.7rem, 7vw, 2.2rem)/1.1 system-ui, sans-serif; letter-spacing: .04em; overflow-wrap: anywhere; }
+.baby-piece.son { color: var(--bleu); text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 5px; }
+.baby-mot-vide { color: var(--parchemin-bord); }
+.baby-fabrique-cols { width: 100%; display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 5fr); gap: 8px; }
+.baby-fab-col { min-width: 0; width: 100%; }
+.baby-fab-titre { margin: 0 0 4px; font-weight: 800; font-size: .85rem; color: var(--encre-douce); text-align: center; }
+.baby-touches { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
+.baby-touche { min-width: 40px; height: 40px; padding: 0 6px; border-radius: 10px; border: 2px solid var(--encre); background: #fff; color: var(--encre);
+  font: 800 1.1rem/1 system-ui, sans-serif; cursor: pointer; box-shadow: 0 2px 0 var(--encre); }
+.baby-touche:active { transform: translateY(2px); box-shadow: none; }
+.baby-touche.voy { background: #fdebe8; color: var(--rouge-texte); border-color: var(--rouge-texte); }
+.baby-touche.cons { background: #eef2fb; color: var(--bleu); border-color: var(--bleu); }
+.baby-touche.son { background: #fff6c2; }
+.baby-fab-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.baby-fab-actions .btn { padding: 8px 14px; font-size: 1rem; }
+@media (prefers-reduced-motion: reduce) {
+  .baby-jeton, .baby-objets.arrive { animation: none !important; }
+}
+/* Relier (grandes / petites lettres, dés / chiffres) : lettres et chiffres en grand, centrés. */
+.baby .gram-mot-relier { justify-content: center; font: 800 1.6rem/1 system-ui, sans-serif; min-height: 64px; }
+.baby .gram-mot-relier .baby-de { width: 40px; height: 40px; }

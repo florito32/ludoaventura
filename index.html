@@ -103,6 +103,8 @@
         <button type="button" class="btn btn-principal" id="btn-commencer">Commencer l'aventure</button>
         <!-- Partie rapide solo (v6.43, js/rapide.js ; bouton bleu et « solo » en v6.44). -->
         <button type="button" class="btn btn-bleu" id="btn-rapide"><span aria-hidden="true">⚡</span> Partie rapide solo</button>
+        <!-- Baby jeux (v9.1, js/baby-ecran.js) : petits jeux de lettres et de chiffres, joués sur le plateau comme une partie rapide. -->
+        <button type="button" class="btn btn-baby" id="btn-baby"><span aria-hidden="true">🧸</span> Baby jeux</button>
         <!-- Didacticiel : Ludo (l'aventurier de l'accueil) guide la préparation et le premier tour (js/ludo.js). -->
         <button type="button" class="btn btn-secondaire" id="btn-didacticiel">Didacticiel avec Ludo</button>
       </div>
@@ -117,6 +119,16 @@
       <span class="barre-vide" aria-hidden="true"></span>
     </header>
     <div class="page-corps" id="rapide-corps"></div>
+  </section>
+
+  <!-- ÉCRAN Baby jeux (v9.1, js/baby-ecran.js) : Lettres et Chiffres, lettres / chiffres travaillés, écriture, jeux. -->
+  <section class="ecran page" id="ecran-baby" aria-labelledby="titre-baby" hidden>
+    <header class="barre">
+      <button type="button" class="btn-retour" data-retour-accueil><span aria-hidden="true">←</span> Accueil</button>
+      <h2 id="titre-baby">Baby jeux</h2>
+      <span class="barre-vide" aria-hidden="true"></span>
+    </header>
+    <div class="page-corps" id="baby-corps"></div>
   </section>
 
   <!-- ÉCRANS des étoiles (v6.36, js/recompenses.js) : Mes étoiles, Progression du jour, Défi du jour. -->
@@ -681,6 +693,8 @@
 <script src="js/conjugaison.js"></script>
 <script src="js/grammaire.js"></script>
 <script src="js/phonemes.js"></script>
+<script src="js/baby.js"></script>
+<script src="js/baby-carte.js"></script>
 <script src="js/grammaire-carte.js"></script>
 <script src="js/phrases.js"></script>
 <script src="js/voix.js"></script>
@@ -697,6 +711,7 @@
 <script src="js/figurines.js"></script>
 <script src="js/plateau.js"></script>
 <script src="js/rapide.js"></script>
+<script src="js/baby-ecran.js"></script>
 <script src="js/ludo.js"></script>
 <script src="js/version.js"></script>
 <script src="js/navigateur.js"></script>
