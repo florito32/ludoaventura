@@ -4,9 +4,14 @@
 (function () {
   'use strict';
 
-  var VERSION = '9.2';
+  var VERSION = '9.3';
 
   var HISTORY = [
+    { v: '9.3', date: '2026-11-16', changes: [
+      "Clavier à lettres : en orthographe, en conjugaison et pour les questions ouvertes de géographie et d’histoire, on répond en touchant des lettres proposées par le jeu (celles de la réponse et des lettres pièges, au moins 18, par ordre alphabétique) : plus jamais le clavier du téléphone ni de l’ordinateur.",
+      "Une case par lettre (l’espace, le tiret et l’apostrophe ont aussi leur case), touche « é è ê » pour mettre l’accent sur la dernière lettre, touches - et ’, ⌫, « Tout effacer », espace et Valider.",
+      "Une question ouverte attend toujours un nom, jamais une phrase entière : sinon elle se pose dans l’autre sens, ou devient « Relie »."
+    ] },
     { v: '9.2', date: '2026-11-16', changes: [
       "Baby jeux : réglages en deux pages qui tiennent chacune sur l’écran, sans défiler. Page 1 : Lettres ou Chiffres (l’un ou l’autre), l’écriture (majuscules, minuscules ou les deux) et les lettres ou les chiffres à travailler ; page 2 : la liste des petits jeux.",
       "« Modifier les choix » pendant une partie de Baby jeux ou une partie rapide solo ramène à ses propres réglages (et plus à la préparation de l’aventure) ; « Reprendre la partie » garde l’aventure, l’aventurier et les points, « ← Partie » revient au plateau sans rien changer."

@@ -176,9 +176,10 @@ test('chaque mode choisi doit avoir au moins un temps', async ({ page }) => {
 async function repondre(page, bonne) {
   const c = await page.evaluate(() => window.Aventura.partie.carte);
   const juste = await page.evaluate((c) => window.Conjugaison.formes(c.verbe, c.temps, c.personne)[0], c);
-  c.ecrit = bonne ? juste : juste + 'x';
+  // v9.3 : une case par lettre → la faute garde la même longueur (dernière lettre changée).
+  c.ecrit = bonne ? juste : juste.slice(0, -1) + (juste.slice(-1) === 'x' ? 'z' : 'x');
   await page.getByLabel('Ta réponse').fill(c.ecrit);
-  await page.getByRole('button', { name: 'OK', exact: true }).click();
+  await page.getByRole('button', { name: /^(OK|Valider)$/ }).click();
   return c;
 }
 

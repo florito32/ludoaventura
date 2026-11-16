@@ -515,6 +515,23 @@
                 <button type="button" class="touche touche-zero" data-touche="0">0</button>
                 <button type="button" class="touche" data-touche="," aria-label="Virgule">,</button>
               </div>
+              <!-- v9.3 (demande du 16/11/2026) : clavier à lettres pour toute réponse en lettres (orthographe, conjugaison,
+                   question ouverte de géographie ou d'histoire) : une case par signe, lettres proposées par le jeu (js/clavier-lettres.js). -->
+              <div class="clavier" id="clavier" hidden>
+                <div class="cases-reponse" id="cases-reponse" aria-hidden="true"></div>
+                <div class="clavier-grille" id="clavier-grille" role="group" aria-label="Lettres proposées"></div>
+                <div class="clavier-rangee">
+                  <button type="button" class="touche touche-outil" data-cl="accent" aria-label="Changer l’accent de la dernière lettre">é è ê</button>
+                  <button type="button" class="touche touche-outil" data-cl="-" aria-label="Tiret">-</button>
+                  <button type="button" class="touche touche-outil" data-cl="’" aria-label="Apostrophe">’</button>
+                  <button type="button" class="touche touche-outil touche-petit" data-cl="tout">Tout effacer</button>
+                </div>
+                <div class="clavier-rangee">
+                  <button type="button" class="touche touche-outil" data-cl="retour" aria-label="Effacer la dernière lettre"><span aria-hidden="true">⌫</span></button>
+                  <button type="button" class="touche touche-outil touche-espace" data-cl="espace" aria-label="Espace">espace</button>
+                  <button type="submit" class="touche touche-valider" id="btn-valider-lettres">Valider</button>
+                </div>
+              </div>
             </form>
             <div class="carte-correction">
               <p class="carte-reponse" id="carte-reponse" hidden></p>
@@ -691,6 +708,7 @@
 <script src="js/calcul.js"></script>
 <script src="js/problemes.js"></script>
 <script src="js/conjugaison.js"></script>
+<script src="js/clavier-lettres.js"></script>
 <script src="js/grammaire.js"></script>
 <script src="js/phonemes.js"></script>
 <script src="js/baby.js"></script>

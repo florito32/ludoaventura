@@ -375,7 +375,7 @@ test('question ouverte : chiffres romains écrits en minuscules → juste', asyn
   const c = await piocher(page);
   expect(c.format).toBe('O');
   await page.getByLabel('Ta réponse').fill(c.bonne.toLowerCase());
-  await page.getByRole('button', { name: 'OK', exact: true }).click();
+  await page.getByRole('button', { name: /^(OK|Valider)$/ }).click();
   await expect(page.locator('#carte-reponse')).toContainText('Bonne réponse');
   expect(await page.evaluate(() => window.Aventura.partie.regles.de)).toBe('fort');
 });

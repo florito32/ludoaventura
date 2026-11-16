@@ -316,7 +316,7 @@ test('v6.40 : « Phrase d’exemple » apparaît après « Écouter » et lit la
   await page.reload();
   await expect(phrase).toBeVisible();
   await page.getByLabel('Ta réponse').fill('99');
-  await page.getByRole('button', { name: 'OK', exact: true }).click();
+  await page.getByRole('button', { name: /^(OK|Valider)$/ }).click();
   await page.getByRole('button', { name: 'J’ai compris' }).click();
   await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await expect(phrase).toBeHidden();
