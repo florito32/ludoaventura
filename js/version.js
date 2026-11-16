@@ -4,9 +4,15 @@
 (function () {
   'use strict';
 
-  var VERSION = '9.3';
+  var VERSION = '9.4';
 
   var HISTORY = [
+    { v: '9.4', date: '2026-11-16', changes: [
+      "Nouveau bouton « Se connecter » en haut de l’accueil (icône d’aventurier) : avec Google ou avec une adresse e-mail et un mot de passe, pour retrouver ses étoiles, coffres, pierres et niveaux sur l’ordinateur, la tablette ou le téléphone.",
+      "La connexion est facultative : « Jouer en invité » garde la progression seulement sur l’appareil, comme avant.",
+      "En se connectant, ce qui a été gagné sur l’appareil s’ajoute à la progression du compte ; ensuite chaque gain est sauvegardé tout seul quelques secondes plus tard.",
+      "Inscription par e-mail avec confirmation, « Mot de passe oublié ? », « Se déconnecter » (l’appareil repart alors en invité, la progression reste sur le compte)."
+    ] },
     { v: '9.3', date: '2026-11-16', changes: [
       "Clavier à lettres : en orthographe, en conjugaison et pour les questions ouvertes de géographie et d’histoire, on répond en touchant des lettres proposées par le jeu (celles de la réponse et des lettres pièges, au moins 18, par ordre alphabétique) : plus jamais le clavier du téléphone ni de l’ordinateur.",
       "Une case par lettre (l’espace, le tiret et l’apostrophe ont aussi leur case), touche « é è ê » pour mettre l’accent sur la dernière lettre, touches - et ’, ⌫, « Tout effacer », espace et Valider.",

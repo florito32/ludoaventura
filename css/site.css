@@ -1512,8 +1512,52 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
   .pastille .ico { width: 28px; height: 28px; }
 }
 /* Téléphones : le texte du coffre est caché (l'icône animée et la pastille du nombre de coffres restent). */
-@media (max-width: 440px) { .pastille-coffre span:not(.badge) { display: none; } .pastille-coffre { padding-right: 6px; } .accueil-haut { gap: 6px; } }
+/* v9.4 : jusqu'à 520 px (au lieu de 440) depuis l'arrivée de la pastille du compte, pour que la barre tienne
+   sur les téléphones carrés (480 px). */
+@media (max-width: 520px) { .pastille-coffre span:not(.badge) { display: none; } .pastille-coffre { padding-right: 6px; } .accueil-haut { gap: 6px; } }
 @media (max-width: 380px) { .pe-niveau .mini-jauge { width: 48px; } }
+
+/* Compte (v9.4, js/compte.js) : pastille en haut de l'accueil et écran « Mon compte ». */
+.pastille-compte { font-size: .85rem; white-space: nowrap; }
+.pastille-compte.connecte::after {
+  content: ""; position: absolute; top: -3px; right: -3px; width: 14px; height: 14px; border-radius: 50%;
+  background: #1f7a3a; border: 2px solid #fff;
+}
+/* Téléphones et écrans moyens : l'icône seule (le nom reste lu par les lecteurs d'écran). */
+/* Sous 1024 px (téléphones, y compris en paysage, et tablettes) : l'icône seule. Le texte est masqué à la vue
+   seulement (pas display: none), pour que le bouton garde son nom pour les lecteurs d'écran. */
+@media (max-width: 1023px) {
+  .pastille-compte #compte-pastille-texte { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+  .pastille-compte { padding-right: 6px; }
+}
+.compte-carte { display: grid; gap: 10px; }
+.compte-carte h3 { margin-bottom: 0; }
+.compte-carte .petit { margin: 0; }
+.compte-message { margin: 0; padding: 10px 12px; border-radius: 12px; border: 2px solid var(--encre); background: #fff; font-weight: 700; line-height: 1.35; }
+.compte-message.ok { border-color: #1f7a3a; color: #145128; }
+.compte-message.erreur { border-color: var(--rouge-texte); color: var(--rouge-texte); }
+.btn-google { display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; }
+.g-logo { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: #fff; border: 2px solid var(--encre); font: 800 1rem/1 system-ui, sans-serif; color: #1a56c4; }
+.compte-ou { margin: 2px 0; display: flex; align-items: center; gap: 10px; color: var(--encre-douce); font-size: .9rem; }
+.compte-ou::before, .compte-ou::after { content: ""; flex: 1; border-top: 2px solid var(--parchemin-bord); }
+.compte-form { display: grid; gap: 6px; }
+.compte-form label { font-weight: 700; }
+.compte-form input[type="email"], .compte-form input[type="password"], .compte-form input[type="text"] {
+  font: inherit; font-size: 1rem; min-height: 48px; padding: 8px 12px; width: 100%; min-width: 0;
+  border: 2px solid var(--encre); border-radius: 10px; background: #fff; color: var(--encre);
+}
+.compte-form .compte-voir { display: flex; align-items: center; gap: 8px; font-weight: 400; min-height: 44px; }
+.compte-voir input { width: 22px; height: 22px; }
+.petit-inline { font-weight: 400; font-size: .85rem; color: var(--encre-douce); }
+.compte-boutons { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+.compte-boutons .btn { flex: 1 1 160px; min-height: 48px; padding: 8px 14px; }
+.compte-carte > .btn { min-height: 48px; padding: 8px 14px; }
+.lien-bouton {
+  justify-self: start; font: inherit; font-weight: 700; color: var(--bleu); background: none; border: 0; padding: 8px 0;
+  min-height: 44px; text-decoration: underline; cursor: pointer;
+}
+.compte-qui { margin: 0; overflow-wrap: anywhere; }
+#compte-corps button:disabled { opacity: .6; cursor: progress; }
 
 /* Écrans « Mes étoiles », « Ma progression », « Défi du jour ». */
 .page { width: 100%; max-width: 640px; margin: 0 auto; padding: 8px 12px 16px; }
