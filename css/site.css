@@ -1524,7 +1524,12 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
   background: #1f7a3a; border: 2px solid #fff;
 }
 /* Téléphones et écrans moyens : l'icône seule (le nom reste lu par les lecteurs d'écran). */
-@media (max-width: 760px) { .pastille-compte #compte-pastille-texte { display: none; } .pastille-compte { padding-right: 6px; } }
+/* Sous 1024 px (téléphones, y compris en paysage, et tablettes) : l'icône seule. Le texte est masqué à la vue
+   seulement (pas display: none), pour que le bouton garde son nom pour les lecteurs d'écran. */
+@media (max-width: 1023px) {
+  .pastille-compte #compte-pastille-texte { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+  .pastille-compte { padding-right: 6px; }
+}
 .compte-carte { display: grid; gap: 10px; }
 .compte-carte h3 { margin-bottom: 0; }
 .compte-carte .petit { margin: 0; }

@@ -32,15 +32,16 @@ async function service(page, { distant = null, connexion = SESSION, erreurConnex
   return envois;
 }
 // Premier démarrage passé (Ludo ne se présente pas), progression de l'appareil et session éventuelles.
-async function preparer(page, { local = null, session = null } = {}) {
-  await page.addInitScript(([l, s]) => {
+async function preparer(page, { local = null, session = null, base = null } = {}) {
+  await page.addInitScript(([l, s, b]) => {
     window.AVENTURA_DELAI_SYNCHRO = 0;
     if (sessionStorage.getItem('test-prepare')) return; // une seule fois : les rechargements gardent l'état
     sessionStorage.setItem('test-prepare', '1');
     localStorage.setItem('ludo-vu', '1');
     if (l) localStorage.setItem('ludoaventura-etoiles', JSON.stringify(l));
     if (s) localStorage.setItem('ludoaventura-session', JSON.stringify(s));
-  }, [local, session]);
+    if (b) localStorage.setItem('ludoaventura-compte', JSON.stringify(b));
+  }, [local, session, base]);
 }
 const sessionValide = () => ({ access_token: 'jeton-test', refresh_token: 'renouveau-test', expires_at: Math.floor(Date.now() / 1000) + 3600, user: UTILISATEUR });
 
@@ -173,11 +174,13 @@ test('lien expiré reçu par e-mail : message d’erreur', async ({ page }) => {
 });
 
 test('connecté : chaque gain est envoyé au compte, et la déconnexion remet l’appareil en invité', async ({ page }) => {
-  await preparer(page, { local: progression(30), session: sessionValide() });
+  // Appareil déjà synchronisé (base = 30 ⭐ déjà envoyées) : rien n'est ajouté deux fois à l'ouverture.
+  await preparer(page, { local: progression(30), session: sessionValide(), base: { uid: UTILISATEUR.id, total: 30, gemmes: 0 } });
   const envois = await service(page, { distant: progression(30) });
   await page.goto('./');
   await expect(page.locator('#btn-compte')).toHaveClass(/connecte/);
   await expect.poll(() => envois.progression.length).toBeGreaterThan(0); // synchro à l'ouverture
+  expect(envois.progression[0].donnees.total).toBe(30);
   await page.evaluate(() => window.Recompenses.compte.gagner(5, 'partie', 'test'));
   await expect.poll(() => envois.progression.at(-1).donnees.total).toBe(35);
   await page.locator('#btn-compte').click();
