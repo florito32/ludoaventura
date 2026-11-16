@@ -1,7 +1,7 @@
 // Histoire (v7.1) : la matière Histoire, rangée par périodes (BACKLOG lignes 270 et 275).
 // Choix de l'utilisateur du 12/11/2026 : 7 périodes, 51 jeux, 4 niveaux, et chaque niveau n'a QUE son
 // propre contenu (Expert = seulement du contenu expert). Livraison par période : l'Antiquité d'abord (12
-// jeux, regroupés en 6 en v8.4), puis la Préhistoire (v7.6, 5 jeux), le Moyen Âge (v7.7, 8 jeux, regroupés en 3 en v8.5), la Renaissance (v7.8, 6 jeux, regroupés en 2 en v8.7), les Temps modernes (v7.9, 4 jeux, regroupés en 2 en v8.8), la Révolution et le XIXe siècle (v7.10, 9 jeux, regroupés en 3 en v8.9) et le XXe siècle (v7.11, 7 jeux).
+// jeux, regroupés en 6 en v8.4), puis la Préhistoire (v7.6, 5 jeux), le Moyen Âge (v7.7, 8 jeux, regroupés en 3 en v8.5), la Renaissance (v7.8, 6 jeux, regroupés en 2 en v8.7), les Temps modernes (v7.9, 4 jeux, regroupés en 2 en v8.8), la Révolution et le XIXe siècle (v7.10, 9 jeux, regroupés en 3 en v8.9) et le XXe siècle (v7.11, 7 jeux, regroupés en 3 en v8.10).
 // Format des séries : voir js/savoirs.js. « A|B » = A s'affiche, B est aussi accepté en question ouverte.
 (function (racine) {
   'use strict';
@@ -2245,24 +2245,232 @@
             ['L’Assommoir', 1], ['Au Bonheur des Dames', 1], ['La Bête humaine', 1], ['Nana', 1]] }]
       } }
     ] },
-    // ---------- XXe siècle (v7.11, BACKLOG ligne 295 : 7 jeux, hypothèse à valider) ----------
+    // ---------- XXe siècle (v7.11 : 7 jeux ; regroupés en 3 en v8.10, BACKLOG lignes 332 et 334, hypothèse à valider) ----------
     // Non retenus pour l'instant : Première et Seconde Guerre mondiale (sujets sensibles : attendent un choix de l'utilisateur),
     // Le mur de Berlin, Objets d'hier.
-    { id: 'z03', matiere: 'histoire', famille: 'xx', nom: 'Conquête spatiale', court: 'Espace', icone: '🚀', series: [
+    // Le XXe siècle en dates : présidents (ex-z05), construction européenne (ex-z07), frise (ex-z11) et vie en France.
+    { id: 'z05', matiere: 'histoire', famille: 'xx', nom: 'Le XXe siècle en dates', court: 'Dates', icone: '📏', series: [
+      { k: 'paires', gauche: 'Personnage', droite: 'Ce qu’il a fait', consigneR: 'Relie chaque personnage à ce qu’il a fait.', q: 'Qu’a fait {a} ?', qi: 'Qui est-ce : {b} ?', ouverte: false, niveaux: {
+        facile: [['Charles de Gaulle', 'Premier président de la Ve République'], ['François Mitterrand', 'Président pendant 14 ans, de 1981 à 1995'],
+          ['Jacques Chirac', 'Président de 1995 à 2007'], ['Emmanuel Macron', 'Président élu en 2017']],
+        moyen: [['Georges Pompidou', 'Président mort pendant son mandat, en 1974'], ['Valéry Giscard d’Estaing', 'Président qui fait passer la majorité à 18 ans'],
+          ['Nicolas Sarkozy', 'Président de 2007 à 2012'], ['François Hollande', 'Président de 2012 à 2017'], ['Robert Badinter', 'Ministre qui fait abolir la peine de mort en 1981']],
+        difficile: [['Alain Poher', 'Remplace deux fois le président, en 1969 et en 1974'], ['Michel Debré', 'Premier Premier ministre de la Ve République'],
+          ['René Coty', 'Dernier président de la IVe République'], ['Vincent Auriol', 'Premier président de la IVe République'], ['Léon Blum', 'Chef du gouvernement du Front populaire, en 1936']],
+        expert: [['Albert Lebrun', 'Dernier président de la IIIe République'], ['Jacques Chaban-Delmas', 'Premier ministre de Georges Pompidou, de 1969 à 1972'],
+          ['Pierre Mauroy', 'Premier ministre de François Mitterrand, de 1981 à 1984'], ['Lionel Jospin', 'Premier ministre de la cohabitation, de 1997 à 2002'],
+          ['Raymond Poincaré', 'Président de la République de 1913 à 1920']]
+      } },
+      { k: 'paires', gauche: 'Nom', droite: 'Ce que c’est', consigneR: 'Relie chaque nom de la construction européenne à ce qu’il est.', q: 'Qu’est-ce que {a} ?', qi: 'Qu’est-ce qui est : {b} ?', ouverte: false, niveaux: {
+        facile: [['L’euro', 'La monnaie de nombreux pays d’Europe'], ['Le drapeau européen', 'Bleu avec 12 étoiles jaunes'], ['Strasbourg', 'La ville du Parlement européen'],
+          ['Bruxelles', 'La ville de la Commission européenne']],
+        moyen: [['L’Ode à la joie', 'L’hymne européen'], ['Le 9 mai', 'La journée de l’Europe'], ['Robert Schuman', 'Propose en 1950 de mettre en commun le charbon et l’acier'],
+          ['Schengen', 'Village du Luxembourg où l’on décide de supprimer les contrôles aux frontières']],
+        difficile: [['Jean Monnet', 'Un des « pères de l’Europe », inspirateur de la déclaration Schuman'], ['Maastricht', 'Ville des Pays-Bas où est signé le traité qui crée l’Union européenne'],
+          ['Francfort', 'La ville de la Banque centrale européenne'], ['« Unie dans la diversité »', 'La devise de l’Union européenne'],
+          ['Le traité de Rome', 'Crée la Communauté économique européenne en 1957']],
+        expert: [['Konrad Adenauer', 'Chancelier allemand, un des pères de l’Europe'], ['Alcide De Gasperi', 'Chef du gouvernement italien, un des pères de l’Europe'],
+          ['Paul-Henri Spaak', 'Ministre belge qui prépare le traité de Rome'], ['Jacques Delors', 'Président de la Commission européenne de 1985 à 1995'],
+          ['Erasmus', 'Programme d’échanges d’étudiants créé en 1987']]
+      } },
+      { k: 'qcm', niveaux: {
+        facile: [
+          ['Qui a été le premier président de la Ve République ?', 'Charles de Gaulle', ['François Mitterrand', 'Napoléon', 'Louis XIV']],
+          ['Quelle monnaie utilise-t-on en France depuis 2002 ?', 'L’euro', ['Le franc', 'Le dollar', 'La livre']],
+          ['Combien d’étoiles y a-t-il sur le drapeau européen ?', '12', ['6', '27', '50']],
+          ['Quel mur est tombé en 1989 ?', 'Le mur de Berlin', ['La Grande Muraille de Chine', 'Le mur d’Hadrien', 'Le mur de Paris']],
+          ['Combien d’années dure aujourd’hui le mandat du président ?', '5 ans', ['7 ans', '4 ans', '10 ans']],
+          ['Quel jour se souvient-on de l’armistice de 1918 ?', 'Le 11 novembre', ['Le 14 juillet', 'Le 1er mai', 'Le 25 décembre']],
+          ['Dans quelle ville siège le Parlement européen ?', 'Strasbourg', ['Paris', 'Lyon', 'Marseille']],
+          ['Quel président a été élu en 2017 ?', 'Emmanuel Macron', ['Charles de Gaulle', 'François Mitterrand', 'Jacques Chirac']],
+          ['Avant l’euro, quelle était la monnaie de la France ?', 'Le franc', ['La livre', 'Le dollar', 'Le mark']],
+          ['Quel pays voisin de la France s’est réunifié en 1990 ?', 'L’Allemagne', ['L’Espagne', 'L’Italie', 'La Belgique']]],
+        moyen: [
+          ['Combien d’années durait le mandat du président avant 2002 ?', '7 ans', ['5 ans', '4 ans', '10 ans']],
+          ['Quel président est resté le plus longtemps au pouvoir sous la Ve République ?', 'François Mitterrand', ['Charles de Gaulle', 'Jacques Chirac', 'Valéry Giscard d’Estaing']],
+          ['Quel traité, signé en 1957, crée la Communauté économique européenne ?', 'Le traité de Rome', ['Le traité de Maastricht', 'Le traité de Lisbonne', 'Le traité de Versailles']],
+          ['Combien de pays ont fondé la construction européenne ?', '6', ['2', '12', '27']],
+          ['Qu’obtiennent les salariés français en 1936, avec le Front populaire ?', 'Des congés payés', ['Le droit de vote', 'L’école gratuite', 'Le droit de grève']],
+          ['Quel pays a quitté l’Union européenne en 2020 ?', 'Le Royaume-Uni', ['La Suisse', 'La Norvège', 'La Grèce']],
+          ['Où a été signé, en 1985, l’accord qui supprime les contrôles aux frontières ?', 'À Schengen', ['À Rome', 'À Maastricht', 'À Lisbonne']],
+          ['Quel président fait passer la majorité de 21 à 18 ans, en 1974 ?', 'Valéry Giscard d’Estaing', ['François Mitterrand', 'Charles de Gaulle', 'Georges Pompidou']],
+          ['Quelle ville a été coupée en deux par un mur de 1961 à 1989 ?', 'Berlin', ['Vienne', 'Moscou', 'Varsovie']],
+          ['Comment appelle-t-on la grande révolte d’étudiants et d’ouvriers de 1968 ?', 'Mai 68', ['La Commune', 'La Fronde', 'Les Trois Glorieuses']]],
+        difficile: [
+          ['Sous quel président la peine de mort a-t-elle été abolie, en 1981 ?', 'François Mitterrand', ['Valéry Giscard d’Estaing', 'Jacques Chirac', 'Georges Pompidou', 'Charles de Gaulle']],
+          ['En quelle année naît la Ve République ?', '1958', ['1945', '1946', '1962', '1968']],
+          ['Quelle République a précédé la Ve ?', 'La IVe République', ['La IIIe République', 'La IIe République', 'La Ire République']],
+          ['Depuis 1962, comment le président est-il élu ?', 'Par tous les Français', ['Par les députés et les sénateurs', 'Par les maires', 'Par le Premier ministre']],
+          ['Comment appelle-t-on la période où le président et le Premier ministre ne sont pas du même camp ?', 'La cohabitation', ['L’alternance', 'La Restauration', 'Le Consulat']],
+          ['Quel traité de 1963 scelle l’amitié entre la France et l’Allemagne ?', 'Le traité de l’Élysée', ['Le traité de Rome', 'Le traité de Versailles', 'Le traité de Maastricht']],
+          ['Combien de pays compte l’Union européenne depuis le départ du Royaume-Uni ?', '27', ['25', '28', '30']],
+          ['Que décide la loi de 1905 ?', 'L’État et les religions sont séparés', ['Les femmes peuvent voter', 'L’école devient obligatoire', 'Les salariés ont des congés payés']],
+          ['Comment s’appelle l’alliance de gauche qui gagne les élections de 1936 ?', 'Le Front populaire', ['Le Cartel des gauches', 'La Commune', 'Le Directoire']],
+          ['Quel pays est entré dans la Communauté européenne en même temps que l’Espagne, en 1986 ?', 'Le Portugal', ['La Grèce', 'L’Autriche', 'L’Irlande', 'Le Danemark']]],
+        expert: [
+          ['Avec quel chancelier allemand de Gaulle signe-t-il le traité de l’Élysée ?', 'Konrad Adenauer', ['Willy Brandt', 'Helmut Kohl', 'Helmut Schmidt', 'Angela Merkel']],
+          ['En quelle année les Français ont-ils dit non au projet de Constitution européenne ?', '2005', ['1992', '1995', '2000', '2007']],
+          ['Quelle liberté donne la loi de 1901 ?', 'Créer librement une association', ['Voter', 'Faire grève', 'Divorcer', 'Créer un syndicat']],
+          ['Combien de semaines de congés payés les salariés obtiennent-ils en 1936 ?', '2', ['1', '3', '4', '5']],
+          ['En quelle année a lieu la première cohabitation de la Ve République ?', '1986', ['1974', '1981', '1993', '1997']],
+          ['Qui est le Premier ministre de la première cohabitation, en 1986 ?', 'Jacques Chirac', ['Édouard Balladur', 'Lionel Jospin', 'Michel Rocard', 'Laurent Fabius']],
+          ['Quel pays a dit non deux fois, par référendum, à l’entrée dans la Communauté européenne ?', 'La Norvège', ['L’Autriche', 'Le Danemark', 'L’Irlande', 'La Suède']],
+          ['Dans quelle ville est signé, en 1951, le traité du charbon et de l’acier ?', 'Paris', ['Rome', 'Bruxelles', 'Strasbourg', 'Luxembourg']],
+          ['En quelle année la télévision française passe-t-elle à la couleur ?', '1967', ['1950', '1958', '1975', '1981']],
+          ['En quelle année l’Union européenne a-t-elle reçu le prix Nobel de la paix ?', '2012', ['1957', '1992', '2002', '2020']]]
+      } },
+      { k: 'vf', niveaux: {
+        facile: [['Le drapeau européen a 12 étoiles.', true, ''], ['Charles de Gaulle a été le premier président de la Ve République.', true, ''],
+          ['Le mur de Berlin est tombé en 1989.', true, ''],
+          ['En France, on paie encore avec des francs.', false, 'Depuis 2002, on paie en euros.'],
+          ['Le Parlement européen siège à Marseille.', false, 'Il siège à Strasbourg.'],
+          ['Le président de la République est élu pour 10 ans.', false, 'Il est élu pour 5 ans depuis 2002.']],
+        moyen: [['François Mitterrand a été président pendant 14 ans.', true, ''], ['Le traité de Rome a été signé en 1957.', true, ''],
+          ['En 1936, les salariés obtiennent leurs premiers congés payés.', true, ''],
+          ['Le Royaume-Uni fait toujours partie de l’Union européenne.', false, 'Il l’a quittée le 31 janvier 2020.'],
+          ['Le mandat du président a toujours duré 5 ans.', false, 'Il durait 7 ans jusqu’en 2002.'],
+          ['Mai 68 est une fête qui a lieu chaque année.', false, 'C’est une grande révolte d’étudiants et d’ouvriers, en mai 1968.']],
+        difficile: [['La peine de mort a été abolie en France en 1981.', true, ''], ['La Ve République est née en 1958.', true, ''],
+          ['Depuis la loi de 1905, l’État et les religions sont séparés en France.', true, ''], ['Le traité de Maastricht a créé l’Union européenne.', true, ''],
+          ['L’Allemagne s’est réunifiée en 1975.', false, 'Elle s’est réunifiée le 3 octobre 1990.'],
+          ['La Suisse fait partie de l’Union européenne.', false, 'Elle n’en fait pas partie, même si elle est dans l’espace Schengen.']],
+        expert: [['De Gaulle et Adenauer ont signé le traité de l’Élysée en 1963.', true, ''],
+          ['Le Danemark est entré dans la Communauté européenne en 1973, avec le Royaume-Uni et l’Irlande.', true, ''],
+          ['La 5e semaine de congés payés date de 1982.', true, ''], ['Georges Pompidou a été Premier ministre du général de Gaulle.', true, ''],
+          ['Les Français ont dit oui à la Constitution européenne en 2005.', false, 'Ils ont dit non, à près de 55 %.'],
+          ['La télévision en couleur est arrivée en France en 1950.', false, 'Elle est arrivée en 1967.']]
+      } },
+      { k: 'ordre', consigne: 'Range ces événements du XXe siècle du plus ancien au plus récent.', q: 'En quelle année : {a} ?', niveaux: {
+        facile: [['Armistice du 11 novembre', 1918, '1918'], ['Premiers congés payés en France', 1936, '1936'], ['Traité de Rome', 1957, '1957'],
+          ['Naissance de la Ve République', 1958, '1958'], ['Premier pas sur la Lune', 1969, '1969'], ['Chute du mur de Berlin', 1989, '1989'],
+          ['Pièces et billets en euros', 2002, '2002']],
+        moyen: [['Loi de séparation des Églises et de l’État', 1905, '1905'], ['Les Françaises votent pour la première fois', 1945, '1945'],
+          ['Déclaration de Robert Schuman', 1950, '1950'], ['Mai 68', 1968, '1968'], ['Premières élections européennes', 1979, '1979'],
+          ['François Mitterrand est élu président', 1981, '1981'], ['Traité de Maastricht', 1992, '1992'], ['Jacques Chirac est élu président', 1995, '1995']],
+        difficile: [['Krach de Wall Street', 1929, '1929'], ['Création de l’ONU', 1945, '1945'], ['Première élection du président par tous les Français', 1965, '1965'],
+          ['La majorité passe à 18 ans', 1974, '1974'], ['Abolition de la peine de mort', 1981, '1981'], ['Première cohabitation', 1986, '1986'],
+          ['Réunification de l’Allemagne', 1990, '1990'], ['Référendum : le mandat passe de 7 à 5 ans', 2000, '2000']],
+        expert: [['Loi sur les associations', 1901, '1901'], ['Naufrage du Titanic', 1912, '1912'], ['Indépendance de l’Inde', 1947, '1947'],
+          ['Déclaration universelle des droits de l’homme', 1948, '1948'], ['Traité de l’Élysée', 1963, '1963'], ['La télévision passe à la couleur en France', 1967, '1967'],
+          ['Le Royaume-Uni entre dans la Communauté européenne', 1973, '1973'], ['Accord de Schengen', 1985, '1985']]
+      } },
+      { k: 'ordre', consigne: 'Range ces présidents du premier au plus récent.', q: 'En quelle année {a} devient-il président ?', niveaux: {
+        facile: [['Charles de Gaulle', 1959, '1959'], ['Georges Pompidou', 1969, '1969'], ['François Mitterrand', 1981, '1981'], ['Jacques Chirac', 1995, '1995']],
+        moyen: [['Valéry Giscard d’Estaing', 1974, '1974'], ['Nicolas Sarkozy', 2007, '2007'], ['François Hollande', 2012, '2012'], ['Emmanuel Macron', 2017, '2017']],
+        difficile: [['Gaston Doumergue', 1924, '1924'], ['Albert Lebrun', 1932, '1932'], ['Vincent Auriol', 1947, '1947'], ['René Coty', 1954, '1954']],
+        expert: [['Émile Loubet', 1899, '1899'], ['Armand Fallières', 1906, '1906'], ['Raymond Poincaré', 1913, '1913'], ['Paul Deschanel', 1920, '1920'],
+          ['Paul Doumer', 1931, '1931']]
+      } },
+      { k: 'classer', niveaux: {
+        facile: [{ q: 'Range : ce pays fait-il partie de l’Union européenne ?', colonnes: ['Dans l’Union', 'Pas dans l’Union'],
+          items: [['La France', 0], ['L’Allemagne', 0], ['L’Italie', 0], ['L’Espagne', 0], ['La Suisse', 1], ['La Norvège', 1], ['Le Royaume-Uni', 1], ['La Russie', 1]] }],
+        moyen: [{ q: 'Range : président de la Ve République ou roi de France ?', colonnes: ['Président', 'Roi'],
+          items: [['Charles de Gaulle', 0], ['François Mitterrand', 0], ['Jacques Chirac', 0], ['Georges Pompidou', 0],
+            ['Louis XIV', 1], ['Henri IV', 1], ['François Ier', 1], ['Saint Louis', 1]] }],
+        difficile: [{ q: 'Range : avant ou après 1950 ?', colonnes: ['Avant 1950', 'Après 1950'],
+          items: [['La loi de séparation des Églises et de l’État', 0], ['Les premiers congés payés', 0], ['Le premier vote des Françaises', 0], ['Le krach de Wall Street', 0],
+            ['Mai 68', 1], ['L’abolition de la peine de mort', 1], ['Le traité de Rome', 1], ['La chute du mur de Berlin', 1]] }],
+        expert: [{ q: 'Range : pays fondateur en 1957 ou entré plus tard ?', colonnes: ['Fondateur', 'Entré plus tard'],
+          items: [['La Belgique', 0], ['Les Pays-Bas', 0], ['Le Luxembourg', 0], ['L’Italie', 0],
+            ['Le Danemark', 1], ['La Grèce', 1], ['Le Portugal', 1], ['L’Autriche', 1]] }]
+      } },
+      { k: 'indices', consigne: 'Qui suis-je ? Trouve le personnage.', niveaux: {
+        facile: [{ r: 'Charles de Gaulle', i: ['Je suis né à Lille en 1890.', 'J’étais général.', 'Le 18 juin 1940, j’ai parlé aux Français à la radio, depuis Londres.', 'J’ai fondé la Ve République en 1958.', 'Le grand aéroport de Roissy, près de Paris, porte mon nom.'] },
+          { r: 'François Mitterrand', i: ['Je suis né à Jarnac, en Charente, en 1916.', 'J’ai été plusieurs fois ministre sous la IVe République.', 'En 1965, j’ai été battu par le général de Gaulle au second tour.', 'J’ai été élu président en 1981.', 'Je suis resté président 14 ans, jusqu’en 1995.'] }],
+        moyen: [{ r: 'Jacques Chirac', i: ['J’ai été maire de Paris pendant 18 ans.', 'J’ai été deux fois Premier ministre.', 'J’ai été élu président en 1995.', 'Pendant mon mandat, la durée du mandat de président est passée de 7 à 5 ans.', 'J’ai été réélu en 2002.'] },
+          { r: 'Robert Schuman', i: ['Je suis né au Luxembourg en 1886.', 'J’ai été ministre des Affaires étrangères de la France.', 'Le 9 mai 1950, j’ai proposé de mettre en commun le charbon et l’acier.', 'La journée de l’Europe, le 9 mai, rappelle mon discours.', 'On m’appelle l’un des « pères de l’Europe ».'] }],
+        difficile: [{ r: 'Valéry Giscard d’Estaing', i: ['Je suis né à Coblence, en Allemagne, en 1926.', 'J’ai été ministre des Finances.', 'Je suis devenu président à 48 ans, en 1974.', 'Pendant mon mandat, la majorité est passée de 21 à 18 ans.', 'J’ai été battu par François Mitterrand en 1981.'] },
+          { r: 'Léon Blum', i: ['Je suis né à Paris en 1872.', 'J’ai été critique littéraire.', 'Je dirigeais le Parti socialiste.', 'En 1936, je suis devenu chef du gouvernement du Front populaire.', 'Mon gouvernement a donné aux salariés leurs premiers congés payés.'] }],
+        expert: [{ r: 'Georges Pompidou', i: ['Je suis né dans le Cantal en 1911.', 'J’ai été professeur de lettres, puis banquier.', 'J’ai été Premier ministre du général de Gaulle pendant six ans.', 'Un grand centre d’art de Paris porte mon nom.', 'Je suis mort pendant mon mandat de président, en 1974.'] },
+          { r: 'Jean Monnet', i: ['Je suis né à Cognac en 1888.', 'Ma famille vendait du cognac.', 'J’ai inspiré la déclaration Schuman de 1950.', 'J’ai été le premier président de la Haute Autorité du charbon et de l’acier.', 'Je repose au Panthéon depuis 1988.'] }]
+      } }
+    ] },
+    // Sciences et espace : conquête spatiale (ex-z03) et inventions du XXe siècle (ex-z04).
+    { id: 'z03', matiere: 'histoire', famille: 'xx', nom: 'Sciences et espace', court: 'Sciences', icone: '🚀', series: [
       { k: 'paires', gauche: 'Personnage ou engin', droite: 'Exploit', consigneR: 'Relie chaque personnage ou engin à son exploit.', q: 'Quel exploit est lié à {a} ?', qi: 'Qui ou quoi : {b} ?', ouverte: false, niveaux: {
-        facile: [['Youri Gagarine', 'Premier homme dans l’espace'], ['Neil Armstrong', 'Premier homme à marcher sur la Lune'], ['Thomas Pesquet', 'Astronaute français de la Station spatiale internationale']],
-        moyen: [['Spoutnik 1', 'Premier satellite artificiel'], ['Laïka', 'Premier animal en orbite autour de la Terre'], ['Valentina Terechkova', 'Première femme dans l’espace'],
-          ['Buzz Aldrin', 'Deuxième homme à marcher sur la Lune']],
-        difficile: [['Apollo 11', 'Mission du premier pas sur la Lune'], ['Jean-Loup Chrétien', 'Premier Français dans l’espace'], ['Claudie Haigneré', 'Première Française dans l’espace'],
-          ['Alexeï Leonov', 'Première sortie dans l’espace'], ['Ariane 1', 'Première fusée européenne, lancée de Kourou']],
+        facile: [['Youri Gagarine', 'Premier homme dans l’espace'], ['Neil Armstrong', 'Premier homme à marcher sur la Lune'], ['Thomas Pesquet', 'Astronaute français de la Station spatiale internationale'],
+          ['Spoutnik 1', 'Premier satellite artificiel']],
+        moyen: [['Laïka', 'Premier animal en orbite autour de la Terre'], ['Valentina Terechkova', 'Première femme dans l’espace'],
+          ['Buzz Aldrin', 'Deuxième homme à marcher sur la Lune'], ['Jean-Loup Chrétien', 'Premier Français dans l’espace']],
+        difficile: [['Apollo 11', 'Mission du premier pas sur la Lune'], ['Claudie Haigneré', 'Première Française dans l’espace'],
+          ['Alexeï Leonov', 'Première sortie dans l’espace'], ['Ariane 1', 'Première fusée européenne, lancée de Kourou'], ['Vostok 1', 'Vaisseau de Youri Gagarine']],
         expert: [['Michael Collins', 'Reste en orbite autour de la Lune pendant Apollo 11'], ['Hubble', 'Télescope lancé dans l’espace en 1990'], ['Mir', 'Station spatiale russe, de 1986 à 2001'],
           ['Apollo 13', 'Mission vers la Lune sauvée après une explosion'], ['Sally Ride', 'Première Américaine dans l’espace'], ['Sojourner', 'Premier robot à rouler sur Mars']]
       } },
+      { k: 'paires', gauche: 'Invention ou découverte', droite: 'Inventeur', consigneR: 'Relie chaque invention ou découverte à son auteur.', q: 'Qui est à l’origine de : {a} ?', qi: 'Qu’a inventé ou découvert {b} ?', ouverte: false, niveaux: {
+        facile: [['L’avion à moteur', 'Les frères Wright'], ['La pénicilline', 'Alexander Fleming'], ['Le World Wide Web', 'Tim Berners-Lee'],
+          ['Le scaphandre autonome', 'Jacques-Yves Cousteau']],
+        moyen: [['La théorie de la relativité', 'Albert Einstein'], ['La télévision', 'John Logie Baird'], ['Le téléphone portable', 'Martin Cooper'],
+          ['L’ordinateur Apple I', 'Steve Jobs et Steve Wozniak']],
+        difficile: [['La carte à puce', 'Roland Moreno'], ['Le transistor', 'Bardeen, Brattain et Shockley'], ['Le stylo à bille', 'László Bíró'],
+          ['L’éclairage au néon', 'Georges Claude'], ['Le vaccin contre la polio', 'Jonas Salk'], ['La double hélice de l’ADN', 'Watson et Crick']],
+        expert: [['Le laser', 'Theodore Maiman'], ['La fermeture Éclair moderne', 'Gideon Sundback'], ['Le Velcro', 'Georges de Mestral'],
+          ['Le Rubik’s Cube', 'Ernő Rubik'], ['Le four à micro-ondes', 'Percy Spencer'], ['L’insuline pour soigner le diabète', 'Banting et Best']]
+      } },
       { k: 'qcm', niveaux: {
-        facile: [['En quelle année l’homme a-t-il marché sur la Lune pour la première fois ?', '1969', ['1945', '1999']]],
-        moyen: [['De quel pays venait Youri Gagarine ?', 'L’Union soviétique', ['Les États-Unis', 'La France', 'La Chine']]],
-        difficile: [['D’où partent les fusées européennes Ariane ?', 'De Kourou, en Guyane', ['De Toulouse', 'De Cap Canaveral', 'De Baïkonour', 'De l’île de La Réunion']]],
-        expert: [['Comment s’appelait le module qui s’est posé sur la Lune pendant Apollo 11 ?', 'Eagle', ['Columbia', 'Spoutnik', 'Saturn', 'Vostok', 'Discovery']]]
+        facile: [
+          ['En quelle année l’homme a-t-il marché sur la Lune pour la première fois ?', '1969', ['1920', '1945', '1999']],
+          ['De quel pays venait Youri Gagarine ?', 'L’Union soviétique', ['Les États-Unis', 'La France', 'La Chine']],
+          ['Qui a été le premier homme à marcher sur la Lune ?', 'Neil Armstrong', ['Youri Gagarine', 'Thomas Pesquet', 'Buzz Aldrin']],
+          ['Comment s’appelle le premier satellite artificiel ?', 'Spoutnik 1', ['Apollo 11', 'Ariane 1', 'Hubble']],
+          ['Qu’ont fait voler les frères Wright en 1903 ?', 'Le premier avion à moteur', ['La première fusée', 'La première montgolfière', 'Le premier hélicoptère']],
+          ['Quel médicament Alexander Fleming a-t-il découvert ?', 'La pénicilline', ['L’aspirine', 'Le vaccin contre la rage', 'L’insuline']],
+          ['Qu’a inventé Tim Berners-Lee ?', 'Le World Wide Web', ['Le téléphone', 'La télévision', 'L’avion']],
+          ['Quel savant est célèbre pour sa formule E = mc² ?', 'Albert Einstein', ['Isaac Newton', 'Louis Pasteur', 'Galilée']],
+          ['Où vivent les astronautes de la Station spatiale internationale ?', 'En orbite autour de la Terre', ['Sur la Lune', 'Sur Mars', 'Au fond de la mer']],
+          ['Quel explorateur a fait connaître la plongée avec le scaphandre autonome ?', 'Jacques-Yves Cousteau', ['Paul-Émile Victor', 'Haroun Tazieff', 'Éric Tabarly']]],
+        moyen: [
+          ['Qui a été la première femme dans l’espace ?', 'Valentina Terechkova', ['Claudie Haigneré', 'Sally Ride', 'Marie Curie']],
+          ['Comment s’appelait la chienne envoyée en orbite en 1957 ?', 'Laïka', ['Belka', 'Lassie', 'Rex']],
+          ['Qui a marché sur la Lune juste après Neil Armstrong ?', 'Buzz Aldrin', ['Michael Collins', 'Youri Gagarine', 'Alexeï Leonov']],
+          ['Quel pays a posé les premiers hommes sur la Lune ?', 'Les États-Unis', ['L’Union soviétique', 'La France', 'La Chine']],
+          ['Quel Français a été le premier à traverser la Manche en avion, en 1909 ?', 'Louis Blériot', ['Clément Ader', 'Roland Garros', 'Antoine de Saint-Exupéry']],
+          ['Qu’a présenté John Logie Baird en 1926 ?', 'La télévision', ['La radio', 'Le téléphone', 'Le cinéma']],
+          ['Avec quel appareil Martin Cooper a-t-il passé un appel inédit en 1973 ?', 'Un téléphone portable', ['Un télégraphe', 'Un fax', 'Un talkie-walkie']],
+          ['Quelle fusée européenne décolle de Guyane ?', 'Ariane', ['Saturn V', 'Vostok', 'Atlas']],
+          ['Qu’est-ce que Hubble ?', 'Un télescope dans l’espace', ['Une fusée', 'Un robot sur Mars', 'Une station spatiale']],
+          ['Dans quel pays se trouve Cap Canaveral, d’où partaient les fusées Apollo ?', 'Les États-Unis', ['La Russie', 'La France', 'Le Japon']]],
+        difficile: [
+          ['D’où partent les fusées européennes Ariane ?', 'De Kourou, en Guyane', ['De Toulouse', 'De Cap Canaveral', 'De Baïkonour', 'De l’île de La Réunion']],
+          ['Qui a fait la première sortie dans l’espace, en 1965 ?', 'Alexeï Leonov', ['Youri Gagarine', 'Neil Armstrong', 'Michael Collins', 'Buzz Aldrin']],
+          ['Qui a été le premier Français dans l’espace, en 1982 ?', 'Jean-Loup Chrétien', ['Thomas Pesquet', 'Patrick Baudry', 'Claudie Haigneré', 'Jean-François Clervoy']],
+          ['Comment s’appelait le vaisseau de Youri Gagarine ?', 'Vostok 1', ['Apollo 11', 'Spoutnik 1', 'Soyouz 1', 'Mercury']],
+          ['Qu’a inventé le Français Roland Moreno en 1974 ?', 'La carte à puce', ['Le Minitel', 'Le TGV', 'Le stylo à bille', 'Le code-barres']],
+          ['Quel petit composant, inventé en 1947, a permis de fabriquer les ordinateurs modernes ?', 'Le transistor', ['L’ampoule', 'La pile', 'L’aimant', 'Le moteur']],
+          ['Qui a mis au point le premier vaccin contre la polio ?', 'Jonas Salk', ['Louis Pasteur', 'Alexander Fleming', 'Edward Jenner', 'Robert Koch']],
+          ['Quel Français a inventé l’éclairage au néon ?', 'Georges Claude', ['Pierre Curie', 'Édouard Branly', 'Louis Lumière', 'Gustave Eiffel']],
+          ['Quel train français roule entre Paris et Lyon depuis 1981 ?', 'Le TGV', ['Le Concorde', 'L’Eurostar', 'L’Orient-Express', 'Le Thalys']],
+          ['Comment s’appelait la station spatiale russe, de 1986 à 2001 ?', 'Mir', ['Skylab', 'Tiangong', 'Hubble', 'Apollo']]],
+        expert: [
+          ['Comment s’appelait le module qui s’est posé sur la Lune pendant Apollo 11 ?', 'Eagle', ['Columbia', 'Spoutnik', 'Saturn', 'Vostok', 'Discovery']],
+          ['Quel astronaute est resté en orbite autour de la Lune pendant Apollo 11 ?', 'Michael Collins', ['Buzz Aldrin', 'Neil Armstrong', 'Jim Lovell', 'Alexeï Leonov', 'Alan Shepard']],
+          ['Comment s’appelait le premier satellite américain, en 1958 ?', 'Explorer 1', ['Vanguard 1', 'Spoutnik 2', 'Telstar', 'Echo 1', 'Hubble']],
+          ['Quelle mission a emmené les derniers hommes sur la Lune, en 1972 ?', 'Apollo 17', ['Apollo 11', 'Apollo 12', 'Apollo 13', 'Apollo 15', 'Apollo 16']],
+          ['Quel satellite a transmis en 1962 la première image de télévision en direct entre l’Amérique et l’Europe ?', 'Telstar', ['Spoutnik 1', 'Explorer 1', 'Hubble', 'Météosat', 'Vanguard 1']],
+          ['Avant Internet, quel petit terminal français permettait de consulter l’annuaire ?', 'Le Minitel', ['Le télégraphe', 'Le baladeur', 'Le fax', 'Le télex', 'La radio']],
+          ['Qui a découvert l’insuline avec Charles Best, en 1921 ?', 'Frederick Banting', ['Alexander Fleming', 'Jonas Salk', 'Louis Pasteur', 'Robert Koch', 'Albert Calmette']],
+          ['Quel appareil photo instantané Edwin Land a-t-il inventé ?', 'Le Polaroid', ['Le Kodak', 'Le Leica', 'Le Nikon', 'Le Canon', 'Le Rolleiflex']],
+          ['Quel avion franco-britannique, plus rapide que le son, a volé de 1969 à 2003 ?', 'Le Concorde', ['L’Airbus A380', 'La Caravelle', 'Le Boeing 747', 'Le Mirage', 'Le Rafale']],
+          ['Quelle sonde, lancée en 1977, est l’objet humain le plus éloigné de la Terre ?', 'Voyager 1', ['Pioneer 10', 'Spoutnik 1', 'Hubble', 'Rosetta', 'Viking 1']]]
+      } },
+      { k: 'vf', niveaux: {
+        facile: [['Neil Armstrong a été le premier homme à marcher sur la Lune.', true, ''], ['Les frères Wright ont fait voler le premier avion à moteur.', true, ''],
+          ['Thomas Pesquet est un astronaute français.', true, ''], ['La pénicilline soigne des infections.', true, ''],
+          ['Youri Gagarine était américain.', false, 'Il était soviétique (de l’URSS).'],
+          ['Personne n’a jamais marché sur la Lune.', false, 'Douze astronautes américains y ont marché, entre 1969 et 1972.']],
+        moyen: [['La première femme dans l’espace était soviétique.', true, ''], ['Buzz Aldrin a marché sur la Lune.', true, ''],
+          ['Les fusées Ariane sont européennes.', true, ''], ['Le premier appel avec un téléphone portable date de 1973.', true, ''],
+          ['Albert Einstein a inventé l’avion.', false, 'Il est célèbre pour la théorie de la relativité ; l’avion à moteur vient des frères Wright.'],
+          ['Le télescope Hubble est posé sur la Lune.', false, 'Il tourne autour de la Terre, dans l’espace.']],
+        difficile: [['Alexeï Leonov a fait la première sortie dans l’espace.', true, ''], ['La carte à puce a été inventée par un Français.', true, ''],
+          ['Claudie Haigneré était médecin avant de partir dans l’espace.', true, ''], ['Le vaccin de Jonas Salk protège de la polio.', true, ''],
+          ['Le transistor a été inventé après le premier pas sur la Lune.', false, 'Il a été inventé en 1947, plus de vingt ans avant.'],
+          ['La station Mir était américaine.', false, 'Elle était soviétique, puis russe.']],
+        expert: [['Apollo 13 n’a pas pu se poser sur la Lune.', true, ''], ['Sally Ride a été la première Américaine dans l’espace, en 1983.', true, ''],
+          ['Le Concorde volait plus vite que le son.', true, ''],
+          ['Michael Collins a marché sur la Lune.', false, 'Il est resté en orbite autour de la Lune, dans le module Columbia.'],
+          ['La sonde Voyager 1 a été lancée en 1997.', false, 'Elle a été lancée en 1977.'],
+          ['Le Rubik’s Cube a été inventé par un Japonais.', false, 'Il a été inventé par le Hongrois Ernő Rubik.']]
       } },
       { k: 'ordre', consigne: 'Range ces étapes de la conquête spatiale de la plus ancienne à la plus récente.', q: 'En quelle année : {a} ?', niveaux: {
         facile: [['Lancement de Spoutnik 1', 1957, '1957'], ['Gagarine part dans l’espace', 1961, '1961'], ['Premier pas sur la Lune', 1969, '1969'],
@@ -2273,23 +2481,6 @@
           ['Lancement de la station Mir', 1986, '1986'], ['Claudie Haigneré part dans l’espace', 1996, '1996']],
         expert: [['Création de la NASA', 1958, '1958'], ['Création du CNES, l’agence spatiale française', 1961, '1961'], ['Derniers hommes sur la Lune (Apollo 17)', 1972, '1972'],
           ['Création de l’Agence spatiale européenne', 1975, '1975'], ['Sally Ride part dans l’espace', 1983, '1983'], ['Le robot Sojourner roule sur Mars', 1997, '1997']]
-      } }
-    ] },
-    { id: 'z04', matiere: 'histoire', famille: 'xx', nom: 'Inventions du XXe siècle', court: 'Inventions', icone: '✈️', series: [
-      { k: 'paires', gauche: 'Invention ou découverte', droite: 'Inventeur', consigneR: 'Relie chaque invention ou découverte à son auteur.', q: 'Qui est à l’origine de : {a} ?', qi: 'Qu’a inventé ou découvert {b} ?', ouverte: false, niveaux: {
-        facile: [['L’avion à moteur', 'Les frères Wright'], ['La pénicilline', 'Alexander Fleming'], ['Le World Wide Web', 'Tim Berners-Lee']],
-        moyen: [['La théorie de la relativité', 'Albert Einstein'], ['La télévision', 'John Logie Baird'], ['Le téléphone portable', 'Martin Cooper'],
-          ['Le scaphandre autonome', 'Jacques-Yves Cousteau']],
-        difficile: [['La carte à puce', 'Roland Moreno'], ['Le transistor', 'Bardeen, Brattain et Shockley'], ['Le stylo à bille', 'László Bíró'],
-          ['L’éclairage au néon', 'Georges Claude'], ['Le vaccin contre la polio', 'Jonas Salk']],
-        expert: [['Le laser', 'Theodore Maiman'], ['La fermeture Éclair moderne', 'Gideon Sundback'], ['Le Velcro', 'Georges de Mestral'],
-          ['Le Rubik’s Cube', 'Ernő Rubik'], ['Le four à micro-ondes', 'Percy Spencer'], ['L’insuline pour soigner le diabète', 'Banting et Best']]
-      } },
-      { k: 'qcm', niveaux: {
-        facile: [['Qu’ont fait voler les frères Wright en 1903 ?', 'Le premier avion à moteur', ['La première fusée', 'La première montgolfière']]],
-        moyen: [['Qui a découvert la pénicilline, le premier antibiotique ?', 'Alexander Fleming', ['Louis Pasteur', 'Marie Curie', 'Albert Einstein']]],
-        difficile: [['Quel Français a été le premier à traverser la Manche en avion, en 1909 ?', 'Louis Blériot', ['Clément Ader', 'Roland Garros', 'Antoine de Saint-Exupéry', 'Jean Mermoz']]],
-        expert: [['Avant Internet, quel petit terminal français permettait de consulter l’annuaire ?', 'Le Minitel', ['Le télégraphe', 'Le baladeur', 'Le fax', 'Le télex', 'La radio']]]
       } },
       { k: 'ordre', consigne: 'Range ces inventions de la plus ancienne à la plus récente.', q: 'En quelle année : {a} ?', niveaux: {
         facile: [['Premier vol des frères Wright', 1903, '1903'], ['Fleming découvre la pénicilline', 1928, '1928'], ['Premier appel avec un téléphone portable', 1973, '1973'],
@@ -2300,109 +2491,159 @@
           ['Le vaccin de Salk contre la polio est autorisé', 1955, '1955'], ['Invention du Rubik’s Cube', 1974, '1974']],
         expert: [['Sundback met au point la fermeture Éclair', 1913, '1913'], ['Bíró dépose le brevet du stylo à bille', 1938, '1938'], ['Spencer dépose le brevet du four à micro-ondes', 1945, '1945'],
           ['Mestral dépose le brevet du Velcro', 1951, '1951'], ['Premiers disques compacts (CD) en vente', 1982, '1982'], ['Premier SMS envoyé', 1992, '1992']]
+      } },
+      { k: 'classer', niveaux: {
+        facile: [{ q: 'Range : va dans l’espace ou vole dans le ciel ?', colonnes: ['Dans l’espace', 'Dans le ciel'],
+          items: [['La fusée Ariane', 0], ['Spoutnik 1', 0], ['La Station spatiale internationale', 0], ['Le télescope Hubble', 0],
+            ['Le Concorde', 1], ['L’avion des frères Wright', 1], ['L’Airbus A380', 1], ['L’hélicoptère', 1]] }],
+        moyen: [{ q: 'Range : astronaute ou inventeur ?', colonnes: ['Astronaute', 'Inventeur'],
+          items: [['Youri Gagarine', 0], ['Neil Armstrong', 0], ['Thomas Pesquet', 0], ['Valentina Terechkova', 0],
+            ['Martin Cooper', 1], ['Roland Moreno', 1], ['Tim Berners-Lee', 1], ['László Bíró', 1]] }],
+        difficile: [{ q: 'Range : soviétique ou américain ?', colonnes: ['Soviétique', 'Américain'],
+          items: [['Youri Gagarine', 0], ['Valentina Terechkova', 0], ['Alexeï Leonov', 0], ['La chienne Laïka', 0],
+            ['Neil Armstrong', 1], ['Buzz Aldrin', 1], ['Sally Ride', 1], ['Michael Collins', 1]] }],
+        expert: [{ q: 'Range : inventé avant ou après 1950 ?', colonnes: ['Avant 1950', 'Après 1950'],
+          items: [['L’avion à moteur', 0], ['La pénicilline', 0], ['La télévision de Baird', 0], ['Le stylo à bille', 0],
+            ['Le laser', 1], ['La carte à puce', 1], ['Le Rubik’s Cube', 1], ['Le World Wide Web', 1]] }]
+      } },
+      { k: 'indices', consigne: 'Qui suis-je ? Trouve le personnage.', niveaux: {
+        facile: [{ r: 'Neil Armstrong', i: ['Je suis né dans l’Ohio, aux États-Unis, en 1930.', 'J’étais pilote d’essai.', 'J’ai commandé la mission Apollo 11.', 'J’ai dit : « C’est un petit pas pour l’homme, un bond de géant pour l’humanité. »', 'J’ai été le premier homme à marcher sur la Lune.'] },
+          { r: 'Youri Gagarine', i: ['Je suis né en Russie en 1934.', 'J’étais pilote de chasse.', 'Mon vaisseau s’appelait Vostok 1.', 'Le 12 avril 1961, j’ai fait le tour de la Terre.', 'J’ai été le premier homme dans l’espace.'] }],
+        moyen: [{ r: 'Thomas Pesquet', i: ['Je suis né à Rouen en 1978.', 'J’ai été pilote de ligne à Air France.', 'J’ai joué du saxophone dans l’espace.', 'Ma première mission s’appelait Proxima.', 'Je suis un astronaute français de l’Agence spatiale européenne.'] },
+          { r: 'Valentina Terechkova', i: ['Je suis née en Russie en 1937.', 'J’ai travaillé dans une usine de textile.', 'J’aimais sauter en parachute.', 'En 1963, j’ai volé à bord de Vostok 6.', 'Je suis la première femme à être allée dans l’espace.'] }],
+        difficile: [{ r: 'Claudie Haigneré', i: ['Je suis née au Creusot en 1957.', 'Je suis médecin, spécialiste des rhumatismes.', 'En 1996, je suis partie vers la station Mir.', 'J’ai ensuite été ministre de la Recherche.', 'Je suis la première Française allée dans l’espace.'] },
+          { r: 'Albert Einstein', i: ['Je suis né en Allemagne en 1879.', 'J’ai travaillé dans un bureau des brevets, en Suisse.', 'J’ai reçu le prix Nobel de physique en 1921.', 'Ma formule la plus connue est E = mc².', 'J’ai imaginé la théorie de la relativité.'] }],
+        expert: [{ r: 'Alexander Fleming', i: ['Je suis né en Écosse en 1881.', 'J’étais médecin et chercheur à Londres.', 'En 1928, une moisissure a poussé par hasard dans une de mes boîtes.', 'J’ai reçu le prix Nobel de médecine en 1945.', 'J’ai découvert la pénicilline.'] },
+          { r: 'Tim Berners-Lee', i: ['Je suis né à Londres en 1955.', 'Mes parents ont travaillé sur l’un des premiers ordinateurs.', 'J’ai travaillé au CERN, près de Genève.', 'En 1991, j’ai mis en ligne le premier site web.', 'J’ai inventé le World Wide Web.'] }]
       } }
     ] },
-    { id: 'z05', matiere: 'histoire', famille: 'xx', nom: 'Présidents de la Ve République', court: 'Présidents', icone: '🏛️', series: [
-      { k: 'ordre', consigne: 'Range ces présidents du premier au plus récent.', q: 'En quelle année {a} devient-il président ?', niveaux: {
-        facile: [['Charles de Gaulle', 1959, '1959'], ['François Mitterrand', 1981, '1981'], ['Jacques Chirac', 1995, '1995'], ['Emmanuel Macron', 2017, '2017']],
-        moyen: [['Georges Pompidou', 1969, '1969'], ['Valéry Giscard d’Estaing', 1974, '1974'], ['Nicolas Sarkozy', 2007, '2007'], ['François Hollande', 2012, '2012']]
-      } },
-      { k: 'ordre', consigne: 'Range ces événements de la Ve République du plus ancien au plus récent.', q: 'En quelle année : {a} ?', niveaux: {
-        difficile: [['Naissance de la Ve République', 1958, '1958'], ['Première élection du président par tous les Français', 1965, '1965'], ['Mai 68', 1968, '1968'],
-          ['Première cohabitation', 1986, '1986'], ['Référendum : le mandat passe de 7 à 5 ans', 2000, '2000']],
-        expert: [['Référendum : le président sera élu par tous les Français', 1962, '1962'], ['Démission de Charles de Gaulle', 1969, '1969'], ['Mort de Georges Pompidou', 1974, '1974'],
-          ['Abolition de la peine de mort', 1981, '1981'], ['Référendum sur le traité de Maastricht', 1992, '1992'], ['Premier président élu pour 5 ans', 2002, '2002']]
-      } },
-      { k: 'qcm', niveaux: {
-        facile: [['Qui a été le premier président de la Ve République ?', 'Charles de Gaulle', ['François Mitterrand', 'Napoléon']]],
-        moyen: [['Combien d’années dure aujourd’hui le mandat du président ?', '5 ans', ['7 ans', '4 ans', '10 ans']]],
-        difficile: [['Sous quel président la peine de mort a-t-elle été abolie, en 1981 ?', 'François Mitterrand', ['Valéry Giscard d’Estaing', 'Jacques Chirac', 'Georges Pompidou', 'Charles de Gaulle']]],
-        expert: [['Quel président est mort pendant son mandat, en 1974 ?', 'Georges Pompidou', ['Charles de Gaulle', 'Félix Faure', 'Valéry Giscard d’Estaing', 'Alain Poher', 'Paul Doumer']]]
-      } },
-      { k: 'indices', consigne: 'Qui suis-je ? Trouve le président.', niveaux: {
-        facile: [{ r: 'Charles de Gaulle', i: ['Je suis né à Lille en 1890.', 'J’étais général.', 'Le 18 juin 1940, j’ai parlé aux Français à la radio, depuis Londres.', 'J’ai fondé la Ve République en 1958.', 'Le grand aéroport de Roissy, près de Paris, porte mon nom.'] }],
-        moyen: [{ r: 'Jacques Chirac', i: ['J’ai été maire de Paris pendant 18 ans.', 'J’ai été deux fois Premier ministre.', 'J’ai été élu président en 1995.', 'Pendant mon mandat, la durée du mandat de président est passée de 7 à 5 ans.', 'J’ai été réélu en 2002.'] }],
-        difficile: [{ r: 'Valéry Giscard d’Estaing', i: ['Je suis né à Coblence, en Allemagne, en 1926.', 'J’ai été ministre des Finances.', 'Je suis devenu président à 48 ans, en 1974.', 'Pendant mon mandat, la majorité est passée de 21 à 18 ans.', 'J’ai été battu par François Mitterrand en 1981.'] }],
-        expert: [{ r: 'Georges Pompidou', i: ['Je suis né dans le Cantal en 1911.', 'J’ai été professeur de lettres, puis banquier.', 'J’ai été Premier ministre du général de Gaulle pendant six ans.', 'Un grand centre d’art de Paris porte mon nom.', 'Je suis mort pendant mon mandat de président, en 1974.'] }]
-      } }
-    ] },
-    { id: 'z06', matiere: 'histoire', famille: 'xx', nom: 'Femmes qui ont marqué l’histoire', court: 'Femmes', icone: '👩‍🔬', series: [
-      { k: 'qcm', niveaux: {
-        facile: [['Quelle savante a reçu deux prix Nobel ?', 'Marie Curie', ['Simone Veil', 'Jeanne d’Arc']]],
-        moyen: [['En quelle année les Françaises ont-elles voté pour la première fois ?', '1945', ['1789', '1918', '1968']]],
-        difficile: [['Qui a été la première présidente du Parlement européen élu par les citoyens, en 1979 ?', 'Simone Veil', ['Marie Curie', 'Édith Cresson', 'Simone de Beauvoir', 'Louise Weiss']]],
-        expert: [['Qui a été la première femme Première ministre en France, en 1991 ?', 'Édith Cresson', ['Simone Veil', 'Ségolène Royal', 'Élisabeth Borne', 'Michèle Alliot-Marie', 'Christine Lagarde']]]
-      } },
-      { k: 'indices', consigne: 'Qui suis-je ? Trouve cette femme.', niveaux: {
-        facile: [{ r: 'Marie Curie', i: ['Je suis née à Varsovie, en Pologne, en 1867.', 'Je suis venue étudier les sciences à Paris.', 'Avec mon mari Pierre, j’ai découvert le radium.', 'J’ai été la première femme à recevoir un prix Nobel.', 'J’ai reçu deux prix Nobel, en physique et en chimie.'] }],
-        moyen: [{ r: 'Simone Veil', i: ['Je suis née à Nice en 1927.', 'J’ai été magistrate.', 'Ministre de la Santé, j’ai fait voter en 1975 une loi importante pour les droits des femmes.', 'J’ai été la première présidente du Parlement européen élu par les citoyens.', 'Je repose au Panthéon depuis 2018.'] }],
-        difficile: [{ r: 'Joséphine Baker', i: ['Je suis née aux États-Unis, à Saint-Louis, en 1906.', 'Je suis devenue une grande vedette du music-hall à Paris.', 'Pendant la Seconde Guerre mondiale, j’ai aidé la Résistance.', 'J’ai adopté douze enfants, ma « tribu arc-en-ciel ».', 'Je suis entrée au Panthéon en 2021.'] }],
-        expert: [{ r: 'Irène Joliot-Curie', i: ['Je suis née à Paris en 1897.', 'Pendant la Première Guerre mondiale, j’ai aidé à faire des radiographies des blessés.', 'Avec mon mari Frédéric, j’ai découvert la radioactivité artificielle.', 'J’ai reçu le prix Nobel de chimie en 1935.', 'Ma mère, Marie Curie, avait reçu deux prix Nobel.'] }]
-      } },
-      { k: 'vf', niveaux: {
-        facile: [['Marie Curie a reçu deux prix Nobel.', true, '']],
-        moyen: [['Les Françaises ont pu voter dès la Révolution de 1789.', false, 'Elles ont obtenu le droit de vote en 1944 et ont voté pour la première fois en 1945.']],
-        difficile: [['Simone Veil repose au Panthéon.', true, '']],
-        expert: [['Marie Curie est la première femme entrée au Panthéon pour ses propres mérites, en 1995.', true, '']]
-      } }
-    ] },
-    { id: 'z07', matiere: 'histoire', famille: 'xx', nom: 'Construction européenne', court: 'Europe', icone: '🇪🇺', series: [
-      { k: 'qcm', niveaux: {
-        facile: [['Quelle monnaie utilise-t-on en France depuis 2002 ?', 'L’euro', ['Le franc', 'Le dollar']]],
-        moyen: [['Combien d’étoiles y a-t-il sur le drapeau européen ?', '12', ['15', '27', '6']]],
-        difficile: [['Quelle ville française est le siège officiel du Parlement européen ?', 'Strasbourg', ['Paris', 'Lyon', 'Lille', 'Marseille']]],
-        expert: [['Quel morceau de Beethoven est devenu l’hymne européen ?', 'L’Ode à la joie', ['La Marseillaise', 'Le Boléro', 'Les Quatre Saisons', 'La Lettre à Élise', 'Le Beau Danube bleu']]]
-      } },
-      { k: 'ordre', consigne: 'Range ces étapes de la construction européenne de la plus ancienne à la plus récente.', q: 'En quelle année : {a} ?', niveaux: {
-        facile: [['Traité de Rome', 1957, '1957'], ['Premières élections européennes', 1979, '1979'], ['Traité de Maastricht', 1992, '1992'], ['Pièces et billets en euros', 2002, '2002']],
-        moyen: [['Déclaration de Robert Schuman', 1950, '1950'], ['Six pays mettent en commun le charbon et l’acier', 1951, '1951'], ['Le Royaume-Uni entre dans la Communauté', 1973, '1973'],
-          ['Accord de Schengen', 1985, '1985'], ['L’Espagne et le Portugal entrent dans la Communauté', 1986, '1986']],
-        difficile: [['Le drapeau aux 12 étoiles est adopté', 1955, '1955'], ['Naissance de la politique agricole commune', 1962, '1962'], ['La Grèce entre dans la Communauté', 1981, '1981'],
-          ['L’euro naît pour les banques', 1999, '1999'], ['Dix nouveaux pays entrent dans l’Union', 2004, '2004']],
-        expert: [['Création du Conseil de l’Europe', 1949, '1949'], ['Traité de l’Élysée entre la France et l’Allemagne', 1963, '1963'], ['Fin des droits de douane entre les Six', 1968, '1968'],
-          ['Signature de l’Acte unique européen', 1986, '1986'], ['L’Autriche, la Finlande et la Suède entrent dans l’Union', 1995, '1995'], ['Signature du traité de Lisbonne', 2007, '2007']]
-      } },
-      { k: 'vf', niveaux: {
-        facile: [['Le drapeau européen est bleu avec des étoiles jaunes.', true, '']],
-        moyen: [['Les pièces et les billets en euros sont arrivés en 2002.', true, '']],
-        difficile: [['La France fait partie des six pays qui ont fondé la construction européenne.', true, '']],
-        expert: [['Le drapeau européen gagne une étoile quand un pays entre dans l’Union.', false, 'Il a toujours 12 étoiles : ce nombre est un symbole de perfection et d’unité.']]
-      } }
-    ] },
-    { id: 'z08', matiere: 'histoire', famille: 'xx', nom: 'Grandes figures du monde', court: 'Figures', icone: '✊', series: [
+    // Grandes figures : femmes qui ont marqué l'histoire (ex-z06) et grandes figures du monde (ex-z08).
+    { id: 'z08', matiere: 'histoire', famille: 'xx', nom: 'Grandes figures', court: 'Figures', icone: '✊', series: [
       { k: 'paires', gauche: 'Personnage', droite: 'Ce qu’il ou elle a fait', consigneR: 'Relie chaque personnage à ce qu’il ou elle a fait.', q: 'Qu’a fait {a} ?', qi: 'Qui : {b} ?', ouverte: false, niveaux: {
         facile: [['Nelson Mandela', 'Président de l’Afrique du Sud après la fin de l’apartheid'], ['Martin Luther King', '« I have a dream » (« Je fais un rêve »)'],
-          ['Gandhi', 'Mène l’Inde à l’indépendance sans violence']],
-        moyen: [['Rosa Parks', 'Refuse de céder sa place dans un bus, en 1955'], ['Mère Teresa', 'Aide les plus pauvres à Calcutta'], ['Albert Schweitzer', 'Fonde un hôpital à Lambaréné, au Gabon'],
-          ['L’abbé Pierre', 'Fonde Emmaüs']],
-        difficile: [['Coluche', 'Crée les Restos du cœur'], ['Desmond Tutu', 'Archevêque sud-africain qui combat l’apartheid'], ['Lech Wałęsa', 'Dirige le syndicat Solidarność, en Pologne'],
-          ['Wangari Maathai', 'Fait planter des millions d’arbres au Kenya'], ['Mikhaïl Gorbatchev', 'Dernier dirigeant de l’URSS']],
-        expert: [['René Cassin', 'Rédige la Déclaration universelle des droits de l’homme'], ['Eleanor Roosevelt', 'Préside la commission des droits de l’homme de l’ONU'],
+          ['Gandhi', 'Mène l’Inde à l’indépendance sans violence'], ['Mère Teresa', 'Aide les plus pauvres à Calcutta']],
+        moyen: [['Rosa Parks', 'Refuse de céder sa place dans un bus, en 1955'], ['Albert Schweitzer', 'Fonde un hôpital à Lambaréné, au Gabon'],
+          ['L’abbé Pierre', 'Fonde Emmaüs'], ['Coluche', 'Crée les Restos du cœur']],
+        difficile: [['Desmond Tutu', 'Archevêque sud-africain qui combat l’apartheid'], ['Lech Wałęsa', 'Dirige le syndicat Solidarność, en Pologne'],
+          ['Wangari Maathai', 'Fait planter des millions d’arbres au Kenya'], ['Mikhaïl Gorbatchev', 'Dernier dirigeant de l’URSS'],
+          ['Eleanor Roosevelt', 'Préside la commission des droits de l’homme de l’ONU']],
+        expert: [['René Cassin', 'Rédige la Déclaration universelle des droits de l’homme'],
           ['Le dalaï-lama', 'Chef spirituel tibétain, prix Nobel de la paix 1989'], ['Andreï Sakharov', 'Physicien soviétique qui défend les droits de l’homme'],
           ['Rigoberta Menchú', 'Défend les peuples indigènes du Guatemala'], ['Václav Havel', 'Écrivain devenu président de la Tchécoslovaquie']]
       } },
-      { k: 'indices', consigne: 'Qui suis-je ? Trouve le personnage.', niveaux: {
-        facile: [{ r: 'Nelson Mandela', i: ['Je suis né en Afrique du Sud en 1918.', 'J’étais avocat.', 'J’ai combattu l’apartheid, qui séparait les Noirs et les Blancs.', 'Je suis resté 27 ans en prison.', 'En 1994, je suis devenu président de mon pays.'] }],
-        moyen: [{ r: 'Martin Luther King', i: ['Je suis né à Atlanta, aux États-Unis, en 1929.', 'J’étais pasteur.', 'J’ai lutté sans violence pour les droits des Noirs américains.', 'J’ai reçu le prix Nobel de la paix en 1964.', 'En 1963, j’ai dit : « I have a dream » (« Je fais un rêve »).'] }],
-        difficile: [{ r: 'Gandhi', i: ['Je suis né en Inde en 1869.', 'J’ai été avocat en Afrique du Sud.', 'En 1930, j’ai marché jusqu’à la mer pour récolter du sel.', 'On m’appelle « Mahatma », la grande âme.', 'J’ai mené l’Inde vers l’indépendance sans violence.'] }],
-        expert: [{ r: 'Rosa Parks', i: ['Je suis née en Alabama en 1913.', 'J’étais couturière.', 'Le 1er décembre 1955, j’ai été arrêtée à Montgomery.', 'Mon arrestation a lancé un boycott des bus pendant 381 jours.', 'J’avais refusé de céder ma place à un passager blanc dans un bus.'] }]
+      { k: 'paires', gauche: 'Femme', droite: 'Ce qu’elle a fait', consigneR: 'Relie chaque femme à ce qu’elle a fait.', q: 'Qu’a fait {a} ?', qi: 'Qui est-ce : {b} ?', ouverte: false, niveaux: {
+        facile: [['Marie Curie', 'Savante qui a reçu deux prix Nobel'], ['Simone Veil', 'Ministre, puis présidente du Parlement européen'],
+          ['Joséphine Baker', 'Artiste de music-hall entrée au Panthéon'], ['Coco Chanel', 'Créatrice de mode et du parfum N° 5']],
+        moyen: [['Édith Piaf', 'Chanteuse de « La Vie en rose »'], ['Amelia Earhart', 'Première femme à traverser seule l’Atlantique en avion'],
+          ['Irène Joliot-Curie', 'Fille de Marie Curie, prix Nobel de chimie'], ['Simone de Beauvoir', 'Écrivaine du « Deuxième Sexe »'],
+          ['Alexandra David-Néel', 'Exploratrice, première Européenne à entrer à Lhassa']],
+        difficile: [['Hélène Boucher', 'Aviatrice qui bat des records de vitesse en 1934'], ['Édith Cresson', 'Première femme Première ministre en France'],
+          ['Louise Weiss', 'Journaliste qui se bat pour le vote des femmes'], ['Colette', 'Écrivaine de « Claudine » et du « Blé en herbe »'],
+          ['Maryse Bastié', 'Aviatrice qui traverse l’Atlantique Sud en 1936']],
+        expert: [['Marie Marvingt', 'Sportive et aviatrice surnommée « la fiancée du danger »'], ['Suzanne Lenglen', 'Championne de tennis, six fois gagnante à Wimbledon'],
+          ['Françoise Giroud', 'Première secrétaire d’État à la Condition féminine, en 1974'], ['Rosalind Franklin', 'Photographie l’ADN aux rayons X'],
+          ['Margaret Thatcher', 'Première femme à diriger le gouvernement britannique']]
       } },
       { k: 'qcm', niveaux: {
-        facile: [['Comment Gandhi se battait-il ?', 'Sans violence', ['Avec une armée', 'Avec des épées']]],
-        moyen: [['De quel pays Nelson Mandela a-t-il été président ?', 'L’Afrique du Sud', ['Le Kenya', 'Les États-Unis', 'L’Inde']]],
-        difficile: [['Dans quelle ville Rosa Parks a-t-elle refusé de céder sa place ?', 'Montgomery', ['New York', 'Atlanta', 'Chicago', 'Washington']]],
-        expert: [['Avec qui Nelson Mandela a-t-il partagé le prix Nobel de la paix en 1993 ?', 'Frederik de Klerk', ['Desmond Tutu', 'Thabo Mbeki', 'Jacob Zuma', 'Steve Biko', 'Kofi Annan']]]
-      } }
-    ] },
-    { id: 'z11', matiere: 'histoire', famille: 'xx', nom: 'Frise du XXe siècle', court: 'Frise', icone: '📏', series: [
-      { k: 'ordre', consigne: 'Range ces événements du XXe siècle du plus ancien au plus récent.', q: 'En quelle année : {a} ?', niveaux: {
-        facile: [['Premier vol des frères Wright', 1903, '1903'], ['Armistice du 11 novembre', 1918, '1918'], ['Premier pas sur la Lune', 1969, '1969'], ['Chute du mur de Berlin', 1989, '1989']],
-        moyen: [['Blériot traverse la Manche en avion', 1909, '1909'], ['Premiers congés payés en France', 1936, '1936'], ['Fin de la Seconde Guerre mondiale en Europe', 1945, '1945'],
-          ['Traité de Rome', 1957, '1957'], ['Gagarine part dans l’espace', 1961, '1961']],
-        difficile: [['Loi de séparation des Églises et de l’État', 1905, '1905'], ['Début de la Première Guerre mondiale', 1914, '1914'], ['Les Françaises obtiennent le droit de vote', 1944, '1944'],
-          ['Naissance de la Ve République', 1958, '1958'], ['La majorité passe à 18 ans', 1974, '1974']],
-        expert: [['Naufrage du Titanic', 1912, '1912'], ['Krach de Wall Street', 1929, '1929'], ['Indépendance de l’Inde', 1947, '1947'],
-          ['Déclaration universelle des droits de l’homme', 1948, '1948'], ['Mai 68', 1968, '1968'], ['Nelson Mandela sort de prison', 1990, '1990']]
+        facile: [
+          ['Quelle savante a reçu deux prix Nobel ?', 'Marie Curie', ['Simone Veil', 'Jeanne d’Arc', 'Coco Chanel']],
+          ['Comment Gandhi se battait-il ?', 'Sans violence', ['Avec une armée', 'Avec des épées', 'Avec des canons']],
+          ['De quel pays Nelson Mandela a-t-il été président ?', 'L’Afrique du Sud', ['Le Kenya', 'Les États-Unis', 'L’Inde']],
+          ['Quelle phrase célèbre a prononcée Martin Luther King ?', '« I have a dream »', ['« Veni, vidi, vici »', '« Liberté, Égalité, Fraternité »', '« Eurêka ! »']],
+          ['Qui a créé les Restos du cœur ?', 'Coluche', ['L’abbé Pierre', 'Mère Teresa', 'Gandhi']],
+          ['Qu’a découvert Marie Curie avec son mari Pierre ?', 'Le radium', ['L’électricité', 'La pénicilline', 'Le vaccin contre la rage']],
+          ['Dans quel pays Marie Curie est-elle née ?', 'La Pologne', ['La France', 'L’Italie', 'L’Espagne']],
+          ['Quel était le métier de Joséphine Baker ?', 'Artiste de music-hall', ['Aviatrice', 'Savante', 'Ministre']],
+          ['Quel prix ont reçu Mandela, Martin Luther King et Mère Teresa ?', 'Le prix Nobel de la paix', ['Un Oscar', 'Le Ballon d’or', 'Le prix Goncourt']],
+          ['Combien d’années Nelson Mandela est-il resté en prison ?', '27 ans', ['2 ans', '10 ans', '50 ans']]],
+        moyen: [
+          ['Quelle association l’abbé Pierre a-t-il fondée ?', 'Emmaüs', ['La Croix-Rouge', 'Les Restos du cœur', 'L’UNICEF']],
+          ['En quelle année les Françaises ont-elles voté pour la première fois ?', '1945', ['1789', '1918', '1968']],
+          ['Qui a écrit et rendu célèbre la chanson « La Vie en rose » ?', 'Édith Piaf', ['Joséphine Baker', 'Sylvie Vartan', 'France Gall']],
+          ['Qu’a refusé de faire Rosa Parks en 1955 ?', 'Céder sa place dans le bus à un passager blanc', ['Payer son ticket', 'Aller à l’école', 'Voter']],
+          ['Dans quelle ville indienne Mère Teresa aidait-elle les plus pauvres ?', 'Calcutta', ['Bombay', 'Delhi', 'Madras']],
+          ['Quelle aviatrice américaine a traversé seule l’Atlantique en 1932 ?', 'Amelia Earhart', ['Hélène Boucher', 'Maryse Bastié', 'Sally Ride']],
+          ['Comment s’appelait la séparation entre Noirs et Blancs en Afrique du Sud ?', 'L’apartheid', ['Le servage', 'La féodalité', 'La monarchie']],
+          ['Quel était le métier de Martin Luther King ?', 'Pasteur', ['Avocat', 'Médecin', 'Président']],
+          ['Quel surnom donne-t-on à Gandhi ?', '« Mahatma », la grande âme', ['« L’Incorruptible »', '« Le Roi-Soleil »', '« Le Petit Caporal »']],
+          ['Quelle fille de Marie Curie a aussi reçu un prix Nobel ?', 'Irène Joliot-Curie', ['Simone Veil', 'Coco Chanel', 'Joséphine Baker']]],
+        difficile: [
+          ['Qui a été la première présidente du Parlement européen élu par les citoyens, en 1979 ?', 'Simone Veil', ['Marie Curie', 'Édith Cresson', 'Simone de Beauvoir', 'Louise Weiss']],
+          ['Dans quelle ville Rosa Parks a-t-elle refusé de céder sa place ?', 'Montgomery', ['New York', 'Atlanta', 'Chicago', 'Washington']],
+          ['Qui a dirigé le syndicat Solidarność, en Pologne ?', 'Lech Wałęsa', ['Mikhaïl Gorbatchev', 'Václav Havel', 'Andreï Sakharov', 'Desmond Tutu']],
+          ['En quelle année Nelson Mandela devient-il président ?', '1994', ['1964', '1980', '1990', '2004']],
+          ['Qui a été le dernier dirigeant de l’URSS ?', 'Mikhaïl Gorbatchev', ['Joseph Staline', 'Lénine', 'Boris Eltsine', 'Léonid Brejnev']],
+          ['Dans quel pays Wangari Maathai a-t-elle fait planter des millions d’arbres ?', 'Le Kenya', ['Le Maroc', 'L’Égypte', 'Le Sénégal', 'Madagascar']],
+          ['Quelle aviatrice française bat des records de vitesse en 1934 ?', 'Hélène Boucher', ['Amelia Earhart', 'Claudie Haigneré', 'Marie Curie', 'Coco Chanel']],
+          ['Qui a écrit « Le Deuxième Sexe » ?', 'Simone de Beauvoir', ['Colette', 'George Sand', 'Marguerite Duras', 'Simone Veil']],
+          ['Dans quelle ville Joséphine Baker est-elle devenue une grande vedette ?', 'Paris', ['New York', 'Londres', 'Berlin', 'Rome']],
+          ['Qui a fondé un hôpital à Lambaréné, au Gabon ?', 'Albert Schweitzer', ['Gandhi', 'L’abbé Pierre', 'Mère Teresa', 'Coluche']]],
+        expert: [
+          ['Qui a été la première femme Première ministre en France, en 1991 ?', 'Édith Cresson', ['Simone Veil', 'Ségolène Royal', 'Élisabeth Borne', 'Michèle Alliot-Marie', 'Christine Lagarde']],
+          ['Avec qui Nelson Mandela a-t-il partagé le prix Nobel de la paix en 1993 ?', 'Frederik de Klerk', ['Desmond Tutu', 'Thabo Mbeki', 'Jacob Zuma', 'Steve Biko', 'Kofi Annan']],
+          ['Quelle championne de tennis française a gagné six fois Wimbledon ?', 'Suzanne Lenglen', ['Amélie Mauresmo', 'Marion Bartoli', 'Mary Pierce', 'Françoise Dürr', 'Caroline Garcia']],
+          ['Quel Français, qui a rédigé la Déclaration universelle des droits de l’homme, reçoit le prix Nobel de la paix en 1968 ?', 'René Cassin', ['Jean Monnet', 'Robert Schuman', 'Léon Blum', 'Albert Schweitzer', 'Aristide Briand']],
+          ['Qui a mené la « révolution de velours » en Tchécoslovaquie, en 1989 ?', 'Václav Havel', ['Lech Wałęsa', 'Mikhaïl Gorbatchev', 'Alexander Dubček', 'Andreï Sakharov', 'Josip Broz Tito']],
+          ['Quelle Première ministre britannique était surnommée « la Dame de fer » ?', 'Margaret Thatcher', ['Theresa May', 'Elizabeth II', 'Indira Gandhi', 'Golda Meir', 'Angela Merkel']],
+          ['Dans quel pays Rigoberta Menchú défend-elle les peuples indigènes ?', 'Le Guatemala', ['Le Mexique', 'Le Pérou', 'La Bolivie', 'Le Chili', 'Le Brésil']],
+          ['Quel prix Andreï Sakharov a-t-il reçu en 1975 ?', 'Le prix Nobel de la paix', ['Le prix Nobel de physique', 'Le prix Goncourt', 'Un Oscar', 'La médaille Fields', 'Le Ballon d’or']],
+          ['En quelle année Joséphine Baker est-elle entrée au Panthéon ?', '2021', ['1975', '1995', '2002', '2010', '2018']],
+          ['Quel prix Nobel Marie Curie a-t-elle reçu seule, en 1911 ?', 'Le prix Nobel de chimie', ['Le prix Nobel de physique', 'Le prix Nobel de médecine', 'Le prix Nobel de la paix', 'Le prix Nobel de littérature', 'Le prix Nobel d’économie']]]
+      } },
+      { k: 'vf', niveaux: {
+        facile: [['Marie Curie a reçu deux prix Nobel.', true, ''], ['Nelson Mandela a été président de l’Afrique du Sud.', true, ''],
+          ['Coluche a créé les Restos du cœur.', true, ''],
+          ['Gandhi se battait avec une grande armée.', false, 'Il luttait sans violence, par exemple en marchant ou en refusant d’obéir à des lois injustes.'],
+          ['Martin Luther King était un roi.', false, 'C’était un pasteur américain ; « King » est son nom de famille.'],
+          ['Joséphine Baker était une savante.', false, 'C’était une artiste de music-hall, qui a aussi aidé la Résistance.']],
+        moyen: [['Rosa Parks a refusé de céder sa place dans un bus.', true, ''], ['Mère Teresa aidait les pauvres en Inde.', true, ''],
+          ['L’abbé Pierre a fondé Emmaüs.', true, ''],
+          ['Les Françaises ont pu voter dès la Révolution de 1789.', false, 'Elles ont obtenu le droit de vote en 1944 et ont voté pour la première fois en 1945.'],
+          ['Édith Piaf était une aviatrice.', false, 'C’était une chanteuse, célèbre pour « La Vie en rose ».'],
+          ['Nelson Mandela n’est jamais allé en prison.', false, 'Il est resté 27 ans en prison, de 1962 à 1990.']],
+        difficile: [['Simone Veil repose au Panthéon.', true, ''], ['Mikhaïl Gorbatchev a été le dernier dirigeant de l’URSS.', true, ''],
+          ['Simone de Beauvoir a écrit « Le Deuxième Sexe ».', true, ''], ['Martin Luther King a reçu le prix Nobel de la paix.', true, ''],
+          ['Lech Wałęsa était un dirigeant soviétique.', false, 'Il était polonais : il a dirigé le syndicat Solidarność, puis il a été président de la Pologne.'],
+          ['Joséphine Baker est née à Paris.', false, 'Elle est née aux États-Unis, à Saint-Louis.']],
+        expert: [['Marie Curie est la première femme entrée au Panthéon pour ses propres mérites, en 1995.', true, ''],
+          ['Irène Joliot-Curie a reçu le prix Nobel de chimie.', true, ''], ['René Cassin a reçu le prix Nobel de la paix.', true, ''], ['Václav Havel était écrivain.', true, ''],
+          ['Suzanne Lenglen était une championne de football.', false, 'C’était une championne de tennis.'],
+          ['Margaret Thatcher a été reine d’Angleterre.', false, 'Elle a été Première ministre du Royaume-Uni, de 1979 à 1990.']]
+      } },
+      { k: 'ordre', consigne: 'Range ces moments du plus ancien au plus récent.', q: 'En quelle année : {a} ?', niveaux: {
+        facile: [['Marie Curie reçoit son premier prix Nobel', 1903, '1903'], ['Les Françaises votent pour la première fois', 1945, '1945'],
+          ['Martin Luther King : « I have a dream »', 1963, '1963'], ['Nelson Mandela devient président', 1994, '1994']],
+        moyen: [['Gandhi marche jusqu’à la mer pour récolter du sel', 1930, '1930'], ['L’abbé Pierre fonde Emmaüs', 1949, '1949'], ['Rosa Parks refuse de céder sa place', 1955, '1955'],
+          ['Mère Teresa reçoit le prix Nobel de la paix', 1979, '1979'], ['Coluche crée les Restos du cœur', 1985, '1985']],
+        difficile: [['Marie Curie reçoit son second prix Nobel', 1911, '1911'], ['Amelia Earhart traverse seule l’Atlantique', 1932, '1932'], ['Indépendance de l’Inde', 1947, '1947'],
+          ['Simone Veil préside le Parlement européen', 1979, '1979'], ['Nelson Mandela sort de prison', 1990, '1990'], ['Édith Cresson devient Première ministre', 1991, '1991']],
+        expert: [['Irène Joliot-Curie reçoit le prix Nobel', 1935, '1935'], ['Déclaration universelle des droits de l’homme', 1948, '1948'],
+          ['René Cassin reçoit le prix Nobel de la paix', 1968, '1968'], ['Andreï Sakharov reçoit le prix Nobel de la paix', 1975, '1975'],
+          ['Lech Wałęsa reçoit le prix Nobel de la paix', 1983, '1983'], ['Joséphine Baker entre au Panthéon', 2021, '2021']]
+      } },
+      { k: 'classer', niveaux: {
+        facile: [{ q: 'Range : savant ou artiste ?', colonnes: ['Savant ou savante', 'Artiste'],
+          items: [['Marie Curie', 0], ['Pierre Curie', 0], ['Albert Einstein', 0], ['Irène Joliot-Curie', 0],
+            ['Joséphine Baker', 1], ['Édith Piaf', 1], ['Coluche', 1], ['Charlie Chaplin', 1]] }],
+        moyen: [{ q: 'Range : a agi surtout en Afrique ou en Amérique ?', colonnes: ['En Afrique', 'En Amérique'],
+          items: [['Nelson Mandela', 0], ['Desmond Tutu', 0], ['Wangari Maathai', 0], ['Albert Schweitzer', 0],
+            ['Martin Luther King', 1], ['Rosa Parks', 1], ['Rigoberta Menchú', 1], ['Amelia Earhart', 1]] }],
+        difficile: [{ q: 'Range : française ou étrangère ?', colonnes: ['Française', 'Étrangère'],
+          items: [['Simone Veil', 0], ['Édith Cresson', 0], ['Hélène Boucher', 0], ['Colette', 0],
+            ['Valentina Terechkova', 1], ['Rosa Parks', 1], ['Margaret Thatcher', 1], ['Amelia Earhart', 1]] }],
+        expert: [{ q: 'Range : a reçu le prix Nobel de la paix, ou non ?', colonnes: ['Prix Nobel de la paix', 'Pas ce prix'],
+          items: [['Lech Wałęsa', 0], ['Desmond Tutu', 0], ['Rigoberta Menchú', 0], ['Andreï Sakharov', 0],
+            ['Gandhi', 1], ['Rosa Parks', 1], ['Coluche', 1], ['Simone Veil', 1]] }]
+      } },
+      { k: 'indices', consigne: 'Qui suis-je ? Trouve le personnage.', niveaux: {
+        facile: [{ r: 'Marie Curie', i: ['Je suis née à Varsovie, en Pologne, en 1867.', 'Je suis venue étudier les sciences à Paris.', 'Avec mon mari Pierre, j’ai découvert le radium.', 'J’ai été la première femme à recevoir un prix Nobel.', 'J’ai reçu deux prix Nobel, en physique et en chimie.'] },
+          { r: 'Nelson Mandela', i: ['Je suis né en Afrique du Sud en 1918.', 'J’étais avocat.', 'J’ai combattu l’apartheid, qui séparait les Noirs et les Blancs.', 'Je suis resté 27 ans en prison.', 'En 1994, je suis devenu président de mon pays.'] }],
+        moyen: [{ r: 'Simone Veil', i: ['Je suis née à Nice en 1927.', 'J’ai été magistrate.', 'Ministre de la Santé, j’ai fait voter en 1975 une loi importante pour les droits des femmes.', 'J’ai été la première présidente du Parlement européen élu par les citoyens.', 'Je repose au Panthéon depuis 2018.'] },
+          { r: 'Martin Luther King', i: ['Je suis né à Atlanta, aux États-Unis, en 1929.', 'J’étais pasteur.', 'J’ai lutté sans violence pour les droits des Noirs américains.', 'J’ai reçu le prix Nobel de la paix en 1964.', 'En 1963, j’ai dit : « I have a dream » (« Je fais un rêve »).'] }],
+        difficile: [{ r: 'Joséphine Baker', i: ['Je suis née aux États-Unis, à Saint-Louis, en 1906.', 'Je suis devenue une grande vedette du music-hall à Paris.', 'Pendant la Seconde Guerre mondiale, j’ai aidé la Résistance.', 'J’ai adopté douze enfants, ma « tribu arc-en-ciel ».', 'Je suis entrée au Panthéon en 2021.'] },
+          { r: 'Gandhi', i: ['Je suis né en Inde en 1869.', 'J’ai été avocat en Afrique du Sud.', 'En 1930, j’ai marché jusqu’à la mer pour récolter du sel.', 'On m’appelle « Mahatma », la grande âme.', 'J’ai mené l’Inde vers l’indépendance sans violence.'] }],
+        expert: [{ r: 'Irène Joliot-Curie', i: ['Je suis née à Paris en 1897.', 'Pendant la Première Guerre mondiale, j’ai aidé à faire des radiographies des blessés.', 'Avec mon mari Frédéric, j’ai découvert la radioactivité artificielle.', 'J’ai reçu le prix Nobel de chimie en 1935.', 'Ma mère, Marie Curie, avait reçu deux prix Nobel.'] },
+          { r: 'Rosa Parks', i: ['Je suis née en Alabama en 1913.', 'J’étais couturière.', 'Le 1er décembre 1955, j’ai été arrêtée à Montgomery.', 'Mon arrestation a lancé un boycott des bus pendant 381 jours.', 'J’avais refusé de céder ma place à un passager blanc dans un bus.'] }]
       } }
     ] }
   ];

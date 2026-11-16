@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '8.9';
+  var VERSION = '8.10';
 
   var HISTORY = [
+    { v: '8.10', date: '2026-11-16', changes: [
+      "Histoire, XXe siècle : les 7 petits jeux sont regroupés en 3, avec environ 38 à 50 questions par niveau chacun, jouables en Quiz et en Normal — Le XXe siècle en dates (présidents, construction européenne, frise, vie en France) ; Sciences et espace (conquête spatiale, inventions) ; Grandes figures (femmes qui ont marqué l’histoire, grandes figures du monde)."
+    ] },
     { v: '8.9', date: '2026-11-16', changes: [
       "Histoire, Révolution et XIXe siècle : les 9 petits jeux sont regroupés en 3, avec environ 38 à 48 questions par niveau chacun, jouables en Quiz et en Normal — Révolution, Napoléon et République (avec les symboles de la République, les régimes et les grandes lois) ; Industrie, inventions et monuments ; Arts et lettres du XIXe (écrivains, peintres, compositeurs)."
     ] },
