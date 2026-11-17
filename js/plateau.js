@@ -1057,10 +1057,12 @@
   // Résumé de l'aventure choisie : histoire et objectif pour le nombre de joueurs choisi.
   function majDetail() {
     lireChoix();
-    var av = partie.aventure;
+    var av = partie.aventure, hist = A.histoire(av, partie.nbJoueurs);
+    // v10.5 : tutoiement seul, « vous » de l'équipe à plusieurs (choix de l'utilisateur du 17/11/2026).
+    $('titre-choix-aventure').textContent = partie.nbJoueurs === 1 ? 'Choisis ton aventure' : 'Choisissez votre aventure';
     $('aventure-detail').innerHTML =
       '<h3>' + av.nom + '</h3>' +
-      (av.histoire ? '<p class="aventure-histoire">' + av.histoire + '</p>' : '<p class="a-venir">Histoire à venir.</p>') +
+      (hist ? '<p class="aventure-histoire">' + hist + '</p>' : '<p class="a-venir">Histoire à venir.</p>') +
       '<p class="detail-objectif">Objectif de l’équipe (' + partie.nbJoueurs + ' joueur' + (partie.nbJoueurs > 1 ? 's' : '') + ') : <strong>' +
       libelleObjectif(av, partie.nbJoueurs) + '</strong></p>';
     sauver();

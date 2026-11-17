@@ -1,7 +1,7 @@
 // Aventures : 10 aventures, objectif selon difficulté × joueurs, affichage sur le rouleau.
 const { test, expect } = require('@playwright/test');
 const A = require('../js/aventures.js');
-const { lancerPartie, versReglages, cocherTout } = require('./aide');
+const { lancerPartie, versReglages, cocherTout, ouvrirNeuf } = require('./aide');
 
 test.describe('données des aventures', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
@@ -122,4 +122,38 @@ test('cadre de l\'aventure choisie entier : dessiné à l\'intérieur de la cart
   // Une autre aventure choisie : le cadre suit.
   await page.getByRole('radio', { name: /^Savane/ }).check();
   expect(await page.locator('.aventure:has(input:checked)').evaluate((el) => getComputedStyle(el, '::after').boxShadow)).toMatch(/inset/);
+});
+
+// v10.5 (demande du 17/11/2026, backlog ligne 406) : le jeu tutoie le joueur. Seul, l'histoire est au « tu » ;
+// à plusieurs, elle s'adresse à l'équipe avec « vous » (pluriel, choix de l'utilisateur).
+test('histoires : « tu » pour une partie seul, « vous » pour l’équipe', async ({ page }) => {
+  for (const a of A.LISTE.filter((x) => x.histoire)) {
+    expect(a.histoireSolo).toBeTruthy();
+    expect(a.histoireSolo).not.toMatch(/\b(vous|votre|vos)\b/i);
+    expect(A.histoire(a, 1)).toBe(a.histoireSolo);
+    expect(A.histoire(a, 3)).toBe(a.histoire);
+  }
+  await page.goto('./');
+  await versReglages(page, 1);
+  await cocherTout(page, 1);
+  await expect(page.locator('#titre-choix-aventure')).toHaveText('Choisis ton aventure');
+  await expect(page.locator('#aventure-detail')).toContainText('Ton pire ennemi, Ragnar');
+  await expect(page.locator('#aventure-detail')).not.toContainText(/\b(vous|votre|vos)\b/i);
+  await ouvrirNeuf(page);
+  await versReglages(page, 2);
+  await cocherTout(page, 2);
+  await expect(page.locator('#titre-choix-aventure')).toHaveText('Choisissez votre aventure');
+  await expect(page.locator('#aventure-detail')).toContainText('Votre pire ennemi, Ragnar');
+});
+
+// Aucun vouvoiement dans la page ni dans les e-mails (hors listes de mots, phrases d'exemple et conjugaison).
+test('aucun vouvoiement dans la page d’accueil ni dans les e-mails', async ({ page, request }) => {
+  test.skip(test.info().project.name !== 'ordinateur', 'un format suffit');
+  await page.goto('./');
+  const meta = await page.locator('meta[name="description"]').getAttribute('content');
+  expect(meta).not.toMatch(/\b(Avancez|cumulez|vous|votre|vos)\b/i);
+  for (const f of ['outils/emails/confirmation.html', 'outils/emails/mot-de-passe.html']) {
+    const t = await (await request.get(f)).text();
+    expect(t.replace(/<[^>]+>/g, ' ')).not.toMatch(/\b(vous|votre|vos|veuillez)\b/i);
+  }
 });

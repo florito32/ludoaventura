@@ -90,7 +90,7 @@
     }
     if (n === 4) {
       return { cle: cle, choix: $('liste-aventures'), cible: $('btn-lancer'),
-        texte: 'Choisissez votre aventure. Chacune a son objectif à atteindre ensemble avant d’arriver au volcan (pierres à tailler, épées à forger…). Puis « Lancer la partie ».' };
+        texte: 'Choisis ton aventure. Chacune a son objectif à atteindre ensemble avant d’arriver au volcan (pierres à tailler, épées à forger…). Puis « Lancer la partie ».' };
     }
     // Étape 3 : la matière, puis ses réglages (un écran ou deux selon la matière).
     valider = $('btn-valider-reglages');
@@ -368,7 +368,7 @@
     etat.mode = 'fin';
     etat.cle = null;
     fleche.hidden = true;
-    montrerBulle('Bravo, tu sais jouer ! Continuez jusqu’au volcan. Si tu as besoin d’aide, touche-moi, en bas à gauche.', [
+    montrerBulle('Bravo, tu sais jouer ! Continue jusqu’au volcan. Si tu as besoin d’aide, touche-moi, en bas à gauche.', [
       ['Compris', 'btn-principal', fermer]
     ]);
   }

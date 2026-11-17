@@ -2,6 +2,10 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.6', date: '2026-11-17', changes: [
+    "Le jeu te tutoie partout. Quand tu joues seul, l’histoire de l’aventure s’adresse à toi (« Ton pire ennemi, Ragnar, t’a volé des troncs… ») ; à plusieurs, elle parle à l’équipe (« vous »).",
+    "« Choisis ton aventure » quand tu joues seul ; Ludo dit « Continue jusqu’au volcan »."
+  ] },
   { v: '10.5', date: '2026-11-17', changes: [
     "Baby jeux « J’entends la lettre », « Les syllabes » et « Un son, des écritures » : la lettre, la syllabe ou le son à trouver est dit seul, dans une phrase à part et plus lentement, pour bien l’entendre.",
     "À la fin du tour, l’encadré de progression (« … taille 5 pierres ! Au tour de … ») ne s’affiche plus sur le plateau ; il reste annoncé aux lecteurs d’écran."
