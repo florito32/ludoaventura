@@ -293,8 +293,8 @@ test('partie rapide « Français » : une carte de grammaire au niveau choisi', 
   await page.goto('./');
   await page.getByRole('button', { name: 'Partie rapide' }).click();
   await page.getByRole('button', { name: 'Lancer la partie' }).click();
-  // On force la matière de la prochaine carte (le hasard choisit sinon entre les 3 matières du français).
-  await page.evaluate(() => { const R = window.Rapide, c = R.carte; R.carte = (m, n) => { const t = c(m, n, () => 0.9); return t; }; });
+  // On force la matière de la prochaine carte (v10.4 : 4 matières du français, 0.6 tombe sur la grammaire).
+  await page.evaluate(() => { const R = window.Rapide, c = R.carte; R.carte = (m, n) => { const t = c(m, n, () => 0.6); return t; }; });
   await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await expect(page.locator('#carte-titre')).toContainText('Grammaire · Difficile');
   await expect.poll(() => page.evaluate(() => !document.getElementById('carte-gram').hidden || !document.getElementById('carte-saisie').hidden)).toBe(true);
