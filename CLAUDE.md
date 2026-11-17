@@ -7,7 +7,7 @@
 - Site en ligne : https://florito32.github.io/ludoaventura/
 - Dépôt distinct de `florito32/minijeux` (site de petits jeux, ancien nom « ludoaventura »).
 - Fichiers clés : `index.html` (écrans : accueil, plateau), `js/plateau.js` (cases du parcours en % de l'image, pions), `img/` (illustrations détourées en WebP), `js/version.js` (version + historique), `js/navigateur.js` + `sw.js` (nettoyage de l'ancienne copie hors ligne, ne pas réactiver).
-- À chaque mise en ligne : incrémenter `VERSION` dans `js/version.js`.
+- À chaque mise en ligne : incrémenter `VERSION` dans `js/version.js` et ajouter l'entrée en tête de `js/version-historique.js` (chargé seulement au clic sur la version).
 
 ## Questions
 - Au moindre doute, poser la question **avant** de mettre en ligne (boîte de dialogue à choix, réponse recommandée en premier, une question à la fois).
@@ -17,6 +17,9 @@
 - `BACKLOG.md` est la mémoire du projet : chaque instruction = une ligne.
 - Statuts : à faire / en cours / fait à valider / terminé / question en attente.
 - Pour chaque ligne livrée, indiquer que les tests sont passés.
+- `BACKLOG.md` ne garde que l'actif ; ce qui est terminé (et l'ancien « fait à valider ») part dans `BACKLOG-archive.md`. Ne lire l'archive qu'en cas de besoin (recherche ciblée).
+- Une ligne active : 300 caractères au plus ; le détail (hypothèses, causes, chiffres) va dans la pull request.
+- Le backlog se met à jour **dans la même pull request** que la fonctionnalité (pas de PR « Backlog : livrée » séparée).
 
 ## Code et site
 - Site web statique hébergé sur GitHub Pages.
@@ -28,6 +31,7 @@
 ## Versions
 - Chaque page affiche son numéro de version (ex. v1.3) ; un clic ouvre l'historique des changements.
 - Incrémenter à chaque mise en ligne.
+- Plusieurs sessions publient en parallèle : fixer le numéro de version (et les numéros de lignes du backlog) **dans le dernier commit, juste avant la fusion**, après `git fetch` de `main`, jamais au début du travail.
 
 ## Tests A/B
 - En cas d'hésitation : page de test (A à gauche, B à droite, paramètres modifiables), bouton « Copier mes choix ».
@@ -43,7 +47,8 @@
 ## Tests (Playwright)
 - Avant chaque push : parcours principal, fonctionnalités modifiées, affichage téléphone / tablette / ordinateur.
 - Chaque fonctionnalité ou bug corrigé ajoute son test.
-- Les tests tournent sur GitHub Actions à chaque pull request : pas de fusion si un test échoue.
+- Les tests tournent sur GitHub Actions à chaque pull request, en 4 jobs parallèles (3 à 5 min) ; pas de tests quand seuls des `.md` changent. Pas de fusion si un test échoue.
+- En local, pendant la mise au point : lancer seulement les fichiers de test concernés ; la suite complète tourne sur GitHub.
 - Après mise en ligne : test rapide sur la vraie page GitHub Pages.
 
 ## Vérité
