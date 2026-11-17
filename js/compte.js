@@ -1,6 +1,7 @@
 // Compte en ligne et sauvegarde de la progression (v9.4, demande du 16/11/2026, backlog lignes 346 à 349).
 // Choix de l'utilisateur :
-//  - connexion FACULTATIVE : sans compte, on joue « en invité » et la progression reste sur l'appareil (comme avant) ;
+//  - sans compte, on joue « en invité » et la progression reste sur l'appareil (comme avant) ; depuis la v10.3,
+//    une fenêtre propose de se connecter à chaque ouverture du jeu tant qu'on n'est pas connecté ;
 //  - connexion avec Google, ou avec une adresse e-mail + un mot de passe (confirmation par e-mail à l'inscription,
 //    « Mot de passe oublié ») ; les e-mails partent par Brevo (réglé dans le tableau de bord Supabase) ;
 //  - une seule progression par compte (pas de profils par enfant) ;
@@ -378,7 +379,37 @@
     return true;
   }
 
+  // ---------- Fenêtre de connexion au lancement (v10.3, backlog ligne 405) ----------
+  // Demande du 17/11/2026 : il faut se connecter pour jouer. Tant que le joueur n'est pas connecté, une fenêtre
+  // au centre de l'écran propose « Se connecter », « Créer un compte » ou « Jouer en invité », à CHAQUE ouverture
+  // du jeu (choix de l'utilisateur). Échap = « Jouer en invité ».
+  // Les tests automatiques (navigator.webdriver) ne la voient pas, sauf s'ils la demandent (AVENTURA_FENETRE_COMPTE) :
+  // sinon elle couvrirait l'accueil de tous les autres tests.
+  var fenetre = $('fenetre-compte');
+  function fermerFenetre() { if (fenetre && fenetre.open) fenetre.close(); }
+  function ouvrirCompte(m, champ) {
+    fermerFenetre();
+    window.Aventura.afficher('ecran-compte');
+    changerMode(m);
+    if ($(champ)) $(champ).focus();
+  }
+  if (fenetre) {
+    $('fenetre-connecter').addEventListener('click', function () { ouvrirCompte('connexion', 'compte-email'); });
+    $('fenetre-creer').addEventListener('click', function () { ouvrirCompte('creation', 'creation-email'); });
+    $('fenetre-invite').addEventListener('click', fermerFenetre);
+  }
+  function fenetreAuLancement() {
+    if (!fenetre || session) return;
+    var auto = typeof navigator !== 'undefined' && navigator.webdriver;
+    if (auto && window.AVENTURA_FENETRE_COMPTE !== true) return;
+    if (!fenetre.open) fenetre.showModal();
+    $('fenetre-connecter').focus();
+  }
+
   majPage();
-  if (!lireRetour() && session) synchroniser(); // ouverture du jeu : on récupère ce qui a été gagné ailleurs
+  if (!lireRetour()) {
+    if (session) synchroniser(); // ouverture du jeu : on récupère ce qui a été gagné ailleurs
+    else fenetreAuLancement();
+  }
   window.Compte = Object.assign(C, { synchroniser: synchroniser, session: function () { return session; }, etat: etat });
 })(typeof window !== 'undefined' ? window : globalThis);

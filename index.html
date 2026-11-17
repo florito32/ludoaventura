@@ -806,6 +806,21 @@
   </div>
 </dialog>
 
+<!-- Fenêtre de connexion (v10.3, demande du 17/11/2026, backlog ligne 405) : au lancement, tant que le joueur
+     n'est pas connecté, une fenêtre au centre de l'écran propose de se connecter, de créer un compte ou de jouer
+     en invité. Elle revient à chaque ouverture du jeu (choix de l'utilisateur). js/compte.js l'ouvre. -->
+<dialog class="fin fenetre-compte" id="fenetre-compte" aria-labelledby="fenetre-compte-titre" aria-describedby="fenetre-compte-texte">
+  <svg class="fenetre-compte-ico" aria-hidden="true"><use href="#i-compte"/></svg>
+  <h2 id="fenetre-compte-titre">Bienvenue dans Aventura !</h2>
+  <p id="fenetre-compte-texte">Connecte-toi pour garder tes étoiles, tes coffres et tes niveaux sur tous tes appareils.</p>
+  <div class="menu-actions">
+    <button type="button" class="btn btn-principal" id="fenetre-connecter">Se connecter</button>
+    <button type="button" class="btn btn-secondaire" id="fenetre-creer">Créer un compte</button>
+    <button type="button" class="btn btn-secondaire" id="fenetre-invite">Jouer en invité</button>
+  </div>
+  <p class="petit fenetre-compte-note">En invité, ta progression reste seulement sur cet appareil.</p>
+</dialog>
+
 <script src="js/des.js"></script>
 <script src="js/aventures.js"></script>
 <script src="js/aventuriers.js"></script>
