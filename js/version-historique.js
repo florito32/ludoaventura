@@ -2,6 +2,10 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.8', date: '2026-11-17', changes: [
+    "Baby jeux : « Encore un ! » devient « J’en ajoute ». Tu pars d’un des chiffres que tu travailles et on t’en ajoute 1, 2 ou 3 (le total peut dépasser 10).",
+    "La phrase est plus naturelle : « Tu as 5 pommes. Tu en reçois 2 de plus. Combien de pommes as-tu maintenant ? » (avec « une pomme », « un ballon », « d’étoiles » bien accordés)."
+  ] },
   { v: '10.7', date: '2026-11-17', changes: [
     "Crédits (en bas de page) : les illustrations du jeu sont de Stuki San."
   ] },

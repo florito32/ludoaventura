@@ -62,12 +62,33 @@ test.describe('contenu des baby jeux', () => {
         if (c.choix) for (const x of c.choix) if (x !== c.bonne) expect([2, 5]).not.toContain(Number(x));
         if (c.jetons) for (const j of c.jetons) expect(j.bon).toBe(j.t === String(bonne));
       }
-      // Encore un ! : on arrive sur un chiffre choisi (il faut au moins 2).
+      // J’en ajoute : on part d'un chiffre choisi (même seul : 1 convient), on ajoute 1 à 3.
       const e = B.generer('encore-un', reg);
-      expect(e.bonne).toBe(String(e.avant + 1));
-      expect(['2', '5']).toContain(e.bonne);
+      expect([2, 5]).toContain(e.avant);
+      expect([1, 2, 3]).toContain(e.ajout);
+      expect(e.bonne).toBe(String(e.avant + e.ajout));
+      expect(e.choix).toHaveLength(3);
+      expect(new Set(e.choix).size).toBe(3);
+      for (const x of e.choix) expect(Number(x)).toBeGreaterThanOrEqual(1);
     }
-    expect(B.generer('encore-un', { chiffres: [1] })).toBeNull();
+    expect(B.generer('encore-un', { chiffres: [1] }).avant).toBe(1);
+  });
+
+  test('J’en ajoute : phrase naturelle (« Tu as 5 pommes… »), accords et vérité du calcul', () => {
+    const vus = new Set();
+    for (let k = 0; k < 400; k++) {
+      const c = B.generer('encore-un', { chiffres: [1, 5, 10] });
+      vus.add(c.avant + '+' + c.ajout);
+      expect(c.consigne).toMatch(/^Tu as \d+ \S+\. Tu en reçois [123] de plus\. Combien d(e |’)\S+ as-tu maintenant \?$/);
+      expect(c.consigne).not.toMatch(/Il y en a|encore un arrive/);
+      expect(c.oral).toMatch(/^Tu as (un|une|[a-zé]+) \S+\. Tu en reçois (un|une|deux|trois) de plus\./);
+      const nom = c.consigne.split(' ')[3].replace('.', '');
+      if (c.avant === 1) expect(nom).not.toMatch(/s$/); // singulier : « 1 pomme »
+      else expect(nom).toMatch(/s$/); // pluriel : « 5 pommes »
+      expect(B.juste(c, String(c.avant + c.ajout))).toBe(true);
+    }
+    // 3 départs × 3 ajouts : tout sort.
+    expect(vus.size).toBe(9);
   });
 
   test('lettres : lettres choisies et écriture (majuscules, minuscules, les deux)', () => {
@@ -313,4 +334,37 @@ test('les jetons se baladent (animation) quand l’appareil n’a pas demandé m
   await expect(page.locator('.baby-modele .baby-de').first()).toBeVisible(); // le dé classique
   const anim = await page.locator('.baby-jeton').first().evaluate((e) => getComputedStyle(e).animationName);
   expect(anim).toBe('baby-balade');
+});
+
+// « J’en ajoute » (v10.7, demande du 17/11/2026) : phrase claire, objets du départ + objets ajoutés, rien ne déborde (cas le plus chargé : 10 + 3).
+test('J’en ajoute : la carte dit « Tu as 10 … Tu en reçois N de plus », montre les objets, tient sur tous les écrans', async ({ page }) => {
+  await ouvrirBaby(page, { categories: ['chiffres'], chiffres: [10], jeux: ['encore-un'] });
+  await page.getByRole('button', { name: 'Choisir les jeux' }).click();
+  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
+  const carte = page.locator('#carte-piochee');
+  await expect(carte).toBeVisible();
+  const c = await page.evaluate(() => window.Aventura.partie.carte);
+  expect(c.jeu).toBe('encore-un');
+  expect(c.avant).toBe(10);
+  await expect(carte).toContainText('Tu as 10 ');
+  await expect(carte).toContainText('Tu en reçois ' + c.ajout + ' de plus');
+  await expect(carte).not.toContainText('encore un arrive');
+  // 10 objets au départ + les objets reçus.
+  await expect(carte.locator('.baby-objets:not(.arrive) > span')).toHaveCount(10);
+  await expect(carte.locator('.baby-objets.arrive > span')).toHaveCount(c.ajout);
+  // Rien ne déborde de l'écran.
+  const deborde = await page.evaluate(() => {
+    const w = window.innerWidth, h = window.innerHeight, out = [];
+    if (document.documentElement.scrollWidth > w + 1) out.push('page large');
+    document.querySelectorAll('#carte-piochee .baby-objets, #carte-piochee button').forEach((e) => {
+      const r = e.getBoundingClientRect();
+      if (r.width && (r.right > w + 1 || r.left < -1 || r.bottom > h + 1)) out.push((e.className || e.textContent).toString().slice(0, 20));
+    });
+    return out;
+  });
+  expect(deborde).toEqual([]);
+  // La bonne réponse est juste, une mauvaise non.
+  await carte.getByRole('button', { name: c.bonne, exact: true }).click();
+  await expect(page.locator('#carte-piochee')).toContainText(/Bravo|Bien joué|juste|Super/i);
 });
