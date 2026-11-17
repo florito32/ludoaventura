@@ -1,16 +1,25 @@
 # Tests Playwright à chaque pull request et à chaque push sur main.
 # Image officielle Playwright : navigateurs déjà installés (CI plus rapide).
+# Audit du 17/11/2026 (backlog ligne 394) : la suite complète prenait 13 à 17 min dans un seul job.
+#  - 4 jobs en parallèle (sharding, https://playwright.dev/docs/test-sharding) ;
+#  - pas de tests quand seuls des fichiers .md changent (backlog, CLAUDE.md, README).
 name: Tests
 on:
   pull_request:
+    paths-ignore: ['**.md']
   push:
     branches: [main]
+    paths-ignore: ['**.md']
 jobs:
   playwright:
     runs-on: ubuntu-latest
     container: mcr.microsoft.com/playwright:v1.63.0-noble
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
     steps:
       - uses: actions/checkout@v4
       - run: npm ci
-      - run: npm test
+      - run: npx playwright test --shard=${{ matrix.shard }}/4
         env: { HOME: /root }
