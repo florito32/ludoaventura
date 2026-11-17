@@ -1593,6 +1593,22 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
   .fenetre-compte .fenetre-compte-note { margin-top: 6px; }
 }
 
+/* v10.9 : pseudo (écran « Mon compte » et fenêtre « Choisis ton pseudo »). */
+.compte-pseudo { display: grid; gap: 4px; }
+.compte-pseudo .lien-bouton { justify-self: start; }
+.compte-form > .petit { margin: 0; }
+.fenetre-pseudo .compte-form { text-align: left; }
+.fenetre-pseudo .compte-message { margin: 4px 0 0; }
+.fenetre-pseudo .menu-actions { margin-top: 8px; }
+.fenetre-pseudo .menu-actions .btn { min-height: 48px; }
+@media (max-height: 520px) {
+  .fenetre-pseudo h2 { font-size: 1.15rem; }
+  .fenetre-pseudo #fenetre-pseudo-texte { font-size: .9rem; margin-bottom: 6px; }
+  .fenetre-pseudo .compte-form input[type="text"] { min-height: 40px; padding-block: 4px; }
+  .fenetre-pseudo .menu-actions { margin-top: 4px; }
+  .fenetre-pseudo .menu-actions .btn { min-height: 40px; }
+}
+
 /* Écrans « Mes étoiles », « Ma progression », « Défi du jour ». */
 .page { width: 100%; max-width: 640px; margin: 0 auto; padding: 8px 12px 16px; }
 .page-corps { display: grid; gap: 12px; }

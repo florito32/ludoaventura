@@ -13,7 +13,7 @@ function progression(total, gemmes = 0) {
 
 // Imite le service : connexion, utilisateur, lecture et écriture de la progression. Renvoie les envois reçus.
 async function service(page, { distant = null, connexion = SESSION, erreurConnexion = null, verifOk = true } = {}) {
-  const envois = { progression: [], deconnexion: 0, inscription: [], oubli: [], verif: [], renvoi: [] };
+  const envois = { progression: [], deconnexion: 0, inscription: [], oubli: [], verif: [], renvoi: [], pseudos: [] };
   await page.route(SERVICE + '/**', async (route) => {
     const req = route.request(), url = new URL(req.url()), m = req.method();
     const json = (status, corps) => route.fulfill({ status, contentType: 'application/json', body: corps === undefined ? '' : JSON.stringify(corps) });
@@ -22,6 +22,7 @@ async function service(page, { distant = null, connexion = SESSION, erreurConnex
       return json(200, connexion);
     }
     if (url.pathname === '/auth/v1/user') return json(200, UTILISATEUR);
+    if (url.pathname === '/rest/v1/rpc/pseudo_disponible') { envois.pseudos.push(req.postDataJSON().p_pseudo); return json(200, 'ok'); }
     if (url.pathname === '/auth/v1/signup') { envois.inscription.push(req.postDataJSON()); return json(200, { id: 'nouveau', email: req.postDataJSON().email }); }
     if (url.pathname === '/auth/v1/verify') {
       envois.verif.push(req.postDataJSON());
@@ -140,7 +141,7 @@ test('connexion refusée : message clair en français', async ({ page }) => {
   await expect(page.locator('#compte-invite')).toBeVisible();
 });
 
-test('création de compte : bouton seul, formulaire à part (e-mail + 2 mots de passe), puis seulement « Vérifie tes e-mails »', async ({ page }) => {
+test('création de compte : bouton seul, formulaire à part (e-mail, pseudo + 2 mots de passe), puis seulement « Vérifie tes e-mails »', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await preparer(page);
   const envois = await service(page);
@@ -159,6 +160,7 @@ test('création de compte : bouton seul, formulaire à part (e-mail + 2 mots de 
   const r = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
   expect(r.violations.map((v) => v.id)).toEqual([]);
   await page.locator('#creation-email').fill('nouveau@example.com');
+  await page.locator('#creation-pseudo').fill('Lina_Rose');
   await page.locator('#creation-mdp').fill('secret123');
   await page.locator('#creation-mdp2').fill('secret124');
   await page.getByRole('button', { name: 'Créer mon compte' }).click();
@@ -169,7 +171,8 @@ test('création de compte : bouton seul, formulaire à part (e-mail + 2 mots de 
   await expect(page.getByRole('heading', { name: 'Vérifie tes e-mails' })).toBeVisible();
   await expect(page.locator('#compte-attente')).toContainText('nouveau@example.com');
   await expect(page.locator('#compte-attente')).toContainText('attend ta validation');
-  expect(envois.inscription).toEqual([{ email: 'nouveau@example.com', password: 'secret123' }]);
+  expect(envois.inscription).toEqual([{ email: 'nouveau@example.com', password: 'secret123', data: { pseudo: 'Lina_Rose' } }]);
+  expect(envois.pseudos).toEqual(['Lina_Rose']); // pseudo vérifié avant la création du compte
   // Plus rien d'autre à l'écran : ni formulaire, ni message, ni Google, ni invité.
   for (const id of ['compte-invite', 'compte-creation', 'compte-connecte', 'compte-message']) await expect(page.locator('#' + id)).toBeHidden();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);

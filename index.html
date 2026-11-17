@@ -168,6 +168,10 @@
         <form id="compte-creation-form" class="compte-form" novalidate>
           <label for="creation-email">Adresse e-mail</label>
           <input type="email" id="creation-email" name="email" autocomplete="email" inputmode="email" spellcheck="false" autocapitalize="off">
+          <!-- Pseudo (v10.9, demande du 17/11/2026) : unique, 4 à 20 caractères ; il sert à te reconnaître dans les classements. -->
+          <label for="creation-pseudo">Pseudo <span class="petit-inline">(4 à 20 caractères)</span></label>
+          <input type="text" id="creation-pseudo" name="nickname" autocomplete="nickname" spellcheck="false" autocapitalize="off" minlength="4" maxlength="20" aria-describedby="creation-pseudo-aide">
+          <p class="petit" id="creation-pseudo-aide">Lettres, chiffres, tiret (-) et tiret bas (_), sans espace. Deux joueurs ne peuvent pas avoir le même pseudo.</p>
           <label for="creation-mdp">Mot de passe <span class="petit-inline">(au moins 6 caractères)</span></label>
           <input type="password" id="creation-mdp" name="password" autocomplete="new-password" minlength="6">
           <label for="creation-mdp2">Confirmer le mot de passe</label>
@@ -200,6 +204,22 @@
       <section class="carte-page compte-carte" id="compte-connecte" hidden>
         <h3>Tu es connecté</h3>
         <p class="compte-qui">Compte : <strong id="compte-qui"></strong></p>
+        <!-- Pseudo (v10.9) : affiché dès que le jeu l'a lu sur le compte ; modifiable ici à tout moment. -->
+        <div class="compte-pseudo" id="compte-pseudo-bloc" hidden>
+          <p class="compte-qui">Pseudo : <strong id="compte-pseudo"></strong></p>
+          <p class="petit" id="compte-pseudo-note" hidden>Ce pseudo a été choisi par le jeu : tu peux le changer.</p>
+          <button type="button" class="lien-bouton" id="compte-pseudo-changer">Changer mon pseudo</button>
+          <form id="compte-pseudo-form" class="compte-form" novalidate hidden>
+            <label for="compte-pseudo-champ">Nouveau pseudo <span class="petit-inline">(4 à 20 caractères)</span></label>
+            <input type="text" id="compte-pseudo-champ" name="nickname" autocomplete="nickname" spellcheck="false" autocapitalize="off" minlength="4" maxlength="20" aria-describedby="compte-pseudo-aide">
+            <p class="petit" id="compte-pseudo-aide">Lettres, chiffres, tiret (-) et tiret bas (_), sans espace.</p>
+            <p class="compte-message erreur" id="compte-pseudo-message" role="alert" hidden></p>
+            <div class="compte-boutons">
+              <button type="submit" class="btn btn-principal">Enregistrer le pseudo</button>
+              <button type="button" class="btn btn-secondaire" id="compte-pseudo-annuler">Annuler</button>
+            </div>
+          </form>
+        </div>
         <p class="petit" id="compte-etat"></p>
         <div class="compte-boutons">
           <button type="button" class="btn btn-secondaire" id="compte-synchro">Sauvegarder maintenant</button>
@@ -821,6 +841,24 @@
     <button type="button" class="btn btn-secondaire" id="fenetre-invite">Jouer en invité</button>
   </div>
   <p class="petit fenetre-compte-note">En invité, ta progression reste seulement sur cet appareil.</p>
+</dialog>
+
+<!-- Fenêtre « Choisis ton pseudo » (v10.9, demande du 17/11/2026) : à la prochaine ouverture du jeu après la création
+     d'un compte Google, tant que le pseudo est celui que le jeu a fabriqué (prénom + initiale + numéro). « Plus tard »
+     (ou Échap) la ferme jusqu'à la prochaine ouverture. js/compte.js l'ouvre. -->
+<dialog class="fin fenetre-compte fenetre-pseudo" id="fenetre-pseudo" aria-labelledby="fenetre-pseudo-titre" aria-describedby="fenetre-pseudo-texte">
+  <h2 id="fenetre-pseudo-titre">Choisis ton pseudo</h2>
+  <p id="fenetre-pseudo-texte">Pour l’instant, tu t’appelles <strong id="fenetre-pseudo-actuel"></strong> : c’est le jeu qui l’a choisi. Tu peux prendre un pseudo à toi.</p>
+  <form id="fenetre-pseudo-form" class="compte-form" novalidate>
+    <label for="fenetre-pseudo-champ">Mon pseudo <span class="petit-inline">(4 à 20 caractères)</span></label>
+    <input type="text" id="fenetre-pseudo-champ" name="nickname" autocomplete="nickname" spellcheck="false" autocapitalize="off" minlength="4" maxlength="20" aria-describedby="fenetre-pseudo-aide">
+    <p class="petit" id="fenetre-pseudo-aide">Lettres, chiffres, tiret (-) et tiret bas (_), sans espace.</p>
+    <p class="compte-message erreur" id="fenetre-pseudo-message" role="alert" hidden></p>
+    <div class="menu-actions">
+      <button type="submit" class="btn btn-principal" id="fenetre-pseudo-ok">Choisir ce pseudo</button>
+      <button type="button" class="btn btn-secondaire" id="fenetre-pseudo-plus-tard">Plus tard</button>
+    </div>
+  </form>
 </dialog>
 
 <script src="js/des.js"></script>
