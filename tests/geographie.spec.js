@@ -99,10 +99,10 @@ test.describe('contenu de géographie', () => {
   test('v8.1 : pays voisins — frontières justes (France, Allemagne), jamais un voisin parmi les mauvaises réponses', () => {
     const j = S.trouver('g07');
     const qcm = NIVEAUX.flatMap((n) => j.series[0].niveaux[n]);
-    const france = qcm.filter((x) => x[0] === 'Quel pays a une frontière avec ce pays : France ?').map((x) => x[1]).sort();
+    const france = qcm.filter((x) => x[0] === 'Quel pays a une frontière avec la France ?').map((x) => x[1]).sort();
     expect(france).toEqual(['Allemagne', 'Andorre', 'Belgique', 'Espagne', 'Italie', 'Luxembourg', 'Monaco', 'Suisse']);
     for (const x of qcm.filter((y) => y[0].startsWith('Quel pays a une frontière'))) {
-      const pays = x[0].split(' : ')[1].replace(' ?', '');
+      const pays = x[0].replace('Quel pays a une frontière avec ', '').replace(' ?', '');
       const voisins = qcm.filter((y) => y[0] === x[0]).map((y) => y[1]);
       for (const f of x[2]) expect(voisins, pays + ' / ' + f).not.toContain(f);
     }

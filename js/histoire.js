@@ -55,21 +55,21 @@
       { k: 'indices', consigne: 'Qui suis-je ? Trouve l’ancêtre.', niveaux: {
         facile: [{ r: 'Lucy', i: ['Je suis une ancêtre très ancienne.', 'J’ai vécu il y a environ 3,2 millions d’années.', 'On a retrouvé mon squelette en 1974.', 'Je vivais en Éthiopie.', 'Mon nom vient d’une chanson des Beatles.'] },
           { r: 'Ötzi', i: ['J’ai vécu à la fin de la préhistoire.', 'Je portais des habits de cuir et une hache en cuivre.', 'Je suis mort il y a environ 5 300 ans.', 'Des randonneurs m’ont trouvé en 1991.', 'J’étais conservé dans un glacier des Alpes.'] }],
-        moyen: [{ r: 'L’homme de Tautavel', i: ['J’ai vécu il y a environ 450 000 ans.', 'Je chassais le cheval, le renne et le bison.', 'J’habitais une grotte : la Caune de l’Arago.', 'Je vivais dans les Pyrénées-Orientales.', 'Je suis l’un des plus anciens habitants connus de France.'] }],
+        moyen: [{ r: 'L’homme de Tautavel', i: ['J’ai vécu il y a environ 450 000 ans.', 'Je chassais le cheval, le renne et le bison.', 'J’habitais une grotte, la Caune de l’Arago.', 'Je vivais dans les Pyrénées-Orientales.', 'Je suis l’un des plus anciens habitants connus de France.'] }],
         difficile: [{ r: 'L’homme de Néandertal', i: ['J’ai vécu en Europe et en Asie.', 'J’étais trapu et j’avais un gros nez.', 'J’enterrais parfois mes morts.', 'J’ai disparu il y a environ 40 000 ans.', 'On m’a nommé d’après une vallée d’Allemagne.'] }],
         expert: [{ r: 'Toumaï', i: ['Je suis l’un des plus anciens ancêtres connus.', 'J’ai environ 7 millions d’années.', 'Une équipe franco-tchadienne m’a trouvé en 2001.', 'Mon nom veut dire « espoir de vie » en langue goran.', 'On a trouvé mon crâne au Tchad.'] }]
       } },
       { k: 'classer', niveaux: {
-        facile: [{ q: 'Range : Paléolithique (pierre taillée) ou Néolithique (pierre polie) ?', colonnes: ['Paléolithique', 'Néolithique'],
+        facile: [{ q: 'Ces activités datent-elles du Paléolithique (pierre taillée) ou du Néolithique (pierre polie) ?', qq: ['Laquelle de ces activités date du Paléolithique ?', 'Laquelle de ces activités date du Néolithique ?'], colonnes: ['Paléolithique', 'Néolithique'],
           items: [['Chasser le mammouth', 0], ['Cueillir des fruits sauvages', 0], ['Peindre dans les grottes', 0], ['Changer souvent de camp', 0],
             ['Cultiver le blé', 1], ['Élever des moutons', 1], ['Vivre dans un village', 1], ['Fabriquer des pots en terre', 1]] }],
-        moyen: [{ q: 'Range ces outils et ces modes de vie : Paléolithique ou Néolithique ?', colonnes: ['Paléolithique', 'Néolithique'],
+        moyen: [{ q: 'Ces outils et ces modes de vie datent-ils du Paléolithique ou du Néolithique ?', qq: ['Lequel de ces outils ou modes de vie date du Paléolithique ?', 'Lequel de ces outils ou modes de vie date du Néolithique ?'], colonnes: ['Paléolithique', 'Néolithique'],
           items: [['Le biface', 0], ['Le propulseur', 0], ['Être nomade', 0], ['Le harpon en bois de renne', 0], ['Les huttes en os de mammouth', 0],
             ['La hache en pierre polie', 1], ['Être sédentaire', 1], ['La faucille', 1], ['La meule pour moudre le grain', 1], ['Les champs de lentilles et de pois', 1]] }],
-        difficile: [{ q: 'Range ces lieux et ces trouvailles : Paléolithique ou Néolithique ?', colonnes: ['Paléolithique', 'Néolithique'],
+        difficile: [{ q: 'Ces lieux et ces trouvailles datent-ils du Paléolithique ou du Néolithique ?', qq: ['Lequel de ces lieux ou de ces trouvailles date du Paléolithique ?', 'Lequel de ces lieux ou de ces trouvailles date du Néolithique ?'], colonnes: ['Paléolithique', 'Néolithique'],
           items: [['La grotte de Lascaux', 0], ['La grotte Chauvet', 0], ['La Dame de Brassempouy', 0], ['L’homme de Tautavel', 0], ['Les aiguilles à chas en os', 0],
             ['Les menhirs de Carnac', 1], ['Les dolmens', 1], ['Le tissage de la laine et du lin', 1], ['Les greniers à grain', 1], ['Les premiers villages de maisons en bois', 1]] }],
-        expert: [{ q: 'Range ces cultures et ces sites : Paléolithique ou Néolithique ?', colonnes: ['Paléolithique', 'Néolithique'],
+        expert: [{ q: 'Ces cultures et ces sites datent-ils du Paléolithique ou du Néolithique ?', qq: ['Laquelle de ces cultures ou de ces sites date du Paléolithique ?', 'Laquelle de ces cultures ou de ces sites date du Néolithique ?'], colonnes: ['Paléolithique', 'Néolithique'],
           items: [['Le Magdalénien', 0], ['L’Aurignacien', 0], ['Le Moustérien', 0], ['Le Solutréen', 0], ['Les feuilles de laurier en silex', 0],
             ['Le Rubané', 1], ['Le Chasséen', 1], ['Le Cardial', 1], ['Le site de Çatal Höyük', 1], ['Le cairn de Barnenez', 1]] }]
       } },
@@ -80,7 +80,7 @@
         facile: [['Au Paléolithique, les hommes taillaient la pierre.', true, ''],
           ['Au Paléolithique, les hommes cultivaient des champs de blé.', false, 'Ils chassaient, pêchaient et cueillaient : l’agriculture arrive au Néolithique.'],
           ['Les hommes préhistoriques ont vu des dinosaures.', false, 'Les dinosaures ont disparu il y a 66 millions d’années, bien avant les premiers hommes.']],
-        moyen: [['Au Néolithique, les hommes deviennent sédentaires : ils vivent au même endroit.', true, ''],
+        moyen: [['Au Néolithique, les hommes deviennent sédentaires, c’est-à-dire qu’ils vivent au même endroit.', true, ''],
           ['Le mot « Néolithique » veut dire « âge de la pierre nouvelle ».', true, ''],
           ['Les hommes préhistoriques vivaient tous dans des grottes.', false, 'Ils vivaient surtout sous des abris de roche, dans des tentes ou des huttes ; les grottes servaient souvent de sanctuaires.']],
         difficile: [['L’agriculture est née au Proche-Orient avant d’arriver en France.', true, ''],
@@ -172,13 +172,13 @@
     ] },
     { id: 'p03', matiere: 'histoire', famille: 'pre', nom: 'Art, outils et mégalithes', court: 'Art, outils', icone: '🎨', series: [
       { k: 'paires', gauche: 'Grotte', droite: 'Où elle se trouve', consigneR: 'Relie chaque grotte ornée à l’endroit où elle se trouve.',
-        q: 'Où se trouve la grotte {a} ?', qi: 'Quelle grotte ornée se trouve {b} ?', ouverte: false, niveaux: {
+        q: 'Où se trouve la grotte {a} ?', qi: 'Quelle grotte ornée se trouve {min:b} ?', ouverte: false, niveaux: {
           facile: [['de Niaux', 'En Ariège'], ['de Lascaux', 'En Dordogne'], ['Chauvet', 'En Ardèche'], ['Cosquer', 'Près de Marseille, sous la mer']],
-          moyen: [['de Rouffignac', 'En Dordogne, la grotte aux cent mammouths'], ['de Pech-Merle', 'Dans le Lot'], ['d’Altamira', 'En Espagne'], ['de Gargas', 'Dans les Hautes-Pyrénées']],
+          moyen: [['de Rouffignac', 'En Dordogne, la grotte aux cent mammouths', 'Quelle grotte ornée de Dordogne est surnommée la grotte aux cent mammouths ?'], ['de Pech-Merle', 'Dans le Lot'], ['d’Altamira', 'En Espagne'], ['de Gargas', 'Dans les Hautes-Pyrénées']],
           difficile: [['de Font-de-Gaume', 'Aux Eyzies, en Dordogne'], ['d’Arcy-sur-Cure', 'Dans l’Yonne'],
-            ['de Cussac', 'En Dordogne, avec des tombes'], ['du Mas-d’Azil', 'En Ariège, une rivière la traverse']],
-          expert: [['des Combarelles', 'Aux Eyzies, pleine de gravures'], ['de Lascaux IV', 'À Montignac : la copie qui se visite'], ['de Chauvet 2', 'À Vallon-Pont-d’Arc : la copie qui se visite'],
-            ['d’Ekain', 'Au Pays basque espagnol'], ['de Foz Côa', 'Au Portugal, gravures en plein air'], ['de Coliboaia', 'En Roumanie']]
+            ['de Cussac', 'En Dordogne, avec des tombes', 'Quelle grotte ornée de Dordogne abrite aussi des tombes ?'], ['du Mas-d’Azil', 'En Ariège, une rivière la traverse', 'Quelle grotte ornée d’Ariège est traversée par une rivière ?']],
+          expert: [['des Combarelles', 'Aux Eyzies, pleine de gravures', 'Quelle grotte ornée des Eyzies est couverte de gravures ?'], ['de Lascaux IV', 'À Montignac, la copie qui se visite', 'Quelle copie de grotte ornée se visite à Montignac ?'], ['de Chauvet 2', 'À Vallon-Pont-d’Arc, la copie qui se visite', 'Quelle copie de grotte ornée se visite à Vallon-Pont-d’Arc ?'],
+            ['d’Ekain', 'Au Pays basque espagnol'], ['de Foz Côa', 'Au Portugal, gravures en plein air', 'Quel site du Portugal est célèbre pour ses gravures en plein air ?'], ['de Coliboaia', 'En Roumanie']]
         } },
       { k: 'qcm', niveaux: {
         facile: [['Qui a découvert la grotte de Lascaux en 1940 ?', 'Des adolescents', ['Des archéologues', 'Des pompiers', 'Un roi']],
@@ -199,10 +199,10 @@
           { r: 'Chauvet', i: ['Je suis une grotte ornée.', 'Trois spéléologues m’ont découverte en 1994.', 'Mes peintures ont environ 36 000 ans.', 'On y voit des lions et des rhinocéros.', 'Je suis en Ardèche, près du pont d’Arc.'] }],
         moyen: [{ r: 'Cosquer', i: ['Je suis une grotte ornée.', 'J’ai été découverte par un plongeur.', 'La mer a monté depuis la préhistoire.', 'On y voit des mains et des pingouins.', 'Mon entrée est sous la mer, près de Marseille.'] }],
         difficile: [{ r: 'Altamira', i: ['Je suis une grotte ornée.', 'J’ai été découverte au XIXe siècle.', 'Une petite fille a vu mes peintures la première.', 'Mon plafond est couvert de bisons rouges et noirs.', 'Je suis en Espagne, en Cantabrie.'] }],
-        expert: [{ r: 'Rouffignac', i: ['Je suis une grotte ornée.', 'Je suis très longue : on m’explore en petit train.', 'Des ours ont creusé des nids dans mon sol.', 'On m’appelle la grotte aux cent mammouths.', 'Je suis en Dordogne, dans le Périgord noir.'] }]
+        expert: [{ r: 'Rouffignac', i: ['Je suis une grotte ornée.', 'Je suis si longue qu’on m’explore en petit train.', 'Des ours ont creusé des nids dans mon sol.', 'On m’appelle la grotte aux cent mammouths.', 'Je suis en Dordogne, dans le Périgord noir.'] }]
       } },
       { k: 'paires', gauche: 'Outil', droite: 'À quoi il sert', consigneR: 'Relie chaque outil à ce qu’il permet de faire.',
-        q: 'À quoi sert {a} ?', qi: 'Quel outil sert à : {b} ?', niveaux: {
+        q: 'À quoi sert {le:a} ?', qi: 'Quel outil sert à {min:b} ?', niveaux: {
           facile: [['Le biface', 'Couper et racler'], ['L’aiguille en os', 'Coudre des vêtements'], ['Le harpon', 'Pêcher des poissons'], ['La lampe à graisse', 'S’éclairer dans la grotte']],
           moyen: [['Le propulseur', 'Lancer la sagaie plus loin'], ['La meule', 'Moudre le grain'], ['La faucille', 'Couper les épis de blé'], ['La hache polie', 'Abattre des arbres']],
           difficile: [['Le grattoir', 'Nettoyer les peaux'], ['Le burin', 'Graver l’os et la pierre'], ['Le percuteur', 'Frapper le silex pour le tailler'],
@@ -220,7 +220,7 @@
         expert: [['Quel ancêtre aurait fabriqué les premiers bifaces ?', 'Homo erectus', ['Lucy', 'Toumaï', 'Homo sapiens', 'L’homme de Cro-Magnon', 'Ötzi']],
           ['Qu’est-ce que l’obsidienne, échangée au Néolithique ?', 'Un verre volcanique très coupant', ['Un métal', 'Un coquillage', 'Une graine', 'Une teinture', 'Un os de baleine']]]
       } },
-      { k: 'paires', gauche: 'Mot', droite: 'Ce que c’est', consigneR: 'Relie chaque mot à ce qu’il désigne.', q: 'Qu’est-ce qu’{a} ?', qi: 'Comment s’appelle : {b} ?', niveaux: {
+      { k: 'paires', gauche: 'Mot', droite: 'Ce que c’est', consigneR: 'Relie chaque mot à ce qu’il désigne.', q: 'Qu’est-ce qu’{a} ?', qi: 'Comment s’appelle{nt:b} {min:b} ?', niveaux: {
         facile: [['un tumulus', 'Une butte de terre sur une tombe'], ['un menhir', 'Une grande pierre dressée'], ['un dolmen', 'Une table de pierre, une tombe'], ['un alignement', 'Des rangées de menhirs']],
         moyen: [['un cairn', 'Un tas de pierres sur des tombes'], ['un cromlech', 'Un cercle de menhirs'], ['une allée couverte', 'Un long couloir de pierres'], ['un mégalithe', 'Un monument en grosses pierres']],
         difficile: [['un orthostate', 'Une pierre dressée d’un mur de dolmen'], ['une table de couverture', 'La grande dalle posée sur un dolmen'],
@@ -228,7 +228,7 @@
         expert: [['un menhir christianisé', 'Un menhir surmonté d’une croix'], ['une stèle', 'Une pierre plate gravée'], ['une statue-menhir', 'Un menhir sculpté en personnage'],
           ['une sépulture collective', 'Une tombe pour plusieurs morts'], ['un ciste', 'Un petit coffre de pierre pour un mort'], ['un péristalithe', 'Un cercle de pierres autour d’un tumulus']]
       } },
-      { k: 'paires', gauche: 'Site', droite: 'Où il se trouve', consigneR: 'Relie chaque site mégalithique à l’endroit où il se trouve.', q: 'Où se trouve {a} ?', ouverte: false, niveaux: {
+      { k: 'paires', gauche: 'Site', droite: 'Où il se trouve', consigneR: 'Relie chaque site mégalithique à l’endroit où il se trouve.', q: 'Où peut-on voir {le:a} ?', ouverte: false, niveaux: {
         facile: [['Newgrange', 'En Irlande'], ['Les alignements de Carnac', 'En Bretagne'], ['Stonehenge', 'En Angleterre'], ['Les statues de l’île de Pâques', 'Dans l’océan Pacifique']],
         moyen: [['Le cercle de Callanish', 'En Écosse'], ['Le grand menhir brisé de Locmariaquer', 'Dans le Morbihan'], ['Le cairn de Barnenez', 'Dans le Finistère'], ['La Roche-aux-Fées', 'En Ille-et-Vilaine']],
         difficile: [['Le cairn de Gavrinis', 'Sur une île du golfe du Morbihan'], ['Le grand dolmen de Bagneux', 'À Saumur'], ['Le menhir de Champ-Dolent', 'À Dol-de-Bretagne'],
@@ -239,7 +239,7 @@
       { k: 'vf', niveaux: {
         facile: [['Les menhirs ont été dressés par les Gaulois.', false, 'Ils ont été dressés au Néolithique, des milliers d’années avant les Gaulois.'],
           ['À Carnac, il y a des milliers de menhirs.', true, '']],
-        moyen: [['« Menhir » vient du breton : « men » (pierre) et « hir » (longue).', true, ''],
+        moyen: [['« Menhir » vient du breton « men » (pierre) et « hir » (longue).', true, ''],
           ['Les dolmens étaient d’abord des maisons.', false, 'C’étaient des tombes collectives, souvent recouvertes de terre.']],
         difficile: [['Le grand menhir brisé de Locmariaquer mesurait environ 20 mètres.', true, ''],
           ['Les mégalithes ont été construits avec des grues en métal.', false, 'Les hommes du Néolithique utilisaient des rondins, des cordes, des leviers et beaucoup de bras.']],
@@ -459,7 +459,7 @@
         facile: [{ r: 'Thésée', i: ['Je suis un héros grec.', 'Mon père, Égée, était roi d’Athènes.', 'Ariane m’a donné une pelote de fil.', 'Je suis entré dans le labyrinthe de Crète.', 'J’ai tué le Minotaure.'] },
           { r: 'Ulysse', i: ['Je suis un héros grec.', 'Je suis roi d’Ithaque.', 'Ma femme Pénélope m’a attendu vingt ans.', 'J’ai trompé le cyclope Polyphème.', 'J’ai eu l’idée du cheval de Troie.'] }],
         moyen: [{ r: 'Jason', i: ['Je suis un héros grec.', 'Mon oncle m’a pris mon trône.', 'Mon bateau s’appelait l’Argo.', 'Médée m’a aidé grâce à sa magie.', 'J’ai rapporté la Toison d’or.'] }],
-        difficile: [{ r: 'Œdipe', i: ['Je suis un héros grec.', 'Je suis devenu roi de Thèbes.', 'Bébé, j’ai été abandonné dans la montagne.', 'Un monstre posait une énigme sur un animal à 4, 2 puis 3 pattes.', 'J’ai trouvé la réponse à l’énigme du Sphinx : l’homme.'] }],
+        difficile: [{ r: 'Œdipe', i: ['Je suis un héros grec.', 'Je suis devenu roi de Thèbes.', 'Bébé, j’ai été abandonné dans la montagne.', 'Un monstre posait une énigme sur un animal à 4, 2 puis 3 pattes.', 'J’ai trouvé la réponse à l’énigme du Sphinx, l’homme.'] }],
         expert: [{ r: 'Sisyphe', i: ['Je suis un roi de la mythologie grecque.', 'J’ai fondé la ville de Corinthe.', 'J’ai enchaîné la Mort pour ne pas mourir.', 'Les dieux m’ont puni aux Enfers.', 'Je pousse un rocher en haut d’une colline, et il retombe toujours.'] }]
       } }
     ] },
@@ -478,7 +478,7 @@
             ['a été le dernier pharaon né en Égypte', 'Nectanébo II|Nectanebo II'], ['est monté sur le trône enfant et a régné plusieurs dizaines d’années', 'Pépi II|Pepi II']]
         } },
       { k: 'paires', gauche: 'Écriture', droite: 'Peuple', consigneR: 'Relie chaque écriture au peuple qui l’utilisait.',
-        q: 'Quel peuple utilisait cette écriture : {a} ?', ouverte: false, niveaux: {
+        q: 'Quel peuple utilisait {le:a} ?', ouverte: false, niveaux: {
           facile: [['Les hiéroglyphes', 'Les Égyptiens'], ['Le cunéiforme', 'Les Mésopotamiens'], ['L’alphabet grec', 'Les Grecs'], ['L’alphabet latin', 'Les Romains']],
           difficile: [['Les runes', 'Les peuples germaniques'], ['Les caractères chinois', 'Les Chinois'], ['L’alphabet phénicien', 'Les Phéniciens'],
             ['Les glyphes mayas', 'Les Mayas'], ['L’alphabet hébreu', 'Les Hébreux'], ['L’alphabet étrusque', 'Les Étrusques']]
@@ -562,29 +562,29 @@
           ['Champollion était déjà allé en Égypte quand il a déchiffré les hiéroglyphes.', false, 'Il les a déchiffrés en 1822 et n’est allé en Égypte qu’en 1828.']]
       } },
       { k: 'classer', niveaux: {
-        facile: [{ q: 'Range : Égypte ancienne ou Rome antique ?', colonnes: ['Égypte', 'Rome'],
+        facile: [{ q: 'Ces mots font-ils penser à l’Égypte ancienne ou à la Rome antique ?', qq: ['Lequel de ces mots fait penser à l’Égypte ancienne ?', 'Lequel de ces mots fait penser à la Rome antique ?'], colonnes: ['Égypte', 'Rome'],
           items: [['Les pyramides', 0], ['Le pharaon', 0], ['Les momies', 0], ['Les hiéroglyphes', 0], ['Le Colisée', 1], ['L’empereur', 1], ['Les gladiateurs', 1], ['La toge', 1]] }],
-        moyen: [{ q: 'Range : Égypte ou Mésopotamie ?', colonnes: ['Égypte', 'Mésopotamie'],
+        moyen: [{ q: 'Ces mots font-ils penser à l’Égypte ou à la Mésopotamie ?', qq: ['Lequel de ces mots fait penser à l’Égypte ?', 'Lequel de ces mots fait penser à la Mésopotamie ?'], colonnes: ['Égypte', 'Mésopotamie'],
           items: [['Les hiéroglyphes', 0], ['Le papyrus', 0], ['Le Nil', 0], ['Les pyramides', 0], ['Le pharaon', 0],
             ['Le cunéiforme', 1], ['Les tablettes d’argile', 1], ['Le Tigre et l’Euphrate', 1], ['Les ziggourats', 1], ['Babylone', 1]] }],
-        difficile: [{ q: 'Range ces pharaons : Ancien Empire ou Nouvel Empire ?', colonnes: ['Ancien Empire', 'Nouvel Empire'],
+        difficile: [{ q: 'Ces pharaons ont-ils régné sous l’Ancien Empire ou sous le Nouvel Empire ?', qq: ['Lequel de ces pharaons a régné sous l’Ancien Empire ?', 'Lequel de ces pharaons a régné sous le Nouvel Empire ?'], colonnes: ['Ancien Empire', 'Nouvel Empire'],
           items: [['Khéops', 0], ['Khéphren', 0], ['Mykérinos', 0], ['Djéser', 0], ['Snéfrou', 0],
             ['Ramsès II', 1], ['Toutânkhamon', 1], ['Akhenaton', 1], ['Hatchepsout', 1], ['Thoutmôsis III', 1]] }],
-        expert: [{ q: 'Range ces villes : Haute-Égypte (le sud) ou Basse-Égypte (le nord et le delta) ?', colonnes: ['Haute-Égypte', 'Basse-Égypte'],
+        expert: [{ q: 'Ces villes se trouvent-elles en Haute-Égypte (le sud) ou en Basse-Égypte (le nord et le delta) ?', qq: ['Laquelle de ces villes se trouve en Haute-Égypte, au sud ?', 'Laquelle de ces villes se trouve en Basse-Égypte, au nord ?'], colonnes: ['Haute-Égypte', 'Basse-Égypte'],
           items: [['Thèbes', 0], ['Abydos', 0], ['Assouan', 0], ['Edfou', 0], ['Memphis', 1], ['Alexandrie', 1], ['Saïs', 1], ['Tanis', 1], ['Bubastis', 1]] }]
       } },
-      { k: 'ordre', consigne: 'Range ces événements de l’Égypte du plus ancien au plus récent.', q: 'Quand : {a} ?', niveaux: {
-        facile: [['Construction de la pyramide de Khéops', -2560, 'vers 2560 av. J.-C.'], ['Règne de Toutânkhamon', -1330, 'vers 1330 av. J.-C.'],
-          ['Mort de Cléopâtre', -30, '30 av. J.-C.'], ['Découverte du tombeau de Toutânkhamon', 1922, '1922']],
-        moyen: [['Premiers hiéroglyphes', -3200, 'vers 3200 av. J.-C.'], ['Pyramide à degrés de Djéser', -2650, 'vers 2650 av. J.-C.'],
-          ['Début du règne de Ramsès II', -1279, '1279 av. J.-C.'], ['Alexandre le Grand fonde Alexandrie', -331, '331 av. J.-C.'],
-          ['Champollion déchiffre les hiéroglyphes', 1822, '1822']],
-        difficile: [['Début de l’Ancien Empire', -2700, 'vers 2700 av. J.-C.'], ['Début du Moyen Empire', -2050, 'vers 2050 av. J.-C.'],
-          ['Début du Nouvel Empire', -1550, 'vers 1550 av. J.-C.'], ['L’Égypte devient une province romaine', -30, '30 av. J.-C.'],
-          ['Découverte de la pierre de Rosette', 1799, '1799']],
-        expert: [['Narmer unifie l’Égypte', -3100, 'vers 3100 av. J.-C.'], ['Règne d’Akhenaton', -1350, 'vers 1350 av. J.-C.'],
-          ['Bataille de Qadesh', -1274, 'vers 1274 av. J.-C.'], ['Les Perses conquièrent l’Égypte', -525, '525 av. J.-C.'],
-          ['Ptolémée Ier devient roi d’Égypte', -305, '305 av. J.-C.'], ['Abou Simbel est déplacé', 1964, 'de 1964 à 1968']]
+      { k: 'ordre', consigne: 'Range ces événements de l’Égypte du plus ancien au plus récent.', q: 'Quand a eu lieu cet événement ?', niveaux: {
+        facile: [['Construction de la pyramide de Khéops', -2560, 'vers 2560 av. J.-C.', 'Quand la pyramide de Khéops a-t-elle été construite ?'], ['Règne de Toutânkhamon', -1330, 'vers 1330 av. J.-C.', 'Quand Toutânkhamon a-t-il régné ?'],
+          ['Mort de Cléopâtre', -30, '30 av. J.-C.', 'Quand Cléopâtre est-elle morte ?'], ['Découverte du tombeau de Toutânkhamon', 1922, '1922', 'Quand le tombeau de Toutânkhamon a-t-il été découvert ?']],
+        moyen: [['Premiers hiéroglyphes', -3200, 'vers 3200 av. J.-C.', 'Quand les premiers hiéroglyphes sont-ils apparus ?'], ['Pyramide à degrés de Djéser', -2650, 'vers 2650 av. J.-C.', 'Quand la pyramide à degrés de Djéser a-t-elle été construite ?'],
+          ['Début du règne de Ramsès II', -1279, '1279 av. J.-C.', 'Quand le règne de Ramsès II a-t-il commencé ?'], ['Alexandre le Grand fonde Alexandrie', -331, '331 av. J.-C.', 'Quand Alexandre le Grand a-t-il fondé Alexandrie ?'],
+          ['Champollion déchiffre les hiéroglyphes', 1822, '1822', 'Quand Champollion a-t-il déchiffré les hiéroglyphes ?']],
+        difficile: [['Début de l’Ancien Empire', -2700, 'vers 2700 av. J.-C.', 'Quand l’Ancien Empire a-t-il commencé ?'], ['Début du Moyen Empire', -2050, 'vers 2050 av. J.-C.', 'Quand le Moyen Empire a-t-il commencé ?'],
+          ['Début du Nouvel Empire', -1550, 'vers 1550 av. J.-C.', 'Quand le Nouvel Empire a-t-il commencé ?'], ['L’Égypte devient une province romaine', -30, '30 av. J.-C.', 'Quand l’Égypte est-elle devenue une province romaine ?'],
+          ['Découverte de la pierre de Rosette', 1799, '1799', 'Quand la pierre de Rosette a-t-elle été découverte ?']],
+        expert: [['Narmer unifie l’Égypte', -3100, 'vers 3100 av. J.-C.', 'Quand Narmer a-t-il unifié l’Égypte ?'], ['Règne d’Akhenaton', -1350, 'vers 1350 av. J.-C.', 'Quand Akhenaton a-t-il régné ?'],
+          ['Bataille de Qadesh', -1274, 'vers 1274 av. J.-C.', 'Quand la bataille de Qadesh a-t-elle eu lieu ?'], ['Les Perses conquièrent l’Égypte', -525, '525 av. J.-C.', 'Quand les Perses ont-ils conquis l’Égypte ?'],
+          ['Ptolémée Ier devient roi d’Égypte', -305, '305 av. J.-C.', 'Quand Ptolémée Ier est-il devenu roi d’Égypte ?'], ['Abou Simbel est déplacé', 1964, 'de 1964 à 1968', 'Quand le temple d’Abou Simbel a-t-il été déplacé ?']]
       } },
       { k: 'indices', consigne: 'Qui suis-je ? Trouve le pharaon.', niveaux: {
         facile: [{ r: 'Toutânkhamon', i: ['J’ai régné sur l’Égypte.', 'Je suis devenu pharaon vers 9 ans.', 'Je suis mort jeune, vers 19 ans.', 'Howard Carter a trouvé mon tombeau en 1922.', 'Mon masque funéraire en or est très célèbre.'] },
@@ -701,44 +701,44 @@
           ['Hannibal a fini par prendre Rome.', false, 'Il n’a jamais attaqué Rome elle-même et a été vaincu à Zama.']]
       } },
       { k: 'classer', niveaux: {
-        facile: [{ q: 'Range : les Gaulois ou les Romains ?', colonnes: ['Gaulois', 'Romains'],
+        facile: [{ q: 'Ces mots font-ils penser aux Gaulois ou aux Romains ?', qq: ['Lequel de ces mots fait penser aux Gaulois ?', 'Lequel de ces mots fait penser aux Romains ?'], colonnes: ['Gaulois', 'Romains'],
           items: [['Les druides', 0], ['Vercingétorix', 0], ['L’oppidum', 0], ['Les braies', 0], ['Le gui', 0],
             ['Le légionnaire', 1], ['La toge', 1], ['L’empereur', 1], ['Le Colisée', 1], ['Le latin', 1]] }],
-        moyen: [{ q: 'Range : République romaine ou Empire romain ?', colonnes: ['République', 'Empire'],
+        moyen: [{ q: 'Ces noms appartiennent-ils à la République romaine ou à l’Empire romain ?', qq: ['Lequel de ces noms appartient à la République romaine ?', 'Lequel de ces noms appartient à l’Empire romain ?'], colonnes: ['République', 'Empire'],
           items: [['Les deux consuls', 0], ['Les guerres puniques', 0], ['Spartacus', 0], ['Jules César', 0], ['La destruction de Carthage', 0],
             ['Auguste', 1], ['Néron', 1], ['Trajan', 1], ['Le Colisée', 1], ['Constantin', 1]] }]
       } },
-      { k: 'ordre', consigne: 'Range ces événements de Rome du plus ancien au plus récent.', q: 'En quelle année : {a} ?', niveaux: {
-        facile: [['Fondation de Rome, selon la légende', -753, '753 av. J.-C.'], ['Jules César bat Vercingétorix à Alésia', -52, '52 av. J.-C.'],
-          ['Auguste devient le premier empereur', -27, '27 av. J.-C.'], ['Fin de l’Empire romain d’Occident', 476, '476']],
-        moyen: [['Rome devient une République', -509, '509 av. J.-C.'], ['Jules César est assassiné', -44, '44 av. J.-C.'],
-          ['Le Vésuve ensevelit Pompéi', 79, '79'], ['L’empereur Constantin autorise les chrétiens (édit de Milan)', 313, '313'],
-          ['Rome est pillée par les Wisigoths', 410, '410']],
-        difficile: [['Hannibal traverse les Alpes avec ses éléphants', -218, '218 av. J.-C.'], ['Rome détruit Carthage', -146, '146 av. J.-C.'],
-          ['Révolte des esclaves menée par Spartacus', -73, '73 av. J.-C.'], ['Inauguration du Colisée', 80, '80'],
-          ['L’Empire est à son plus grand, sous Trajan', 117, '117'], ['L’Empire est partagé entre Occident et Orient', 395, '395']],
-        expert: [['Bataille de Cannes, grande victoire d’Hannibal', -216, '216 av. J.-C.'], ['Bataille d’Actium : Octave bat Antoine et Cléopâtre', -31, '31 av. J.-C.'],
-          ['Début du mur d’Hadrien en Bretagne', 122, '122'], ['Édit de Caracalla : tous les hommes libres deviennent citoyens', 212, '212'],
-          ['Constantinople devient la nouvelle capitale', 330, '330'], ['Attila est battu aux champs Catalauniques', 451, '451'],
-          ['Le sac de Rome par les Vandales', 455, '455']]
+      { k: 'ordre', consigne: 'Range ces événements de Rome du plus ancien au plus récent.', q: 'En quelle année a eu lieu cet événement ?', niveaux: {
+        facile: [['Fondation de Rome, selon la légende', -753, '753 av. J.-C.', 'En quelle année Rome a-t-elle été fondée, selon la légende ?'], ['Jules César bat Vercingétorix à Alésia', -52, '52 av. J.-C.', 'En quelle année Jules César a-t-il battu Vercingétorix à Alésia ?'],
+          ['Auguste devient le premier empereur', -27, '27 av. J.-C.', 'En quelle année Auguste est-il devenu le premier empereur ?'], ['Fin de l’Empire romain d’Occident', 476, '476', 'En quelle année l’Empire romain d’Occident a-t-il pris fin ?']],
+        moyen: [['Rome devient une République', -509, '509 av. J.-C.', 'En quelle année Rome est-elle devenue une République ?'], ['Jules César est assassiné', -44, '44 av. J.-C.', 'En quelle année Jules César a-t-il été assassiné ?'],
+          ['Le Vésuve ensevelit Pompéi', 79, '79', 'En quelle année le Vésuve a-t-il enseveli Pompéi ?'], ['L’empereur Constantin autorise les chrétiens (édit de Milan)', 313, '313', 'En quelle année l’empereur Constantin a-t-il autorisé les chrétiens, par l’édit de Milan ?'],
+          ['Rome est pillée par les Wisigoths', 410, '410', 'En quelle année Rome a-t-elle été pillée par les Wisigoths ?']],
+        difficile: [['Hannibal traverse les Alpes avec ses éléphants', -218, '218 av. J.-C.', 'En quelle année Hannibal a-t-il traversé les Alpes avec ses éléphants ?'], ['Rome détruit Carthage', -146, '146 av. J.-C.', 'En quelle année Rome a-t-elle détruit Carthage ?'],
+          ['Révolte des esclaves menée par Spartacus', -73, '73 av. J.-C.', 'En quelle année Spartacus a-t-il mené la révolte des esclaves ?'], ['Inauguration du Colisée', 80, '80', 'En quelle année le Colisée a-t-il été inauguré ?'],
+          ['L’Empire est à son plus grand, sous Trajan', 117, '117', 'En quelle année l’Empire romain a-t-il atteint sa plus grande taille, sous Trajan ?'], ['L’Empire est partagé entre Occident et Orient', 395, '395', 'En quelle année l’Empire a-t-il été partagé entre l’Occident et l’Orient ?']],
+        expert: [['Bataille de Cannes, grande victoire d’Hannibal', -216, '216 av. J.-C.', 'En quelle année Hannibal a-t-il remporté la grande victoire de Cannes ?'], ['Octave bat Antoine et Cléopâtre à Actium', -31, '31 av. J.-C.', 'En quelle année Octave a-t-il battu Antoine et Cléopâtre à Actium ?'],
+          ['Début du mur d’Hadrien en Bretagne', 122, '122', 'En quelle année la construction du mur d’Hadrien a-t-elle commencé en Bretagne ?'], ['Édit de Caracalla, qui fait de tous les hommes libres des citoyens', 212, '212', 'En quelle année l’édit de Caracalla a-t-il fait de tous les hommes libres des citoyens ?'],
+          ['Constantinople devient la nouvelle capitale', 330, '330', 'En quelle année Constantinople est-elle devenue la nouvelle capitale ?'], ['Attila est battu aux champs Catalauniques', 451, '451', 'En quelle année Attila a-t-il été battu aux champs Catalauniques ?'],
+          ['Le sac de Rome par les Vandales', 455, '455', 'En quelle année les Vandales ont-ils pillé Rome ?']]
       } }
     ] },
     { id: 'a07', matiere: 'histoire', famille: 'ant', nom: 'Monuments et merveilles', court: 'Monuments', icone: '🏟️', series: [
       { k: 'paires', gauche: 'Monument', droite: 'Lieu', consigneR: 'Relie chaque monument à son lieu.',
-        q: 'Où se trouve ce monument : {a} ?', ouverte: false, niveaux: {
+        q: 'Où peut-on voir {le:a} ?', ouverte: false, niveaux: {
           facile: [['Le Colisée', 'Rome'], ['Le Parthénon', 'Athènes'], ['Les pyramides de Gizeh', 'L’Égypte'], ['Le pont du Gard', 'Le sud de la France']],
           moyen: [['La Maison carrée', 'Nîmes'], ['Pompéi', 'Près de Naples'], ['Le mur d’Hadrien', 'Le nord de l’Angleterre'],
             ['Les temples d’Abou Simbel', 'Le sud de l’Égypte'], ['Pétra, la ville taillée dans la roche', 'La Jordanie'], ['Le théâtre antique d’Orange', 'Le Vaucluse']]
         } },
       { k: 'paires', gauche: 'Site', droite: 'Pays actuel', consigneR: 'Relie chaque site antique à son pays actuel.',
-        q: 'Dans quel pays actuel se trouve ce site : {a} ?', ouverte: false, niveaux: {
+        q: 'Dans quel pays actuel peut-on voir {le:a} ?', ouverte: false, niveaux: {
           difficile: [['Le temple de Karnak', 'L’Égypte'], ['Le théâtre d’Épidaure', 'La Grèce'], ['Leptis Magna', 'La Libye'], ['Persépolis', 'L’Iran'],
             ['Palmyre', 'La Syrie'], ['Éphèse', 'La Turquie'], ['Carthage', 'La Tunisie']],
           expert: [['Volubilis', 'Le Maroc'], ['Timgad', 'L’Algérie'], ['Baalbek', 'Le Liban'], ['La Porta Nigra de Trèves', 'L’Allemagne'],
             ['Le théâtre romain de Mérida', 'L’Espagne'], ['Jerash', 'La Jordanie'], ['L’amphithéâtre d’El Jem', 'La Tunisie']]
         } },
       { k: 'paires', gauche: 'Merveille', droite: 'Ville', consigneR: 'Relie chaque merveille du monde à sa ville.',
-        q: 'Où se trouvait cette merveille : {a} ?', ouverte: false, niveaux: {
+        q: 'Dans quelle ville pouvait-on voir {le:a}, l’une des Sept Merveilles du monde ?', ouverte: false, niveaux: {
           moyen: [['Le Colosse', 'Rhodes'], ['Le phare', 'Alexandrie'], ['Les jardins suspendus', 'Babylone'], ['La statue de Zeus', 'Olympie'],
             ['Le temple d’Artémis', 'Éphèse'], ['Le Mausolée', 'Halicarnasse'], ['La grande pyramide', 'Gizeh']]
         } },
@@ -749,7 +749,7 @@
           ['Dans quel pays se trouve la pyramide de Khéops ?', 'L’Égypte', ['La Grèce', 'L’Italie', 'Le Mexique']],
           ['Dans quelle ville se trouve le Colisée ?', 'Rome', ['Athènes', 'Paris', 'Le Caire']],
           ['À quoi servait le Colisée ?', 'Aux combats de gladiateurs', ['À prier les dieux', 'À loger l’empereur', 'À stocker le blé']],
-          ['À quoi servait le pont du Gard ?', 'À faire passer de l’eau : c’est un aqueduc', ['À faire passer des trains', 'À défendre une ville', 'À traverser la mer']],
+          ['À quoi servait le pont du Gard ?', 'À faire passer de l’eau, car c’est un aqueduc', ['À faire passer des trains', 'À défendre une ville', 'À traverser la mer']],
           ['Sur quelle colline d’Athènes se trouve le Parthénon ?', 'L’Acropole', ['Le Capitole', 'Le Palatin', 'L’Olympe']],
           ['À quelle déesse le Parthénon était-il consacré ?', 'Athéna', ['Aphrodite', 'Héra', 'Artémis']],
           ['Quel monument de Paris date de l’époque de Lutèce ?', 'Les arènes de Lutèce', ['La tour Eiffel', 'Notre-Dame', 'L’Arc de triomphe de l’Étoile']],
@@ -817,27 +817,27 @@
           ['Le Colosse de Rhodes avait une jambe sur chaque rive du port.', false, 'C’est une légende : une statue si grande au-dessus de l’eau aurait été impossible à construire.']]
       } },
       { k: 'classer', niveaux: {
-        facile: [{ q: 'Range : monument grec ou monument romain ?', colonnes: ['Grec', 'Romain'],
+        facile: [{ q: 'Ces monuments ont-ils été construits par les Grecs ou par les Romains ?', qq: ['Lequel de ces monuments a été construit par les Grecs ?', 'Lequel de ces monuments a été construit par les Romains ?'], colonnes: ['Grec', 'Romain'],
           items: [['Le Parthénon', 0], ['L’Acropole d’Athènes', 0], ['Le sanctuaire de Delphes', 0], ['Le théâtre d’Épidaure', 0], ['Le Colisée', 1], ['Le pont du Gard', 1], ['Les arènes de Nîmes', 1], ['La Maison carrée', 1]] }],
-        moyen: [{ q: 'Range ces monuments : en Égypte ou en Grèce ?', colonnes: ['Égypte', 'Grèce'],
+        moyen: [{ q: 'Ces monuments se trouvent-ils en Égypte ou en Grèce ?', qq: ['Lequel de ces monuments se trouve en Égypte ?', 'Lequel de ces monuments se trouve en Grèce ?'], colonnes: ['Égypte', 'Grèce'],
           items: [['Les pyramides de Gizeh', 0], ['Le Sphinx', 0], ['Abou Simbel', 0], ['Le temple de Karnak', 0], ['Le phare d’Alexandrie', 0],
             ['Le Parthénon', 1], ['Le théâtre d’Épidaure', 1], ['Le sanctuaire de Delphes', 1], ['Le stade d’Olympie', 1], ['Le temple de Poséidon au cap Sounion', 1]] }],
-        difficile: [{ q: 'Range ces sites romains : en France ou ailleurs dans l’Empire ?', colonnes: ['En France', 'Ailleurs'],
+        difficile: [{ q: 'Ces sites romains se trouvent-ils en France ou ailleurs dans l’Empire ?', qq: ['Lequel de ces sites romains se trouve en France ?', 'Lequel de ces sites romains se trouve hors de France ?'], colonnes: ['En France', 'Ailleurs'],
           items: [['Le pont du Gard', 0], ['La Maison carrée', 0], ['Le théâtre d’Orange', 0], ['Les arènes d’Arles', 0], ['Le site de Glanum', 0],
             ['Leptis Magna', 1], ['Le mur d’Hadrien', 1], ['Pompéi', 1], ['Éphèse', 1], ['L’amphithéâtre d’El Jem', 1]] }],
-        expert: [{ q: 'Range ces merveilles : dans le monde grec ou en Égypte et Mésopotamie ?', colonnes: ['Monde grec', 'Égypte et Mésopotamie'],
+        expert: [{ q: 'Ces merveilles se trouvaient-elles dans le monde grec ou en Égypte et en Mésopotamie ?', qq: ['Laquelle de ces merveilles se trouvait dans le monde grec ?', 'Laquelle de ces merveilles se trouvait en Égypte ou en Mésopotamie ?'], colonnes: ['Monde grec', 'Égypte et Mésopotamie'],
           items: [['La statue de Zeus', 0], ['Le Colosse de Rhodes', 0], ['Le temple d’Artémis', 0], ['Le Mausolée d’Halicarnasse', 0],
             ['La pyramide de Khéops', 1], ['Le phare d’Alexandrie', 1], ['Les jardins suspendus', 1]] }]
       } },
-      { k: 'ordre', consigne: 'Range ces monuments du plus ancien au plus récent.', q: 'Quand a été construit ce monument : {a} ?', niveaux: {
-        facile: [['La pyramide de Khéops', -2560, 'vers 2560 av. J.-C.'], ['Le Parthénon', -438, 'achevé en 438 av. J.-C.'],
-          ['Le Colisée', 80, 'inauguré en 80'], ['La tour Eiffel', 1889, '1889']],
-        moyen: [['Stonehenge (grandes pierres)', -2500, 'vers 2500 av. J.-C.'], ['Le temple d’Abou Simbel', -1260, 'vers 1260 av. J.-C.'],
-          ['Le phare d’Alexandrie', -280, 'vers 280 av. J.-C.'], ['Le pont du Gard', 50, 'vers 50'], ['Le Panthéon de Rome actuel', 125, 'vers 125']],
-        difficile: [['La porte d’Ishtar', -575, 'vers 575 av. J.-C.'], ['Le Mausolée d’Halicarnasse', -350, 'vers 350 av. J.-C.'],
-          ['Le Colosse de Rhodes', -280, 'achevé vers 280 av. J.-C.'], ['Le mur d’Hadrien', 122, 'commencé en 122'], ['Sainte-Sophie de Constantinople', 537, '537']],
-        expert: [['La ziggourat d’Ur', -2100, 'vers 2100 av. J.-C.'], ['Persépolis', -518, 'fondée vers 518 av. J.-C.'],
-          ['Le théâtre d’Épidaure', -340, 'vers 340 av. J.-C.'], ['La colonne Trajane', 113, '113'], ['Le pont d’Alcántara', 104, 'vers 104']]
+      { k: 'ordre', consigne: 'Range ces monuments du plus ancien au plus récent.', q: 'Quand ce monument a-t-il été construit ?', niveaux: {
+        facile: [['La pyramide de Khéops', -2560, 'vers 2560 av. J.-C.', 'Quand la pyramide de Khéops a-t-elle été construite ?'], ['Le Parthénon', -438, 'achevé en 438 av. J.-C.', 'Quand le Parthénon a-t-il été construit ?'],
+          ['Le Colisée', 80, 'inauguré en 80', 'Quand le Colisée a-t-il été construit ?'], ['La tour Eiffel', 1889, '1889', 'Quand la tour Eiffel a-t-elle été construite ?']],
+        moyen: [['Stonehenge (grandes pierres)', -2500, 'vers 2500 av. J.-C.', 'Quand les grandes pierres de Stonehenge ont-elles été dressées ?'], ['Le temple d’Abou Simbel', -1260, 'vers 1260 av. J.-C.', 'Quand le temple d’Abou Simbel a-t-il été construit ?'],
+          ['Le phare d’Alexandrie', -280, 'vers 280 av. J.-C.', 'Quand le phare d’Alexandrie a-t-il été construit ?'], ['Le pont du Gard', 50, 'vers 50', 'Quand le pont du Gard a-t-il été construit ?'], ['Le Panthéon de Rome actuel', 125, 'vers 125', 'Quand le Panthéon de Rome actuel a-t-il été construit ?']],
+        difficile: [['La porte d’Ishtar', -575, 'vers 575 av. J.-C.', 'Quand la porte d’Ishtar a-t-elle été construite ?'], ['Le Mausolée d’Halicarnasse', -350, 'vers 350 av. J.-C.', 'Quand le Mausolée d’Halicarnasse a-t-il été construit ?'],
+          ['Le Colosse de Rhodes', -280, 'achevé vers 280 av. J.-C.', 'Quand le Colosse de Rhodes a-t-il été construit ?'], ['Le mur d’Hadrien', 122, 'commencé en 122', 'Quand le mur d’Hadrien a-t-il été construit ?'], ['Sainte-Sophie de Constantinople', 537, '537', 'Quand Sainte-Sophie de Constantinople a-t-elle été construite ?']],
+        expert: [['La ziggourat d’Ur', -2100, 'vers 2100 av. J.-C.', 'Quand la ziggourat d’Ur a-t-elle été construite ?'], ['Persépolis', -518, 'fondée vers 518 av. J.-C.', 'Quand Persépolis a-t-elle été construite ?'],
+          ['Le théâtre d’Épidaure', -340, 'vers 340 av. J.-C.', 'Quand le théâtre d’Épidaure a-t-il été construit ?'], ['La colonne Trajane', 113, '113', 'Quand la colonne Trajane a-t-elle été construite ?'], ['Le pont d’Alcántara', 104, 'vers 104', 'Quand le pont d’Alcántara a-t-il été construit ?']]
       } }
     ] },
     { id: 'a10', matiere: 'histoire', famille: 'ant', nom: 'Chiffres romains', court: 'I, V, X…', icone: 'Ⅻ', series: [
@@ -946,16 +946,16 @@
           ['Sparte avait un seul roi.', false, 'Sparte avait deux rois en même temps.']]
       } },
       { k: 'classer', niveaux: {
-        facile: [{ q: 'Range : Grèce antique ou Rome antique ?', colonnes: ['Grèce', 'Rome'],
+        facile: [{ q: 'Ces mots font-ils penser à la Grèce antique ou à la Rome antique ?', qq: ['Lequel de ces mots fait penser à la Grèce antique ?', 'Lequel de ces mots fait penser à la Rome antique ?'], colonnes: ['Grèce', 'Rome'],
           items: [['Athènes', 0], ['Sparte', 0], ['Les Jeux olympiques', 0], ['L’agora', 0], ['L’Acropole', 0],
             ['Le Colisée', 1], ['Les légionnaires', 1], ['Le latin', 1], ['Le forum', 1], ['Les gladiateurs', 1]] }],
-        moyen: [{ q: 'Range : Athènes ou Sparte ?', colonnes: ['Athènes', 'Sparte'],
+        moyen: [{ q: 'Ces mots font-ils penser à Athènes ou à Sparte ?', qq: ['Lequel de ces mots fait penser à Athènes ?', 'Lequel de ces mots fait penser à Sparte ?'], colonnes: ['Athènes', 'Sparte'],
           items: [['La démocratie', 0], ['Périclès', 0], ['Le Parthénon', 0], ['Le port du Pirée', 0], ['Socrate', 0],
             ['Léonidas', 1], ['Deux rois en même temps', 1], ['L’entraînement militaire dès l’enfance', 1], ['Les hilotes', 1], ['Les 300 des Thermopyles', 1]] }],
-        difficile: [{ q: 'Range ces mots : Grèce ou Rome ?', colonnes: ['Grèce', 'Rome'],
+        difficile: [{ q: 'Ces mots viennent-ils de la Grèce antique ou de la Rome antique ?', qq: ['Lequel de ces mots vient de la Grèce antique ?', 'Lequel de ces mots vient de la Rome antique ?'], colonnes: ['Grèce', 'Rome'],
           items: [['L’agora', 0], ['L’hoplite', 0], ['La cité', 0], ['Le stratège', 0], ['L’ostracisme', 0],
             ['Le consul', 1], ['La domus', 1], ['L’insula', 1], ['Le légionnaire', 1], ['Le patricien', 1]] }],
-        expert: [{ q: 'Range ces épreuves : aux Jeux olympiques antiques ou seulement aux Jeux modernes ?', colonnes: ['Jeux antiques', 'Seulement modernes'],
+        expert: [{ q: 'Ces épreuves existaient-elles aux Jeux olympiques antiques, ou seulement aux Jeux modernes ?', qq: ['Laquelle de ces épreuves existait déjà aux Jeux olympiques antiques ?', 'Laquelle de ces épreuves n’existe qu’aux Jeux olympiques modernes ?'], colonnes: ['Jeux antiques', 'Seulement modernes'],
           items: [['Le stade', 0], ['Le pancrace', 0], ['Le pentathlon', 0], ['La course en armes', 0], ['La course de chars', 0], ['Le pugilat (la boxe)', 0],
             ['Le marathon', 1], ['La natation', 1], ['Le saut à la perche', 1], ['Le cyclisme', 1], ['Le volley-ball', 1]] }]
       } }
@@ -989,22 +989,22 @@
           { r: 'Guillaume le Conquérant', i: ['Je suis né en Normandie.', 'Je descends du chef viking Rollon.', 'La tapisserie de Bayeux raconte mon histoire.', 'J’ai gagné la bataille d’Hastings.', 'Je suis devenu roi d’Angleterre en 1066.'] }],
         difficile: [{ r: 'Philippe Auguste', i: ['Je suis un roi capétien.', 'J’ai beaucoup agrandi le domaine royal.', 'J’ai fait entourer Paris d’un rempart et construire le premier Louvre.', 'Je suis parti en croisade avec Richard Cœur de Lion.', 'J’ai gagné la bataille de Bouvines en 1214.'] },
           { r: 'Du Guesclin', i: ['Je suis un chevalier breton.', 'On disait que j’étais très laid.', 'J’ai combattu les Anglais pendant la guerre de Cent Ans.', 'J’ai emmené les Grandes Compagnies se battre en Espagne.', 'Le roi Charles V m’a fait connétable de France.'] }],
-        expert: [{ r: 'Hugues Capet', i: ['J’étais duc des Francs.', 'Mon surnom viendrait d’une cape d’abbé.', 'Les grands seigneurs m’ont élu roi.', 'Je suis devenu roi en 987.', 'Ma dynastie porte mon nom : les Capétiens.'] },
+        expert: [{ r: 'Hugues Capet', i: ['J’étais duc des Francs.', 'Mon surnom viendrait d’une cape d’abbé.', 'Les grands seigneurs m’ont élu roi.', 'Je suis devenu roi en 987.', 'Ma dynastie porte mon nom, les Capétiens.'] },
           { r: 'Aliénor d’Aquitaine', i: ['Je suis duchesse d’Aquitaine.', 'J’ai d’abord épousé le roi de France Louis VII.', 'Puis j’ai épousé Henri II Plantagenêt.', 'Je suis la mère de Richard Cœur de Lion.', 'J’ai été reine de France, puis reine d’Angleterre.'] }]
       } },
-      { k: 'ordre', consigne: 'Range ces événements du Moyen Âge du plus ancien au plus récent.', q: 'En quelle année : {a} ?', niveaux: {
-        facile: [['Fin de l’Empire romain d’Occident', 476, '476'], ['Charlemagne est couronné empereur', 800, '800'], ['Début de la guerre de Cent Ans', 1337, '1337'],
-          ['Jeanne d’Arc délivre Orléans', 1429, '1429'], ['Jeanne d’Arc est brûlée à Rouen', 1431, '1431'], ['Fin de la guerre de Cent Ans', 1453, '1453'],
-          ['Christophe Colomb arrive en Amérique', 1492, '1492']],
-        moyen: [['Charles Martel arrête les Arabes près de Poitiers', 732, '732'], ['Hugues Capet devient roi', 987, '987'], ['Guillaume le Conquérant gagne à Hastings', 1066, '1066'],
-          ['Départ de la première croisade', 1096, '1096'], ['Bataille de Crécy', 1346, '1346'], ['Bataille de Poitiers, le roi Jean le Bon est pris', 1356, '1356'],
-          ['Bataille d’Azincourt', 1415, '1415']],
-        difficile: [['Traité de Verdun : l’empire de Charlemagne est partagé', 843, '843'], ['Rollon reçoit la Normandie', 911, '911'], ['Début de la construction de Notre-Dame de Paris', 1163, '1163'],
-          ['Bataille de Bouvines', 1214, '1214'], ['La peste noire arrive à Marseille', 1347, '1347'], ['Naissance de Jeanne d’Arc à Domrémy', 1412, '1412'],
-          ['Traité de Troyes : le roi d’Angleterre héritier de la France', 1420, '1420'], ['Jeanne d’Arc est capturée à Compiègne', 1430, '1430']],
-        expert: [['Le pape Urbain II appelle à la croisade à Clermont', 1095, '1095'], ['Les croisés prennent Jérusalem', 1099, '1099'], ['Début de la croisade contre les Albigeois', 1209, '1209'],
-          ['Mort de Saint Louis à Tunis', 1270, '1270'], ['Arrestation des Templiers', 1307, '1307'], ['La Grande Jacquerie, révolte des paysans', 1358, '1358'],
-          ['Traité de Brétigny', 1360, '1360'], ['Charles VII reprend Paris', 1436, '1436'], ['Bataille de Formigny', 1450, '1450']]
+      { k: 'ordre', consigne: 'Range ces événements du Moyen Âge du plus ancien au plus récent.', q: 'En quelle année a eu lieu cet événement ?', niveaux: {
+        facile: [['Fin de l’Empire romain d’Occident', 476, '476', 'En quelle année l’Empire romain d’Occident a-t-il pris fin ?'], ['Charlemagne est couronné empereur', 800, '800', 'En quelle année Charlemagne a-t-il été couronné empereur ?'], ['Début de la guerre de Cent Ans', 1337, '1337', 'En quelle année la guerre de Cent Ans a-t-elle commencé ?'],
+          ['Jeanne d’Arc délivre Orléans', 1429, '1429', 'En quelle année Jeanne d’Arc a-t-elle délivré Orléans ?'], ['Jeanne d’Arc est brûlée à Rouen', 1431, '1431', 'En quelle année Jeanne d’Arc a-t-elle été brûlée à Rouen ?'], ['Fin de la guerre de Cent Ans', 1453, '1453', 'En quelle année la guerre de Cent Ans a-t-elle pris fin ?'],
+          ['Christophe Colomb arrive en Amérique', 1492, '1492', 'En quelle année Christophe Colomb est-il arrivé en Amérique ?']],
+        moyen: [['Charles Martel arrête les Arabes près de Poitiers', 732, '732', 'En quelle année Charles Martel a-t-il arrêté les Arabes près de Poitiers ?'], ['Hugues Capet devient roi', 987, '987', 'En quelle année Hugues Capet est-il devenu roi ?'], ['Guillaume le Conquérant gagne à Hastings', 1066, '1066', 'En quelle année Guillaume le Conquérant a-t-il gagné la bataille d’Hastings ?'],
+          ['Départ de la première croisade', 1096, '1096', 'En quelle année la première croisade est-elle partie ?'], ['Bataille de Crécy', 1346, '1346', 'En quelle année la bataille de Crécy a-t-elle eu lieu ?'], ['Bataille de Poitiers, le roi Jean le Bon est pris', 1356, '1356', 'En quelle année le roi Jean le Bon a-t-il été pris à la bataille de Poitiers ?'],
+          ['Bataille d’Azincourt', 1415, '1415', 'En quelle année la bataille d’Azincourt a-t-elle eu lieu ?']],
+        difficile: [['Traité de Verdun, qui partage l’empire de Charlemagne', 843, '843', 'En quelle année le traité de Verdun a-t-il partagé l’empire de Charlemagne ?'], ['Rollon reçoit la Normandie', 911, '911', 'En quelle année Rollon a-t-il reçu la Normandie ?'], ['Début de la construction de Notre-Dame de Paris', 1163, '1163', 'En quelle année la construction de Notre-Dame de Paris a-t-elle commencé ?'],
+          ['Bataille de Bouvines', 1214, '1214', 'En quelle année la bataille de Bouvines a-t-elle eu lieu ?'], ['La peste noire arrive à Marseille', 1347, '1347', 'En quelle année la peste noire est-elle arrivée à Marseille ?'], ['Naissance de Jeanne d’Arc à Domrémy', 1412, '1412', 'En quelle année Jeanne d’Arc est-elle née à Domrémy ?'],
+          ['Traité de Troyes, qui fait du roi d’Angleterre l’héritier de la France', 1420, '1420', 'En quelle année le traité de Troyes a-t-il fait du roi d’Angleterre l’héritier de la France ?'], ['Jeanne d’Arc est capturée à Compiègne', 1430, '1430', 'En quelle année Jeanne d’Arc a-t-elle été capturée à Compiègne ?']],
+        expert: [['Le pape Urbain II appelle à la croisade à Clermont', 1095, '1095', 'En quelle année le pape Urbain II a-t-il appelé à la croisade à Clermont ?'], ['Les croisés prennent Jérusalem', 1099, '1099', 'En quelle année les croisés ont-ils pris Jérusalem ?'], ['Début de la croisade contre les Albigeois', 1209, '1209', 'En quelle année la croisade contre les Albigeois a-t-elle commencé ?'],
+          ['Mort de Saint Louis à Tunis', 1270, '1270', 'En quelle année Saint Louis est-il mort à Tunis ?'], ['Arrestation des Templiers', 1307, '1307', 'En quelle année les Templiers ont-ils été arrêtés ?'], ['La Grande Jacquerie, révolte des paysans', 1358, '1358', 'En quelle année les paysans se sont-ils révoltés lors de la Grande Jacquerie ?'],
+          ['Traité de Brétigny', 1360, '1360', 'En quelle année le traité de Brétigny a-t-il été signé ?'], ['Charles VII reprend Paris', 1436, '1436', 'En quelle année Charles VII a-t-il repris Paris ?'], ['Bataille de Formigny', 1450, '1450', 'En quelle année la bataille de Formigny a-t-elle eu lieu ?']]
       } },
       { k: 'qcm', niveaux: {
         facile: [
@@ -1095,7 +1095,7 @@
       } }
     ] },
     { id: 'm02', matiere: 'histoire', famille: 'mag', nom: 'Châteaux, chevaliers et paysans', court: 'Châteaux', icone: '🏰', series: [
-      { k: 'paires', gauche: 'Partie du château', droite: 'Ce que c’est', consigneR: 'Relie chaque partie du château fort à ce qu’elle est.', q: 'Qu’est-ce que {a} ?', qi: 'Comment s’appelle : {b} ?', niveaux: {
+      { k: 'paires', gauche: 'Partie du château', droite: 'Ce que c’est', consigneR: 'Relie chaque partie du château fort à ce qu’elle est.', q: 'Qu’est-ce que {a} ?', qi: 'Comment s’appelle{nt:b} {min:b} ?', niveaux: {
         facile: [['le donjon', 'La plus haute tour, dernier refuge'], ['le pont-levis', 'Un pont qu’on relève'], ['les douves', 'Un fossé rempli d’eau'], ['les créneaux', 'Les découpes en haut des murs'],
           ['le rempart', 'Le grand mur qui entoure le château']],
         moyen: [['la herse', 'Une grille qui descend pour fermer la porte'], ['le chemin de ronde', 'Le passage en haut des remparts'], ['la meurtrière', 'Une fente étroite pour tirer à l’arc'],
@@ -1105,7 +1105,7 @@
         expert: [['le merlon', 'La partie pleine entre deux créneaux'], ['l’échauguette', 'Une petite tour accrochée en haut d’un mur'], ['la poterne', 'Une petite porte discrète'],
           ['le châtelet', 'Le bâtiment fortifié qui garde l’entrée'], ['la bretèche', 'Un petit balcon fermé au-dessus d’une porte'], ['l’assommoir', 'Un trou dans la voûte de l’entrée pour frapper les assaillants']]
       } },
-      { k: 'paires', gauche: 'Mot', droite: 'Ce qu’il veut dire', consigneR: 'Relie chaque mot de la chevalerie à son sens.', q: 'Que veut dire « {a} » ?', qi: 'Quel mot veut dire : {b} ?', niveaux: {
+      { k: 'paires', gauche: 'Mot', droite: 'Ce qu’il veut dire', consigneR: 'Relie chaque mot de la chevalerie à son sens.', q: 'Que veut dire « {a} » ?', qi: 'Quel mot désigne {min:b} ?', niveaux: {
         facile: [['adoubement', 'La cérémonie pour devenir chevalier'], ['tournoi', 'Un combat pour s’entraîner et montrer sa force'], ['armure', 'Le costume de métal qui protège'], ['écu', 'Le bouclier du chevalier']],
         moyen: [['page', 'Un jeune garçon qui commence à servir un seigneur'], ['écuyer', 'Celui qui aide le chevalier et porte ses armes'], ['joute', 'Un duel à cheval, avec une lance'], ['destrier', 'Le cheval de combat']],
         difficile: [['cotte de mailles', 'Une chemise faite d’anneaux de fer'], ['heaume', 'Le casque qui couvre toute la tête'], ['blason', 'Les dessins et couleurs qui font reconnaître un chevalier'],
@@ -1113,7 +1113,7 @@
         expert: [['palefroi', 'Le cheval de voyage'], ['colée', 'Le coup donné au futur chevalier pendant l’adoubement'], ['éperons', 'Des pointes aux talons pour diriger le cheval'],
           ['lice', 'Le terrain clos des tournois'], ['Templiers', 'Des moines-soldats'], ['courtoisie', 'Les belles manières du chevalier envers les dames']]
       } },
-      { k: 'paires', gauche: 'Mot', droite: 'Ce qu’il veut dire', consigneR: 'Relie chaque mot de la seigneurie à son sens.', q: 'Que veut dire « {a} » ?', qi: 'Quel mot veut dire : {b} ?', niveaux: {
+      { k: 'paires', gauche: 'Mot', droite: 'Ce qu’il veut dire', consigneR: 'Relie chaque mot de la seigneurie à son sens.', q: 'Que veut dire « {a} » ?', qi: 'Quel mot désigne {min:b} ?', niveaux: {
         facile: [['seigneur', 'Le maître du château et des terres'], ['serf', 'Un paysan qui n’est pas libre'], ['corvée', 'Le travail gratuit dû au seigneur'], ['paysan', 'Celui qui cultive la terre']],
         moyen: [['fief', 'La terre donnée à un vassal'], ['vassal', 'Celui qui jure fidélité à un seigneur'], ['dîme', 'L’impôt payé à l’Église'], ['moulin banal', 'Le moulin du seigneur, payant']],
         difficile: [['suzerain', 'Le seigneur à qui le vassal jure fidélité'], ['hommage', 'La cérémonie où le vassal jure fidélité'], ['taille', 'Un impôt payé au seigneur'],
@@ -1122,13 +1122,13 @@
           ['réserve', 'Les terres que le seigneur garde pour lui'], ['assolement triennal', 'La rotation des cultures sur trois ans'], ['mainmorte', 'Le droit du seigneur sur l’héritage du serf']]
       } },
       { k: 'classer', niveaux: {
-        facile: [{ q: 'Les trois ordres : ceux qui prient ou ceux qui combattent ?', colonnes: ['Ceux qui prient', 'Ceux qui combattent'],
+        facile: [{ q: 'Ces personnes font-elles partie de ceux qui prient ou de ceux qui combattent ?', qq: ['Laquelle de ces personnes fait partie de ceux qui prient ?', 'Laquelle de ces personnes fait partie de ceux qui combattent ?'], colonnes: ['Ceux qui prient', 'Ceux qui combattent'],
           items: [['Un moine', 0], ['Un évêque', 0], ['Un curé', 0], ['Un abbé', 0], ['Un chevalier', 1], ['Un seigneur', 1], ['Un duc', 1], ['Un comte', 1]] }],
-        moyen: [{ q: 'Les trois ordres : ceux qui combattent ou ceux qui travaillent ?', colonnes: ['Ceux qui combattent', 'Ceux qui travaillent'],
+        moyen: [{ q: 'Ces personnes font-elles partie de ceux qui combattent ou de ceux qui travaillent ?', qq: ['Laquelle de ces personnes fait partie de ceux qui combattent ?', 'Laquelle de ces personnes fait partie de ceux qui travaillent ?'], colonnes: ['Ceux qui combattent', 'Ceux qui travaillent'],
           items: [['Un écuyer', 0], ['Un baron', 0], ['Un marquis', 0], ['Un connétable', 0], ['Un paysan', 1], ['Un serf', 1], ['Un forgeron', 1], ['Un meunier', 1], ['Un artisan', 1]] }],
-        difficile: [{ q: 'Les trois ordres : ceux qui prient ou ceux qui travaillent ?', colonnes: ['Ceux qui prient', 'Ceux qui travaillent'],
+        difficile: [{ q: 'Ces personnes font-elles partie de ceux qui prient ou de ceux qui travaillent ?', qq: ['Laquelle de ces personnes fait partie de ceux qui prient ?', 'Laquelle de ces personnes fait partie de ceux qui travaillent ?'], colonnes: ['Ceux qui prient', 'Ceux qui travaillent'],
           items: [['Une abbesse', 0], ['Un chanoine', 0], ['Le pape', 0], ['Un prieur', 0], ['Un berger', 1], ['Un tisserand', 1], ['Un bûcheron', 1], ['Un charpentier', 1]] }],
-        expert: [{ q: 'Qui reçoit ce paiement : le seigneur ou l’Église ?', colonnes: ['Le seigneur', 'L’Église'],
+        expert: [{ q: 'Ces paiements vont-ils au seigneur ou à l’Église ?', qq: ['Lequel de ces paiements va au seigneur ?', 'Lequel de ces paiements va à l’Église ?'], colonnes: ['Le seigneur', 'L’Église'],
           items: [['La corvée', 0], ['La taille', 0], ['Les banalités', 0], ['Le cens', 0], ['La dîme', 1], ['Le denier de saint Pierre', 1], ['Les offrandes de la messe', 1]] }]
       } },
       { k: 'qcm', niveaux: {
@@ -1206,20 +1206,20 @@
     ] },
     { id: 'm07', matiere: 'histoire', famille: 'mag', nom: 'Églises, croisades et Vikings', court: 'Églises', icone: '⛪', series: [
       { k: 'classer', niveaux: {
-        facile: [{ q: 'Range ces caractéristiques : art roman ou art gothique ?', colonnes: ['Roman', 'Gothique'],
+        facile: [{ q: 'Ces caractéristiques sont-elles celles de l’art roman ou de l’art gothique ?', qq: ['Laquelle de ces caractéristiques est celle de l’art roman ?', 'Laquelle de ces caractéristiques est celle de l’art gothique ?'], colonnes: ['Roman', 'Gothique'],
           items: [['Des murs très épais', 0], ['De petites fenêtres', 0], ['Des arcs ronds', 0], ['Une église plutôt sombre', 0],
             ['De grands vitraux', 1], ['Des arcs en pointe', 1], ['Une église très haute et lumineuse', 1], ['Des arcs-boutants à l’extérieur', 1]] }],
-        moyen: [{ q: 'Range ces églises célèbres : romanes ou gothiques ?', colonnes: ['Roman', 'Gothique'],
+        moyen: [{ q: 'Ces églises célèbres sont-elles romanes ou gothiques ?', qq: ['Laquelle de ces églises est romane ?', 'Laquelle de ces églises est gothique ?'], colonnes: ['Roman', 'Gothique'],
           items: [['Saint-Sernin de Toulouse', 0], ['L’abbatiale Sainte-Foy de Conques', 0], ['Notre-Dame-la-Grande de Poitiers', 0], ['L’abbatiale de Saint-Savin', 0],
             ['Notre-Dame de Paris', 1], ['La cathédrale de Chartres', 1], ['La cathédrale d’Amiens', 1], ['La Sainte-Chapelle', 1], ['La cathédrale de Reims', 1]] }],
-        difficile: [{ q: 'Range ces abbayes et cathédrales : romanes ou gothiques ?', colonnes: ['Roman', 'Gothique'],
+        difficile: [{ q: 'Ces abbayes et ces cathédrales sont-elles romanes ou gothiques ?', qq: ['Lequel de ces monuments est roman ?', 'Lequel de ces monuments est gothique ?'], colonnes: ['Roman', 'Gothique'],
           items: [['L’abbaye de Fontenay', 0], ['Le cloître de Moissac', 0], ['Saint-Philibert de Tournus', 0], ['La basilique de Paray-le-Monial', 0],
             ['La cathédrale de Strasbourg', 1], ['La cathédrale de Beauvais', 1], ['La cathédrale de Bourges', 1], ['La cathédrale de Rouen', 1]] }],
-        expert: [{ q: 'Range ces mots d’architecture : roman ou gothique ?', colonnes: ['Roman', 'Gothique'],
+        expert: [{ q: 'Ces mots d’architecture désignent-ils l’art roman ou l’art gothique ?', qq: ['Lequel de ces mots désigne l’art roman ?', 'Lequel de ces mots désigne l’art gothique ?'], colonnes: ['Roman', 'Gothique'],
           items: [['La voûte en berceau', 0], ['La voûte d’arêtes', 0], ['L’arc en plein cintre', 0], ['Le style de Cluny', 0],
             ['La croisée d’ogives', 1], ['La rosace', 1], ['Le style flamboyant', 1], ['Le style rayonnant', 1]] }]
       } },
-      { k: 'paires', gauche: 'Monument', droite: 'Où il se trouve', consigneR: 'Relie chaque monument du Moyen Âge à l’endroit où il se trouve.', q: 'Où se trouve {a} ?', ouverte: false, niveaux: {
+      { k: 'paires', gauche: 'Monument', droite: 'Où il se trouve', consigneR: 'Relie chaque monument du Moyen Âge à l’endroit où il se trouve.', q: 'Où peut-on voir {le:a} ?', ouverte: false, niveaux: {
         facile: [['Le Mont-Saint-Michel', 'En Normandie'], ['La cité de Carcassonne', 'En Occitanie'], ['Le palais des Papes', 'À Avignon'], ['La cathédrale Notre-Dame', 'À Paris']],
         moyen: [['La cathédrale du sacre des rois', 'À Reims'], ['La Sainte-Chapelle', 'Sur l’île de la Cité, à Paris'], ['Les remparts d’Aigues-Mortes', 'Dans le Gard'],
           ['La cité médiévale de Provins', 'En Seine-et-Marne']],
@@ -1228,7 +1228,7 @@
         expert: [['Le cloître de Moissac', 'Dans le Tarn-et-Garonne'], ['La basilique Saint-Sernin', 'À Toulouse'], ['Le donjon de Vincennes', 'Dans le Val-de-Marne'],
           ['Château-Gaillard', 'Aux Andelys, dans l’Eure'], ['L’abbaye de Fontenay', 'En Côte-d’Or'], ['La cathédrale de Beauvais', 'Dans l’Oise']]
       } },
-      { k: 'paires', gauche: 'Mot', droite: 'Ce que c’est', consigneR: 'Relie chaque mot du monde viking à ce qu’il désigne.', q: 'Qu’est-ce que {a} ?', qi: 'Comment s’appelle : {b} ?', niveaux: {
+      { k: 'paires', gauche: 'Mot', droite: 'Ce que c’est', consigneR: 'Relie chaque mot du monde viking à ce qu’il désigne.', q: 'Qu’est-ce que {a} ?', qi: 'Comment s’appelle{nt:b} {min:b} ?', niveaux: {
         facile: [['le drakkar', 'Le bateau de guerre des Vikings'], ['la Scandinavie', 'La région d’où viennent les Vikings'], ['Odin', 'Le dieu principal des Vikings'],
           ['les Normands', 'Les Vikings installés en France']],
         moyen: [['Thor', 'Le dieu du tonnerre, avec son marteau'], ['les runes', 'L’alphabet des Vikings'], ['le Valhalla', 'Le palais des guerriers morts au combat'], ['une saga', 'Un long récit d’exploits']],
@@ -1317,7 +1317,7 @@
     // Arts, découvertes et châteaux = anciens « Artistes et œuvres » + « Grandes découvertes » + « Châteaux de la Loire » ;
     // Rois et guerres de Religion = anciens « Rois de la Renaissance » + « Réforme et guerres de Religion » + « Frise ».
     { id: 'r01', matiere: 'histoire', famille: 'ren', nom: 'Arts, découvertes et châteaux', court: 'Découvertes', icone: '🧭', series: [
-      { k: 'paires', gauche: 'Artiste', droite: 'Œuvre', consigneR: 'Relie chaque artiste à son œuvre.', q: 'Quelle œuvre a faite {a} ?', qi: 'Qui a fait : {b} ?', ouverte: false, niveaux: {
+      { k: 'paires', gauche: 'Artiste', droite: 'Œuvre', consigneR: 'Relie chaque artiste à son œuvre.', q: 'Quelle œuvre a réalisée {le:a} ?', qi: 'Qui a réalisé {min:b} ?', ouverte: false, niveaux: {
         facile: [['Léonard de Vinci', 'La Joconde'], ['Michel-Ange', 'Le plafond de la chapelle Sixtine'], ['Botticelli', 'La Naissance de Vénus'], ['Raphaël', 'L’École d’Athènes']],
         moyen: [['Michel-Ange', 'La statue de David, en marbre'], ['Léonard de Vinci', 'La Cène'], ['Albrecht Dürer', 'Le Jeune Lièvre'],
           ['Bruegel l’Ancien', 'Les Chasseurs dans la neige'], ['Jérôme Bosch', 'Le Jardin des délices']],
@@ -1326,7 +1326,7 @@
         expert: [['Donatello', 'Le David en bronze'], ['Hans Holbein le Jeune', 'Les Ambassadeurs'], ['Mantegna', 'La Chambre des Époux, à Mantoue'],
           ['Piero della Francesca', 'La Flagellation du Christ'], ['Giorgione', 'La Tempête'], ['Jean Clouet', 'Le portrait de François Ier'], ['Masaccio', 'La Trinité, à Florence']]
       } },
-      { k: 'paires', gauche: 'Explorateur', droite: 'Son voyage', consigneR: 'Relie chaque explorateur à son voyage.', q: 'Qu’a fait {a} ?', qi: 'Quel explorateur : {b} ?', ouverte: false, niveaux: {
+      { k: 'paires', gauche: 'Explorateur', droite: 'Son voyage', consigneR: 'Relie chaque explorateur à son voyage.', q: 'Qu’a fait {le:a} ?', qi: 'Quel explorateur {min:b} ?', ouverte: false, niveaux: {
         facile: [['Christophe Colomb', 'Arrive en Amérique en 1492'], ['Magellan', 'Lance le premier tour du monde'], ['Vasco de Gama', 'Ouvre la route des Indes par l’Afrique'],
           ['Jacques Cartier', 'Explore le Canada']],
         moyen: [['Amerigo Vespucci', 'A donné son nom à l’Amérique'], ['Bartolomeu Dias', 'Passe le cap de Bonne-Espérance'], ['Hernán Cortés', 'Conquiert l’empire aztèque'],
@@ -1337,15 +1337,15 @@
         expert: [['Henri le Navigateur', 'Prince portugais qui lance les explorations'], ['Francisco de Orellana', 'Descend l’Amazone'], ['Hernando de Soto', 'Atteint le Mississippi'],
           ['Juan Ponce de León', 'Aborde la Floride'], ['Diogo Cão', 'Atteint l’embouchure du fleuve Congo'], ['Pedro de Valdivia', 'Fonde Santiago du Chili']]
       } },
-      { k: 'paires', gauche: 'Château', droite: 'Ce qui le rend célèbre', consigneR: 'Relie chaque château à ce qui le rend célèbre.', q: 'Qu’est-ce qui rend {a} célèbre ?', qi: 'Quel château : {b} ?', ouverte: false, niveaux: {
-        facile: [['Chambord', 'Le plus grand château de la Loire'], ['Chenonceau', 'Il est construit au-dessus du Cher'], ['Amboise', 'Léonard de Vinci y est enterré'],
-          ['Villandry', 'Ses jardins et son grand potager']],
-        moyen: [['Blois', 'Son grand escalier à vis de François Ier'], ['Azay-le-Rideau', 'Il se reflète dans l’Indre'], ['le Clos Lucé', 'La dernière maison de Léonard de Vinci'],
-          ['Chinon', 'Jeanne d’Arc y rencontre Charles VII']],
-        difficile: [['Chaumont-sur-Loire', 'Donné à Diane de Poitiers en échange de Chenonceau'], ['Cheverny', 'Il a inspiré le Moulinsart de Tintin'],
-          ['Ussé', 'Il aurait inspiré La Belle au bois dormant'], ['Langeais', 'Charles VIII y épouse Anne de Bretagne']],
-        expert: [['Chambord', 'Son escalier à double révolution'], ['Chenonceau', 'On l’appelle le château des Dames'], ['Blois', 'Le duc de Guise y est assassiné en 1588'],
-          ['Amboise', 'Une conjuration protestante y échoue en 1560'], ['Loches', 'Ludovic Sforza y meurt prisonnier'], ['Saumur', 'Il est peint dans les Très Riches Heures du duc de Berry']]
+      { k: 'paires', gauche: 'Château', droite: 'Ce qui le rend célèbre', consigneR: 'Relie chaque château à ce qui le rend célèbre.', q: 'Qu’est-ce qui fait la célébrité {de:a} ?', qi: 'Quel château est connu pour cette particularité ?', ouverte: false, niveaux: {
+        facile: [['Chambord', 'Le plus grand château de la Loire', 'Quel est le plus grand château de la Loire ?'], ['Chenonceau', 'Il est construit au-dessus du Cher', 'Quel château est construit au-dessus du Cher ?'], ['Amboise', 'Léonard de Vinci y est enterré', 'Dans quel château Léonard de Vinci est-il enterré ?'],
+          ['Villandry', 'Ses jardins et son grand potager', 'Quel château est célèbre pour ses jardins et son grand potager ?']],
+        moyen: [['Blois', 'Son grand escalier à vis de François Ier', 'Quel château a le grand escalier à vis de François Ier ?'], ['Azay-le-Rideau', 'Il se reflète dans l’Indre', 'Quel château se reflète dans l’Indre ?'], ['le Clos Lucé', 'La dernière maison de Léonard de Vinci', 'Quel château a été la dernière maison de Léonard de Vinci ?'],
+          ['Chinon', 'Jeanne d’Arc y rencontre Charles VII', 'Dans quel château Jeanne d’Arc a-t-elle rencontré Charles VII ?']],
+        difficile: [['Chaumont-sur-Loire', 'Donné à Diane de Poitiers en échange de Chenonceau', 'Quel château a été donné à Diane de Poitiers en échange de Chenonceau ?'], ['Cheverny', 'Il a inspiré le Moulinsart de Tintin', 'Quel château a inspiré le Moulinsart de Tintin ?'],
+          ['Ussé', 'Il aurait inspiré La Belle au bois dormant', 'Quel château aurait inspiré La Belle au bois dormant ?'], ['Langeais', 'Charles VIII y épouse Anne de Bretagne', 'Dans quel château Charles VIII a-t-il épousé Anne de Bretagne ?']],
+        expert: [['Chambord', 'Son escalier à double révolution', 'Quel château a un escalier à double révolution ?'], ['Chenonceau', 'On l’appelle le château des Dames', 'Quel château appelle-t-on le château des Dames ?'], ['Blois', 'Le duc de Guise y est assassiné en 1588', 'Dans quel château le duc de Guise a-t-il été assassiné en 1588 ?'],
+          ['Amboise', 'Une conjuration protestante y échoue en 1560', 'Dans quel château une conjuration protestante a-t-elle échoué en 1560 ?'], ['Loches', 'Ludovic Sforza y meurt prisonnier', 'Dans quel château Ludovic Sforza est-il mort prisonnier ?'], ['Saumur', 'Il est peint dans les Très Riches Heures du duc de Berry', 'Quel château est peint dans les Très Riches Heures du duc de Berry ?']]
       } },
       { k: 'indices', consigne: 'Qui suis-je ? Trouve l’artiste ou l’explorateur.', niveaux: {
         facile: [{ r: 'Léonard de Vinci', i: ['Je suis né en Italie, en 1452.', 'Je suis peintre, ingénieur et inventeur.', 'J’ai dessiné des machines volantes.', 'Le roi François Ier m’a invité en France.', 'J’ai peint La Joconde.'] },
@@ -1355,17 +1355,17 @@
         difficile: [{ r: 'Jacques Cartier', i: ['Je suis né à Saint-Malo.', 'J’ai fait trois voyages en Amérique du Nord.', 'J’ai navigué pour le roi François Ier.', 'J’ai remonté le fleuve Saint-Laurent.', 'J’ai planté une croix à Gaspé, en 1534, au nom du roi de France.'] }],
         expert: [{ r: 'Gutenberg', i: ['Je suis né à Mayence, en Allemagne.', 'J’ai appris le métier d’orfèvre.', 'J’ai mis au point des caractères mobiles en métal.', 'J’ai imprimé une célèbre Bible, vers 1455.', 'On me dit l’inventeur de l’imprimerie en Europe.'] }]
       } },
-      { k: 'ordre', consigne: 'Range ces événements de la Renaissance du plus ancien au plus récent.', q: 'En quelle année : {a} ?', niveaux: {
-        facile: [['Gutenberg imprime sa Bible', 1455, 'vers 1455'], ['Christophe Colomb arrive en Amérique', 1492, '1492'], ['Vasco de Gama arrive en Inde', 1498, '1498'],
-          ['Léonard de Vinci commence La Joconde', 1503, 'vers 1503'], ['Fin du premier tour du monde', 1522, '1522']],
-        moyen: [['Bartolomeu Dias passe le cap de Bonne-Espérance', 1488, '1488'], ['Cabral arrive au Brésil', 1500, '1500'], ['Michel-Ange finit le plafond de la chapelle Sixtine', 1512, '1512'],
-          ['Léonard de Vinci s’installe en France', 1516, '1516'], ['Mort de Léonard de Vinci', 1519, '1519'], ['Jacques Cartier arrive au Canada', 1534, '1534']],
-        difficile: [['Diogo Cão atteint le fleuve Congo', 1482, '1482'], ['Balboa voit l’océan Pacifique', 1513, '1513'], ['Début de la construction de Chambord', 1519, '1519'],
-          ['Cortés prend Tenochtitlan', 1521, '1521'], ['Pizarro capture l’empereur inca Atahualpa', 1532, '1532'], ['Jacques Cartier remonte le Saint-Laurent', 1535, '1535'],
-          ['Copernic publie que la Terre tourne autour du Soleil', 1543, '1543']],
-        expert: [['Les Ottomans prennent Constantinople', 1453, '1453'], ['Botticelli peint La Naissance de Vénus', 1485, 'vers 1485'], ['Traité de Tordesillas', 1494, '1494'],
-          ['Michel-Ange finit sa statue de David', 1504, '1504'], ['Verrazzano entre dans la baie de New York', 1524, '1524'], ['Orellana descend l’Amazone', 1542, '1542'],
-          ['Fondation de Saint-Augustin, en Floride', 1565, '1565']]
+      { k: 'ordre', consigne: 'Range ces événements de la Renaissance du plus ancien au plus récent.', q: 'En quelle année a eu lieu cet événement ?', niveaux: {
+        facile: [['Gutenberg imprime sa Bible', 1455, 'vers 1455', 'En quelle année Gutenberg a-t-il imprimé sa Bible ?'], ['Christophe Colomb arrive en Amérique', 1492, '1492', 'En quelle année Christophe Colomb est-il arrivé en Amérique ?'], ['Vasco de Gama arrive en Inde', 1498, '1498', 'En quelle année Vasco de Gama est-il arrivé en Inde ?'],
+          ['Léonard de Vinci commence La Joconde', 1503, 'vers 1503', 'En quelle année Léonard de Vinci a-t-il commencé La Joconde ?'], ['Fin du premier tour du monde', 1522, '1522', 'En quelle année le premier tour du monde s’est-il achevé ?']],
+        moyen: [['Bartolomeu Dias passe le cap de Bonne-Espérance', 1488, '1488', 'En quelle année Bartolomeu Dias a-t-il passé le cap de Bonne-Espérance ?'], ['Cabral arrive au Brésil', 1500, '1500', 'En quelle année Cabral est-il arrivé au Brésil ?'], ['Michel-Ange finit le plafond de la chapelle Sixtine', 1512, '1512', 'En quelle année Michel-Ange a-t-il fini le plafond de la chapelle Sixtine ?'],
+          ['Léonard de Vinci s’installe en France', 1516, '1516', 'En quelle année Léonard de Vinci s’est-il installé en France ?'], ['Mort de Léonard de Vinci', 1519, '1519', 'En quelle année Léonard de Vinci est-il mort ?'], ['Jacques Cartier arrive au Canada', 1534, '1534', 'En quelle année Jacques Cartier est-il arrivé au Canada ?']],
+        difficile: [['Diogo Cão atteint le fleuve Congo', 1482, '1482', 'En quelle année Diogo Cão a-t-il atteint le fleuve Congo ?'], ['Balboa voit l’océan Pacifique', 1513, '1513', 'En quelle année Balboa a-t-il vu l’océan Pacifique ?'], ['Début de la construction de Chambord', 1519, '1519', 'En quelle année la construction de Chambord a-t-elle commencé ?'],
+          ['Cortés prend Tenochtitlan', 1521, '1521', 'En quelle année Cortés a-t-il pris Tenochtitlan ?'], ['Pizarro capture l’empereur inca Atahualpa', 1532, '1532', 'En quelle année Pizarro a-t-il capturé l’empereur inca Atahualpa ?'], ['Jacques Cartier remonte le Saint-Laurent', 1535, '1535', 'En quelle année Jacques Cartier a-t-il remonté le Saint-Laurent ?'],
+          ['Copernic publie que la Terre tourne autour du Soleil', 1543, '1543', 'En quelle année Copernic a-t-il publié que la Terre tourne autour du Soleil ?']],
+        expert: [['Les Ottomans prennent Constantinople', 1453, '1453', 'En quelle année les Ottomans ont-ils pris Constantinople ?'], ['Botticelli peint La Naissance de Vénus', 1485, 'vers 1485', 'En quelle année Botticelli a-t-il peint La Naissance de Vénus ?'], ['Traité de Tordesillas', 1494, '1494', 'En quelle année le traité de Tordesillas a-t-il été signé ?'],
+          ['Michel-Ange finit sa statue de David', 1504, '1504', 'En quelle année Michel-Ange a-t-il fini sa statue de David ?'], ['Verrazzano entre dans la baie de New York', 1524, '1524', 'En quelle année Verrazzano est-il entré dans la baie de New York ?'], ['Orellana descend l’Amazone', 1542, '1542', 'En quelle année Orellana a-t-il descendu l’Amazone ?'],
+          ['Fondation de Saint-Augustin, en Floride', 1565, '1565', 'En quelle année Saint-Augustin a-t-elle été fondée, en Floride ?']]
       } },
       { k: 'qcm', niveaux: {
         facile: [
@@ -1448,16 +1448,16 @@
           ['Christophe Colomb n’a fait qu’un seul voyage vers l’Amérique.', false, 'Il en a fait quatre, entre 1492 et 1504.']]
       } },
       { k: 'classer', niveaux: {
-        facile: [{ q: 'Range : artiste ou explorateur ?', colonnes: ['Artiste', 'Explorateur'],
+        facile: [{ q: 'Ces personnages sont-ils des artistes ou des explorateurs ?', qq: ['Lequel de ces personnages est un artiste ?', 'Lequel de ces personnages est un explorateur ?'], colonnes: ['Artiste', 'Explorateur'],
           items: [['Léonard de Vinci', 0], ['Michel-Ange', 0], ['Botticelli', 0], ['Raphaël', 0],
             ['Christophe Colomb', 1], ['Magellan', 1], ['Vasco de Gama', 1], ['Jacques Cartier', 1]] }],
-        moyen: [{ q: 'Range ces explorateurs : au service de l’Espagne ou du Portugal ?', colonnes: ['Espagne', 'Portugal'],
+        moyen: [{ q: 'Ces explorateurs étaient-ils au service de l’Espagne ou du Portugal ?', qq: ['Lequel de ces explorateurs était au service de l’Espagne ?', 'Lequel de ces explorateurs était au service du Portugal ?'], colonnes: ['Espagne', 'Portugal'],
           items: [['Christophe Colomb', 0], ['Magellan', 0], ['Hernán Cortés', 0], ['Francisco Pizarro', 0], ['Balboa', 0],
             ['Vasco de Gama', 1], ['Bartolomeu Dias', 1], ['Cabral', 1], ['Diogo Cão', 1]] }],
-        difficile: [{ q: 'Range ces artistes : Italie ou Europe du Nord (Flandre, Allemagne) ?', colonnes: ['Italie', 'Europe du Nord'],
+        difficile: [{ q: 'Ces artistes viennent-ils d’Italie ou d’Europe du Nord (Flandre, Allemagne) ?', qq: ['Lequel de ces artistes vient d’Italie ?', 'Lequel de ces artistes vient d’Europe du Nord ?'], colonnes: ['Italie', 'Europe du Nord'],
           items: [['Botticelli', 0], ['Titien', 0], ['Raphaël', 0], ['Donatello', 0], ['Brunelleschi', 0],
             ['Albrecht Dürer', 1], ['Jérôme Bosch', 1], ['Bruegel l’Ancien', 1], ['Jan van Eyck', 1], ['Hans Holbein', 1]] }],
-        expert: [{ q: 'Range : château fort du Moyen Âge ou château de la Renaissance ?', colonnes: ['Moyen Âge', 'Renaissance'],
+        expert: [{ q: 'Ces châteaux sont-ils des châteaux forts du Moyen Âge ou des châteaux de la Renaissance ?', qq: ['Lequel de ces châteaux est un château fort du Moyen Âge ?', 'Lequel de ces châteaux date de la Renaissance ?'], colonnes: ['Moyen Âge', 'Renaissance'],
           items: [['Le château de Chinon', 0], ['Le donjon de Loches', 0], ['Le château de Langeais', 0], ['Le château de Vincennes', 0], ['Château-Gaillard', 0],
             ['Chambord', 1], ['Azay-le-Rideau', 1], ['Chenonceau', 1], ['Villandry', 1], ['Fontainebleau', 1]] }]
       } }
@@ -1486,17 +1486,17 @@
           { r: 'Jean Calvin', i: ['Je suis né à Noyon, en Picardie.', 'J’ai dû quitter la France à cause de mes idées.', 'J’ai écrit L’Institution de la religion chrétienne.', 'J’ai vécu et prêché à Genève.', 'Je suis l’un des grands chefs de la Réforme protestante.'] }],
         expert: [{ r: 'Anne de Bretagne', i: ['Je suis duchesse de Bretagne.', 'J’ai épousé Charles VIII à Langeais.', 'Après sa mort, j’ai épousé Louis XII.', 'J’ai été deux fois reine de France.', 'Ma fille Claude a épousé François Ier.'] }]
       } },
-      { k: 'ordre', consigne: 'Range ces événements du plus ancien au plus récent.', q: 'En quelle année : {a} ?', niveaux: {
-        facile: [['Bataille de Marignan', 1515, '1515'], ['Luther publie ses 95 thèses', 1517, '1517'], ['Massacre de la Saint-Barthélemy', 1572, '1572'],
-          ['Édit de Nantes', 1598, '1598'], ['Assassinat d’Henri IV', 1610, '1610']],
-        moyen: [['Charles VIII part conquérir l’Italie', 1494, '1494'], ['Affaire des Placards contre la messe', 1534, '1534'],
-          ['Ordonnance de Villers-Cotterêts : le français dans les actes officiels', 1539, '1539'], ['Mort d’Henri II dans un tournoi', 1559, '1559'],
-          ['Massacre de Wassy, début des guerres de Religion', 1562, '1562'], ['Henri IV devient catholique', 1593, '1593']],
-        difficile: [['Le pape excommunie Luther', 1521, '1521'], ['François Ier est fait prisonnier à Pavie', 1525, '1525'], ['Calvin s’installe pour de bon à Genève', 1541, '1541'],
-          ['Début du concile de Trente', 1545, '1545'], ['Conjuration d’Amboise', 1560, '1560'], ['Assassinat du duc de Guise à Blois', 1588, '1588'], ['Assassinat d’Henri III', 1589, '1589']],
-        expert: [['Camp du Drap d’or', 1520, '1520'], ['Luther refuse de se rétracter à la diète de Worms', 1521, '1521'], ['Paix d’Augsbourg', 1555, '1555'],
-          ['Les Français reprennent Calais aux Anglais', 1558, '1558'], ['Colloque de Poissy', 1561, '1561'], ['Paix de Saint-Germain', 1570, '1570'],
-          ['Naissance de la Sainte Ligue catholique', 1576, '1576']]
+      { k: 'ordre', consigne: 'Range ces événements du plus ancien au plus récent.', q: 'En quelle année a eu lieu cet événement ?', niveaux: {
+        facile: [['Bataille de Marignan', 1515, '1515', 'En quelle année la bataille de Marignan a-t-elle eu lieu ?'], ['Luther publie ses 95 thèses', 1517, '1517', 'En quelle année Luther a-t-il publié ses 95 thèses ?'], ['Massacre de la Saint-Barthélemy', 1572, '1572', 'En quelle année le massacre de la Saint-Barthélemy a-t-il eu lieu ?'],
+          ['Édit de Nantes', 1598, '1598', 'En quelle année l’édit de Nantes a-t-il été signé ?'], ['Assassinat d’Henri IV', 1610, '1610', 'En quelle année Henri IV a-t-il été assassiné ?']],
+        moyen: [['Charles VIII part conquérir l’Italie', 1494, '1494', 'En quelle année Charles VIII est-il parti conquérir l’Italie ?'], ['Affaire des Placards contre la messe', 1534, '1534', 'En quelle année l’affaire des Placards contre la messe a-t-elle eu lieu ?'],
+          ['Ordonnance de Villers-Cotterêts, qui impose le français dans les actes officiels', 1539, '1539', 'En quelle année l’ordonnance de Villers-Cotterêts a-t-elle imposé le français dans les actes officiels ?'], ['Mort d’Henri II dans un tournoi', 1559, '1559', 'En quelle année Henri II est-il mort dans un tournoi ?'],
+          ['Massacre de Wassy, début des guerres de Religion', 1562, '1562', 'En quelle année le massacre de Wassy a-t-il déclenché les guerres de Religion ?'], ['Henri IV devient catholique', 1593, '1593', 'En quelle année Henri IV est-il devenu catholique ?']],
+        difficile: [['Le pape excommunie Luther', 1521, '1521', 'En quelle année le pape a-t-il excommunié Luther ?'], ['François Ier est fait prisonnier à Pavie', 1525, '1525', 'En quelle année François Ier a-t-il été fait prisonnier à Pavie ?'], ['Calvin s’installe pour de bon à Genève', 1541, '1541', 'En quelle année Calvin s’est-il installé pour de bon à Genève ?'],
+          ['Début du concile de Trente', 1545, '1545', 'En quelle année le concile de Trente a-t-il commencé ?'], ['Conjuration d’Amboise', 1560, '1560', 'En quelle année la conjuration d’Amboise a-t-elle eu lieu ?'], ['Assassinat du duc de Guise à Blois', 1588, '1588', 'En quelle année le duc de Guise a-t-il été assassiné à Blois ?'], ['Assassinat d’Henri III', 1589, '1589', 'En quelle année Henri III a-t-il été assassiné ?']],
+        expert: [['Camp du Drap d’or', 1520, '1520', 'En quelle année la rencontre du camp du Drap d’or a-t-elle eu lieu ?'], ['Luther refuse de se rétracter à la diète de Worms', 1521, '1521', 'En quelle année Luther a-t-il refusé de se rétracter à la diète de Worms ?'], ['Paix d’Augsbourg', 1555, '1555', 'En quelle année la paix d’Augsbourg a-t-elle été signée ?'],
+          ['Les Français reprennent Calais aux Anglais', 1558, '1558', 'En quelle année les Français ont-ils repris Calais aux Anglais ?'], ['Colloque de Poissy', 1561, '1561', 'En quelle année le colloque de Poissy a-t-il eu lieu ?'], ['Paix de Saint-Germain', 1570, '1570', 'En quelle année la paix de Saint-Germain a-t-elle été signée ?'],
+          ['Naissance de la Sainte Ligue catholique', 1576, '1576', 'En quelle année la Sainte Ligue catholique est-elle née ?']]
       } },
       { k: 'qcm', niveaux: {
         facile: [
@@ -1576,16 +1576,16 @@
           ['La Sainte Ligue était un groupe de protestants.', false, 'C’était une ligue catholique, menée par les Guise.']]
       } },
       { k: 'classer', niveaux: {
-        facile: [{ q: 'Range : catholique ou protestant ?', colonnes: ['Catholique', 'Protestant'],
+        facile: [{ q: 'Ces mots et ces personnages sont-ils catholiques ou protestants ?', qq: ['Lequel de ces mots ou personnages est catholique ?', 'Lequel de ces mots ou personnages est protestant ?'], colonnes: ['Catholique', 'Protestant'],
           items: [['Le pape', 0], ['La messe en latin', 0], ['Prier les saints', 0], ['Le duc de Guise', 0],
             ['Martin Luther', 1], ['Jean Calvin', 1], ['Lire la Bible dans sa langue', 1], ['Le temple', 1]] }],
-        moyen: [{ q: 'Range ces personnages : catholiques ou protestants, pendant les guerres de Religion ?', colonnes: ['Catholique', 'Protestant'],
+        moyen: [{ q: 'Pendant les guerres de Religion, ces personnages étaient-ils catholiques ou protestants ?', qq: ['Lequel de ces personnages était catholique pendant les guerres de Religion ?', 'Lequel de ces personnages était protestant pendant les guerres de Religion ?'], colonnes: ['Catholique', 'Protestant'],
           items: [['Catherine de Médicis', 0], ['Henri de Guise', 0], ['Charles IX', 0], ['Le pape', 0],
             ['L’amiral de Coligny', 1], ['Henri de Navarre, avant 1593', 1], ['Jean Calvin', 1], ['Théodore de Bèze', 1]] }],
-        difficile: [{ q: 'Range ces rois : Valois ou Bourbon ?', colonnes: ['Valois', 'Bourbon'],
+        difficile: [{ q: 'Ces rois appartiennent-ils à la famille des Valois ou à celle des Bourbons ?', qq: ['Lequel de ces rois est un Valois ?', 'Lequel de ces rois est un Bourbon ?'], colonnes: ['Valois', 'Bourbon'],
           items: [['Charles VIII', 0], ['Louis XII', 0], ['François Ier', 0], ['Henri II', 0], ['Charles IX', 0], ['Henri III', 0],
             ['Henri IV', 1], ['Louis XIII', 1], ['Louis XIV', 1], ['Louis XV', 1]] }],
-        expert: [{ q: 'Range : fait de François Ier ou d’Henri IV ?', colonnes: ['François Ier', 'Henri IV'],
+        expert: [{ q: 'Ces faits datent-ils du règne de François Ier ou de celui d’Henri IV ?', qq: ['Lequel de ces faits date du règne de François Ier ?', 'Lequel de ces faits date du règne d’Henri IV ?'], colonnes: ['François Ier', 'Henri IV'],
           items: [['La victoire de Marignan', 0], ['L’ordonnance de Villers-Cotterêts', 0], ['Le camp du Drap d’or', 0], ['La captivité à Madrid', 0], ['Les lecteurs royaux', 0],
             ['L’édit de Nantes', 1], ['La victoire d’Ivry', 1], ['« Paris vaut bien une messe »', 1], ['Sully aux Finances', 1], ['L’achèvement du Pont-Neuf', 1]] }]
       } }
@@ -1594,18 +1594,18 @@
     // Louis XIV et son temps = anciens « Louis XIV et Versailles » + « Frise des Temps modernes » (+ Louis XIII, Louis XV, Louis XVI, Nouvelle-France) ;
     // Écrivains et Lumières = anciens « Écrivains classiques » + « Les Lumières ».
     { id: 't01', matiere: 'histoire', famille: 'mod', nom: 'Louis XIV et son temps', court: 'Louis XIV', icone: '☀️', series: [
-      { k: 'paires', gauche: 'Personnage', droite: 'Son rôle', consigneR: 'Relie chaque personnage à son rôle.', q: 'Quel est le rôle de {a} ?', qi: 'Qui est-ce : {b} ?', ouverte: false, niveaux: {
-        facile: [['Louis XIV', 'Le Roi-Soleil'], ['Colbert', 'Ministre des finances de Louis XIV'], ['André Le Nôtre', 'Dessine les jardins de Versailles'],
-          ['Louis XIII', 'Le père de Louis XIV'], ['Richelieu', 'Cardinal, ministre de Louis XIII'], ['Marie-Antoinette', 'Reine, épouse de Louis XVI']],
-        moyen: [['Mazarin', 'Ministre pendant l’enfance de Louis XIV'], ['Vauban', 'Construit des forteresses aux frontières'],
-          ['Lully', 'Compose la musique de la cour'], ['Louis XV', 'Arrière-petit-fils et successeur de Louis XIV'], ['Louis XVI', 'Roi quand commence la Révolution'],
-          ['Champlain', 'Fonde Québec en 1608']],
-        difficile: [['Fouquet', 'Arrêté en 1661, après une fête à Vaux-le-Vicomte'], ['Louvois', 'Ministre de la Guerre de Louis XIV'], ['Charles Le Brun', 'Peint le plafond de la galerie des Glaces'],
-          ['Jules Hardouin-Mansart', 'Architecte de la galerie des Glaces'], ['Anne d’Autriche', 'Mère de Louis XIV, régente du royaume'],
-          ['D’Artagnan', 'Mousquetaire gascon qui arrête Fouquet'], ['Madame de Pompadour', 'Favorite de Louis XV']],
-        expert: [['Marie-Thérèse d’Autriche', 'Épouse Louis XIV en 1660'], ['Madame de Montespan', 'Favorite, mère de sept enfants du roi'], ['Saint-Simon', 'Raconte la vie de la cour dans ses Mémoires'],
-          ['Louis Le Vau', 'Premier architecte des agrandissements de Versailles'], ['Pierre-Paul Riquet', 'Fait creuser le canal du Midi'], ['Le Grand Dauphin', 'Fils de Louis XIV, mort avant lui'],
-          ['Philippe d’Orléans', 'Régent pendant l’enfance de Louis XV'], ['Turgot', 'Ministre des finances de Louis XVI de 1774 à 1776']]
+      { k: 'paires', gauche: 'Personnage', droite: 'Son rôle', consigneR: 'Relie chaque personnage à son rôle.', q: 'Quel est le rôle {de:a} ?', qi: 'Qui {min:b} ?', ouverte: false, niveaux: {
+        facile: [['Louis XIV', 'Le Roi-Soleil', 'Quel roi était surnommé le Roi-Soleil ?'], ['Colbert', 'Ministre des finances de Louis XIV', 'Qui était le ministre des Finances de Louis XIV ?'], ['André Le Nôtre', 'Dessine les jardins de Versailles', 'Qui a dessiné les jardins de Versailles ?'],
+          ['Louis XIII', 'Le père de Louis XIV', 'Qui était le père de Louis XIV ?'], ['Richelieu', 'Cardinal, ministre de Louis XIII', 'Quel cardinal était le ministre de Louis XIII ?'], ['Marie-Antoinette', 'Reine, épouse de Louis XVI', 'Quelle reine était l’épouse de Louis XVI ?']],
+        moyen: [['Mazarin', 'Ministre pendant l’enfance de Louis XIV', 'Qui était ministre pendant l’enfance de Louis XIV ?'], ['Vauban', 'Construit des forteresses aux frontières', 'Qui a construit des forteresses aux frontières ?'],
+          ['Lully', 'Compose la musique de la cour', 'Qui composait la musique de la cour ?'], ['Louis XV', 'Arrière-petit-fils et successeur de Louis XIV', 'Qui était l’arrière-petit-fils et le successeur de Louis XIV ?'], ['Louis XVI', 'Roi quand commence la Révolution', 'Qui était roi quand la Révolution a commencé ?'],
+          ['Champlain', 'Fonde Québec en 1608', 'Qui a fondé Québec en 1608 ?']],
+        difficile: [['Fouquet', 'Arrêté en 1661, après une fête à Vaux-le-Vicomte', 'Qui a été arrêté en 1661, après une fête à Vaux-le-Vicomte ?'], ['Louvois', 'Ministre de la Guerre de Louis XIV', 'Qui était le ministre de la Guerre de Louis XIV ?'], ['Charles Le Brun', 'Peint le plafond de la galerie des Glaces', 'Qui a peint le plafond de la galerie des Glaces ?'],
+          ['Jules Hardouin-Mansart', 'Architecte de la galerie des Glaces', 'Qui était l’architecte de la galerie des Glaces ?'], ['Anne d’Autriche', 'Mère de Louis XIV, régente du royaume', 'Qui était la mère de Louis XIV, régente du royaume ?'],
+          ['D’Artagnan', 'Mousquetaire gascon qui arrête Fouquet', 'Quel mousquetaire gascon a arrêté Fouquet ?'], ['Madame de Pompadour', 'Favorite de Louis XV', 'Qui était la favorite de Louis XV ?']],
+        expert: [['Marie-Thérèse d’Autriche', 'Épouse Louis XIV en 1660', 'Qui a épousé Louis XIV en 1660 ?'], ['Madame de Montespan', 'Favorite, mère de sept enfants du roi', 'Quelle favorite a eu sept enfants avec le roi ?'], ['Saint-Simon', 'Raconte la vie de la cour dans ses Mémoires', 'Qui a raconté la vie de la cour dans ses Mémoires ?'],
+          ['Louis Le Vau', 'Premier architecte des agrandissements de Versailles', 'Qui a été le premier architecte des agrandissements de Versailles ?'], ['Pierre-Paul Riquet', 'Fait creuser le canal du Midi', 'Qui a fait creuser le canal du Midi ?'], ['Le Grand Dauphin', 'Fils de Louis XIV, mort avant lui', 'Quel fils de Louis XIV est mort avant lui ?'],
+          ['Philippe d’Orléans', 'Régent pendant l’enfance de Louis XV', 'Qui a été régent pendant l’enfance de Louis XV ?'], ['Turgot', 'Ministre des finances de Louis XVI de 1774 à 1776', 'Qui a été ministre des Finances de Louis XVI de 1774 à 1776 ?']]
       } },
       { k: 'qcm', niveaux: {
         facile: [
@@ -1696,35 +1696,35 @@
         expert: [{ r: 'Madame de Maintenon', i: ['Je suis née dans la prison de Niort.', 'Mon grand-père était le poète Agrippa d’Aubigné.', 'J’ai d’abord épousé le poète Scarron.', 'J’ai élevé les enfants du roi et de Madame de Montespan.', 'J’ai épousé Louis XIV en secret.'] },
           { r: 'Champlain', i: ['Je suis né en Saintonge.', 'Je suis navigateur et dessinateur de cartes.', 'J’ai exploré le fleuve Saint-Laurent.', 'Un grand lac porte mon nom, entre les États-Unis et le Canada.', 'J’ai fondé Québec en 1608.'] }]
       } },
-      { k: 'ordre', consigne: 'Range ces événements des Temps modernes du plus ancien au plus récent.', q: 'En quelle année : {a} ?', niveaux: {
-        facile: [['Assassinat d’Henri IV', 1610, '1610'], ['Louis XIV devient roi', 1643, '1643'], ['La cour s’installe à Versailles', 1682, '1682'],
-          ['Mort de Louis XIV', 1715, '1715'], ['Louis XVI devient roi', 1774, '1774'], ['Prise de la Bastille', 1789, '1789']],
-        moyen: [['Champlain fonde Québec', 1608, '1608'], ['Richelieu crée l’Académie française', 1635, '1635'], ['Révocation de l’édit de Nantes', 1685, '1685'],
-          ['Louis XV devient roi', 1715, '1715'], ['Mariage du futur Louis XVI et de Marie-Antoinette', 1770, '1770'], ['Premier vol en montgolfière avec des passagers', 1783, '1783']],
-        difficile: [['Richelieu prend La Rochelle', 1628, '1628'], ['Mort de Richelieu', 1642, '1642'], ['Début de la Fronde', 1648, '1648'],
-          ['Mort de Mazarin : Louis XIV gouverne seul', 1661, '1661'], ['Cavelier de La Salle nomme la Louisiane', 1682, '1682'],
-          ['Premier volume de l’Encyclopédie', 1751, '1751'], ['Traité de Paris : la France perd le Canada', 1763, '1763']],
-        expert: [['Traité des Pyrénées', 1659, '1659'], ['Arrestation de Fouquet', 1661, '1661'], ['Traités d’Utrecht', 1713, '1713'],
-          ['Faillite de la banque de Law', 1720, '1720'], ['Début de la guerre de Sept Ans', 1756, '1756'], ['Déclaration d’indépendance des États-Unis', 1776, '1776'],
-          ['Affaire du Collier de la reine', 1785, '1785']]
+      { k: 'ordre', consigne: 'Range ces événements des Temps modernes du plus ancien au plus récent.', q: 'En quelle année a eu lieu cet événement ?', niveaux: {
+        facile: [['Assassinat d’Henri IV', 1610, '1610', 'En quelle année Henri IV a-t-il été assassiné ?'], ['Louis XIV devient roi', 1643, '1643', 'En quelle année Louis XIV est-il devenu roi ?'], ['La cour s’installe à Versailles', 1682, '1682', 'En quelle année la cour s’est-elle installée à Versailles ?'],
+          ['Mort de Louis XIV', 1715, '1715', 'En quelle année Louis XIV est-il mort ?'], ['Louis XVI devient roi', 1774, '1774', 'En quelle année Louis XVI est-il devenu roi ?'], ['Prise de la Bastille', 1789, '1789', 'En quelle année la Bastille a-t-elle été prise ?']],
+        moyen: [['Champlain fonde Québec', 1608, '1608', 'En quelle année Champlain a-t-il fondé Québec ?'], ['Richelieu crée l’Académie française', 1635, '1635', 'En quelle année Richelieu a-t-il créé l’Académie française ?'], ['Révocation de l’édit de Nantes', 1685, '1685', 'En quelle année l’édit de Nantes a-t-il été révoqué ?'],
+          ['Louis XV devient roi', 1715, '1715', 'En quelle année Louis XV est-il devenu roi ?'], ['Mariage du futur Louis XVI et de Marie-Antoinette', 1770, '1770', 'En quelle année le futur Louis XVI a-t-il épousé Marie-Antoinette ?'], ['Premier vol en montgolfière avec des passagers', 1783, '1783', 'En quelle année une montgolfière a-t-elle emporté des passagers pour la première fois ?']],
+        difficile: [['Richelieu prend La Rochelle', 1628, '1628', 'En quelle année Richelieu a-t-il pris La Rochelle ?'], ['Mort de Richelieu', 1642, '1642', 'En quelle année Richelieu est-il mort ?'], ['Début de la Fronde', 1648, '1648', 'En quelle année la Fronde a-t-elle commencé ?'],
+          ['Mort de Mazarin, après laquelle Louis XIV gouverne seul', 1661, '1661', 'En quelle année Mazarin est-il mort, laissant Louis XIV gouverner seul ?'], ['Cavelier de La Salle nomme la Louisiane', 1682, '1682', 'En quelle année Cavelier de La Salle a-t-il nommé la Louisiane ?'],
+          ['Premier volume de l’Encyclopédie', 1751, '1751', 'En quelle année le premier volume de l’Encyclopédie est-il paru ?'], ['Traité de Paris, où la France perd le Canada', 1763, '1763', 'En quelle année la France a-t-elle perdu le Canada, au traité de Paris ?']],
+        expert: [['Traité des Pyrénées', 1659, '1659', 'En quelle année le traité des Pyrénées a-t-il été signé ?'], ['Arrestation de Fouquet', 1661, '1661', 'En quelle année Fouquet a-t-il été arrêté ?'], ['Traités d’Utrecht', 1713, '1713', 'En quelle année les traités d’Utrecht ont-ils été signés ?'],
+          ['Faillite de la banque de Law', 1720, '1720', 'En quelle année la banque de Law a-t-elle fait faillite ?'], ['Début de la guerre de Sept Ans', 1756, '1756', 'En quelle année la guerre de Sept Ans a-t-elle commencé ?'], ['Déclaration d’indépendance des États-Unis', 1776, '1776', 'En quelle année les États-Unis ont-ils déclaré leur indépendance ?'],
+          ['Affaire du Collier de la reine', 1785, '1785', 'En quelle année l’affaire du Collier de la reine a-t-elle éclaté ?']]
       } },
       { k: 'classer', niveaux: {
-        facile: [{ q: 'Range : à la cour de Louis XIV ou de nos jours ?', colonnes: ['Sous Louis XIV', 'De nos jours'],
+        facile: [{ q: 'Ces gestes se faisaient-ils à la cour de Louis XIV, ou se font-ils de nos jours ?', qq: ['Lequel de ces gestes se faisait déjà à la cour de Louis XIV ?', 'Lequel de ces gestes n’existe que de nos jours ?'], colonnes: ['Sous Louis XIV', 'De nos jours'],
           items: [['Voyager en carrosse', 0], ['Porter une perruque poudrée', 0], ['S’éclairer à la bougie', 0], ['Écrire à la plume d’oie', 0],
             ['Voyager en voiture', 1], ['Téléphoner', 1], ['S’éclairer à l’ampoule électrique', 1], ['Écrire sur un ordinateur', 1]] }],
-        moyen: [{ q: 'Range : règne de Louis XIII ou de Louis XIV ?', colonnes: ['Louis XIII', 'Louis XIV'],
+        moyen: [{ q: 'Ces noms et ces faits datent-ils du règne de Louis XIII ou de celui de Louis XIV ?', qq: ['Lequel de ces noms ou faits date du règne de Louis XIII ?', 'Lequel de ces noms ou faits date du règne de Louis XIV ?'], colonnes: ['Louis XIII', 'Louis XIV'],
           items: [['Le cardinal de Richelieu', 0], ['Le siège de La Rochelle', 0], ['La création de l’Académie française', 0], ['Le mariage avec Anne d’Autriche', 0],
             ['Colbert', 1], ['La galerie des Glaces', 1], ['La révocation de l’édit de Nantes', 1], ['Les forteresses de Vauban', 1], ['La cour à Versailles', 1]] }],
-        difficile: [{ q: 'Range : règne de Louis XIV ou de Louis XV ?', colonnes: ['Louis XIV', 'Louis XV'],
+        difficile: [{ q: 'Ces noms et ces faits datent-ils du règne de Louis XIV ou de celui de Louis XV ?', qq: ['Lequel de ces noms ou faits date du règne de Louis XIV ?', 'Lequel de ces noms ou faits date du règne de Louis XV ?'], colonnes: ['Louis XIV', 'Louis XV'],
           items: [['La Fronde', 0], ['Colbert', 0], ['La révocation de l’édit de Nantes', 0], ['L’affaire des Poisons', 0], ['Le canal du Midi', 0],
             ['Madame de Pompadour', 1], ['La guerre de Sept Ans', 1], ['La perte du Canada', 1], ['La place Louis-XV, aujourd’hui place de la Concorde', 1], ['Le premier volume de l’Encyclopédie', 1]] }],
-        expert: [{ q: 'Range ces ministres : de Louis XIV ou de Louis XVI ?', colonnes: ['Louis XIV', 'Louis XVI'],
+        expert: [{ q: 'Ces ministres ont-ils servi Louis XIV ou Louis XVI ?', qq: ['Lequel de ces ministres a servi Louis XIV ?', 'Lequel de ces ministres a servi Louis XVI ?'], colonnes: ['Louis XIV', 'Louis XVI'],
           items: [['Colbert', 0], ['Louvois', 0], ['Fouquet', 0], ['Mazarin', 0],
             ['Turgot', 1], ['Necker', 1], ['Calonne', 1], ['Vergennes', 1]] }]
       } }
     ] },
     { id: 't05', matiere: 'histoire', famille: 'mod', nom: 'Écrivains et Lumières', court: 'Écrivains', icone: '💡', series: [
-      { k: 'paires', gauche: 'Auteur', droite: 'Œuvre', consigneR: 'Relie chaque auteur à son œuvre.', q: 'Quelle œuvre a écrite {a} ?', qi: 'Qui a écrit : {b} ?', ouverte: false, niveaux: {
+      { k: 'paires', gauche: 'Auteur', droite: 'Œuvre', consigneR: 'Relie chaque auteur à son œuvre.', q: 'Quelle œuvre a écrite {le:a} ?', qi: 'Qui a écrit « {b} » ?', ouverte: false, niveaux: {
         facile: [['Molière', 'Le Malade imaginaire'], ['Jean de La Fontaine', 'Le Corbeau et le Renard'], ['Charles Perrault', 'Le Petit Chaperon rouge'],
           ['Voltaire', 'Candide'], ['Pierre Corneille', 'Le Cid']],
         moyen: [['Jean Racine', 'Phèdre'], ['Molière', 'Le Bourgeois gentilhomme'], ['Charles Perrault', 'Le Chat botté'], ['Beaumarchais', 'Le Barbier de Séville'],
@@ -1735,16 +1735,16 @@
           ['La Rochefoucauld', 'Les Maximes'], ['Scarron', 'Le Roman comique'], ['Cyrano de Bergerac', 'Les États et Empires de la Lune'],
           ['L’abbé Prévost', 'Manon Lescaut'], ['Bernardin de Saint-Pierre', 'Paul et Virginie']]
       } },
-      { k: 'paires', gauche: 'Personnage', droite: 'Ce qui le rend célèbre', consigneR: 'Relie chaque personnage à ce qui le rend célèbre.', q: 'Qu’est-ce qui rend {a} célèbre ?', qi: 'Qui est-ce : {b} ?', ouverte: false, niveaux: {
-        facile: [['Voltaire', 'Se moque des injustices et défend la tolérance'], ['Jean-Jacques Rousseau', 'Pense que l’homme naît bon'], ['Diderot', 'Dirige l’Encyclopédie'],
-          ['Montesquieu', 'Veut séparer les trois pouvoirs']],
-        moyen: [['D’Alembert', 'Dirige l’Encyclopédie avec Diderot'], ['Beaumarchais', 'Écrit Le Mariage de Figaro'], ['Buffon', 'Écrit une grande Histoire naturelle'],
-          ['Lavoisier', 'Fonde la chimie moderne'], ['Les frères Montgolfier', 'Font voler le premier ballon à air chaud']],
-        difficile: [['Condorcet', 'Défend l’école pour tous, filles comprises'], ['Émilie du Châtelet', 'Traduit Newton en français'], ['Kant', 'Écrit : « Ose savoir ! »'],
-          ['Benjamin Franklin', 'Invente le paratonnerre'], ['Linné', 'Classe et nomme les plantes et les animaux'], ['Isaac Newton', 'Explique la gravitation universelle']],
-        expert: [['Madame Geoffrin', 'Reçoit les philosophes dans son salon'], ['Jean Calas', 'Protestant condamné à tort, défendu par Voltaire'], ['Frédéric II de Prusse', 'Roi qui accueille Voltaire à sa cour'],
-          ['Catherine II de Russie', 'Impératrice qui achète la bibliothèque de Diderot'], ['Malesherbes', 'Protège l’Encyclopédie de la censure'],
-          ['Parmentier', 'Fait connaître la pomme de terre en France'], ['Marivaux', 'Donne son nom au « marivaudage »']]
+      { k: 'paires', gauche: 'Personnage', droite: 'Ce qui le rend célèbre', consigneR: 'Relie chaque personnage à ce qui le rend célèbre.', q: 'Qu’est-ce qui fait la célébrité {de:a} ?', qi: 'Qui {min:b} ?', ouverte: false, niveaux: {
+        facile: [['Voltaire', 'Se moque des injustices et défend la tolérance', 'Qui se moquait des injustices et défendait la tolérance ?'], ['Jean-Jacques Rousseau', 'Pense que l’homme naît bon', 'Qui pensait que l’homme naît bon ?'], ['Diderot', 'Dirige l’Encyclopédie', 'Qui a dirigé l’Encyclopédie ?'],
+          ['Montesquieu', 'Veut séparer les trois pouvoirs', 'Qui voulait séparer les trois pouvoirs ?']],
+        moyen: [['D’Alembert', 'Dirige l’Encyclopédie avec Diderot', 'Qui a dirigé l’Encyclopédie avec Diderot ?'], ['Beaumarchais', 'Écrit Le Mariage de Figaro', 'Qui a écrit Le Mariage de Figaro ?'], ['Buffon', 'Écrit une grande Histoire naturelle', 'Qui a écrit une grande Histoire naturelle ?'],
+          ['Lavoisier', 'Fonde la chimie moderne', 'Qui a fondé la chimie moderne ?'], ['Les frères Montgolfier', 'Font voler le premier ballon à air chaud', 'Qui a fait voler le premier ballon à air chaud ?']],
+        difficile: [['Condorcet', 'Défend l’école pour tous, filles comprises', 'Qui défendait l’école pour tous, filles comprises ?'], ['Émilie du Châtelet', 'Traduit Newton en français', 'Qui a traduit Newton en français ?'], ['Kant', 'Écrit « Ose savoir ! »', 'Qui a écrit « Ose savoir ! » ?'],
+          ['Benjamin Franklin', 'Invente le paratonnerre', 'Qui a inventé le paratonnerre ?'], ['Linné', 'Classe et nomme les plantes et les animaux', 'Qui a classé et nommé les plantes et les animaux ?'], ['Isaac Newton', 'Explique la gravitation universelle', 'Qui a expliqué la gravitation universelle ?']],
+        expert: [['Madame Geoffrin', 'Reçoit les philosophes dans son salon', 'Qui recevait les philosophes dans son salon ?'], ['Jean Calas', 'Protestant condamné à tort, défendu par Voltaire', 'Quel protestant a été condamné à tort, puis défendu par Voltaire ?'], ['Frédéric II de Prusse', 'Roi qui accueille Voltaire à sa cour', 'Quel roi a accueilli Voltaire à sa cour ?'],
+          ['Catherine II de Russie', 'Impératrice qui achète la bibliothèque de Diderot', 'Quelle impératrice a acheté la bibliothèque de Diderot ?'], ['Malesherbes', 'Protège l’Encyclopédie de la censure', 'Qui a protégé l’Encyclopédie de la censure ?'],
+          ['Parmentier', 'Fait connaître la pomme de terre en France', 'Qui a fait connaître la pomme de terre en France ?'], ['Marivaux', 'Donne son nom au « marivaudage »', 'Qui a donné son nom au « marivaudage » ?']]
       } },
       { k: 'qcm', niveaux: {
         facile: [
@@ -1827,16 +1827,16 @@
           { r: 'Diderot', i: ['Je suis né à Langres.', 'Mon père était coutelier.', 'J’ai été enfermé au donjon de Vincennes en 1749.', 'Catherine II de Russie a acheté ma bibliothèque.', 'J’ai dirigé l’Encyclopédie avec d’Alembert.'] }]
       } },
       { k: 'classer', niveaux: {
-        facile: [{ q: 'Range : fable de La Fontaine ou conte de Perrault ?', colonnes: ['Fable de La Fontaine', 'Conte de Perrault'],
+        facile: [{ q: 'Ces histoires sont-elles des fables de La Fontaine ou des contes de Perrault ?', qq: ['Laquelle de ces histoires est une fable de La Fontaine ?', 'Laquelle de ces histoires est un conte de Perrault ?'], colonnes: ['Fable de La Fontaine', 'Conte de Perrault'],
           items: [['Le Corbeau et le Renard', 0], ['La Cigale et la Fourmi', 0], ['Le Lièvre et la Tortue', 0], ['Le Loup et l’Agneau', 0],
             ['Le Petit Chaperon rouge', 1], ['Cendrillon', 1], ['Le Chat botté', 1], ['Le Petit Poucet', 1]] }],
-        moyen: [{ q: 'Range ces écrivains : XVIIe siècle ou XVIIIe siècle, celui des Lumières ?', colonnes: ['XVIIe siècle', 'XVIIIe siècle'],
+        moyen: [{ q: 'Ces écrivains ont-ils vécu au XVIIe siècle ou au XVIIIe siècle, celui des Lumières ?', qq: ['Lequel de ces écrivains a vécu au XVIIe siècle ?', 'Lequel de ces écrivains est un écrivain des Lumières, au XVIIIe siècle ?'], colonnes: ['XVIIe siècle', 'XVIIIe siècle'],
           items: [['Molière', 0], ['Jean Racine', 0], ['Pierre Corneille', 0], ['Jean de La Fontaine', 0], ['Charles Perrault', 0],
             ['Voltaire', 1], ['Jean-Jacques Rousseau', 1], ['Diderot', 1], ['Montesquieu', 1], ['Beaumarchais', 1]] }],
-        difficile: [{ q: 'Range ces pièces : comédie ou tragédie ?', colonnes: ['Comédie', 'Tragédie'],
+        difficile: [{ q: 'Ces pièces de théâtre sont-elles des comédies ou des tragédies ?', qq: ['Laquelle de ces pièces est une comédie ?', 'Laquelle de ces pièces est une tragédie ?'], colonnes: ['Comédie', 'Tragédie'],
           items: [['L’Avare', 0], ['Tartuffe', 0], ['Le Bourgeois gentilhomme', 0], ['Le Jeu de l’amour et du hasard', 0], ['Le Mariage de Figaro', 0],
             ['Phèdre', 1], ['Andromaque', 1], ['Britannicus', 1], ['Horace', 1], ['Bérénice', 1]] }],
-        expert: [{ q: 'Range ces œuvres : de Voltaire ou de Rousseau ?', colonnes: ['Voltaire', 'Rousseau'],
+        expert: [{ q: 'Ces œuvres ont-elles été écrites par Voltaire ou par Rousseau ?', qq: ['Laquelle de ces œuvres a été écrite par Voltaire ?', 'Laquelle de ces œuvres a été écrite par Rousseau ?'], colonnes: ['Voltaire', 'Rousseau'],
           items: [['Candide', 0], ['Zadig', 0], ['Micromégas', 0], ['Les Lettres philosophiques', 0], ['Le Traité sur la tolérance', 0],
             ['Émile', 1], ['Du contrat social', 1], ['Les Confessions', 1], ['Julie ou la Nouvelle Héloïse', 1], ['Les Rêveries du promeneur solitaire', 1]] }]
       } }
@@ -1846,24 +1846,24 @@
     // Industrie, inventions et monuments = anciens « Inventions de la révolution industrielle » + « Monuments du XIXe siècle » ;
     // Arts et lettres du XIXe = anciens « Écrivains du XIXe siècle » + « Peintres impressionnistes » (+ compositeurs et sculpteurs).
     { id: 'x01', matiere: 'histoire', famille: 'xix', nom: 'Révolution, Napoléon et République', court: 'Révolution', icone: '🇫🇷', series: [
-      { k: 'paires', gauche: 'Personnage', droite: 'Son rôle', consigneR: 'Relie chaque personnage à son rôle.', q: 'Quel est le rôle de {a} ?', qi: 'Qui est-ce : {b} ?', ouverte: false, niveaux: {
-        facile: [['Louis XVI', 'Roi guillotiné en 1793'], ['Napoléon Ier', 'Empereur des Français sacré en 1804'], ['Jules Ferry', 'Rend l’école gratuite et obligatoire'],
-          ['Victor Schœlcher', 'Fait abolir l’esclavage en 1848'], ['Rouget de Lisle', 'Compose La Marseillaise'], ['Marie-Antoinette', 'Reine guillotinée en 1793']],
-        moyen: [['Robespierre', 'Révolutionnaire surnommé « l’Incorruptible »'], ['Marat', 'Journaliste tué dans sa baignoire en 1793'], ['La Fayette', 'Commande la garde nationale de Paris en 1789'],
-          ['Joséphine de Beauharnais', 'Première épouse de Napoléon'], ['Louis-Philippe', 'Roi des Français de 1830 à 1848'], ['Napoléon III', 'Dernier empereur des Français']],
-        difficile: [['Charlotte Corday', 'Poignarde Marat en 1793'], ['Olympe de Gouges', 'Écrit la Déclaration des droits de la femme'], ['Louis XVIII', 'Frère de Louis XVI, roi en 1814'],
-          ['Charles X', 'Dernier roi sacré à Reims, en 1825'], ['Danton', 'Grand orateur, guillotiné en avril 1794'], ['Gambetta', 'Quitte Paris assiégé en ballon, en 1870']],
-        expert: [['Sieyès', 'Écrit « Qu’est-ce que le tiers état ? »'], ['Saint-Just', 'Ami de Robespierre, guillotiné avec lui'], ['Talleyrand', 'Ministre des Relations extérieures de Napoléon'],
-          ['Fouché', 'Ministre de la Police de Napoléon'], ['Cambacérès', 'Deuxième consul, a travaillé au Code civil'], ['Mac Mahon', 'Maréchal, président de la République de 1873 à 1879']]
+      { k: 'paires', gauche: 'Personnage', droite: 'Son rôle', consigneR: 'Relie chaque personnage à son rôle.', q: 'Quel est le rôle {de:a} ?', qi: 'Qui {min:b} ?', ouverte: false, niveaux: {
+        facile: [['Louis XVI', 'Roi guillotiné en 1793', 'Quel roi a été guillotiné en 1793 ?'], ['Napoléon Ier', 'Empereur des Français sacré en 1804', 'Qui a été sacré empereur des Français en 1804 ?'], ['Jules Ferry', 'Rend l’école gratuite et obligatoire', 'Qui a rendu l’école gratuite et obligatoire ?'],
+          ['Victor Schœlcher', 'Fait abolir l’esclavage en 1848', 'Qui a fait abolir l’esclavage en 1848 ?'], ['Rouget de Lisle', 'Compose La Marseillaise', 'Qui a composé La Marseillaise ?'], ['Marie-Antoinette', 'Reine guillotinée en 1793', 'Quelle reine a été guillotinée en 1793 ?']],
+        moyen: [['Robespierre', 'Révolutionnaire surnommé « l’Incorruptible »', 'Quel révolutionnaire était surnommé « l’Incorruptible » ?'], ['Marat', 'Journaliste tué dans sa baignoire en 1793', 'Quel journaliste a été tué dans sa baignoire en 1793 ?'], ['La Fayette', 'Commande la garde nationale de Paris en 1789', 'Qui commandait la garde nationale de Paris en 1789 ?'],
+          ['Joséphine de Beauharnais', 'Première épouse de Napoléon', 'Qui a été la première épouse de Napoléon ?'], ['Louis-Philippe', 'Roi des Français de 1830 à 1848', 'Qui a été roi des Français de 1830 à 1848 ?'], ['Napoléon III', 'Dernier empereur des Français', 'Qui a été le dernier empereur des Français ?']],
+        difficile: [['Charlotte Corday', 'Poignarde Marat en 1793', 'Qui a poignardé Marat en 1793 ?'], ['Olympe de Gouges', 'Écrit la Déclaration des droits de la femme', 'Qui a écrit la Déclaration des droits de la femme ?'], ['Louis XVIII', 'Frère de Louis XVI, roi en 1814', 'Quel frère de Louis XVI est devenu roi en 1814 ?'],
+          ['Charles X', 'Dernier roi sacré à Reims, en 1825', 'Qui a été le dernier roi sacré à Reims, en 1825 ?'], ['Danton', 'Grand orateur, guillotiné en avril 1794', 'Quel grand orateur a été guillotiné en avril 1794 ?'], ['Gambetta', 'Quitte Paris assiégé en ballon, en 1870', 'Qui a quitté Paris assiégé en ballon, en 1870 ?']],
+        expert: [['Sieyès', 'Écrit « Qu’est-ce que le tiers état ? »', 'Qui a écrit « Qu’est-ce que le tiers état ? » ?'], ['Saint-Just', 'Ami de Robespierre, guillotiné avec lui', 'Quel ami de Robespierre a été guillotiné avec lui ?'], ['Talleyrand', 'Ministre des Relations extérieures de Napoléon', 'Qui était le ministre des Relations extérieures de Napoléon ?'],
+          ['Fouché', 'Ministre de la Police de Napoléon', 'Qui était le ministre de la Police de Napoléon ?'], ['Cambacérès', 'Deuxième consul, a travaillé au Code civil', 'Quel deuxième consul a travaillé au Code civil ?'], ['Mac Mahon', 'Maréchal, président de la République de 1873 à 1879', 'Quel maréchal a été président de la République de 1873 à 1879 ?']]
       } },
-      { k: 'paires', gauche: 'Symbole ou lieu', droite: 'Ce que c’est', consigneR: 'Relie chaque symbole ou lieu à ce qu’il est.', q: 'Qu’est-ce que {a} ?', qi: 'Qu’est-ce qui est : {b} ?', ouverte: false, niveaux: {
-        facile: [['Marianne', 'Une femme qui représente la République'], ['Le drapeau', 'Bleu, blanc, rouge'], ['La Marseillaise', 'L’hymne national'], ['Le 14 juillet', 'La fête nationale']],
-        moyen: [['La devise', 'Liberté, Égalité, Fraternité'], ['Le bonnet phrygien', 'Le bonnet rouge de Marianne'], ['Le coq', 'Un animal qui représente souvent la France'],
-          ['La cocarde', 'Un rond bleu, blanc, rouge']],
-        difficile: [['L’Élysée', 'Le palais du président de la République'], ['Le palais Bourbon', 'Là où siège l’Assemblée nationale'], ['Le palais du Luxembourg', 'Là où siège le Sénat'],
-          ['Matignon', 'L’hôtel du Premier ministre'], ['Le Panthéon', 'Là où reposent de grands personnages']],
-        expert: [['Le faisceau de licteur', 'Symbole de l’autorité, venu de la Rome antique'], ['La Semeuse', 'Femme qui sème, sur des pièces et des timbres'], ['Le sceau de la République', 'Montre la Liberté assise'],
-          ['L’article 2 de la Constitution', 'Cite le drapeau, l’hymne et la devise'], ['La loi du 6 juillet 1880', 'Fait du 14 juillet la fête nationale']]
+      { k: 'paires', gauche: 'Symbole ou lieu', droite: 'Ce que c’est', consigneR: 'Relie chaque symbole ou lieu à ce qu’il est.', q: 'Qu’est-ce que {le:a} ?', qi: 'Qu’est-ce qui correspond à {min:b} ?', ouverte: false, niveaux: {
+        facile: [['Marianne', 'Une femme qui représente la République', 'Quelle femme représente la République ?'], ['Le drapeau', 'Bleu, blanc, rouge', 'Quel symbole est bleu, blanc, rouge ?'], ['La Marseillaise', 'L’hymne national', 'Quel est l’hymne national ?'], ['Le 14 juillet', 'La fête nationale', 'Quelle est la fête nationale ?']],
+        moyen: [['La devise', 'Liberté, Égalité, Fraternité', 'Comment appelle-t-on « Liberté, Égalité, Fraternité » ?'], ['Le bonnet phrygien', 'Le bonnet rouge de Marianne', 'Comment s’appelle le bonnet rouge de Marianne ?'], ['Le coq', 'Un animal qui représente souvent la France', 'Quel animal représente souvent la France ?'],
+          ['La cocarde', 'Un rond bleu, blanc, rouge', 'Quel symbole est un rond bleu, blanc, rouge ?']],
+        difficile: [['L’Élysée', 'Le palais du président de la République', 'Quel est le palais du président de la République ?'], ['Le palais Bourbon', 'Là où siège l’Assemblée nationale', 'Où siège l’Assemblée nationale ?'], ['Le palais du Luxembourg', 'Là où siège le Sénat', 'Où siège le Sénat ?'],
+          ['Matignon', 'L’hôtel du Premier ministre', 'Quel est l’hôtel du Premier ministre ?'], ['Le Panthéon', 'Là où reposent de grands personnages', 'Où reposent de grands personnages ?']],
+        expert: [['Le faisceau de licteur', 'Symbole de l’autorité, venu de la Rome antique', 'Quel symbole de l’autorité vient de la Rome antique ?'], ['La Semeuse', 'Femme qui sème, sur des pièces et des timbres', 'Quelle femme sème, sur des pièces et des timbres ?'], ['Le sceau de la République', 'Montre la Liberté assise', 'Quel symbole montre la Liberté assise ?'],
+          ['L’article 2 de la Constitution', 'Cite le drapeau, l’hymne et la devise', 'Quel texte cite le drapeau, l’hymne et la devise ?'], ['La loi du 6 juillet 1880', 'Fait du 14 juillet la fête nationale', 'Quelle loi fait du 14 juillet la fête nationale ?']]
       } },
       { k: 'qcm', niveaux: {
         facile: [
@@ -1956,36 +1956,36 @@
         expert: [{ r: 'Le maréchal Ney', i: ['Je suis né à Sarrelouis en 1769.', 'Mon père était tonnelier.', 'Napoléon m’a fait maréchal d’Empire en 1804.', 'On m’a appelé « le brave des braves » pendant la retraite de Russie.', 'J’ai été fusillé à Paris en 1815.'] },
           { r: 'Victor Schœlcher', i: ['Je suis né à Paris en 1804.', 'Mon père fabriquait de la porcelaine.', 'J’ai voyagé aux Antilles et j’y ai vu l’esclavage.', 'En 1848, je suis sous-secrétaire d’État à la Marine.', 'J’ai fait abolir l’esclavage dans les colonies françaises.'] }]
       } },
-      { k: 'ordre', consigne: 'Range ces événements du plus ancien au plus récent.', q: 'En quelle année : {a} ?', niveaux: {
-        facile: [['Prise de la Bastille', 1789, '1789'], ['Proclamation de la République', 1792, '1792'], ['Exécution de Louis XVI', 1793, '1793'],
-          ['Napoléon est sacré empereur', 1804, '1804'], ['Bataille de Waterloo', 1815, '1815'], ['Abolition de l’esclavage par Schœlcher', 1848, '1848'],
-          ['L’école devient gratuite', 1881, '1881']],
-        moyen: [['Le roi en fuite est arrêté à Varennes', 1791, '1791'], ['Chute de Robespierre', 1794, '1794'], ['Bonaparte devient Premier consul', 1799, '1799'],
-          ['Campagne de Russie', 1812, '1812'], ['Mort de Napoléon à Sainte-Hélène', 1821, '1821'], ['Début du Second Empire', 1852, '1852'],
-          ['Début de la IIIe République', 1870, '1870'], ['L’école devient obligatoire et laïque', 1882, '1882']],
-        difficile: [['Serment du Jeu de paume', 1789, '1789'], ['Fête de la Fédération', 1790, '1790'], ['Victoire de Valmy', 1792, '1792'],
-          ['Le Code civil est publié', 1804, '1804'], ['Les Trois Glorieuses chassent Charles X', 1830, '1830'], ['Révolution de février et IIe République', 1848, '1848'],
-          ['La Commune de Paris', 1871, '1871'], ['Droit de créer des syndicats', 1884, '1884']],
-        expert: [['Abolition des privilèges, la nuit du 4 août', 1789, '1789'], ['Constitution civile du clergé', 1790, '1790'], ['Première Constitution écrite de la France', 1791, '1791'],
-          ['Première abolition de l’esclavage', 1794, '1794'], ['Concordat avec le pape', 1801, '1801'], ['Bonaparte rétablit l’esclavage', 1802, '1802'],
-          ['Les cendres de Napoléon sont ramenées aux Invalides', 1840, '1840'], ['Droit de grève', 1864, '1864']]
+      { k: 'ordre', consigne: 'Range ces événements du plus ancien au plus récent.', q: 'En quelle année a eu lieu cet événement ?', niveaux: {
+        facile: [['Prise de la Bastille', 1789, '1789', 'En quelle année la Bastille a-t-elle été prise ?'], ['Proclamation de la République', 1792, '1792', 'En quelle année la République a-t-elle été proclamée ?'], ['Exécution de Louis XVI', 1793, '1793', 'En quelle année Louis XVI a-t-il été exécuté ?'],
+          ['Napoléon est sacré empereur', 1804, '1804', 'En quelle année Napoléon a-t-il été sacré empereur ?'], ['Bataille de Waterloo', 1815, '1815', 'En quelle année la bataille de Waterloo a-t-elle eu lieu ?'], ['Abolition de l’esclavage par Schœlcher', 1848, '1848', 'En quelle année Schœlcher a-t-il fait abolir l’esclavage ?'],
+          ['L’école devient gratuite', 1881, '1881', 'En quelle année l’école est-elle devenue gratuite ?']],
+        moyen: [['Le roi en fuite est arrêté à Varennes', 1791, '1791', 'En quelle année le roi en fuite a-t-il été arrêté à Varennes ?'], ['Chute de Robespierre', 1794, '1794', 'En quelle année Robespierre est-il tombé ?'], ['Bonaparte devient Premier consul', 1799, '1799', 'En quelle année Bonaparte est-il devenu Premier consul ?'],
+          ['Campagne de Russie', 1812, '1812', 'En quelle année la campagne de Russie a-t-elle eu lieu ?'], ['Mort de Napoléon à Sainte-Hélène', 1821, '1821', 'En quelle année Napoléon est-il mort à Sainte-Hélène ?'], ['Début du Second Empire', 1852, '1852', 'En quelle année le Second Empire a-t-il commencé ?'],
+          ['Début de la IIIe République', 1870, '1870', 'En quelle année la IIIe République a-t-elle commencé ?'], ['L’école devient obligatoire et laïque', 1882, '1882', 'En quelle année l’école est-elle devenue obligatoire et laïque ?']],
+        difficile: [['Serment du Jeu de paume', 1789, '1789', 'En quelle année le serment du Jeu de paume a-t-il eu lieu ?'], ['Fête de la Fédération', 1790, '1790', 'En quelle année la fête de la Fédération a-t-elle eu lieu ?'], ['Victoire de Valmy', 1792, '1792', 'En quelle année la victoire de Valmy a-t-elle eu lieu ?'],
+          ['Le Code civil est publié', 1804, '1804', 'En quelle année le Code civil a-t-il été publié ?'], ['Les Trois Glorieuses chassent Charles X', 1830, '1830', 'En quelle année les Trois Glorieuses ont-elles chassé Charles X ?'], ['Révolution de février et IIe République', 1848, '1848', 'En quelle année la révolution de février a-t-elle fondé la IIe République ?'],
+          ['La Commune de Paris', 1871, '1871', 'En quelle année la Commune de Paris a-t-elle eu lieu ?'], ['Droit de créer des syndicats', 1884, '1884', 'En quelle année le droit de créer des syndicats a-t-il été accordé ?']],
+        expert: [['Abolition des privilèges, la nuit du 4 août', 1789, '1789', 'En quelle année les privilèges ont-ils été abolis, la nuit du 4 août ?'], ['Constitution civile du clergé', 1790, '1790', 'En quelle année la Constitution civile du clergé a-t-elle été votée ?'], ['Première Constitution écrite de la France', 1791, '1791', 'En quelle année la France a-t-elle eu sa première Constitution écrite ?'],
+          ['Première abolition de l’esclavage', 1794, '1794', 'En quelle année l’esclavage a-t-il été aboli pour la première fois ?'], ['Concordat avec le pape', 1801, '1801', 'En quelle année le Concordat avec le pape a-t-il été signé ?'], ['Bonaparte rétablit l’esclavage', 1802, '1802', 'En quelle année Bonaparte a-t-il rétabli l’esclavage ?'],
+          ['Les cendres de Napoléon sont ramenées aux Invalides', 1840, '1840', 'En quelle année les cendres de Napoléon ont-elles été ramenées aux Invalides ?'], ['Droit de grève', 1864, '1864', 'En quelle année le droit de grève a-t-il été accordé ?']]
       } },
       { k: 'classer', niveaux: {
-        facile: [{ q: 'Range : symbole de la République ou de la royauté ?', colonnes: ['La République', 'La royauté'],
+        facile: [{ q: 'Ces symboles sont-ils ceux de la République ou ceux de la royauté ?', qq: ['Lequel de ces symboles est un symbole de la République ?', 'Lequel de ces symboles est un symbole de la royauté ?'], colonnes: ['La République', 'La royauté'],
           items: [['Marianne', 0], ['Le drapeau bleu, blanc, rouge', 0], ['La devise « Liberté, Égalité, Fraternité »', 0], ['La Marseillaise', 0],
             ['La couronne', 1], ['Le sceptre', 1], ['La fleur de lys', 1], ['Le sacre à Reims', 1]] }],
-        moyen: [{ q: 'Range : pendant la Révolution ou sous l’Empire de Napoléon Ier ?', colonnes: ['La Révolution', 'L’Empire'],
+        moyen: [{ q: 'Ces événements ont-ils eu lieu pendant la Révolution ou sous l’Empire de Napoléon Ier ?', qq: ['Lequel de ces événements a eu lieu pendant la Révolution ?', 'Lequel de ces événements a eu lieu sous l’Empire de Napoléon Ier ?'], colonnes: ['La Révolution', 'L’Empire'],
           items: [['La prise de la Bastille', 0], ['La Déclaration des droits de l’homme', 0], ['La Terreur', 0], ['L’exécution de Louis XVI', 0],
             ['Le sacre de 1804', 1], ['La victoire d’Austerlitz', 1], ['La campagne de Russie', 1], ['La victoire d’Iéna', 1]] }],
-        difficile: [{ q: 'Range : roi ou empereur ?', colonnes: ['Roi', 'Empereur'],
+        difficile: [{ q: 'Ces souverains étaient-ils rois ou empereurs ?', qq: ['Lequel de ces souverains était roi ?', 'Lequel de ces souverains était empereur ?'], colonnes: ['Roi', 'Empereur'],
           items: [['Louis XVI', 0], ['Louis XVIII', 0], ['Charles X', 0], ['Louis-Philippe', 0], ['Napoléon Ier', 1], ['Napoléon III', 1]] }],
-        expert: [{ q: 'Range ces régimes : monarchie ou république ?', colonnes: ['Monarchie', 'République'],
+        expert: [{ q: 'Ces régimes étaient-ils des monarchies ou des républiques ?', qq: ['Lequel de ces régimes était une monarchie ?', 'Lequel de ces régimes était une république ?'], colonnes: ['Monarchie', 'République'],
           items: [['La monarchie constitutionnelle de 1791', 0], ['La Restauration', 0], ['La monarchie de Juillet', 0],
             ['La Convention', 1], ['Le Directoire', 1], ['La IIe République', 1], ['Le gouvernement de la Défense nationale', 1], ['La IIIe République', 1]] }]
       } }
     ] },
     { id: 'x05', matiere: 'histoire', famille: 'xix', nom: 'Industrie, inventions et monuments', court: 'Inventions', icone: '🚂', series: [
-      { k: 'paires', gauche: 'Invention', droite: 'Inventeur', consigneR: 'Relie chaque invention à son inventeur.', q: 'Qui a inventé : {a} ?', qi: 'Qu’a inventé {b} ?', ouverte: false, niveaux: {
+      { k: 'paires', gauche: 'Invention', droite: 'Inventeur', consigneR: 'Relie chaque invention à son inventeur.', q: 'Qui a inventé {min:a} ?', qi: 'Quelle invention doit-on {a:b} ?', ouverte: false, niveaux: {
         facile: [['Le téléphone', 'Graham Bell'], ['L’ampoule électrique', 'Thomas Edison'], ['Le cinématographe', 'Les frères Lumière'],
           ['Le vaccin contre la rage', 'Louis Pasteur'], ['L’écriture pour les aveugles', 'Louis Braille']],
         moyen: [['La photographie', 'Nicéphore Niépce'], ['La machine à vapeur améliorée', 'James Watt'], ['Le phonographe', 'Thomas Edison'],
@@ -1995,7 +1995,7 @@
         expert: [['Le métier à tisser à cartes perforées', 'Joseph-Marie Jacquard'], ['Le pneu démontable', 'Les frères Michelin'], ['La machine à coudre', 'Barthélemy Thimonnier'],
           ['L’avion Éole', 'Clément Ader'], ['Le bateau à vapeur Clermont', 'Robert Fulton'], ['La conserve en bocal', 'Nicolas Appert']]
       } },
-      { k: 'paires', gauche: 'Monument', droite: 'Architecte ou constructeur', consigneR: 'Relie chaque monument à celui qui l’a dessiné ou construit.', q: 'Qui a dessiné ou construit {a} ?', qi: 'Quel monument doit-on à {b} ?', ouverte: false, niveaux: {
+      { k: 'paires', gauche: 'Monument', droite: 'Architecte ou constructeur', consigneR: 'Relie chaque monument à celui qui l’a dessiné ou construit.', q: 'Qui a dessiné ou construit {le:a} ?', qi: 'Quel monument doit-on {a:b} ?', ouverte: false, niveaux: {
         facile: [['La tour Eiffel', 'Gustave Eiffel'], ['L’Opéra Garnier', 'Charles Garnier'], ['La statue de la Liberté', 'Auguste Bartholdi'], ['Les grands boulevards de Paris', 'Le baron Haussmann']],
         moyen: [['L’Arc de triomphe de l’Étoile', 'Jean-François Chalgrin'], ['Le Lion de Belfort', 'Auguste Bartholdi'], ['La basilique du Sacré-Cœur', 'Paul Abadie'],
           ['Le Palais idéal', 'Le facteur Cheval']],
@@ -2094,34 +2094,34 @@
         expert: [{ r: 'Nicéphore Niépce', i: ['Je suis né à Chalon-sur-Saône en 1765.', 'J’ai inventé avec mon frère un moteur, le pyréolophore.', 'J’ai travaillé avec Louis Daguerre.', 'J’ai fixé l’image vue de la fenêtre de ma maison.', 'J’ai réalisé la plus ancienne photographie connue.'] },
           { r: 'Clément Ader', i: ['Je suis né à Muret, près de Toulouse.', 'J’ai travaillé sur le téléphone.', 'Mon engin volant ressemblait à une chauve-souris.', 'On me doit le mot « avion ».', 'Mon Éole a décollé de quelques centimètres en 1890.'] }]
       } },
-      { k: 'ordre', consigne: 'Range ces inventions et ces constructions de la plus ancienne à la plus récente.', q: 'En quelle année : {a} ?', niveaux: {
-        facile: [['Première locomotive à vapeur sur des rails', 1804, '1804'], ['Première photographie', 1826, 'vers 1826'], ['Invention du téléphone', 1876, '1876'],
-          ['Edison met au point son ampoule', 1879, '1879'], ['La tour Eiffel est terminée', 1889, '1889'], ['Première séance de cinéma', 1895, '1895']],
-        moyen: [['Louis Braille publie son écriture pour les aveugles', 1829, '1829'], ['Morse envoie un message par télégraphe', 1844, '1844'], ['Nobel invente la dynamite', 1867, '1867'],
-          ['Inauguration de l’Opéra Garnier', 1875, '1875'], ['Pasteur vaccine un enfant contre la rage', 1885, '1885'], ['Inauguration de la statue de la Liberté à New York', 1886, '1886']],
-        difficile: [['Laennec invente le stéthoscope', 1816, '1816'], ['La Rocket de Stephenson gagne un concours de locomotives', 1829, '1829'], ['Daguerre présente le daguerréotype', 1839, '1839'],
-          ['Première Exposition universelle, à Londres', 1851, '1851'], ['Ouverture du canal de Suez', 1869, '1869'], ['Marconi envoie un message radio à travers la Manche', 1899, '1899']],
-        expert: [['Volta invente la pile électrique', 1800, '1800'], ['Jacquard présente son métier à tisser', 1801, '1801'], ['Thimonnier dépose le brevet de la machine à coudre', 1830, '1830'],
-          ['Première ligne de chemin de fer au départ de Paris', 1837, '1837'], ['Clément Ader fait décoller l’Éole', 1890, '1890'], ['Les frères Michelin déposent le brevet du pneu démontable', 1891, '1891'],
-          ['Becquerel découvre la radioactivité', 1896, '1896']]
+      { k: 'ordre', consigne: 'Range ces inventions et ces constructions de la plus ancienne à la plus récente.', q: 'En quelle année a eu lieu cet événement ?', niveaux: {
+        facile: [['Première locomotive à vapeur sur des rails', 1804, '1804', 'En quelle année la première locomotive à vapeur a-t-elle roulé sur des rails ?'], ['Première photographie', 1826, 'vers 1826', 'En quelle année la première photographie a-t-elle été prise ?'], ['Invention du téléphone', 1876, '1876', 'En quelle année le téléphone a-t-il été inventé ?'],
+          ['Edison met au point son ampoule', 1879, '1879', 'En quelle année Edison a-t-il mis au point son ampoule ?'], ['La tour Eiffel est terminée', 1889, '1889', 'En quelle année la tour Eiffel a-t-elle été terminée ?'], ['Première séance de cinéma', 1895, '1895', 'En quelle année la première séance de cinéma a-t-elle eu lieu ?']],
+        moyen: [['Louis Braille publie son écriture pour les aveugles', 1829, '1829', 'En quelle année Louis Braille a-t-il publié son écriture pour les aveugles ?'], ['Morse envoie un message par télégraphe', 1844, '1844', 'En quelle année Morse a-t-il envoyé un message par télégraphe ?'], ['Nobel invente la dynamite', 1867, '1867', 'En quelle année Nobel a-t-il inventé la dynamite ?'],
+          ['Inauguration de l’Opéra Garnier', 1875, '1875', 'En quelle année l’Opéra Garnier a-t-il été inauguré ?'], ['Pasteur vaccine un enfant contre la rage', 1885, '1885', 'En quelle année Pasteur a-t-il vacciné un enfant contre la rage ?'], ['Inauguration de la statue de la Liberté à New York', 1886, '1886', 'En quelle année la statue de la Liberté a-t-elle été inaugurée à New York ?']],
+        difficile: [['Laennec invente le stéthoscope', 1816, '1816', 'En quelle année Laennec a-t-il inventé le stéthoscope ?'], ['La Rocket de Stephenson gagne un concours de locomotives', 1829, '1829', 'En quelle année la Rocket de Stephenson a-t-elle gagné un concours de locomotives ?'], ['Daguerre présente le daguerréotype', 1839, '1839', 'En quelle année Daguerre a-t-il présenté le daguerréotype ?'],
+          ['Première Exposition universelle, à Londres', 1851, '1851', 'En quelle année la première Exposition universelle a-t-elle eu lieu, à Londres ?'], ['Ouverture du canal de Suez', 1869, '1869', 'En quelle année le canal de Suez a-t-il ouvert ?'], ['Marconi envoie un message radio à travers la Manche', 1899, '1899', 'En quelle année Marconi a-t-il envoyé un message radio à travers la Manche ?']],
+        expert: [['Volta invente la pile électrique', 1800, '1800', 'En quelle année Volta a-t-il inventé la pile électrique ?'], ['Jacquard présente son métier à tisser', 1801, '1801', 'En quelle année Jacquard a-t-il présenté son métier à tisser ?'], ['Thimonnier dépose le brevet de la machine à coudre', 1830, '1830', 'En quelle année Thimonnier a-t-il déposé le brevet de la machine à coudre ?'],
+          ['Première ligne de chemin de fer au départ de Paris', 1837, '1837', 'En quelle année la première ligne de chemin de fer au départ de Paris a-t-elle ouvert ?'], ['Clément Ader fait décoller l’Éole', 1890, '1890', 'En quelle année Clément Ader a-t-il fait décoller l’Éole ?'], ['Les frères Michelin déposent le brevet du pneu démontable', 1891, '1891', 'En quelle année les frères Michelin ont-ils déposé le brevet du pneu démontable ?'],
+          ['Becquerel découvre la radioactivité', 1896, '1896', 'En quelle année Becquerel a-t-il découvert la radioactivité ?']]
       } },
       { k: 'classer', niveaux: {
-        facile: [{ q: 'Range : cela existait-il déjà en 1900 ?', colonnes: ['Déjà en 1900', 'Pas encore'],
+        facile: [{ q: 'Ces inventions existaient-elles déjà en 1900, ou pas encore ?', qq: ['Laquelle de ces inventions existait déjà en 1900 ?', 'Laquelle de ces inventions n’existait pas encore en 1900 ?'], colonnes: ['Déjà en 1900', 'Pas encore'],
           items: [['Le train', 0], ['Le téléphone', 0], ['L’ampoule électrique', 0], ['L’appareil photo', 0],
             ['La télévision', 1], ['L’ordinateur', 1], ['Le téléphone portable', 1], ['La fusée spatiale', 1]] }],
-        moyen: [{ q: 'Range : invention d’un Français ou d’un étranger ?', colonnes: ['Française', 'Étrangère'],
+        moyen: [{ q: 'Ces inventions sont-elles l’œuvre d’un Français ou d’un étranger ?', qq: ['Laquelle de ces inventions est l’œuvre d’un Français ?', 'Laquelle de ces inventions est l’œuvre d’un étranger ?'], colonnes: ['Française', 'Étrangère'],
           items: [['Le cinématographe', 0], ['L’écriture braille', 0], ['La photographie', 0], ['Le vaccin contre la rage', 0],
             ['Le téléphone de Bell', 1], ['L’ampoule d’Edison', 1], ['La dynamite', 1], ['Le télégraphe de Morse', 1]] }],
-        difficile: [{ q: 'Range : construit surtout en fer ou surtout en pierre ?', colonnes: ['Surtout en fer', 'Surtout en pierre'],
+        difficile: [{ q: 'Ces monuments ont-ils été construits surtout en fer ou surtout en pierre ?', qq: ['Lequel de ces monuments a été construit surtout en fer ?', 'Lequel de ces monuments a été construit surtout en pierre ?'], colonnes: ['Surtout en fer', 'Surtout en pierre'],
           items: [['La tour Eiffel', 0], ['Les Halles de Baltard', 0], ['Le viaduc de Garabit', 0], ['La charpente de la statue de la Liberté', 0],
             ['L’Arc de triomphe de l’Étoile', 1], ['L’église de la Madeleine', 1], ['La basilique du Sacré-Cœur', 1], ['Notre-Dame de la Garde', 1]] }],
-        expert: [{ q: 'Range : inventé avant ou après 1850 ?', colonnes: ['Avant 1850', 'Après 1850'],
+        expert: [{ q: 'Ces inventions datent-elles d’avant ou d’après 1850 ?', qq: ['Laquelle de ces inventions date d’avant 1850 ?', 'Laquelle de ces inventions date d’après 1850 ?'], colonnes: ['Avant 1850', 'Après 1850'],
           items: [['La pile électrique', 0], ['Le stéthoscope', 0], ['Le métier Jacquard', 0], ['Le daguerréotype', 0],
             ['La dynamite', 1], ['Le téléphone', 1], ['Le phonographe', 1], ['Le pneu démontable', 1]] }]
       } }
     ] },
     { id: 'x06', matiere: 'histoire', famille: 'xix', nom: 'Arts et lettres du XIXe', court: 'Arts', icone: '🎨', series: [
-      { k: 'paires', gauche: 'Écrivain', droite: 'Livre', consigneR: 'Relie chaque écrivain à son livre.', q: 'Quel livre a écrit {a} ?', qi: 'Qui a écrit : {b} ?', ouverte: false, niveaux: {
+      { k: 'paires', gauche: 'Écrivain', droite: 'Livre', consigneR: 'Relie chaque écrivain à son livre.', q: 'Quel livre a écrit {le:a} ?', qi: 'Qui a écrit « {b} » ?', ouverte: false, niveaux: {
         facile: [['Victor Hugo', 'Les Misérables'], ['Jules Verne', 'Le Tour du monde en quatre-vingts jours'], ['Alexandre Dumas', 'Les Trois Mousquetaires'],
           ['Hector Malot', 'Sans famille'], ['La comtesse de Ségur', 'Les Malheurs de Sophie']],
         moyen: [['Émile Zola', 'Germinal'], ['Alphonse Daudet', 'Les Lettres de mon moulin'], ['Jules Verne', 'Vingt Mille Lieues sous les mers'],
@@ -2131,7 +2131,7 @@
         expert: [['Guy de Maupassant', 'Le Horla'], ['Arthur Rimbaud', 'Le Bateau ivre'], ['Alfred de Musset', 'Lorenzaccio'],
           ['Prosper Mérimée', 'Colomba'], ['Paul Verlaine', 'Poèmes saturniens'], ['Chateaubriand', 'Mémoires d’outre-tombe']]
       } },
-      { k: 'paires', gauche: 'Peintre', droite: 'Tableau', consigneR: 'Relie chaque peintre à son tableau.', q: 'Quel tableau a peint {a} ?', qi: 'Qui a peint : {b} ?', ouverte: false, niveaux: {
+      { k: 'paires', gauche: 'Peintre', droite: 'Tableau', consigneR: 'Relie chaque peintre à son tableau.', q: 'Quel tableau a peint {le:a} ?', qi: 'Qui a peint « {b} » ?', ouverte: false, niveaux: {
         facile: [['Claude Monet', 'Impression, soleil levant'], ['Vincent van Gogh', 'Les Tournesols'], ['Auguste Renoir', 'Bal du moulin de la Galette'], ['Edgar Degas', 'La Classe de danse']],
         moyen: [['Édouard Manet', 'Le Déjeuner sur l’herbe'], ['Paul Cézanne', 'Les Joueurs de cartes'], ['Georges Seurat', 'Un dimanche à la Grande Jatte'],
           ['Vincent van Gogh', 'La Nuit étoilée'], ['Eugène Delacroix', 'La Liberté guidant le peuple']],
@@ -2231,16 +2231,16 @@
           { r: 'George Sand', i: ['Mon vrai nom est Aurore Dupin.', 'J’ai grandi à Nohant, dans le Berry.', 'Je m’habillais parfois en homme.', 'J’ai vécu une histoire d’amour avec Chopin.', 'J’ai écrit La Mare au diable et La Petite Fadette.'] }]
       } },
       { k: 'classer', niveaux: {
-        facile: [{ q: 'Range : écrivain ou peintre ?', colonnes: ['Écrivain', 'Peintre'],
+        facile: [{ q: 'Ces artistes sont-ils des écrivains ou des peintres ?', qq: ['Lequel de ces artistes est un écrivain ?', 'Lequel de ces artistes est un peintre ?'], colonnes: ['Écrivain', 'Peintre'],
           items: [['Victor Hugo', 0], ['Jules Verne', 0], ['Alexandre Dumas', 0], ['Hector Malot', 0],
             ['Claude Monet', 1], ['Vincent van Gogh', 1], ['Auguste Renoir', 1], ['Edgar Degas', 1]] }],
-        moyen: [{ q: 'Range : roman de Victor Hugo ou de Jules Verne ?', colonnes: ['Victor Hugo', 'Jules Verne'],
+        moyen: [{ q: 'Ces romans ont-ils été écrits par Victor Hugo ou par Jules Verne ?', qq: ['Lequel de ces romans a été écrit par Victor Hugo ?', 'Lequel de ces romans a été écrit par Jules Verne ?'], colonnes: ['Victor Hugo', 'Jules Verne'],
           items: [['Les Misérables', 0], ['Notre-Dame de Paris', 0], ['Quatrevingt-treize', 0], ['Les Travailleurs de la mer', 0],
             ['Michel Strogoff', 1], ['Cinq Semaines en ballon', 1], ['L’Île mystérieuse', 1], ['De la Terre à la Lune', 1]] }],
-        difficile: [{ q: 'Range : peintre ou compositeur ?', colonnes: ['Peintre', 'Compositeur'],
+        difficile: [{ q: 'Ces artistes sont-ils des peintres ou des compositeurs ?', qq: ['Lequel de ces artistes est un peintre ?', 'Lequel de ces artistes est un compositeur ?'], colonnes: ['Peintre', 'Compositeur'],
           items: [['Paul Cézanne', 0], ['Édouard Manet', 0], ['Camille Pissarro', 0], ['Eugène Delacroix', 0],
             ['Georges Bizet', 1], ['Hector Berlioz', 1], ['Frédéric Chopin', 1], ['Camille Saint-Saëns', 1]] }],
-        expert: [{ q: 'Range : roman de Balzac ou de Zola ?', colonnes: ['Balzac', 'Zola'],
+        expert: [{ q: 'Ces romans ont-ils été écrits par Balzac ou par Zola ?', qq: ['Lequel de ces romans a été écrit par Balzac ?', 'Lequel de ces romans a été écrit par Zola ?'], colonnes: ['Balzac', 'Zola'],
           items: [['Eugénie Grandet', 0], ['Illusions perdues', 0], ['La Peau de chagrin', 0], ['Le Colonel Chabert', 0],
             ['L’Assommoir', 1], ['Au Bonheur des Dames', 1], ['La Bête humaine', 1], ['Nana', 1]] }]
       } }
@@ -2250,28 +2250,28 @@
     // Le mur de Berlin, Objets d'hier.
     // Le XXe siècle en dates : présidents (ex-z05), construction européenne (ex-z07), frise (ex-z11) et vie en France.
     { id: 'z05', matiere: 'histoire', famille: 'xx', nom: 'Le XXe siècle en dates', court: 'Dates', icone: '📏', series: [
-      { k: 'paires', gauche: 'Personnage', droite: 'Ce qu’il a fait', consigneR: 'Relie chaque personnage à ce qu’il a fait.', q: 'Qu’a fait {a} ?', qi: 'Qui est-ce : {b} ?', ouverte: false, niveaux: {
-        facile: [['Charles de Gaulle', 'Premier président de la Ve République'], ['François Mitterrand', 'Président pendant 14 ans, de 1981 à 1995'],
-          ['Jacques Chirac', 'Président de 1995 à 2007'], ['Emmanuel Macron', 'Président élu en 2017']],
-        moyen: [['Georges Pompidou', 'Président mort pendant son mandat, en 1974'], ['Valéry Giscard d’Estaing', 'Président qui fait passer la majorité à 18 ans'],
-          ['Nicolas Sarkozy', 'Président de 2007 à 2012'], ['François Hollande', 'Président de 2012 à 2017'], ['Robert Badinter', 'Ministre qui fait abolir la peine de mort en 1981']],
-        difficile: [['Alain Poher', 'Remplace deux fois le président, en 1969 et en 1974'], ['Michel Debré', 'Premier Premier ministre de la Ve République'],
-          ['René Coty', 'Dernier président de la IVe République'], ['Vincent Auriol', 'Premier président de la IVe République'], ['Léon Blum', 'Chef du gouvernement du Front populaire, en 1936']],
-        expert: [['Albert Lebrun', 'Dernier président de la IIIe République'], ['Jacques Chaban-Delmas', 'Premier ministre de Georges Pompidou, de 1969 à 1972'],
-          ['Pierre Mauroy', 'Premier ministre de François Mitterrand, de 1981 à 1984'], ['Lionel Jospin', 'Premier ministre de la cohabitation, de 1997 à 2002'],
-          ['Raymond Poincaré', 'Président de la République de 1913 à 1920']]
+      { k: 'paires', gauche: 'Personnage', droite: 'Ce qu’il a fait', consigneR: 'Relie chaque personnage à ce qu’il a fait.', q: 'Qu’a fait {le:a} ?', qi: 'Qui {min:b} ?', ouverte: false, niveaux: {
+        facile: [['Charles de Gaulle', 'Premier président de la Ve République', 'Qui a été le premier président de la Ve République ?'], ['François Mitterrand', 'Président pendant 14 ans, de 1981 à 1995', 'Qui a été président pendant 14 ans, de 1981 à 1995 ?'],
+          ['Jacques Chirac', 'Président de 1995 à 2007', 'Qui a été président de 1995 à 2007 ?'], ['Emmanuel Macron', 'Président élu en 2017', 'Quel président a été élu en 2017 ?']],
+        moyen: [['Georges Pompidou', 'Président mort pendant son mandat, en 1974', 'Quel président est mort pendant son mandat, en 1974 ?'], ['Valéry Giscard d’Estaing', 'Président qui fait passer la majorité à 18 ans', 'Quel président a fait passer la majorité à 18 ans ?'],
+          ['Nicolas Sarkozy', 'Président de 2007 à 2012', 'Qui a été président de 2007 à 2012 ?'], ['François Hollande', 'Président de 2012 à 2017', 'Qui a été président de 2012 à 2017 ?'], ['Robert Badinter', 'Ministre qui fait abolir la peine de mort en 1981', 'Quel ministre a fait abolir la peine de mort en 1981 ?']],
+        difficile: [['Alain Poher', 'Remplace deux fois le président, en 1969 et en 1974', 'Qui a remplacé deux fois le président, en 1969 et en 1974 ?'], ['Michel Debré', 'Premier Premier ministre de la Ve République', 'Qui a été le premier Premier ministre de la Ve République ?'],
+          ['René Coty', 'Dernier président de la IVe République', 'Qui a été le dernier président de la IVe République ?'], ['Vincent Auriol', 'Premier président de la IVe République', 'Qui a été le premier président de la IVe République ?'], ['Léon Blum', 'Chef du gouvernement du Front populaire, en 1936', 'Qui a dirigé le gouvernement du Front populaire, en 1936 ?']],
+        expert: [['Albert Lebrun', 'Dernier président de la IIIe République', 'Qui a été le dernier président de la IIIe République ?'], ['Jacques Chaban-Delmas', 'Premier ministre de Georges Pompidou, de 1969 à 1972', 'Qui a été le Premier ministre de Georges Pompidou, de 1969 à 1972 ?'],
+          ['Pierre Mauroy', 'Premier ministre de François Mitterrand, de 1981 à 1984', 'Qui a été le Premier ministre de François Mitterrand, de 1981 à 1984 ?'], ['Lionel Jospin', 'Premier ministre de la cohabitation, de 1997 à 2002', 'Qui a été Premier ministre pendant la cohabitation, de 1997 à 2002 ?'],
+          ['Raymond Poincaré', 'Président de la République de 1913 à 1920', 'Qui a été président de la République de 1913 à 1920 ?']]
       } },
-      { k: 'paires', gauche: 'Nom', droite: 'Ce que c’est', consigneR: 'Relie chaque nom de la construction européenne à ce qu’il est.', q: 'Qu’est-ce que {a} ?', qi: 'Qu’est-ce qui est : {b} ?', ouverte: false, niveaux: {
-        facile: [['L’euro', 'La monnaie de nombreux pays d’Europe'], ['Le drapeau européen', 'Bleu avec 12 étoiles jaunes'], ['Strasbourg', 'La ville du Parlement européen'],
-          ['Bruxelles', 'La ville de la Commission européenne']],
-        moyen: [['L’Ode à la joie', 'L’hymne européen'], ['Le 9 mai', 'La journée de l’Europe'], ['Robert Schuman', 'Propose en 1950 de mettre en commun le charbon et l’acier'],
-          ['Schengen', 'Village du Luxembourg où l’on décide de supprimer les contrôles aux frontières']],
-        difficile: [['Jean Monnet', 'Un des « pères de l’Europe », inspirateur de la déclaration Schuman'], ['Maastricht', 'Ville des Pays-Bas où est signé le traité qui crée l’Union européenne'],
-          ['Francfort', 'La ville de la Banque centrale européenne'], ['« Unie dans la diversité »', 'La devise de l’Union européenne'],
-          ['Le traité de Rome', 'Crée la Communauté économique européenne en 1957']],
-        expert: [['Konrad Adenauer', 'Chancelier allemand, un des pères de l’Europe'], ['Alcide De Gasperi', 'Chef du gouvernement italien, un des pères de l’Europe'],
-          ['Paul-Henri Spaak', 'Ministre belge qui prépare le traité de Rome'], ['Jacques Delors', 'Président de la Commission européenne de 1985 à 1995'],
-          ['Erasmus', 'Programme d’échanges d’étudiants créé en 1987']]
+      { k: 'paires', gauche: 'Nom', droite: 'Ce que c’est', consigneR: 'Relie chaque nom de la construction européenne à ce qu’il est.', q: 'Que sais-tu {de:a} ?', qi: 'Qu’est-ce qui correspond à {min:b} ?', ouverte: false, niveaux: {
+        facile: [['L’euro', 'La monnaie de nombreux pays d’Europe', 'Quelle est la monnaie de nombreux pays d’Europe ?'], ['Le drapeau européen', 'Bleu avec 12 étoiles jaunes', 'Quel symbole est bleu avec 12 étoiles jaunes ?'], ['Strasbourg', 'La ville du Parlement européen', 'Quelle est la ville du Parlement européen ?'],
+          ['Bruxelles', 'La ville de la Commission européenne', 'Quelle est la ville de la Commission européenne ?']],
+        moyen: [['L’Ode à la joie', 'L’hymne européen', 'Quel est l’hymne européen ?'], ['Le 9 mai', 'La journée de l’Europe', 'Quelle est la journée de l’Europe ?'], ['Robert Schuman', 'Propose en 1950 de mettre en commun le charbon et l’acier', 'Qui a proposé en 1950 de mettre en commun le charbon et l’acier ?'],
+          ['Schengen', 'Village du Luxembourg où l’on décide de supprimer les contrôles aux frontières', 'Dans quel village du Luxembourg a-t-on décidé de supprimer les contrôles aux frontières ?']],
+        difficile: [['Jean Monnet', 'Un des « pères de l’Europe », inspirateur de la déclaration Schuman', 'Qui est l’un des « pères de l’Europe », inspirateur de la déclaration Schuman ?'], ['Maastricht', 'Ville des Pays-Bas où est signé le traité qui crée l’Union européenne', 'Dans quelle ville des Pays-Bas a été signé le traité qui crée l’Union européenne ?'],
+          ['Francfort', 'La ville de la Banque centrale européenne', 'Quelle est la ville de la Banque centrale européenne ?'], ['« Unie dans la diversité »', 'La devise de l’Union européenne', 'Quelle est la devise de l’Union européenne ?'],
+          ['Le traité de Rome', 'Crée la Communauté économique européenne en 1957', 'Quel traité a créé la Communauté économique européenne en 1957 ?']],
+        expert: [['Konrad Adenauer', 'Chancelier allemand, un des pères de l’Europe', 'Quel chancelier allemand est l’un des pères de l’Europe ?'], ['Alcide De Gasperi', 'Chef du gouvernement italien, un des pères de l’Europe', 'Quel chef du gouvernement italien est l’un des pères de l’Europe ?'],
+          ['Paul-Henri Spaak', 'Ministre belge qui prépare le traité de Rome', 'Quel ministre belge a préparé le traité de Rome ?'], ['Jacques Delors', 'Président de la Commission européenne de 1985 à 1995', 'Qui a présidé la Commission européenne de 1985 à 1995 ?'],
+          ['Erasmus', 'Programme d’échanges d’étudiants créé en 1987', 'Quel programme d’échanges d’étudiants a été créé en 1987 ?']]
       } },
       { k: 'qcm', niveaux: {
         facile: [
@@ -2340,19 +2340,19 @@
           ['Les Français ont dit oui à la Constitution européenne en 2005.', false, 'Ils ont dit non, à près de 55 %.'],
           ['La télévision en couleur est arrivée en France en 1950.', false, 'Elle est arrivée en 1967.']]
       } },
-      { k: 'ordre', consigne: 'Range ces événements du XXe siècle du plus ancien au plus récent.', q: 'En quelle année : {a} ?', niveaux: {
-        facile: [['Armistice du 11 novembre', 1918, '1918'], ['Premiers congés payés en France', 1936, '1936'], ['Traité de Rome', 1957, '1957'],
-          ['Naissance de la Ve République', 1958, '1958'], ['Premier pas sur la Lune', 1969, '1969'], ['Chute du mur de Berlin', 1989, '1989'],
-          ['Pièces et billets en euros', 2002, '2002']],
-        moyen: [['Loi de séparation des Églises et de l’État', 1905, '1905'], ['Les Françaises votent pour la première fois', 1945, '1945'],
-          ['Déclaration de Robert Schuman', 1950, '1950'], ['Mai 68', 1968, '1968'], ['Premières élections européennes', 1979, '1979'],
-          ['François Mitterrand est élu président', 1981, '1981'], ['Traité de Maastricht', 1992, '1992'], ['Jacques Chirac est élu président', 1995, '1995']],
-        difficile: [['Krach de Wall Street', 1929, '1929'], ['Création de l’ONU', 1945, '1945'], ['Première élection du président par tous les Français', 1965, '1965'],
-          ['La majorité passe à 18 ans', 1974, '1974'], ['Abolition de la peine de mort', 1981, '1981'], ['Première cohabitation', 1986, '1986'],
-          ['Réunification de l’Allemagne', 1990, '1990'], ['Référendum : le mandat passe de 7 à 5 ans', 2000, '2000']],
-        expert: [['Loi sur les associations', 1901, '1901'], ['Naufrage du Titanic', 1912, '1912'], ['Indépendance de l’Inde', 1947, '1947'],
-          ['Déclaration universelle des droits de l’homme', 1948, '1948'], ['Traité de l’Élysée', 1963, '1963'], ['La télévision passe à la couleur en France', 1967, '1967'],
-          ['Le Royaume-Uni entre dans la Communauté européenne', 1973, '1973'], ['Accord de Schengen', 1985, '1985']]
+      { k: 'ordre', consigne: 'Range ces événements du XXe siècle du plus ancien au plus récent.', q: 'En quelle année a eu lieu cet événement ?', niveaux: {
+        facile: [['Armistice du 11 novembre', 1918, '1918', 'En quelle année l’armistice du 11 novembre a-t-il été signé ?'], ['Premiers congés payés en France', 1936, '1936', 'En quelle année les Français ont-ils eu leurs premiers congés payés ?'], ['Traité de Rome', 1957, '1957', 'En quelle année le traité de Rome a-t-il été signé ?'],
+          ['Naissance de la Ve République', 1958, '1958', 'En quelle année la Ve République est-elle née ?'], ['Premier pas sur la Lune', 1969, '1969', 'En quelle année l’homme a-t-il fait son premier pas sur la Lune ?'], ['Chute du mur de Berlin', 1989, '1989', 'En quelle année le mur de Berlin est-il tombé ?'],
+          ['Pièces et billets en euros', 2002, '2002', 'En quelle année les pièces et les billets en euros sont-ils arrivés ?']],
+        moyen: [['Loi de séparation des Églises et de l’État', 1905, '1905', 'En quelle année la loi de séparation des Églises et de l’État a-t-elle été votée ?'], ['Les Françaises votent pour la première fois', 1945, '1945', 'En quelle année les Françaises ont-elles voté pour la première fois ?'],
+          ['Déclaration de Robert Schuman', 1950, '1950', 'En quelle année Robert Schuman a-t-il fait sa déclaration ?'], ['Mai 68', 1968, '1968', 'En quelle année les événements de Mai 68 ont-ils eu lieu ?'], ['Premières élections européennes', 1979, '1979', 'En quelle année les premières élections européennes ont-elles eu lieu ?'],
+          ['François Mitterrand est élu président', 1981, '1981', 'En quelle année François Mitterrand a-t-il été élu président ?'], ['Traité de Maastricht', 1992, '1992', 'En quelle année le traité de Maastricht a-t-il été signé ?'], ['Jacques Chirac est élu président', 1995, '1995', 'En quelle année Jacques Chirac a-t-il été élu président ?']],
+        difficile: [['Krach de Wall Street', 1929, '1929', 'En quelle année le krach de Wall Street a-t-il eu lieu ?'], ['Création de l’ONU', 1945, '1945', 'En quelle année l’ONU a-t-elle été créée ?'], ['Première élection du président par tous les Français', 1965, '1965', 'En quelle année tous les Français ont-ils élu le président pour la première fois ?'],
+          ['La majorité passe à 18 ans', 1974, '1974', 'En quelle année la majorité est-elle passée à 18 ans ?'], ['Abolition de la peine de mort', 1981, '1981', 'En quelle année la peine de mort a-t-elle été abolie ?'], ['Première cohabitation', 1986, '1986', 'En quelle année la première cohabitation a-t-elle commencé ?'],
+          ['Réunification de l’Allemagne', 1990, '1990', 'En quelle année l’Allemagne a-t-elle été réunifiée ?'], ['Référendum qui fait passer le mandat de 7 à 5 ans', 2000, '2000', 'En quelle année un référendum a-t-il fait passer le mandat du président de 7 à 5 ans ?']],
+        expert: [['Loi sur les associations', 1901, '1901', 'En quelle année la loi sur les associations a-t-elle été votée ?'], ['Naufrage du Titanic', 1912, '1912', 'En quelle année le Titanic a-t-il fait naufrage ?'], ['Indépendance de l’Inde', 1947, '1947', 'En quelle année l’Inde est-elle devenue indépendante ?'],
+          ['Déclaration universelle des droits de l’homme', 1948, '1948', 'En quelle année la Déclaration universelle des droits de l’homme a-t-elle été adoptée ?'], ['Traité de l’Élysée', 1963, '1963', 'En quelle année le traité de l’Élysée a-t-il été signé ?'], ['La télévision passe à la couleur en France', 1967, '1967', 'En quelle année la télévision est-elle passée à la couleur en France ?'],
+          ['Le Royaume-Uni entre dans la Communauté européenne', 1973, '1973', 'En quelle année le Royaume-Uni est-il entré dans la Communauté européenne ?'], ['Accord de Schengen', 1985, '1985', 'En quelle année l’accord de Schengen a-t-il été signé ?']]
       } },
       { k: 'ordre', consigne: 'Range ces présidents du premier au plus récent.', q: 'En quelle année {a} devient-il président ?', niveaux: {
         facile: [['Charles de Gaulle', 1959, '1959'], ['Georges Pompidou', 1969, '1969'], ['François Mitterrand', 1981, '1981'], ['Jacques Chirac', 1995, '1995']],
@@ -2362,15 +2362,15 @@
           ['Paul Doumer', 1931, '1931']]
       } },
       { k: 'classer', niveaux: {
-        facile: [{ q: 'Range : ce pays fait-il partie de l’Union européenne ?', colonnes: ['Dans l’Union', 'Pas dans l’Union'],
+        facile: [{ q: 'Ces pays font-ils partie de l’Union européenne ?', qq: ['Lequel de ces pays fait partie de l’Union européenne ?', 'Lequel de ces pays ne fait pas partie de l’Union européenne ?'], colonnes: ['Dans l’Union', 'Pas dans l’Union'],
           items: [['La France', 0], ['L’Allemagne', 0], ['L’Italie', 0], ['L’Espagne', 0], ['La Suisse', 1], ['La Norvège', 1], ['Le Royaume-Uni', 1], ['La Russie', 1]] }],
-        moyen: [{ q: 'Range : président de la Ve République ou roi de France ?', colonnes: ['Président', 'Roi'],
+        moyen: [{ q: 'Ces personnages sont-ils des présidents de la Ve République ou des rois de France ?', qq: ['Lequel de ces personnages a été président de la Ve République ?', 'Lequel de ces personnages a été roi de France ?'], colonnes: ['Président', 'Roi'],
           items: [['Charles de Gaulle', 0], ['François Mitterrand', 0], ['Jacques Chirac', 0], ['Georges Pompidou', 0],
             ['Louis XIV', 1], ['Henri IV', 1], ['François Ier', 1], ['Saint Louis', 1]] }],
-        difficile: [{ q: 'Range : avant ou après 1950 ?', colonnes: ['Avant 1950', 'Après 1950'],
+        difficile: [{ q: 'Ces événements ont-ils eu lieu avant ou après 1950 ?', qq: ['Lequel de ces événements a eu lieu avant 1950 ?', 'Lequel de ces événements a eu lieu après 1950 ?'], colonnes: ['Avant 1950', 'Après 1950'],
           items: [['La loi de séparation des Églises et de l’État', 0], ['Les premiers congés payés', 0], ['Le premier vote des Françaises', 0], ['Le krach de Wall Street', 0],
             ['Mai 68', 1], ['L’abolition de la peine de mort', 1], ['Le traité de Rome', 1], ['La chute du mur de Berlin', 1]] }],
-        expert: [{ q: 'Range : pays fondateur en 1957 ou entré plus tard ?', colonnes: ['Fondateur', 'Entré plus tard'],
+        expert: [{ q: 'Ces pays ont-ils fondé l’Europe en 1957, ou sont-ils entrés plus tard ?', qq: ['Lequel de ces pays a fondé la Communauté européenne en 1957 ?', 'Lequel de ces pays est entré plus tard dans la Communauté européenne ?'], colonnes: ['Fondateur', 'Entré plus tard'],
           items: [['La Belgique', 0], ['Les Pays-Bas', 0], ['Le Luxembourg', 0], ['L’Italie', 0],
             ['Le Danemark', 1], ['La Grèce', 1], ['Le Portugal', 1], ['L’Autriche', 1]] }]
       } },
@@ -2387,17 +2387,17 @@
     ] },
     // Sciences et espace : conquête spatiale (ex-z03) et inventions du XXe siècle (ex-z04).
     { id: 'z03', matiere: 'histoire', famille: 'xx', nom: 'Sciences et espace', court: 'Sciences', icone: '🚀', series: [
-      { k: 'paires', gauche: 'Personnage ou engin', droite: 'Exploit', consigneR: 'Relie chaque personnage ou engin à son exploit.', q: 'Quel exploit est lié à {a} ?', qi: 'Qui ou quoi : {b} ?', ouverte: false, niveaux: {
-        facile: [['Youri Gagarine', 'Premier homme dans l’espace'], ['Neil Armstrong', 'Premier homme à marcher sur la Lune'], ['Thomas Pesquet', 'Astronaute français de la Station spatiale internationale'],
-          ['Spoutnik 1', 'Premier satellite artificiel']],
-        moyen: [['Laïka', 'Premier animal en orbite autour de la Terre'], ['Valentina Terechkova', 'Première femme dans l’espace'],
-          ['Buzz Aldrin', 'Deuxième homme à marcher sur la Lune'], ['Jean-Loup Chrétien', 'Premier Français dans l’espace']],
-        difficile: [['Apollo 11', 'Mission du premier pas sur la Lune'], ['Claudie Haigneré', 'Première Française dans l’espace'],
-          ['Alexeï Leonov', 'Première sortie dans l’espace'], ['Ariane 1', 'Première fusée européenne, lancée de Kourou'], ['Vostok 1', 'Vaisseau de Youri Gagarine']],
-        expert: [['Michael Collins', 'Reste en orbite autour de la Lune pendant Apollo 11'], ['Hubble', 'Télescope lancé dans l’espace en 1990'], ['Mir', 'Station spatiale russe, de 1986 à 2001'],
-          ['Apollo 13', 'Mission vers la Lune sauvée après une explosion'], ['Sally Ride', 'Première Américaine dans l’espace'], ['Sojourner', 'Premier robot à rouler sur Mars']]
+      { k: 'paires', gauche: 'Personnage ou engin', droite: 'Exploit', consigneR: 'Relie chaque personnage ou engin à son exploit.', q: 'Quel exploit est lié {a:a} ?', qi: 'Qui {min:b} ?', ouverte: false, niveaux: {
+        facile: [['Youri Gagarine', 'Premier homme dans l’espace', 'Qui a été le premier homme dans l’espace ?'], ['Neil Armstrong', 'Premier homme à marcher sur la Lune', 'Qui a été le premier homme à marcher sur la Lune ?'], ['Thomas Pesquet', 'Astronaute français de la Station spatiale internationale', 'Quel astronaute français a vécu dans la Station spatiale internationale ?'],
+          ['Spoutnik 1', 'Premier satellite artificiel', 'Quel a été le premier satellite artificiel ?']],
+        moyen: [['Laïka', 'Premier animal en orbite autour de la Terre', 'Quel a été le premier animal en orbite autour de la Terre ?'], ['Valentina Terechkova', 'Première femme dans l’espace', 'Qui a été la première femme dans l’espace ?'],
+          ['Buzz Aldrin', 'Deuxième homme à marcher sur la Lune', 'Qui a été le deuxième homme à marcher sur la Lune ?'], ['Jean-Loup Chrétien', 'Premier Français dans l’espace', 'Qui a été le premier Français dans l’espace ?']],
+        difficile: [['Apollo 11', 'Mission du premier pas sur la Lune', 'Quelle mission a fait le premier pas sur la Lune ?'], ['Claudie Haigneré', 'Première Française dans l’espace', 'Qui a été la première Française dans l’espace ?'],
+          ['Alexeï Leonov', 'Première sortie dans l’espace', 'Qui a fait la première sortie dans l’espace ?'], ['Ariane 1', 'Première fusée européenne, lancée de Kourou', 'Quelle a été la première fusée européenne, lancée de Kourou ?'], ['Vostok 1', 'Vaisseau de Youri Gagarine', 'Quel était le vaisseau de Youri Gagarine ?']],
+        expert: [['Michael Collins', 'Reste en orbite autour de la Lune pendant Apollo 11', 'Qui est resté en orbite autour de la Lune pendant Apollo 11 ?'], ['Hubble', 'Télescope lancé dans l’espace en 1990', 'Quel télescope a été lancé dans l’espace en 1990 ?'], ['Mir', 'Station spatiale russe, de 1986 à 2001', 'Quelle station spatiale russe a tourné autour de la Terre de 1986 à 2001 ?'],
+          ['Apollo 13', 'Mission vers la Lune sauvée après une explosion', 'Quelle mission vers la Lune a été sauvée après une explosion ?'], ['Sally Ride', 'Première Américaine dans l’espace', 'Qui a été la première Américaine dans l’espace ?'], ['Sojourner', 'Premier robot à rouler sur Mars', 'Quel a été le premier robot à rouler sur Mars ?']]
       } },
-      { k: 'paires', gauche: 'Invention ou découverte', droite: 'Inventeur', consigneR: 'Relie chaque invention ou découverte à son auteur.', q: 'Qui est à l’origine de : {a} ?', qi: 'Qu’a inventé ou découvert {b} ?', ouverte: false, niveaux: {
+      { k: 'paires', gauche: 'Invention ou découverte', droite: 'Inventeur', consigneR: 'Relie chaque invention ou découverte à son auteur.', q: 'Qui est à l’origine {de:a} ?', qi: 'Quelle invention ou découverte doit-on {a:b} ?', ouverte: false, niveaux: {
         facile: [['L’avion à moteur', 'Les frères Wright'], ['La pénicilline', 'Alexander Fleming'], ['Le World Wide Web', 'Tim Berners-Lee'],
           ['Le scaphandre autonome', 'Jacques-Yves Cousteau']],
         moyen: [['La théorie de la relativité', 'Albert Einstein'], ['La télévision', 'John Logie Baird'], ['Le téléphone portable', 'Martin Cooper'],
@@ -2472,37 +2472,37 @@
           ['La sonde Voyager 1 a été lancée en 1997.', false, 'Elle a été lancée en 1977.'],
           ['Le Rubik’s Cube a été inventé par un Japonais.', false, 'Il a été inventé par le Hongrois Ernő Rubik.']]
       } },
-      { k: 'ordre', consigne: 'Range ces étapes de la conquête spatiale de la plus ancienne à la plus récente.', q: 'En quelle année : {a} ?', niveaux: {
-        facile: [['Lancement de Spoutnik 1', 1957, '1957'], ['Gagarine part dans l’espace', 1961, '1961'], ['Premier pas sur la Lune', 1969, '1969'],
-          ['Premier morceau de la Station spatiale internationale', 1998, '1998']],
-        moyen: [['Terechkova, première femme dans l’espace', 1963, '1963'], ['Leonov sort dans l’espace', 1965, '1965'], ['Apollo 13 revient sur Terre', 1970, '1970'],
-          ['Jean-Loup Chrétien part dans l’espace', 1982, '1982'], ['Lancement du télescope Hubble', 1990, '1990']],
-        difficile: [['Laïka part dans l’espace', 1957, '1957'], ['Première fusée Ariane', 1979, '1979'], ['Premier vol d’une navette spatiale', 1981, '1981'],
-          ['Lancement de la station Mir', 1986, '1986'], ['Claudie Haigneré part dans l’espace', 1996, '1996']],
-        expert: [['Création de la NASA', 1958, '1958'], ['Création du CNES, l’agence spatiale française', 1961, '1961'], ['Derniers hommes sur la Lune (Apollo 17)', 1972, '1972'],
-          ['Création de l’Agence spatiale européenne', 1975, '1975'], ['Sally Ride part dans l’espace', 1983, '1983'], ['Le robot Sojourner roule sur Mars', 1997, '1997']]
+      { k: 'ordre', consigne: 'Range ces étapes de la conquête spatiale de la plus ancienne à la plus récente.', q: 'En quelle année a eu lieu cet événement ?', niveaux: {
+        facile: [['Lancement de Spoutnik 1', 1957, '1957', 'En quelle année Spoutnik 1 a-t-il été lancé ?'], ['Gagarine part dans l’espace', 1961, '1961', 'En quelle année Gagarine est-il parti dans l’espace ?'], ['Premier pas sur la Lune', 1969, '1969', 'En quelle année l’homme a-t-il fait son premier pas sur la Lune ?'],
+          ['Premier morceau de la Station spatiale internationale', 1998, '1998', 'En quelle année le premier morceau de la Station spatiale internationale a-t-il été lancé ?']],
+        moyen: [['Terechkova, première femme dans l’espace', 1963, '1963', 'En quelle année Valentina Terechkova est-elle devenue la première femme dans l’espace ?'], ['Leonov sort dans l’espace', 1965, '1965', 'En quelle année Leonov est-il sorti dans l’espace ?'], ['Apollo 13 revient sur Terre', 1970, '1970', 'En quelle année Apollo 13 est-il revenu sur Terre ?'],
+          ['Jean-Loup Chrétien part dans l’espace', 1982, '1982', 'En quelle année Jean-Loup Chrétien est-il parti dans l’espace ?'], ['Lancement du télescope Hubble', 1990, '1990', 'En quelle année le télescope Hubble a-t-il été lancé ?']],
+        difficile: [['Laïka part dans l’espace', 1957, '1957', 'En quelle année la chienne Laïka est-elle partie dans l’espace ?'], ['Première fusée Ariane', 1979, '1979', 'En quelle année la première fusée Ariane a-t-elle décollé ?'], ['Premier vol d’une navette spatiale', 1981, '1981', 'En quelle année une navette spatiale a-t-elle volé pour la première fois ?'],
+          ['Lancement de la station Mir', 1986, '1986', 'En quelle année la station Mir a-t-elle été lancée ?'], ['Claudie Haigneré part dans l’espace', 1996, '1996', 'En quelle année Claudie Haigneré est-elle partie dans l’espace ?']],
+        expert: [['Création de la NASA', 1958, '1958', 'En quelle année la NASA a-t-elle été créée ?'], ['Création du CNES, l’agence spatiale française', 1961, '1961', 'En quelle année le CNES, l’agence spatiale française, a-t-il été créé ?'], ['Derniers hommes sur la Lune (Apollo 17)', 1972, '1972', 'En quelle année les derniers hommes ont-ils marché sur la Lune, avec Apollo 17 ?'],
+          ['Création de l’Agence spatiale européenne', 1975, '1975', 'En quelle année l’Agence spatiale européenne a-t-elle été créée ?'], ['Sally Ride part dans l’espace', 1983, '1983', 'En quelle année Sally Ride est-elle partie dans l’espace ?'], ['Le robot Sojourner roule sur Mars', 1997, '1997', 'En quelle année le robot Sojourner a-t-il roulé sur Mars ?']]
       } },
-      { k: 'ordre', consigne: 'Range ces inventions de la plus ancienne à la plus récente.', q: 'En quelle année : {a} ?', niveaux: {
-        facile: [['Premier vol des frères Wright', 1903, '1903'], ['Fleming découvre la pénicilline', 1928, '1928'], ['Premier appel avec un téléphone portable', 1973, '1973'],
-          ['Premier site web', 1991, '1991']],
-        moyen: [['Blériot traverse la Manche en avion', 1909, '1909'], ['Baird montre sa télévision', 1926, '1926'], ['Cousteau met au point le scaphandre autonome', 1943, '1943'],
-          ['Premier laser', 1960, '1960'], ['Moreno invente la carte à puce', 1974, '1974']],
-        difficile: [['Georges Claude présente l’éclairage au néon', 1910, '1910'], ['Découverte de l’insuline', 1921, '1921'], ['Invention du transistor', 1947, '1947'],
-          ['Le vaccin de Salk contre la polio est autorisé', 1955, '1955'], ['Invention du Rubik’s Cube', 1974, '1974']],
-        expert: [['Sundback met au point la fermeture Éclair', 1913, '1913'], ['Bíró dépose le brevet du stylo à bille', 1938, '1938'], ['Spencer dépose le brevet du four à micro-ondes', 1945, '1945'],
-          ['Mestral dépose le brevet du Velcro', 1951, '1951'], ['Premiers disques compacts (CD) en vente', 1982, '1982'], ['Premier SMS envoyé', 1992, '1992']]
+      { k: 'ordre', consigne: 'Range ces inventions de la plus ancienne à la plus récente.', q: 'En quelle année a eu lieu cet événement ?', niveaux: {
+        facile: [['Premier vol des frères Wright', 1903, '1903', 'En quelle année les frères Wright ont-ils fait leur premier vol ?'], ['Fleming découvre la pénicilline', 1928, '1928', 'En quelle année Fleming a-t-il découvert la pénicilline ?'], ['Premier appel avec un téléphone portable', 1973, '1973', 'En quelle année le premier appel avec un téléphone portable a-t-il été passé ?'],
+          ['Premier site web', 1991, '1991', 'En quelle année le premier site web a-t-il été mis en ligne ?']],
+        moyen: [['Blériot traverse la Manche en avion', 1909, '1909', 'En quelle année Blériot a-t-il traversé la Manche en avion ?'], ['Baird montre sa télévision', 1926, '1926', 'En quelle année Baird a-t-il montré sa télévision ?'], ['Cousteau met au point le scaphandre autonome', 1943, '1943', 'En quelle année Cousteau a-t-il mis au point le scaphandre autonome ?'],
+          ['Premier laser', 1960, '1960', 'En quelle année le premier laser a-t-il fonctionné ?'], ['Moreno invente la carte à puce', 1974, '1974', 'En quelle année Moreno a-t-il inventé la carte à puce ?']],
+        difficile: [['Georges Claude présente l’éclairage au néon', 1910, '1910', 'En quelle année Georges Claude a-t-il présenté l’éclairage au néon ?'], ['Découverte de l’insuline', 1921, '1921', 'En quelle année l’insuline a-t-elle été découverte ?'], ['Invention du transistor', 1947, '1947', 'En quelle année le transistor a-t-il été inventé ?'],
+          ['Le vaccin de Salk contre la polio est autorisé', 1955, '1955', 'En quelle année le vaccin de Salk contre la polio a-t-il été autorisé ?'], ['Invention du Rubik’s Cube', 1974, '1974', 'En quelle année le Rubik’s Cube a-t-il été inventé ?']],
+        expert: [['Sundback met au point la fermeture Éclair', 1913, '1913', 'En quelle année Sundback a-t-il mis au point la fermeture Éclair ?'], ['Bíró dépose le brevet du stylo à bille', 1938, '1938', 'En quelle année Bíró a-t-il déposé le brevet du stylo à bille ?'], ['Spencer dépose le brevet du four à micro-ondes', 1945, '1945', 'En quelle année Spencer a-t-il déposé le brevet du four à micro-ondes ?'],
+          ['Mestral dépose le brevet du Velcro', 1951, '1951', 'En quelle année Mestral a-t-il déposé le brevet du Velcro ?'], ['Premiers disques compacts (CD) en vente', 1982, '1982', 'En quelle année les premiers disques compacts (CD) ont-ils été mis en vente ?'], ['Premier SMS envoyé', 1992, '1992', 'En quelle année le premier SMS a-t-il été envoyé ?']]
       } },
       { k: 'classer', niveaux: {
-        facile: [{ q: 'Range : va dans l’espace ou vole dans le ciel ?', colonnes: ['Dans l’espace', 'Dans le ciel'],
+        facile: [{ q: 'Ces engins vont-ils dans l’espace ou volent-ils dans le ciel ?', qq: ['Lequel de ces engins va dans l’espace ?', 'Lequel de ces engins vole dans le ciel, sans aller dans l’espace ?'], colonnes: ['Dans l’espace', 'Dans le ciel'],
           items: [['La fusée Ariane', 0], ['Spoutnik 1', 0], ['La Station spatiale internationale', 0], ['Le télescope Hubble', 0],
             ['Le Concorde', 1], ['L’avion des frères Wright', 1], ['L’Airbus A380', 1], ['L’hélicoptère', 1]] }],
-        moyen: [{ q: 'Range : astronaute ou inventeur ?', colonnes: ['Astronaute', 'Inventeur'],
+        moyen: [{ q: 'Ces personnes sont-elles des astronautes ou des inventeurs ?', qq: ['Laquelle de ces personnes est astronaute ?', 'Laquelle de ces personnes est inventeur ?'], colonnes: ['Astronaute', 'Inventeur'],
           items: [['Youri Gagarine', 0], ['Neil Armstrong', 0], ['Thomas Pesquet', 0], ['Valentina Terechkova', 0],
             ['Martin Cooper', 1], ['Roland Moreno', 1], ['Tim Berners-Lee', 1], ['László Bíró', 1]] }],
-        difficile: [{ q: 'Range : soviétique ou américain ?', colonnes: ['Soviétique', 'Américain'],
+        difficile: [{ q: 'Ces pionniers de l’espace sont-ils soviétiques ou américains ?', qq: ['Lequel de ces pionniers de l’espace est soviétique ?', 'Lequel de ces pionniers de l’espace est américain ?'], colonnes: ['Soviétique', 'Américain'],
           items: [['Youri Gagarine', 0], ['Valentina Terechkova', 0], ['Alexeï Leonov', 0], ['La chienne Laïka', 0],
             ['Neil Armstrong', 1], ['Buzz Aldrin', 1], ['Sally Ride', 1], ['Michael Collins', 1]] }],
-        expert: [{ q: 'Range : inventé avant ou après 1950 ?', colonnes: ['Avant 1950', 'Après 1950'],
+        expert: [{ q: 'Ces inventions datent-elles d’avant ou d’après 1950 ?', qq: ['Laquelle de ces inventions date d’avant 1950 ?', 'Laquelle de ces inventions date d’après 1950 ?'], colonnes: ['Avant 1950', 'Après 1950'],
           items: [['L’avion à moteur', 0], ['La pénicilline', 0], ['La télévision de Baird', 0], ['Le stylo à bille', 0],
             ['Le laser', 1], ['La carte à puce', 1], ['Le Rubik’s Cube', 1], ['Le World Wide Web', 1]] }]
       } },
@@ -2519,30 +2519,30 @@
     ] },
     // Grandes figures : femmes qui ont marqué l'histoire (ex-z06) et grandes figures du monde (ex-z08).
     { id: 'z08', matiere: 'histoire', famille: 'xx', nom: 'Grandes figures', court: 'Figures', icone: '✊', series: [
-      { k: 'paires', gauche: 'Personnage', droite: 'Ce qu’il ou elle a fait', consigneR: 'Relie chaque personnage à ce qu’il ou elle a fait.', q: 'Qu’a fait {a} ?', qi: 'Qui : {b} ?', ouverte: false, niveaux: {
-        facile: [['Nelson Mandela', 'Président de l’Afrique du Sud après la fin de l’apartheid'], ['Martin Luther King', '« I have a dream » (« Je fais un rêve »)'],
-          ['Gandhi', 'Mène l’Inde à l’indépendance sans violence'], ['Mère Teresa', 'Aide les plus pauvres à Calcutta']],
-        moyen: [['Rosa Parks', 'Refuse de céder sa place dans un bus, en 1955'], ['Albert Schweitzer', 'Fonde un hôpital à Lambaréné, au Gabon'],
-          ['L’abbé Pierre', 'Fonde Emmaüs'], ['Coluche', 'Crée les Restos du cœur']],
-        difficile: [['Desmond Tutu', 'Archevêque sud-africain qui combat l’apartheid'], ['Lech Wałęsa', 'Dirige le syndicat Solidarność, en Pologne'],
-          ['Wangari Maathai', 'Fait planter des millions d’arbres au Kenya'], ['Mikhaïl Gorbatchev', 'Dernier dirigeant de l’URSS'],
-          ['Eleanor Roosevelt', 'Préside la commission des droits de l’homme de l’ONU']],
-        expert: [['René Cassin', 'Rédige la Déclaration universelle des droits de l’homme'],
-          ['Le dalaï-lama', 'Chef spirituel tibétain, prix Nobel de la paix 1989'], ['Andreï Sakharov', 'Physicien soviétique qui défend les droits de l’homme'],
-          ['Rigoberta Menchú', 'Défend les peuples indigènes du Guatemala'], ['Václav Havel', 'Écrivain devenu président de la Tchécoslovaquie']]
+      { k: 'paires', gauche: 'Personnage', droite: 'Ce qu’il ou elle a fait', consigneR: 'Relie chaque personnage à ce qu’il ou elle a fait.', q: 'Qu’a fait {le:a} ?', qi: 'Qui {min:b} ?', ouverte: false, niveaux: {
+        facile: [['Nelson Mandela', 'Président de l’Afrique du Sud après la fin de l’apartheid', 'Qui a été président de l’Afrique du Sud après la fin de l’apartheid ?'], ['Martin Luther King', '« I have a dream » (« Je fais un rêve »)', 'Qui a dit « I have a dream » (« Je fais un rêve ») ?'],
+          ['Gandhi', 'Mène l’Inde à l’indépendance sans violence', 'Qui a mené l’Inde à l’indépendance sans violence ?'], ['Mère Teresa', 'Aide les plus pauvres à Calcutta', 'Qui a aidé les plus pauvres à Calcutta ?']],
+        moyen: [['Rosa Parks', 'Refuse de céder sa place dans un bus, en 1955', 'Qui a refusé de céder sa place dans un bus, en 1955 ?'], ['Albert Schweitzer', 'Fonde un hôpital à Lambaréné, au Gabon', 'Qui a fondé un hôpital à Lambaréné, au Gabon ?'],
+          ['L’abbé Pierre', 'Fonde Emmaüs', 'Qui a fondé Emmaüs ?'], ['Coluche', 'Crée les Restos du cœur', 'Qui a créé les Restos du cœur ?']],
+        difficile: [['Desmond Tutu', 'Archevêque sud-africain qui combat l’apartheid', 'Quel archevêque sud-africain a combattu l’apartheid ?'], ['Lech Wałęsa', 'Dirige le syndicat Solidarność, en Pologne', 'Qui a dirigé le syndicat Solidarność, en Pologne ?'],
+          ['Wangari Maathai', 'Fait planter des millions d’arbres au Kenya', 'Qui a fait planter des millions d’arbres au Kenya ?'], ['Mikhaïl Gorbatchev', 'Dernier dirigeant de l’URSS', 'Qui a été le dernier dirigeant de l’URSS ?'],
+          ['Eleanor Roosevelt', 'Préside la commission des droits de l’homme de l’ONU', 'Qui a présidé la commission des droits de l’homme de l’ONU ?']],
+        expert: [['René Cassin', 'Rédige la Déclaration universelle des droits de l’homme', 'Qui a rédigé la Déclaration universelle des droits de l’homme ?'],
+          ['Le dalaï-lama', 'Chef spirituel tibétain, prix Nobel de la paix 1989', 'Quel chef spirituel tibétain a reçu le prix Nobel de la paix en 1989 ?'], ['Andreï Sakharov', 'Physicien soviétique qui défend les droits de l’homme', 'Quel physicien soviétique a défendu les droits de l’homme ?'],
+          ['Rigoberta Menchú', 'Défend les peuples indigènes du Guatemala', 'Qui a défendu les peuples indigènes du Guatemala ?'], ['Václav Havel', 'Écrivain devenu président de la Tchécoslovaquie', 'Quel écrivain est devenu président de la Tchécoslovaquie ?']]
       } },
-      { k: 'paires', gauche: 'Femme', droite: 'Ce qu’elle a fait', consigneR: 'Relie chaque femme à ce qu’elle a fait.', q: 'Qu’a fait {a} ?', qi: 'Qui est-ce : {b} ?', ouverte: false, niveaux: {
-        facile: [['Marie Curie', 'Savante qui a reçu deux prix Nobel'], ['Simone Veil', 'Ministre, puis présidente du Parlement européen'],
-          ['Joséphine Baker', 'Artiste de music-hall entrée au Panthéon'], ['Coco Chanel', 'Créatrice de mode et du parfum N° 5']],
-        moyen: [['Édith Piaf', 'Chanteuse de « La Vie en rose »'], ['Amelia Earhart', 'Première femme à traverser seule l’Atlantique en avion'],
-          ['Irène Joliot-Curie', 'Fille de Marie Curie, prix Nobel de chimie'], ['Simone de Beauvoir', 'Écrivaine du « Deuxième Sexe »'],
-          ['Alexandra David-Néel', 'Exploratrice, première Européenne à entrer à Lhassa']],
-        difficile: [['Hélène Boucher', 'Aviatrice qui bat des records de vitesse en 1934'], ['Édith Cresson', 'Première femme Première ministre en France'],
-          ['Louise Weiss', 'Journaliste qui se bat pour le vote des femmes'], ['Colette', 'Écrivaine de « Claudine » et du « Blé en herbe »'],
-          ['Maryse Bastié', 'Aviatrice qui traverse l’Atlantique Sud en 1936']],
-        expert: [['Marie Marvingt', 'Sportive et aviatrice surnommée « la fiancée du danger »'], ['Suzanne Lenglen', 'Championne de tennis, six fois gagnante à Wimbledon'],
-          ['Françoise Giroud', 'Première secrétaire d’État à la Condition féminine, en 1974'], ['Rosalind Franklin', 'Photographie l’ADN aux rayons X'],
-          ['Margaret Thatcher', 'Première femme à diriger le gouvernement britannique']]
+      { k: 'paires', gauche: 'Femme', droite: 'Ce qu’elle a fait', consigneR: 'Relie chaque femme à ce qu’elle a fait.', q: 'Qu’a fait {le:a} ?', qi: 'Qui {min:b} ?', ouverte: false, niveaux: {
+        facile: [['Marie Curie', 'Savante qui a reçu deux prix Nobel', 'Quelle savante a reçu deux prix Nobel ?'], ['Simone Veil', 'Ministre, puis présidente du Parlement européen', 'Qui a été ministre, puis présidente du Parlement européen ?'],
+          ['Joséphine Baker', 'Artiste de music-hall entrée au Panthéon', 'Quelle artiste de music-hall est entrée au Panthéon ?'], ['Coco Chanel', 'Créatrice de mode et du parfum N° 5', 'Qui a créé une maison de mode et le parfum N° 5 ?']],
+        moyen: [['Édith Piaf', 'Chanteuse de « La Vie en rose »', 'Qui chantait « La Vie en rose » ?'], ['Amelia Earhart', 'Première femme à traverser seule l’Atlantique en avion', 'Qui a été la première femme à traverser seule l’Atlantique en avion ?'],
+          ['Irène Joliot-Curie', 'Fille de Marie Curie, prix Nobel de chimie', 'Quelle fille de Marie Curie a reçu le prix Nobel de chimie ?'], ['Simone de Beauvoir', 'Écrivaine du « Deuxième Sexe »', 'Qui a écrit « Le Deuxième Sexe » ?'],
+          ['Alexandra David-Néel', 'Exploratrice, première Européenne à entrer à Lhassa', 'Quelle exploratrice a été la première Européenne à entrer à Lhassa ?']],
+        difficile: [['Hélène Boucher', 'Aviatrice qui bat des records de vitesse en 1934', 'Quelle aviatrice a battu des records de vitesse en 1934 ?'], ['Édith Cresson', 'Première femme Première ministre en France', 'Qui a été la première femme Première ministre en France ?'],
+          ['Louise Weiss', 'Journaliste qui se bat pour le vote des femmes', 'Quelle journaliste s’est battue pour le vote des femmes ?'], ['Colette', 'Écrivaine de « Claudine » et du « Blé en herbe »', 'Qui a écrit « Claudine » et « Le Blé en herbe » ?'],
+          ['Maryse Bastié', 'Aviatrice qui traverse l’Atlantique Sud en 1936', 'Quelle aviatrice a traversé l’Atlantique Sud en 1936 ?']],
+        expert: [['Marie Marvingt', 'Sportive et aviatrice surnommée « la fiancée du danger »', 'Quelle sportive et aviatrice était surnommée « la fiancée du danger » ?'], ['Suzanne Lenglen', 'Championne de tennis, six fois gagnante à Wimbledon', 'Quelle championne de tennis a gagné six fois à Wimbledon ?'],
+          ['Françoise Giroud', 'Première secrétaire d’État à la Condition féminine, en 1974', 'Qui a été la première secrétaire d’État à la Condition féminine, en 1974 ?'], ['Rosalind Franklin', 'Photographie l’ADN aux rayons X', 'Qui a photographié l’ADN aux rayons X ?'],
+          ['Margaret Thatcher', 'Première femme à diriger le gouvernement britannique', 'Qui a été la première femme à diriger le gouvernement britannique ?']]
       } },
       { k: 'qcm', niveaux: {
         facile: [
@@ -2610,28 +2610,28 @@
           ['Suzanne Lenglen était une championne de football.', false, 'C’était une championne de tennis.'],
           ['Margaret Thatcher a été reine d’Angleterre.', false, 'Elle a été Première ministre du Royaume-Uni, de 1979 à 1990.']]
       } },
-      { k: 'ordre', consigne: 'Range ces moments du plus ancien au plus récent.', q: 'En quelle année : {a} ?', niveaux: {
-        facile: [['Marie Curie reçoit son premier prix Nobel', 1903, '1903'], ['Les Françaises votent pour la première fois', 1945, '1945'],
-          ['Martin Luther King : « I have a dream »', 1963, '1963'], ['Nelson Mandela devient président', 1994, '1994']],
-        moyen: [['Gandhi marche jusqu’à la mer pour récolter du sel', 1930, '1930'], ['L’abbé Pierre fonde Emmaüs', 1949, '1949'], ['Rosa Parks refuse de céder sa place', 1955, '1955'],
-          ['Mère Teresa reçoit le prix Nobel de la paix', 1979, '1979'], ['Coluche crée les Restos du cœur', 1985, '1985']],
-        difficile: [['Marie Curie reçoit son second prix Nobel', 1911, '1911'], ['Amelia Earhart traverse seule l’Atlantique', 1932, '1932'], ['Indépendance de l’Inde', 1947, '1947'],
-          ['Simone Veil préside le Parlement européen', 1979, '1979'], ['Nelson Mandela sort de prison', 1990, '1990'], ['Édith Cresson devient Première ministre', 1991, '1991']],
-        expert: [['Irène Joliot-Curie reçoit le prix Nobel', 1935, '1935'], ['Déclaration universelle des droits de l’homme', 1948, '1948'],
-          ['René Cassin reçoit le prix Nobel de la paix', 1968, '1968'], ['Andreï Sakharov reçoit le prix Nobel de la paix', 1975, '1975'],
-          ['Lech Wałęsa reçoit le prix Nobel de la paix', 1983, '1983'], ['Joséphine Baker entre au Panthéon', 2021, '2021']]
+      { k: 'ordre', consigne: 'Range ces moments du plus ancien au plus récent.', q: 'En quelle année a eu lieu cet événement ?', niveaux: {
+        facile: [['Marie Curie reçoit son premier prix Nobel', 1903, '1903', 'En quelle année Marie Curie a-t-elle reçu son premier prix Nobel ?'], ['Les Françaises votent pour la première fois', 1945, '1945', 'En quelle année les Françaises ont-elles voté pour la première fois ?'],
+          ['Discours « I have a dream » de Martin Luther King', 1963, '1963', 'En quelle année Martin Luther King a-t-il prononcé son discours « I have a dream » ?'], ['Nelson Mandela devient président', 1994, '1994', 'En quelle année Nelson Mandela est-il devenu président ?']],
+        moyen: [['Gandhi marche jusqu’à la mer pour récolter du sel', 1930, '1930', 'En quelle année Gandhi a-t-il marché jusqu’à la mer pour récolter du sel ?'], ['L’abbé Pierre fonde Emmaüs', 1949, '1949', 'En quelle année l’abbé Pierre a-t-il fondé Emmaüs ?'], ['Rosa Parks refuse de céder sa place', 1955, '1955', 'En quelle année Rosa Parks a-t-elle refusé de céder sa place ?'],
+          ['Mère Teresa reçoit le prix Nobel de la paix', 1979, '1979', 'En quelle année Mère Teresa a-t-elle reçu le prix Nobel de la paix ?'], ['Coluche crée les Restos du cœur', 1985, '1985', 'En quelle année Coluche a-t-il créé les Restos du cœur ?']],
+        difficile: [['Marie Curie reçoit son second prix Nobel', 1911, '1911', 'En quelle année Marie Curie a-t-elle reçu son second prix Nobel ?'], ['Amelia Earhart traverse seule l’Atlantique', 1932, '1932', 'En quelle année Amelia Earhart a-t-elle traversé seule l’Atlantique ?'], ['Indépendance de l’Inde', 1947, '1947', 'En quelle année l’Inde est-elle devenue indépendante ?'],
+          ['Simone Veil préside le Parlement européen', 1979, '1979', 'En quelle année Simone Veil est-elle devenue présidente du Parlement européen ?'], ['Nelson Mandela sort de prison', 1990, '1990', 'En quelle année Nelson Mandela est-il sorti de prison ?'], ['Édith Cresson devient Première ministre', 1991, '1991', 'En quelle année Édith Cresson est-elle devenue Première ministre ?']],
+        expert: [['Irène Joliot-Curie reçoit le prix Nobel', 1935, '1935', 'En quelle année Irène Joliot-Curie a-t-elle reçu le prix Nobel ?'], ['Déclaration universelle des droits de l’homme', 1948, '1948', 'En quelle année la Déclaration universelle des droits de l’homme a-t-elle été adoptée ?'],
+          ['René Cassin reçoit le prix Nobel de la paix', 1968, '1968', 'En quelle année René Cassin a-t-il reçu le prix Nobel de la paix ?'], ['Andreï Sakharov reçoit le prix Nobel de la paix', 1975, '1975', 'En quelle année Andreï Sakharov a-t-il reçu le prix Nobel de la paix ?'],
+          ['Lech Wałęsa reçoit le prix Nobel de la paix', 1983, '1983', 'En quelle année Lech Wałęsa a-t-il reçu le prix Nobel de la paix ?'], ['Joséphine Baker entre au Panthéon', 2021, '2021', 'En quelle année Joséphine Baker est-elle entrée au Panthéon ?']]
       } },
       { k: 'classer', niveaux: {
-        facile: [{ q: 'Range : savant ou artiste ?', colonnes: ['Savant ou savante', 'Artiste'],
+        facile: [{ q: 'Ces personnes sont-elles des savants ou des artistes ?', qq: ['Laquelle de ces personnes était scientifique ?', 'Laquelle de ces personnes était artiste ?'], colonnes: ['Savant ou savante', 'Artiste'],
           items: [['Marie Curie', 0], ['Pierre Curie', 0], ['Albert Einstein', 0], ['Irène Joliot-Curie', 0],
             ['Joséphine Baker', 1], ['Édith Piaf', 1], ['Coluche', 1], ['Charlie Chaplin', 1]] }],
-        moyen: [{ q: 'Range : a agi surtout en Afrique ou en Amérique ?', colonnes: ['En Afrique', 'En Amérique'],
+        moyen: [{ q: 'Ces personnes ont-elles agi surtout en Afrique ou en Amérique ?', qq: ['Laquelle de ces personnes a agi surtout en Afrique ?', 'Laquelle de ces personnes a agi surtout en Amérique ?'], colonnes: ['En Afrique', 'En Amérique'],
           items: [['Nelson Mandela', 0], ['Desmond Tutu', 0], ['Wangari Maathai', 0], ['Albert Schweitzer', 0],
             ['Martin Luther King', 1], ['Rosa Parks', 1], ['Rigoberta Menchú', 1], ['Amelia Earhart', 1]] }],
-        difficile: [{ q: 'Range : française ou étrangère ?', colonnes: ['Française', 'Étrangère'],
+        difficile: [{ q: 'Ces femmes sont-elles françaises ou étrangères ?', qq: ['Laquelle de ces femmes est française ?', 'Laquelle de ces femmes est étrangère ?'], colonnes: ['Française', 'Étrangère'],
           items: [['Simone Veil', 0], ['Édith Cresson', 0], ['Hélène Boucher', 0], ['Colette', 0],
             ['Valentina Terechkova', 1], ['Rosa Parks', 1], ['Margaret Thatcher', 1], ['Amelia Earhart', 1]] }],
-        expert: [{ q: 'Range : a reçu le prix Nobel de la paix, ou non ?', colonnes: ['Prix Nobel de la paix', 'Pas ce prix'],
+        expert: [{ q: 'Ces personnes ont-elles reçu le prix Nobel de la paix ?', qq: ['Laquelle de ces personnes a reçu le prix Nobel de la paix ?', 'Laquelle de ces personnes n’a pas reçu le prix Nobel de la paix ?'], colonnes: ['Prix Nobel de la paix', 'Pas ce prix'],
           items: [['Lech Wałęsa', 0], ['Desmond Tutu', 0], ['Rigoberta Menchú', 0], ['Andreï Sakharov', 0],
             ['Gandhi', 1], ['Rosa Parks', 1], ['Coluche', 1], ['Simone Veil', 1]] }]
       } },

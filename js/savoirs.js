@@ -60,7 +60,25 @@
     if (!n) return false;
     return String(attendu).split('|').some(function (a) { return normaliser(a) === n; });
   }
-  function remplir(modele, a, b) { return modele.replace(/\{a\}/g, affiche(a)).replace(/\{b\}/g, affiche(b)); }
+  // Modèle de question (v9.x, demande du 17/11/2026 : des phrases, jamais de deux-points) : {a} et {b} sont les deux
+  // côtés de la paire ; {le:a} « le Togo », {de:a} « du Togo », {en:a} « au Togo », {a:a} « aux frères Lumière », {min:a} « une butte de terre »,
+  // {nt:a} « nt » si a est au pluriel (« Comment s’appelle{nt:b} … ? ») — voir js/articles.js.
+  function articles() {
+    if (racine && racine.Articles) return racine.Articles;
+    return typeof module !== 'undefined' && module.exports ? require('./articles.js') : null;
+  }
+  function remplir(modele, a, b) {
+    var A = articles(), val = { a: a, b: b };
+    return majuscule(modele.replace(/\{(?:(le|de|en|a|min|nt):)?([ab])\}/g, function (tout, f, x) {
+      var v = val[x];
+      if (!f) return affiche(v);
+      if (f === 'nt') return A.pluriel(v) ? 'nt' : '';
+      return A[f](affiche(v));
+    }));
+  }
+  // Question d'une paire : la phrase écrite pour cette paire (3e case : sens qi, ou sens q si la série n'a pas de qi)
+  // si elle existe, sinon le modèle.
+  function questionPaire(s, p, inverse) { return p[2] && (inverse || !s.qi) ? p[2] : remplir(inverse ? s.qi : s.q, p[0], p[1]); }
 
   // ---------- Tirage d'une carte ----------
   // reglage = { jeux: ['g04', …], niveau: 'facile', mode: 'quiz' | 'normal' } ; matiere = 'geographie' ou 'histoire'.
@@ -116,7 +134,7 @@
     return false;
   }
   function classerQuiz(g, k) {
-    return g.items.some(function (x) { return x[1] === k; }) && g.items.filter(function (x) { return x[1] !== k; }).length >= 3;
+    return !!g.qq && g.items.some(function (x) { return x[1] === k; }) && g.items.filter(function (x) { return x[1] !== k; }).length >= 3;
   }
   function autresReponses(s, x) {
     var tous = [];
@@ -171,7 +189,7 @@
       }
       // qiOuverte: false → la question ouverte ne se pose que dans le sens q (on n'écrit pas un nom de monument).
       return {
-        format: 'O', consigne: remplir(inverse ? s.qi : s.q, p[0], p[1]), image: inverse ? null : s.image || null, sujet: inverse ? affiche(p[1]) : p[0],
+        format: 'O', consigne: questionPaire(s, p, inverse), image: inverse ? null : s.image || null, sujet: inverse ? affiche(p[1]) : p[0],
         attendu: inverse ? p[0] : p[1], bonne: affiche(inverse ? p[0] : p[1])
       };
     },
@@ -247,7 +265,7 @@
       var p = choix[0], inverse = sens(s);
       var bonne = affiche(inverse ? p[0] : p[1]);
       var fausses = choix.slice(1).map(function (x) { return affiche(inverse ? x[0] : x[1]); });
-      return quiz(remplir(inverse ? s.qi : s.q, p[0], p[1]), bonne, fausses,
+      return quiz(questionPaire(s, p, inverse), bonne, fausses,
         { image: inverse ? null : s.image || null, sujet: inverse ? affiche(p[1]) : p[0] });
     },
     // « En quelle année … ? » (si la série le permet), sinon « Trouve le plus ancien / le plus haut. ».
@@ -255,14 +273,15 @@
       var items = ordreItems(s, niveau);
       if (items.length < 4) return null;
       if (s.q && hasard() < 0.5) {
-        return quiz(remplir(s.q, items[0][0]), String(items[0][2]), items.slice(1).map(function (x) { return String(x[2]); }));
+        return quiz(items[0][3] || remplir(s.q, items[0][0]), String(items[0][2]), items.slice(1).map(function (x) { return String(x[2]); }));
       }
       var bout = hasard() < 0.5 ? 0 : 1, sensT = s.sens || ['le plus ancien', 'le plus récent'];
       var tri = items.slice().sort(function (x, y) { return x[1] - y[1]; });
       var bon = bout ? tri[tri.length - 1] : tri[0];
       return quiz('Trouve ' + sensT[bout] + '.', bon[0], items.filter(function (x) { return x !== bon; }).map(function (x) { return x[0]; }));
     },
-    // Classer → « Lequel va avec : … ? » (1 de la colonne, 3 de l'autre).
+    // Classer → une vraie question par colonne, écrite dans la série (qq : [colonne 0, colonne 1]),
+    // ex. « Lequel de ces ministres a servi Louis XIV ? » (1 de la colonne, 3 de l'autre).
     classer: function (s, niveau) {
       var groupes = [];
       contenu(s, niveau).forEach(function (g) { [0, 1].forEach(function (k) { if (classerQuiz(g, k)) groupes.push([g, k]); }); });
@@ -270,7 +289,7 @@
       var gk = auHasard(groupes), g = gk[0], k = gk[1];
       var bon = auHasard(g.items.filter(function (x) { return x[1] === k; }));
       var fausses = melanger(g.items.filter(function (x) { return x[1] !== k; })).map(function (x) { return x[0]; });
-      return quiz('Lequel va avec : « ' + g.colonnes[k] + ' » ?', bon[0], fausses, { question: majuscule(g.q.replace(/^Range[^:]*:\s*/, '')) });
+      return quiz(g.qq[k], bon[0], fausses);
     },
     // Vrai ou faux → « Laquelle de ces phrases est vraie (ou fausse) ? ».
     vf: function (s, niveau) {
