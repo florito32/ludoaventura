@@ -21,7 +21,7 @@ test.describe('tirage de la partie rapide avec Géographie et Histoire', () => {
     // Les 4 matières sont tirées.
     const vues = new Set();
     for (let k = 0; k < 400; k++) vues.add(R.carte(['maths', 'francais', 'geographie', 'histoire'], 'moyen', null, 'quiz').matiere);
-    expect([...vues].sort()).toEqual(['conjugaison', 'geographie', 'grammaire', 'histoire', 'maths', 'orthographe']);
+    expect([...vues].sort()).toEqual(['conjugaison', 'geographie', 'grammaire', 'histoire', 'maths', 'orthographe', 'phonemes']); // v10.4 : phonèmes aussi
     expect(R.generer({ matieres: ['histoire'], niveau: 'moyen', mode: 'normal' })).toMatchObject({ matieres: ['histoire'], mode: 'normal' });
     expect(R.generer({ matieres: [], niveau: 'moyen' }).matieres).toEqual(['maths', 'francais', 'geographie', 'histoire']);
   });
