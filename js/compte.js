@@ -183,9 +183,10 @@
   function traduire(e) {
     var m = String(e && e.message || ''), c = e && e.code;
     if (c === 'invalid_credentials' || /invalid login credentials/i.test(m)) return 'Adresse e-mail ou mot de passe incorrect.';
-    if (c === 'email_not_confirmed' || /not confirmed/i.test(m)) return 'Adresse pas encore confirmée : ouvre l’e-mail reçu et touche le lien de confirmation.';
+    if (c === 'email_not_confirmed' || /not confirmed/i.test(m)) return 'Ton compte attend encore sa validation : ouvre l’e-mail reçu et touche « Valider mon compte ».';
     if (c === 'weak_password' || /password should/i.test(m)) return 'Mot de passe trop faible : au moins 6 caractères.';
     if (c === 'user_already_exists' || /already registered/i.test(m)) return 'Un compte existe déjà avec cette adresse : connecte-toi.';
+    if (c === 'otp_expired' || /expired|invalid/i.test(m) && /token|link|otp/i.test(m)) return 'Ce lien de validation a déjà servi ou n’est plus valable.';
     if (c === 'over_email_send_rate_limit' || /rate limit/i.test(m)) return 'Trop de demandes pour le moment : réessaie dans quelques minutes.';
     if (c === 'validation_failed' || /invalid format|email address .* invalid/i.test(m)) return 'Adresse e-mail invalide.';
     if (/failed to fetch|networkerror|load failed/i.test(m)) return 'Pas de connexion à Internet : réessaie plus tard.';
@@ -195,21 +196,37 @@
   function verifier(avecMdp) {
     var f = champs();
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.email)) { dire('Écris ton adresse e-mail (exemple : prenom@gmail.com).', 'erreur'); $('compte-email').focus(); return null; }
-    if (avecMdp && f.mdp.length < 6) { dire('Écris ton mot de passe (au moins 6 caractères).', 'erreur'); $('compte-mdp').focus(); return null; }
+    if (avecMdp && !f.mdp) { dire('Écris ton mot de passe.', 'erreur'); $('compte-mdp').focus(); return null; }
     return f;
   }
   function occupe(oui) { document.querySelectorAll('#compte-corps button').forEach(function (b) { b.disabled = oui; }); }
   function action(promesse) { occupe(true); return promesse.catch(function (e) { dire(traduire(e), 'erreur'); }).then(function () { occupe(false); majPage(); }); }
   function seConnecter() {
     var f = verifier(true); if (!f) return;
-    action(appel('/auth/v1/token?grant_type=password', { methode: 'POST', corps: { email: f.email, password: f.mdp } }).then(function (s) { $('compte-mdp').value = ''; return connecteAvec(s); }));
+    action(appel('/auth/v1/token?grant_type=password', { methode: 'POST', corps: { email: f.email, password: f.mdp } }).then(function (s) { $('compte-mdp').value = ''; return connecteAvec(s); })
+      .catch(function (e) {
+        // Compte pas encore validé : on remontre l'écran « Vérifie tes e-mails » (avec « Renvoyer l'e-mail »).
+        if (e.code === 'email_not_confirmed' || /not confirmed/i.test(e.message)) { emailAttente = f.email; mode = 'attente'; dire(traduire(e), 'erreur'); return; }
+        throw e;
+      }));
   }
+  // Création de compte (v9.9) : formulaire à part (e-mail, mot de passe, confirmation). Une fois la demande
+  // acceptée, l'écran ne montre plus que « Vérifie tes e-mails » (mode « attente »).
   function creer() {
-    var f = verifier(true); if (!f) return;
-    action(appel('/auth/v1/signup?redirect_to=' + encodeURIComponent(adresseRetour()), { methode: 'POST', corps: { email: f.email, password: f.mdp } }).then(function (r) {
-      $('compte-mdp').value = '';
+    var email = $('creation-email').value.trim(), mdp = $('creation-mdp').value, mdp2 = $('creation-mdp2').value;
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { dire('Écris ton adresse e-mail (exemple : prenom@gmail.com).', 'erreur'); $('creation-email').focus(); return; }
+    if (mdp.length < 6) { dire('Choisis un mot de passe d’au moins 6 caractères.', 'erreur'); $('creation-mdp').focus(); return; }
+    if (mdp !== mdp2) { dire('Les deux mots de passe ne sont pas pareils : écris le même dans les deux cases.', 'erreur'); $('creation-mdp2').focus(); return; }
+    action(appel('/auth/v1/signup?redirect_to=' + encodeURIComponent(adresseRetour()), { methode: 'POST', corps: { email: email, password: mdp } }).then(function (r) {
+      $('creation-mdp').value = ''; $('creation-mdp2').value = '';
       if (r && r.access_token) return connecteAvec(r, 'Compte créé, tu es connecté.');
-      dire('Presque fini : ouvre l’e-mail envoyé à ' + f.email + ' et touche le lien pour confirmer ton adresse. (Pense à regarder dans les indésirables.)', 'ok');
+      emailAttente = email; mode = 'attente'; dire('');
+    }));
+  }
+  // « Renvoyer l'e-mail » de validation (écran d'attente, ou connexion refusée car adresse pas encore validée).
+  function renvoyer(email) {
+    action(appel('/auth/v1/resend?redirect_to=' + encodeURIComponent(adresseRetour()), { methode: 'POST', corps: { type: 'signup', email: email } }).then(function () {
+      dire('C’est reparti : un nouvel e-mail vient d’être envoyé à ' + email + '.', 'ok');
     }));
   }
   function oublie() {
@@ -222,7 +239,7 @@
     var mdp = $('compte-nouveau').value;
     if (mdp.length < 6) { dire('Au moins 6 caractères.', 'erreur'); $('compte-nouveau').focus(); return; }
     action(jeton().then(function (j) { return appel('/auth/v1/user', { methode: 'PUT', jeton: j, corps: { password: mdp } }); }).then(function () {
-      $('compte-nouveau').value = ''; modeNouveau = false; dire('Nouveau mot de passe enregistré.', 'ok');
+      $('compte-nouveau').value = ''; mode = 'connexion'; dire('Nouveau mot de passe enregistré.', 'ok');
     }));
   }
   // Déconnexion : le compte garde la progression ; l'appareil repart en invité, à zéro.
@@ -241,7 +258,10 @@
   }
 
   // ---------- Écran « Mon compte » ----------
-  var modeNouveau = false; // retour d'un lien « mot de passe oublié »
+  // Ce que montre l'écran (v9.9) : connexion | creation | attente (e-mail de validation envoyé) |
+  // validation (lien de l'e-mail en cours de vérification) | bienvenue (compte validé) | nouveau (nouveau mot de passe).
+  // Connecté, « connexion » montre la carte « Tu es connecté ».
+  var mode = 'connexion', emailAttente = '', bienvenueDeja = false;
   function dire(texte, type) { var m = $('compte-message'); if (!m) return; m.textContent = texte; m.className = 'compte-message ' + (type || ''); m.hidden = !texte; }
   function heure(d) { return d ? d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : ''; }
   function majPastille() {
@@ -254,46 +274,107 @@
     majPastille();
     var corps = $('compte-corps'); if (!corps) return;
     var co = !!session, attente = etat.synchro === 'en-cours';
-    $('compte-invite').hidden = co || modeNouveau;
-    $('compte-connecte').hidden = !co || modeNouveau;
-    $('compte-nouveau-bloc').hidden = !modeNouveau;
+    $('compte-invite').hidden = !(mode === 'connexion' && !co);
+    $('compte-connecte').hidden = !(mode === 'connexion' && co);
+    $('compte-creation').hidden = mode !== 'creation';
+    $('compte-attente').hidden = mode !== 'attente';
+    $('compte-validation').hidden = mode !== 'validation';
+    $('compte-bienvenue').hidden = mode !== 'bienvenue';
+    $('compte-nouveau-bloc').hidden = mode !== 'nouveau';
+    $('attente-email').textContent = emailAttente;
+    var qui = session && session.user && session.user.email ? session.user.email : 'ton compte';
+    $('bienvenue-email').textContent = qui;
+    $('bienvenue-titre').textContent = bienvenueDeja ? 'Ton compte est déjà validé' : 'Ton compte est validé !';
     if (co) {
-      $('compte-qui').textContent = session.user && session.user.email ? session.user.email : 'ton compte';
+      $('compte-qui').textContent = qui;
       $('compte-etat').textContent = attente ? 'Sauvegarde en cours…'
         : etat.synchro === 'ok' ? 'Progression sauvegardée sur ton compte à ' + heure(etat.quand) + '.'
         : etat.synchro === 'erreur' ? 'Sauvegarde impossible pour le moment (' + traduire(etat.erreur) + ') Elle sera refaite à la prochaine partie.'
         : 'Ta progression est sauvegardée sur ton compte.';
     }
   }
+  function changerMode(m) { mode = m; dire(''); majPage(); }
 
   $('btn-compte').addEventListener('click', function () { window.Aventura.afficher('ecran-compte'); });
   $('compte-google').addEventListener('click', google);
   $('compte-form').addEventListener('submit', function (e) { e.preventDefault(); seConnecter(); });
-  $('compte-creer').addEventListener('click', creer);
+  $('compte-creer').addEventListener('click', function () {
+    $('creation-email').value = $('compte-email').value.trim(); // adresse déjà tapée : reprise
+    changerMode('creation'); $('creation-email').focus();
+  });
+  $('compte-creation-form').addEventListener('submit', function (e) { e.preventDefault(); creer(); });
+  $('creation-annuler').addEventListener('click', function () { changerMode('connexion'); $('compte-email').focus(); });
+  $('creation-voir').addEventListener('change', function () { $('creation-mdp').type = $('creation-mdp2').type = this.checked ? 'text' : 'password'; });
+  $('attente-renvoyer').addEventListener('click', function () { renvoyer(emailAttente); });
+  $('bienvenue-jouer').addEventListener('click', function () { window.Aventura.afficher('ecran-accueil'); });
   $('compte-oublie').addEventListener('click', oublie);
   $('compte-invite-ok').addEventListener('click', function () { window.Aventura.afficher('ecran-accueil'); });
   $('compte-synchro').addEventListener('click', function () { action(synchroniser()); });
   $('compte-sortir').addEventListener('click', seDeconnecter);
   $('compte-nouveau-form').addEventListener('submit', function (e) { e.preventDefault(); nouveauMdp(); });
   $('compte-voir').addEventListener('change', function () { $('compte-mdp').type = this.checked ? 'text' : 'password'; });
-  document.addEventListener('aventura-ecran', function (e) { if (e.detail === 'ecran-compte') majPage(); else if (!modeNouveau) dire(''); });
+  // En quittant « Mon compte », l'écran revient à la connexion (sauf « nouveau mot de passe », pas encore choisi).
+  document.addEventListener('aventura-ecran', function (e) {
+    if (e.detail === 'ecran-compte') majPage();
+    else if (mode !== 'nouveau') { mode = 'connexion'; dire(''); }
+  });
 
-  // ---------- Retour de Google ou d'un lien reçu par e-mail (#access_token=… ou #error=…) ----------
+  // ---------- Retour d'un lien reçu par e-mail ou de Google ----------
+  // v9.9 : l'e-mail de validation (modèle dans outils/emails/) mène à ?valider=<jeton> ; le jeu vérifie le jeton
+  // lui-même (POST /auth/v1/verify). Un simple passage d'un antivirus de messagerie sur le lien (requête GET)
+  // ne consomme donc plus le jeton (docs Supabase, « Email prefetching »). ?mdp=<jeton> : mot de passe oublié.
+  // Les anciens liens (#access_token=… ou #error=…) restent compris.
+  function lienValidationRate(e) {
+    // Lien déjà utilisé : si l'appareil est déjà connecté, c'est que le compte est validé (cas du 17/11/2026 :
+    // « lien expiré » affiché à quelqu'un de connecté). Sinon, on explique sans parler d'erreur technique.
+    if (e && /failed to fetch|networkerror|load failed/i.test(e.message)) {
+      mode = 'connexion'; dire('Pas de connexion à Internet : touche de nouveau le bouton de l’e-mail quand Internet revient.', 'erreur'); return;
+    }
+    if (session) { bienvenueDeja = true; mode = 'bienvenue'; dire(''); if (!etat.quand) synchroniser(); return; }
+    mode = 'connexion';
+    dire('Ce lien de validation a déjà servi ou n’est plus valable. Si tu as déjà validé ton compte, connecte-toi ci-dessous. Sinon, connecte-toi quand même : le jeu te proposera de recevoir un nouvel e-mail.', 'erreur');
+    if (e) console.warn('Validation impossible :', e.message);
+  }
   function lireRetour() {
+    var q = new URLSearchParams(location.search), jetonLien = q.get('valider'), jetonMdp = q.get('mdp');
+    if (jetonLien || jetonMdp) {
+      history.replaceState(null, '', location.pathname + location.hash); // le jeton ne reste pas dans l'adresse
+      window.Aventura.afficher('ecran-compte');
+      if (jetonMdp) {
+        action(appel('/auth/v1/verify', { methode: 'POST', corps: { type: 'recovery', token_hash: jetonMdp } }).then(function (s) {
+          garderSession(s); mode = 'nouveau'; dire('Choisis ton nouveau mot de passe.', '');
+        }).catch(function () {
+          mode = 'connexion';
+          dire('Ce lien a déjà servi ou n’est plus valable : touche « Mot de passe oublié ? » pour en recevoir un nouveau.', 'erreur');
+        }));
+        return true;
+      }
+      mode = 'validation'; majPage();
+      action(appel('/auth/v1/verify', { methode: 'POST', corps: { type: 'email', token_hash: jetonLien } }).then(function (s) {
+        bienvenueDeja = false;
+        return connecteAvec(s, '').then(function () { mode = 'bienvenue'; dire(''); });
+      }, lienValidationRate));
+      return true;
+    }
     var h = location.hash.replace(/^#/, '');
     if (!/(access_token|error)=/.test(h)) return false;
     var p = {}; h.split('&').forEach(function (x) { var i = x.indexOf('='); if (i > 0) p[decodeURIComponent(x.slice(0, i))] = decodeURIComponent(x.slice(i + 1).replace(/\+/g, ' ')); });
     history.replaceState(null, '', location.pathname + location.search); // les jetons ne restent pas dans l'adresse
     window.Aventura.afficher('ecran-compte');
-    if (p.error) { dire(p.error_code === 'otp_expired' ? 'Ce lien a expiré ou a déjà servi : demande-en un nouveau.' : 'Connexion annulée ou impossible (' + (p.error_description || p.error) + ').', 'erreur'); return true; }
+    if (p.error) {
+      if (p.error_code === 'otp_expired') lienValidationRate(null);
+      else dire('Connexion annulée ou impossible (' + (p.error_description || p.error) + ').', 'erreur');
+      majPage(); return true;
+    }
     var s = { access_token: p.access_token, refresh_token: p.refresh_token, expires_in: p.expires_in, expires_at: Number(p.expires_at) || undefined };
     if (p.type === 'recovery') {
-      modeNouveau = true;
+      mode = 'nouveau';
       garderSession(s);
       action(appel('/auth/v1/user', { jeton: s.access_token }).then(function (u) { garderSession(Object.assign({}, session, { user: u })); dire('Choisis ton nouveau mot de passe.', ''); }));
       return true;
     }
-    action(connecteAvec(s, p.type === 'signup' ? 'Adresse confirmée : tu es connecté et ta progression est sauvegardée.' : null));
+    if (p.type === 'signup') { action(connecteAvec(s, '').then(function () { bienvenueDeja = false; mode = 'bienvenue'; dire(''); })); return true; }
+    action(connecteAvec(s, null));
     return true;
   }
 
