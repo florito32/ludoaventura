@@ -6,6 +6,9 @@
 //  - Maths : signes et nombres du niveau ;
 //  - Français : orthographe, conjugaison ou grammaire (une chance sur trois, v6.55) ; orthographe : tous les thèmes,
 //    mots et questions du niveau ; conjugaison : temps et groupes du niveau ; grammaire : tous les jeux, au niveau.
+//  - v10.4 (demande du 17/11/2026, backlog ligne 290) : n'importe quelle question des matières, hors Baby jeux.
+//    Français = orthographe, conjugaison, grammaire ou phonèmes (une chance sur quatre ; phonèmes : tous les jeux,
+//    tous les sons, ils n'ont pas de niveau) ; Maths = calcul mental ou problème (une chance sur deux).
 //  - Géographie et Histoire (v8.5, demande du 13/11/2026) : tous les jeux de la matière jouables dans le mode choisi
 //    (Quiz ou Normal, choix visible seulement quand l'une des deux est cochée), au niveau choisi.
 // Aventure : Facile → facile, Moyen → moyenne, Difficile et Expert → difficile (des aventures « Expert » viendront plus tard).
@@ -20,6 +23,7 @@
   var V = noeud ? require('./conjugaison.js') : racine.Conjugaison;
   var D = noeud ? require('./defis.js') : racine.Defis;
   var G = noeud ? require('./grammaire.js') : racine.Grammaire;
+  var PH = noeud ? require('./phonemes.js') : racine.Phonemes;
 
   var MATIERES = [{ id: 'maths', nom: 'Maths' }, { id: 'francais', nom: 'Français' },
     { id: 'geographie', nom: 'Géographie' }, { id: 'histoire', nom: 'Histoire' }];
@@ -53,6 +57,10 @@
 
   // Réglages de grammaire « tout coché » pour un niveau (v6.55).
   function gramTout(niveau) { return { niveau: niveau, jeux: G.JEUX.map(function (j) { return j.id; }) }; }
+  // Réglages de phonèmes « tout coché » (v10.4) : tous les jeux, tous les sons.
+  function phonTout() { return { jeux: PH.JEUX.map(function (j) { return j.id; }), sons: PH.TOUS_SONS.slice() }; }
+  // Maths (v10.4) : calcul mental ou problème (le même calcul raconté, js/problemes.js), une chance sur deux.
+  function avecType(maths, r) { maths.type = r() < 0.5 ? 'probleme' : 'calcul'; return maths; }
 
   // La partie : choix = { matieres: ['maths', 'francais', 'geographie', 'histoire'], niveau, mode } → aventure (de la difficulté du niveau)
   // et aventurier tirés au hasard. Toujours 1 joueur (partie rapide solo, v6.45).
@@ -79,25 +87,26 @@
     return { packs: D.PACKS.slice(), types: o.types.filter(function (t) { return !dispo || dispo.indexOf(t) >= 0; }), mots: o.mots.slice() };
   }
 
-  // Ce que demande la prochaine carte : { matiere: 'maths' | 'orthographe' | 'conjugaison' | 'grammaire' | 'geographie' | 'histoire',
-  // maths?, conj?, gram?, savoir? } ; savoir = { niveau, mode } (les jeux sont ceux de la matière jouables dans ce mode).
+  // Ce que demande la prochaine carte : { matiere: 'maths' | 'orthographe' | 'conjugaison' | 'grammaire' | 'phonemes' | 'geographie' | 'histoire',
+  // maths?, conj?, gram?, phon?, savoir? } ; savoir = { niveau, mode } (les jeux sont ceux de la matière jouables dans ce mode).
   // niveau absent (partie rapide gardée d'avant la v6.45) : un niveau au hasard, tout coché, comme avant.
   function carte(matieres, niveau, r, mode) {
     r = r || Math.random;
     var m = tirer(matieres && matieres.length ? matieres : ['maths', 'francais'], r);
-    if (m === 'francais') { var f = r(); m = f < 1 / 3 ? 'orthographe' : f < 2 / 3 ? 'conjugaison' : 'grammaire'; }
+    if (m === 'francais') { var f = r(); m = f < 1 / 4 ? 'orthographe' : f < 2 / 4 ? 'conjugaison' : f < 3 / 4 ? 'grammaire' : 'phonemes'; }
     if (m === 'geographie' || m === 'histoire') return { matiere: m, savoir: { niveau: niveau ? niveauValide(niveau) : 'facile', mode: modeValide(mode) } };
     if (m === 'orthographe') return { matiere: 'orthographe' };
+    if (m === 'phonemes') return { matiere: 'phonemes', phon: phonTout() };
     if (m === 'grammaire') return { matiere: 'grammaire', gram: gramTout(niveau ? niveauValide(niveau) : tirer(NIVEAUX, r).id) };
     if (!niveau) {
-      if (m === 'maths') return { matiere: 'maths', maths: mathsTout(tirer(K.NIVEAUX, r).id) };
+      if (m === 'maths') return { matiere: 'maths', maths: avecType(mathsTout(tirer(K.NIVEAUX, r).id), r) };
       return { matiere: 'conjugaison', conj: conjTout(tirer(V.NIVEAUX, r).id) };
     }
     var reg = D.reglages(m, niveauValide(niveau), r);
-    return m === 'maths' ? { matiere: 'maths', maths: reg.maths } : { matiere: 'conjugaison', conj: reg.conj };
+    return m === 'maths' ? { matiere: 'maths', maths: avecType(reg.maths, r) } : { matiere: 'conjugaison', conj: reg.conj };
   }
 
-  var api = { MATIERES: MATIERES, MODES: MODES, NIVEAUX: NIVEAUX, avecSavoir: avecSavoir, generer: generer, carte: carte, ortho: ortho, gramTout: gramTout, mathsTout: mathsTout, conjTout: conjTout };
+  var api = { MATIERES: MATIERES, MODES: MODES, NIVEAUX: NIVEAUX, avecSavoir: avecSavoir, generer: generer, carte: carte, ortho: ortho, gramTout: gramTout, phonTout: phonTout, mathsTout: mathsTout, conjTout: conjTout };
   if (noeud) { module.exports = api; return; }
   racine.Rapide = api;
 
