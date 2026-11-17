@@ -10,6 +10,10 @@ test('plus installable : ni manifeste, ni mode application, ni bouton d\'install
   await expect(page.locator('link[rel="apple-touch-startup-image"]')).toHaveCount(0);
   await expect(page.getByRole('button', { name: /Installer/ })).toHaveCount(0);
   await expect(page.locator('#btn-installer, #installer')).toHaveCount(0);
+  // Le manifeste n'existe plus (404). Sur la vraie page, GitHub Pages répond parfois 503 un court moment
+  // pour un fichier absent (vu le 17/11/2026, 2 fois) : on redemande tant que c'est 503, 20 s au plus.
+  await expect.poll(async () => (await request.get('manifest.webmanifest')).status(), { timeout: 20000, intervals: [1000, 2000, 3000] })
+    .not.toBe(503);
   expect((await request.get('manifest.webmanifest')).status()).toBe(404);
   // L'icône reste pour les favoris et les raccourcis du navigateur.
   const icone = await page.locator('link[rel="apple-touch-icon"]').getAttribute('href');
