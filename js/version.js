@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '9.6';
+  var VERSION = '9.7';
 
   var HISTORY = [
+    { v: '9.7', date: '2026-11-17', changes: [
+      "Après une aventure gagnée, « Retour à l’accueil » garde « ⭐ +19 étoiles » au milieu de l’écran : les étoiles s’envolent une à une vers le compteur du haut, qui grandit à chaque arrivée (1 seconde pour 10 étoiles).",
+      "« Rejouer » ou « Nouvelle partie » : les étoiles sont ajoutées au compte sans animation."
+    ] },
     { v: '9.6', date: '2026-11-17', changes: [
       "Téléphone : barre du haut de l’accueil plus compacte. Le défi du jour, le coffre et le compte deviennent des boutons ronds à icône seule ; le bouton du compte est de nouveau visible.",
       "Le bloc des étoiles est sur trois lignes : niveau, puis étoiles, puis pierres précieuses.",

@@ -1687,6 +1687,21 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .fin-etoiles .petit { font-size: .9rem; color: var(--encre-douce); }
 .btn-fin-coffre { display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; min-height: 48px; padding: 6px 16px; }
 
+/* Retour à l'accueil après une partie gagnée (v9.7) : « ⭐ +19 étoiles » au centre, sans encadré ;
+   les étoiles s'envolent vers le compteur du haut (js/recompenses.js → animerGain). Halo clair pour rester lisible sur l'illustration. */
+.gain-accueil { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 60; margin: 0; pointer-events: none;
+  display: flex; align-items: center; gap: 10px; font-size: clamp(1.6rem, 6vw, 2.4rem); white-space: nowrap;
+  animation: gain-arrive .35s ease-out both; transition: opacity .45s ease, transform .45s ease; }
+.gain-accueil strong { font-family: "Rockwell", "Roboto Slab", Georgia, serif; color: var(--rouge-texte);
+  text-shadow: 0 0 6px #fff, 0 0 12px #fff, 0 0 18px rgba(255, 255, 255, .9); }
+.gain-accueil .ico-gain { width: 1.6em; height: 1.6em; filter: drop-shadow(0 0 6px #fff); }
+.gain-accueil.part { opacity: 0; transform: translate(-50%, -60%); }
+@keyframes gain-arrive { from { opacity: 0; transform: translate(-50%, -50%) scale(.7); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+.etoile-volante { position: fixed; z-index: 61; pointer-events: none; transform-origin: center; will-change: transform; }
+.pe-total.recoit { animation: compteur-recoit .25s ease-out; }
+@keyframes compteur-recoit { 50% { transform: scale(1.25); } }
+@media (prefers-reduced-motion: reduce) { .gain-accueil, .pe-total.recoit { animation: none; } .gain-accueil { transition: none; } }
+
 /* ---------- Défi du jour (v6.37) ---------- */
 .defi-types { border: 0; margin: 0 0 6px; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .defi-type { position: relative; }

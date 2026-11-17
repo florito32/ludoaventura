@@ -46,7 +46,8 @@
 
   // ---------- Accueil ----------
   function majAccueil() {
-    var nv = compte.niveau(), total = compte.etat.total;
+    // Pendant l'envol des étoiles (v9.7), le compteur montre le total atteint par les étoiles déjà arrivées.
+    var total = vol ? vol.vu : compte.etat.total, nv = E.niveau(total);
     if (window.Defis) {
       // Défis encore à faire : ni réussis ni quittés (v6.47).
       var reste = ['solo', 'equipe'].filter(function (t) { return compte.defiAFaire(t); }).length;
@@ -379,6 +380,89 @@
     if (bc) bc.addEventListener('click', function () { ouvrirCoffres(compte.coffresAOuvrir().filter(function (c) { return c.type !== 'jour'; })); });
     majAccueil();
   }
+
+  // ---------- Envol des étoiles gagnées vers le compteur de l'accueil (v9.7, demande du 17/11/2026) ----------
+  // Après « Retour à l'accueil » sur l'écran de fin (js/plateau.js → accueilApresFin), « ⭐ +19 étoiles » reste au
+  // centre de l'écran (sans encadré) ; de là, une étoile par étoile gagnée vole jusqu'au compteur du haut, qui
+  // grandit d'une unité à chaque arrivée. Durée : 1 seconde pour 10 étoiles (choix de l'utilisateur).
+  // Mouvement réduit demandé par l'appareil : pas d'étoiles volantes, le nombre grandit pendant la même durée.
+  var vol = null; // { n, vu, minuteurs, etiquette }
+  var CLE_GAIN = 'ludoaventura-gain-accueil';
+  (function () {
+    var g = null;
+    try { g = JSON.parse(sessionStorage.getItem(CLE_GAIN) || 'null'); sessionStorage.removeItem(CLE_GAIN); } catch (e) { g = null; }
+    var n = g && Math.floor(Number(g.n));
+    if (!n || n < 1 || n > compte.etat.total) return;
+    vol = { n: n, vu: compte.etat.total - n, arrivees: 0, minuteurs: [], etiquette: null };
+    // On attend que l'accueil soit affiché et mis en page (js/plateau.js est chargé après ce fichier).
+    var partir = function () { setTimeout(animerGain, 250); };
+    if (document.readyState === 'complete') partir(); else window.addEventListener('load', partir, { once: true });
+  })();
+
+  function majCompteur() {
+    var nv = E.niveau(vol.vu);
+    $('accueil-total').textContent = vol.vu;
+    $('accueil-niveau').textContent = 'Niveau ' + nv.niveau;
+    $('accueil-jauge').style.width = Math.round(100 * nv.dans / nv.besoin) + '%';
+  }
+  function finirGain() {
+    if (!vol) return;
+    vol.minuteurs.forEach(clearTimeout);
+    document.querySelectorAll('.etoile-volante').forEach(function (x) { x.remove(); });
+    var et = vol.etiquette;
+    vol = null;
+    majAccueil();
+    if (et) { et.classList.add('part'); setTimeout(function () { et.remove(); }, reduit ? 0 : 500); }
+  }
+  function animerGain() {
+    if (!vol) return;
+    var accueil = $('ecran-accueil'), cible = document.querySelector('#btn-etoiles-haut .pe-total .ico');
+    if (!accueil || accueil.hidden || !cible) { finirGain(); return; }
+    var n = vol.n;
+    // « ⭐ +19 étoiles » au centre de l'écran, comme sur l'écran de fin, sans l'encadré.
+    var et = document.createElement('p');
+    et.className = 'gain-accueil';
+    et.setAttribute('role', 'status');
+    et.innerHTML = ico('i-etoile', 'ico-gain') + '<strong>+' + etoiles(n) + '</strong>';
+    document.body.appendChild(et);
+    vol.etiquette = et;
+    var D = typeof window.AVENTURA_DUREE_GAIN === 'number' ? window.AVENTURA_DUREE_GAIN * n : n * 100; // 1 s pour 10 étoiles
+    var vole = reduit ? 0 : Math.min(700, D * 0.6); // durée du vol d'une étoile
+    var ecart = n > 1 ? (D - vole) / (n - 1) : 0;   // la dernière étoile arrive au bout de D
+    var a = et.querySelector('.ico').getBoundingClientRect(), b = cible.getBoundingClientRect();
+    var dx = (b.left + b.width / 2) - (a.left + a.width / 2), dy = (b.top + b.height / 2) - (a.top + a.height / 2);
+    var total = $('btn-etoiles-haut').querySelector('.pe-total');
+    function arrivee() {
+      if (!vol) return;
+      vol.vu++;
+      majCompteur();
+      total.classList.remove('recoit'); void total.offsetWidth; total.classList.add('recoit');
+      if (++vol.arrivees >= vol.n) finirGain();
+    }
+    for (var i = 0; i < n; i++) {
+      vol.minuteurs.push(setTimeout(function () {
+        if (!vol) return;
+        if (reduit || !document.body.animate) { arrivee(); return; }
+        var s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        s.setAttribute('class', 'ico etoile-volante');
+        s.setAttribute('aria-hidden', 'true');
+        s.innerHTML = '<use href="#i-etoile"/>';
+        s.style.left = a.left + 'px'; s.style.top = a.top + 'px';
+        s.style.width = a.width + 'px'; s.style.height = a.height + 'px';
+        document.body.appendChild(s);
+        // Petite courbe : l'étoile monte un peu sur le côté avant de filer vers le compteur.
+        var cote = (Math.random() - 0.5) * 120;
+        var anim = s.animate([
+          { transform: 'translate(0,0) scale(1)', opacity: 1 },
+          { transform: 'translate(' + (dx * 0.35 + cote) + 'px,' + (dy * 0.35 - 30) + 'px) scale(0.9)', opacity: 1, offset: 0.4 },
+          { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(' + (b.width / a.width) + ')', opacity: 1 }
+        ], { duration: vole, easing: 'ease-in' });
+        anim.onfinish = function () { s.remove(); arrivee(); };
+      }, i * ecart));
+    }
+  }
+  // On quitte l'accueil pendant l'envol : tout est compté d'un coup.
+  document.addEventListener('aventura-ecran', function (e) { if (vol && e.detail !== 'ecran-accueil') finirGain(); });
 
   compte.visite(); // venue du jour (série de jours d'affilée, méga coffre)
   majAccueil();

@@ -2436,11 +2436,21 @@
   $('btn-rejouer').addEventListener('click', function () { $('fin').close(); lancerPartie(); });
   $('btn-nouvelle').addEventListener('click', function () {
     $('fin').close();
-    if (partie.rapide) { retourAccueil(); return; } // partie rapide (v6.45) : retour à l'accueil, la partie est effacée
+    if (partie.rapide) { accueilApresFin(); return; } // partie rapide (v6.45) : retour à l'accueil, la partie est effacée
     annulerMinuteurs(); partie.modif = false; quitterDefi(); preparer(1);
   });
   // v7.1 : la partie est finie, on revient à l'accueil sans confirmation (rien n'est perdu : étoiles déjà comptées).
-  $('btn-fin-accueil').addEventListener('click', function () { $('fin').close(); retourAccueil(); });
+  $('btn-fin-accueil').addEventListener('click', function () { $('fin').close(); accueilApresFin(); });
+  // v9.7 (17/11/2026) : en revenant à l'accueil après une partie gagnée, les étoiles gagnées s'envolent du centre
+  // de l'écran vers le compteur (js/recompenses.js → animerGain). La page se recharge : on note le gain dans
+  // l'onglet (sessionStorage) pour que l'accueil le retrouve. « Rejouer » ou « Nouvelle partie » : pas d'animation,
+  // les étoiles sont déjà dans le compte depuis l'affichage du résultat.
+  function accueilApresFin() {
+    var r = partie.regles, rc = r && r.recompense;
+    var n = rc && !rc.quitte && R.reussie(r) ? (rc.base || 0) + (rc.bonus || 0) : 0;
+    if (n > 0) { try { sessionStorage.setItem('ludoaventura-gain-accueil', JSON.stringify({ n: n })); } catch (e) { /* rien : pas d'animation */ } }
+    retourAccueil();
+  }
 
   // ---------- Sauvegarde de la partie (stockage de session) ----------
   // sessionStorage : « survit aux rechargements et restaurations de la page ; fermer l'onglet efface les données »
