@@ -4,9 +4,12 @@
 (function () {
   'use strict';
 
-  var VERSION = '9.9';
+  var VERSION = '10.0';
 
   var HISTORY = [
+    { v: '10.0', date: '2026-11-17', changes: [
+      "L’envol des étoiles gagnées vers le compteur de l’accueil dure 3 secondes au plus (toujours 1 seconde pour 10 étoiles en dessous) : pour un gros gain, chaque étoile qui arrive en apporte plusieurs."
+    ] },
     { v: '9.9', date: '2026-11-17', changes: [
       "Histoire et géographie : toutes les questions sont de vraies phrases, sans deux-points. « Quelle est la capitale de ce pays : Togo ? » devient « Quelle est la capitale du Togo ? », « Touche le département : Finistère » devient « Touche le Finistère sur la carte. ».",
       "Les questions « Lequel va avec : … ? » n’existent plus : chaque série à classer a ses propres questions, par exemple « Lequel de ces gestes se faisait déjà à la cour de Louis XIV ? ».",
