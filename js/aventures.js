@@ -1,5 +1,5 @@
 // Les 10 aventures d'Aventura (anciennes cartes « Mission » des livrets de règles).
-// Textes repris des livrets pour les 5 premières ; les 5 suivantes n'existent qu'en image
+// Textes repris des livrets pour les 5 premières (« vous » de l'équipe ; version « tu » pour une partie seul, v10.5) ; les 5 suivantes n'existent qu'en image
 // (noms supposés, à valider). Illustrations : img/aventures/*.webp, découpées de la planche « Images/histoires/images histoire.jpeg » de l'utilisateur (v5.4).
 // Ambiance du plateau (jour / soir) choisie selon l'aventure : soir pour Savane, Druides, Préhistoire (hypothèse).
 // Objectif choisi par l'utilisateur le 02/11/2026 :
@@ -12,14 +12,19 @@
 
   var LISTE = [
     { id: 'viking', ambiance: 'jour', nom: 'Viking', difficulte: 'facile', unite: 'troncs d’arbre à couper', objet: { un: 'tronc', des: 'troncs', verbe: 'coupe', participe: 'coupé', titre: 'Troncs coupés' }, image: 'img/aventures/viking.webp',
+      histoireSolo: 'Les Vikings vivaient il y a plus de 1000 ans dans les pays du nord. Ils possédaient les navires les plus rapides du monde qu’on appelle « Drakkar ». Ton pire ennemi, Ragnar, t’a volé des troncs d’arbres, tu ne peux donc plus finir la construction de tes navires de guerre. À toi de trouver les troncs d’arbre pour fabriquer un de ces navires légendaires.',
       histoire: 'Les Vikings vivaient il y a plus de 1000 ans dans les pays du nord. Ils possédaient les navires les plus rapides du monde qu’on appelle « Drakkar ». Votre pire ennemi, Ragnar, vous a volé des troncs d’arbres, vous ne pouvez donc plus finir la construction de vos navires de guerre. À vous de trouver les troncs d’arbre pour fabriquer un de ces navires légendaires.' },
     { id: 'chevalier', ambiance: 'jour', nom: 'Chevalier', difficulte: 'facile', unite: 'épées à forger', objet: { un: 'épée', des: 'épées', verbe: 'forge', participe: 'forgé', titre: 'Épées forgées' }, image: 'img/aventures/chevalier.webp',
+      histoireSolo: 'Les chevaliers sont redoutables, ils protègent leurs terres. Ton pire ennemi, Charles dit « Le Terrible », est en route pour ton château avec une armée de soldats d’infanterie. L’armée ennemie arrivera par l’Est à l’aube du septième jour. À toi de forger assez d’épées pour assurer la sécurité du donjon.',
       histoire: 'Les chevaliers sont redoutables, ils protègent leurs terres. Votre pire ennemi, Charles dit « Le Terrible », est en route pour votre château avec une armée de soldats d’infanterie. L’armée ennemie arrivera par l’Est à l’aube du septième jour. À vous de forger assez d’épées pour assurer la sécurité du donjon.' },
     { id: 'prehistoire', ambiance: 'soir', nom: 'Préhistoire', difficulte: 'moyen', unite: 'silex à trouver', objet: { un: 'silex', des: 'silex', verbe: 'trouve', participe: 'trouvé', titre: 'Silex trouvés' }, image: 'img/aventures/prehistoire.webp',
+      histoireSolo: 'Les hommes de la préhistoire ont fait la plus grande découverte de l’histoire, le FEU. Pour faire apparaître du feu, il faut frapper 2 silex entre eux. Il te faut allumer un grand feu pour réchauffer ta tribu et éloigner les prédateurs. À toi de trouver assez de silex pour allumer un grand feu au fond de la caverne.',
       histoire: 'Les hommes de la préhistoire ont fait la plus grande découverte de l’histoire, le FEU. Pour faire apparaître du feu, il faut frapper 2 silex entre eux. Il vous faut allumer un grand feu pour réchauffer votre tribu et éloigner les prédateurs. À vous de trouver assez de silex pour allumer un grand feu au fond de la caverne.' },
     { id: 'mayas', ambiance: 'jour', nom: 'Mayas', difficulte: 'moyen', unite: 'pierres à tailler', objet: { un: 'pierre', des: 'pierres', verbe: 'taille', participe: 'taillé', titre: 'Pierres taillées' }, image: 'img/aventures/mayas.webp',
+      histoireSolo: 'Les Mayas ont construit des pyramides afin d’honorer leur dieu « Kukulkan », le dieu serpent. Tu fais partie des constructeurs d’une de ces pyramides et il faut la finir avant la prochaine pleine lune. À toi de tailler les pierres qu’il te manque ou la colère du dieu Kukulkan se fera entendre.',
       histoire: 'Les Mayas ont construit des pyramides afin d’honorer leur dieu « Kukulkan », le dieu serpent. Vous êtes les constructeurs d’une de ces pyramides et il faut la finir avant la prochaine pleine lune. À vous de tailler les pierres qu’il vous manque ou la colère du dieu Kukulkan se fera entendre.' },
     { id: 'savane', ambiance: 'soir', nom: 'Savane', difficulte: 'difficile', unite: 'gazelles à chasser', objet: { un: 'gazelle', des: 'gazelles', verbe: 'chasse', participe: 'chassé', titre: 'Gazelles chassées' }, image: 'img/aventures/savane.webp',
+      histoireSolo: 'Le lion est le roi des animaux. La saison sèche approche et ton ennemi de la savane, Karkan, a éloigné le troupeau de gazelles pour t’empêcher de nourrir ta meute de lions, lionnes et lionceaux. À toi de chasser assez de gazelles pour ta meute.',
       histoire: 'Le lion est le roi des animaux. La saison sèche approche et votre ennemi de la savane, Karkan, a éloigné le troupeau de gazelles pour vous empêcher de nourrir votre meute de lions, lionnes et lionceaux. À vous de chasser assez de gazelles pour votre meute.' },
     { id: 'egypte', ambiance: 'jour', nom: 'Égypte', difficulte: 'moyen', unite: 'blocs à hisser', objet: { un: 'bloc', des: 'blocs', verbe: 'hisse', participe: 'hissé', titre: 'Blocs hissés' }, image: 'img/aventures/egypte.webp', histoire: '' },
     { id: 'chine', ambiance: 'jour', nom: 'Chine', difficulte: 'moyen', unite: 'briques à poser', objet: { un: 'brique', des: 'briques', verbe: 'pose', participe: 'posé', titre: 'Briques posées' }, image: 'img/aventures/chine.webp', histoire: '' },
@@ -43,7 +48,12 @@
     return null;
   }
 
-  var api = { LISTE: LISTE, POINTS_PAR_JOUEUR: POINTS_PAR_JOUEUR, objectif: objectif, trouver: trouver, quantite: quantite };
+  // Histoire à afficher (v10.5, demande du 17/11/2026, backlog ligne 406) : le jeu tutoie toujours le joueur.
+  // Seul, il lit la version « tu » (histoireSolo) ; à plusieurs, l'histoire s'adresse à l'équipe avec « vous »
+  // (pluriel, choix de l'utilisateur), comme dans les livrets.
+  function histoire(av, nbJoueurs) { return av ? (nbJoueurs === 1 && av.histoireSolo ? av.histoireSolo : av.histoire) : ''; }
+
+  var api = { histoire: histoire, LISTE: LISTE, POINTS_PAR_JOUEUR: POINTS_PAR_JOUEUR, objectif: objectif, trouver: trouver, quantite: quantite };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else racine.Aventures = api;
 })(this);

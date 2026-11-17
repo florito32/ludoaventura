@@ -93,7 +93,7 @@ test('didacticiel : préparation et premier tour, flèche et bulle à chaque ét
   await bulleSansBouton(page);
   await A.valider(page);
 
-  await expect(texte(page)).toContainText('Choisissez votre aventure');
+  await expect(texte(page)).toContainText('Choisis ton aventure');
   await page.getByRole('button', { name: 'Lancer la partie' }).click();
 
   // Premier tour : piocher, répondre, « J'ai compris », dé.
