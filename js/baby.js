@@ -195,7 +195,8 @@
         c.son = g.son; c.exemple = g.ex;
         c.jetons = jetons(g.ecritures.map(function (x) { return ecrire(x, f); }), melanger(autresEcr, r).slice(0, 11 - g.ecritures.length).map(function (x) { return ecrire(x, f); }), r);
         c.consigne = 'Touche toutes les façons d’écrire le son « ' + g.son + ' », comme dans ' + g.ex + '.';
-        c.oral = 'Touche toutes les façons d’écrire le son ' + g.son + ', comme dans ' + g.ex + '.';
+        // Le son est dit seul, puis repris avec son mot exemple (« in. Comme dans lapin. »).
+        c.oral = 'Touche toutes les façons d’écrire le son. ' + g.son + '. Comme dans ' + g.ex + '.';
         c.cle = id + g.son;
         break;
       }
@@ -238,7 +239,8 @@
         c.bonne = ecrire(cible, f);
         c.choix = choixDe(c.bonne, leurresLettre(cible, r).map(function (x) { return ecrire(x, f); }), r);
         c.consigne = 'Écoute (🔊) et touche la bonne lettre.';
-        c.oral = 'Touche la lettre ' + cible + '.';
+        // Chaque morceau est une phrase à part (voix : pause + lecture lente) : la lettre est dite seule, deux fois.
+        c.oral = 'Touche la lettre. ' + cible + '. ' + cible + '.';
         c.cle = id + cible;
         break;
       }
@@ -290,7 +292,8 @@
         c.bonne = ecrire(c1 + v1, f);
         c.choix = choixDe(c.bonne, [ecrire(c1 + v2, f), ecrire(c2 + v1, f)], r);
         c.consigne = 'Écoute (🔊) et touche la bonne syllabe.';
-        c.oral = 'Touche la syllabe ' + (c1 + v1).toLowerCase() + '.';
+        // Syllabe dite seule, deux fois (voir « entends-lettre »).
+        c.oral = 'Touche la syllabe. ' + (c1 + v1).toLowerCase() + '. ' + (c1 + v1).toLowerCase() + '.';
         c.cle = id + c1 + v1;
         break;
       }

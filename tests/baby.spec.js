@@ -36,6 +36,22 @@ test.describe('contenu des baby jeux', () => {
     }
   });
 
+  // v10.5 (demande du 17/11/2026) : la lettre, la syllabe ou le son à trouver est dit seul (phrase à part, lue lentement),
+  // sinon la voix le noie dans la consigne.
+  test('J’entends la lettre, Les syllabes, Un son : la cible est isolée dans la lecture à voix haute', () => {
+    const V = require('../js/voix.js');
+    for (const id of ['entends-lettre', 'syllabes', 'son-ecritures']) {
+      for (let k = 0; k < 30; k++) {
+        const c = B.generer(id, {});
+        const morceaux = V.preparer(c.oral);
+        const cible = id === 'son-ecritures' ? c.son : c.bonne.toLowerCase();
+        const seuls = morceaux.filter((m) => m.texte.replace(/[.!?…,\s]/g, '').toLowerCase() === cible);
+        expect(seuls.length, `${id} : « ${c.oral} » doit dire « ${cible} » dans un morceau à part`).toBeGreaterThanOrEqual(1);
+        for (const m of seuls) expect(m.vitesse).toBeLessThan(0.8); // lecture lente
+      }
+    }
+  });
+
   test('chiffres : les questions portent sur les chiffres choisis, les mauvaises réponses sont les autres', () => {
     const reg = { chiffres: [2, 5] };
     for (let k = 0; k < 300; k++) {
