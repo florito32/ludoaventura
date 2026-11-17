@@ -4,9 +4,14 @@
 (function () {
   'use strict';
 
-  var VERSION = '9.5';
+  var VERSION = '9.6';
 
   var HISTORY = [
+    { v: '9.6', date: '2026-11-17', changes: [
+      "Téléphone : barre du haut de l’accueil plus compacte. Le défi du jour, le coffre et le compte deviennent des boutons ronds à icône seule ; le bouton du compte est de nouveau visible.",
+      "Le bloc des étoiles est sur trois lignes : niveau, puis étoiles, puis pierres précieuses.",
+      "Le numéro de version et cet historique ne s’affichent plus que pour le compte de l’auteur du jeu."
+    ] },
     { v: '9.5', date: '2026-11-17', changes: [
       "Voix plus naturelle pour « 🔊 Écouter » (maths, problèmes, français, histoire, géographie, Baby jeux) : le jeu choisit la meilleure voix française de l’appareil (voix « Natural » de Microsoft, « Premium » ou « Enhanced » d’Apple, voix Google), sinon une autre voix française.",
       "Le texte est préparé avant d’être lu : petites pauses après « : » et autour des mots entre guillemets, une phrase à la fois, la question dite en montant un peu le ton, les nombres un peu plus lentement.",
@@ -516,11 +521,25 @@
     return dialog;
   }
 
-  function init() {
+  // v9.5 (17/11/2026) : le numéro de version et l'historique ne sont montrés qu'au compte de l'auteur.
+  // Simple masquage d'affichage (pas une protection : le fichier reste public), lu dans la session
+  // enregistrée par js/compte.js.
+  var ADMIN = 'fborel64@gmail.com';
+  function estAdmin() {
+    try {
+      var s = JSON.parse(localStorage.getItem('ludoaventura-session') || 'null');
+      return !!(s && s.user && String(s.user.email || '').toLowerCase() === ADMIN);
+    } catch (e) { return false; }
+  }
+
+  var dialog = null;
+  function rafraichir() {
     var slots = document.querySelectorAll('[data-version]');
-    if (!slots.length) return;
-    var dialog = buildDialog();
+    var admin = estAdmin();
     slots.forEach(function (slot) {
+      slot.hidden = !admin;
+      if (!admin || slot.querySelector('.version-badge')) return;
+      if (!dialog) dialog = buildDialog();
       var btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'version-badge';
@@ -531,7 +550,10 @@
       slot.appendChild(btn);
     });
   }
+  function init() { rafraichir(); }
 
+  // Appelé par js/compte.js à la connexion et à la déconnexion.
+  window.SiteVersion = { rafraichir: rafraichir };
   window.SITE_VERSION = VERSION;
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();

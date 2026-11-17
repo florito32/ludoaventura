@@ -1473,7 +1473,7 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .accueil { position: relative; }
 .accueil-haut {
   position: absolute; z-index: 2; top: calc(8px + env(safe-area-inset-top)); left: 8px; right: 8px;
-  display: flex; justify-content: space-between; gap: 8px; pointer-events: none;
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; pointer-events: none;
 }
 .pastille {
   pointer-events: auto; position: relative; display: inline-flex; align-items: center; gap: 6px;
@@ -1481,14 +1481,16 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
   background: var(--parchemin); border: 3px solid var(--encre); border-radius: 99px; box-shadow: 0 3px 0 rgb(0 0 0 / .3);
 }
 .pastille .ico { width: 34px; height: 34px; }
-.pe-total { font: 800 1.35rem/1 "Rockwell", "Roboto Slab", Georgia, serif; min-width: 1.2ch; }
-.pe-niveau { display: flex; flex-direction: column; gap: 3px; font-size: .78rem; line-height: 1; text-align: left; white-space: nowrap; }
+/* v9.5 : niveau, étoiles et pierres précieuses empilés (une seule petite étoile, devant le total). */
+.pastille-etoiles { padding: 3px 14px 3px 12px; border-radius: 22px; }
+.pe-pile { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; }
+.pe-niveau { display: flex; flex-direction: column; gap: 3px; font-size: .78rem; line-height: 1; white-space: nowrap; }
 .mini-jauge { display: block; width: 64px; height: 8px; background: #fff; border: 2px solid var(--encre); border-radius: 99px; overflow: hidden; }
 .mini-jauge span { display: block; height: 100%; width: 0; background: #f2b705; }
-/* Pierres précieuses (v6.46) sous le total d'étoiles. */
-.pe-compteurs { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
-.pe-gemmes { display: inline-flex; align-items: center; gap: 1px; font: 800 .8rem/1 system-ui, sans-serif; color: #12687b; }
-.pastille .pe-gemmes .ico { width: 15px; height: 15px; }
+.pe-total { display: inline-flex; align-items: center; gap: 3px; font: 800 1.05rem/1 "Rockwell", "Roboto Slab", Georgia, serif; }
+.pastille .pe-total .ico { width: 17px; height: 17px; }
+.pe-gemmes { display: inline-flex; align-items: center; gap: 3px; font: 800 .85rem/1 system-ui, sans-serif; color: #12687b; }
+.pastille .pe-gemmes .ico { width: 16px; height: 16px; }
 .total-gemmes { margin: 2px 0 0; display: flex; align-items: center; justify-content: center; gap: 6px; font-weight: 700; }
 .total-gemmes .ico { width: 30px; height: 30px; }
 .total-gemmes strong { font: 800 1.5rem/1 "Rockwell", "Roboto Slab", Georgia, serif; color: #12687b; }
@@ -1515,6 +1517,14 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 /* v9.4 : jusqu'à 520 px (au lieu de 440) depuis l'arrivée de la pastille du compte, pour que la barre tienne
    sur les téléphones carrés (480 px). */
 @media (max-width: 520px) { .pastille-coffre span:not(.badge) { display: none; } .pastille-coffre { padding-right: 6px; } .accueil-haut { gap: 6px; } }
+/* v9.5 (17/11/2026, choix B de la page A/B) : sur téléphone, défi du jour, coffre et compte deviennent des
+   boutons ronds à icône seule (48 px, cible tactile confortable) ; le texte du défi reste lu par les lecteurs
+   d'écran. Le bloc des étoiles reste à gauche, les trois icônes sont regroupées à droite. */
+@media (max-width: 520px) {
+  .pastille-etoiles { margin-right: auto; }
+  .pastille-defi, .pastille-coffre, .pastille-compte { width: 48px; height: 48px; min-height: 48px; padding: 0; justify-content: center; flex: none; }
+  .pastille-defi .pd-texte { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+}
 @media (max-width: 380px) { .pe-niveau .mini-jauge { width: 48px; } }
 
 /* Compte (v9.4, js/compte.js) : pastille en haut de l'accueil et écran « Mon compte ». */

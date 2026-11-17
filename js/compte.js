@@ -105,6 +105,7 @@
         user: s.user ? { id: s.user.id, email: s.user.email } : (session && session.user) || null };
     } else session = null;
     ecrireJSON(CLE_SESSION, session);
+    if (window.SiteVersion) window.SiteVersion.rafraichir(); // version visible seulement pour le compte de l'auteur (v9.5)
   }
   // Jeton valable (renouvelé s'il expire dans moins d'une minute) ; null si pas connecté ou session perdue.
   function jeton() {

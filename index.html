@@ -84,11 +84,13 @@
     <!-- Barre du haut (v6.36, js/recompenses.js) : étoiles + niveau (→ Mes étoiles), défi du jour, coffre (→ ouvrir, ou Ma progression). -->
     <div class="accueil-haut">
       <button type="button" class="pastille pastille-etoiles" id="btn-etoiles-haut">
-        <svg class="ico" aria-hidden="true"><use href="#i-etoile"/></svg>
-        <!-- Total d'étoiles et, dessous, pierres précieuses (v6.46) : empilés pour que la barre tienne sur téléphone. -->
-        <span class="pe-compteurs"><span class="pe-total"><span id="accueil-total">0</span><span class="visually-hidden"> étoiles,</span></span>
-        <span class="pe-gemmes"><svg class="ico" aria-hidden="true"><use href="#i-gemme"/></svg><span id="accueil-gemmes">0</span><span class="visually-hidden"> pierres précieuses,</span></span></span>
-        <span class="pe-niveau"><span id="accueil-niveau">Niveau 1</span><span class="mini-jauge" aria-hidden="true"><span id="accueil-jauge"></span></span></span>
+        <!-- v9.5 (17/11/2026) : trois lignes empilées pour gagner de la largeur sur téléphone :
+             niveau (et sa jauge), puis étoiles (une seule petite étoile devant le total), puis pierres précieuses. -->
+        <span class="pe-pile">
+          <span class="pe-niveau"><span id="accueil-niveau">Niveau 1</span><span class="mini-jauge" aria-hidden="true"><span id="accueil-jauge"></span></span></span>
+          <span class="pe-total"><svg class="ico" aria-hidden="true"><use href="#i-etoile"/></svg><span id="accueil-total">0</span><span class="visually-hidden"> étoiles,</span></span>
+          <span class="pe-gemmes"><svg class="ico" aria-hidden="true"><use href="#i-gemme"/></svg><span id="accueil-gemmes">0</span><span class="visually-hidden"> pierres précieuses,</span></span>
+        </span>
         <span class="visually-hidden" id="accueil-etoiles-aide"></span>
       </button>
       <!-- Défi du jour en haut de l'écran (v6.38, demande du 10/11/2026) ; pastille = défis restants. -->
