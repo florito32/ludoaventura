@@ -4,9 +4,15 @@
 (function () {
   'use strict';
 
-  var VERSION = '9.4';
+  var VERSION = '9.5';
 
   var HISTORY = [
+    { v: '9.5', date: '2026-11-17', changes: [
+      "Voix plus naturelle pour « 🔊 Écouter » (maths, problèmes, français, histoire, géographie, Baby jeux) : le jeu choisit la meilleure voix française de l’appareil (voix « Natural » de Microsoft, « Premium » ou « Enhanced » d’Apple, voix Google), sinon une autre voix française.",
+      "Le texte est préparé avant d’être lu : petites pauses après « : » et autour des mots entre guillemets, une phrase à la fois, la question dite en montant un peu le ton, les nombres un peu plus lentement.",
+      "Bonne prononciation de ce que les voix lisaient mal : × ÷ = ? dans les calculs, « av. J.-C. », Louis XIV, François Ier, XIXe siècle, Ve République, °C, %, 50 000.",
+      "Les longues cartes (histoire, géographie, problèmes) sont lues jusqu’au bout, même sur les navigateurs qui coupaient la voix au bout de quelques secondes."
+    ] },
     { v: '9.4', date: '2026-11-16', changes: [
       "Nouveau bouton « Se connecter » en haut de l’accueil (icône d’aventurier) : avec Google ou avec une adresse e-mail et un mot de passe, pour retrouver ses étoiles, coffres, pierres et niveaux sur l’ordinateur, la tablette ou le téléphone.",
       "La connexion est facultative : « Jouer en invité » garde la progression seulement sur l’appareil, comme avant.",

@@ -212,7 +212,9 @@ test('🔊 Écouter : la voix lit la consigne et le mot (en français)', async (
   await page.getByRole('button', { name: 'Écouter' }).click();
   const mot = await page.evaluate(() => window.Aventura.partie.carte.mot);
   const lu = await page.evaluate(() => window.__lu);
-  expect(lu).toEqual([{ text: 'Combien de lettres y a-t-il dans le mot : ' + mot.toLocaleLowerCase('fr-FR') + '.', lang: 'fr-FR' }]);
+  // v9.5 : le texte demandé passe par Voix.preparer (« : » devient une pause « … »), en français.
+  expect(await page.evaluate(() => window.Voix.dernier)).toBe('Combien de lettres y a-t-il dans le mot : ' + mot.toLocaleLowerCase('fr-FR') + '.');
+  expect(lu).toEqual([{ text: 'Combien de lettres y a-t-il dans le mot… ' + mot.toLocaleLowerCase('fr-FR') + '.', lang: 'fr-FR' }]);
 });
 
 test('« Mêmes réglages pour tous » copie packs et questions, puis passe au choix de l\'aventure', async ({ page }) => {
@@ -310,8 +312,7 @@ test('v6.40 : « Phrase d’exemple » apparaît après « Écouter » et lit la
   await phrase.click();
   const mot = await page.evaluate(() => window.Aventura.partie.carte.mot);
   const P = require('../js/phrases.js');
-  const lu = await page.evaluate(() => window.__lu.map((u) => u.text));
-  expect(lu[lu.length - 1]).toBe(P[mot]);
+  expect(await page.evaluate(() => window.Voix.dernier)).toBe(P[mot]);
   // Rafraîchir la page garde le bouton ; la carte suivante le cache jusqu'au prochain « Écouter ».
   await page.reload();
   await expect(phrase).toBeVisible();
