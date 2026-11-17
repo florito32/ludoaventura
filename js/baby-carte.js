@@ -24,22 +24,16 @@
     var lu = n + ' point' + (n > 1 ? 's' : '');
     return '<span class="baby-des" role="img" aria-label="' + lu + '">' + (n <= 6 ? unDe(n) : unDe(6) + unDe(n - 6)) + '</span>';
   }
-  // Une main avec n doigts levés (0 à 5) : le pouce d'abord, puis l'index, le majeur…
-  function uneMain(n) {
-    var doigts = [
-      { x: 6, y: 52, l: 24, a: -50 }, { x: 20, y: 40, l: 34, a: -8 }, { x: 34, y: 38, l: 38, a: 0 },
-      { x: 48, y: 40, l: 34, a: 6 }, { x: 60, y: 46, l: 26, a: 14 }
-    ];
-    var h = doigts.map(function (d, i) {
-      var leve = i < n, l = leve ? d.l : 10;
-      return '<rect x="' + (d.x) + '" y="' + (d.y - l) + '" width="12" height="' + (l + 8) + '" rx="6" transform="rotate(' + d.a + ' ' + (d.x + 6) + ' ' + d.y + ')"' +
-        (leve ? '' : ' class="plie"') + '/>';
-    }).join('');
-    return '<svg class="baby-main" viewBox="-6 -2 84 98" aria-hidden="true" focusable="false">' + h + '<rect x="14" y="40" width="54" height="50" rx="16"/></svg>';
+  // Une main avec n doigts levés (1 à 5, le pouce compte pour 1) : dessin noir sur blanc de js/mains-doigts.js
+  // (Openclipart « Count on fingers », CC0). miroir = main retournée (pouce vers l'extérieur) pour la 1re main des nombres 6 à 10.
+  function uneMain(n, miroir) {
+    var m = window.MAINS_DOIGTS[n];
+    return '<svg class="baby-main' + (miroir ? ' miroir' : '') + '" viewBox="' + m.vb + '" aria-hidden="true" focusable="false">' +
+      '<g stroke="#000" stroke-linecap="round" stroke-linejoin="round">' + m.svg + '</g></svg>';
   }
   function mains(n) {
     return '<span class="baby-mains" role="img" aria-label="' + n + ' doigt' + (n > 1 ? 's' : '') + ' levé' + (n > 1 ? 's' : '') + '">' +
-      (n <= 5 ? uneMain(n) : uneMain(5) + uneMain(n - 5)) + '</span>';
+      (n <= 5 ? uneMain(n, false) : uneMain(5, true) + uneMain(n - 5, false)) + '</span>';
   }
   function objets(e, n, cl) {
     var t = '';
