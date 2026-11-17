@@ -49,7 +49,7 @@
     { id: 'relier-des', cat: 'chiffres', nom: 'Relier dés et chiffres', icone: '🔗', meca: 'relier' },
     { id: 'bulles', cat: 'chiffres', nom: 'Les bulles', icone: '🫧', meca: 'bulles' },
     { id: 'entends-chiffre', cat: 'chiffres', nom: 'J’entends le chiffre', icone: '👂', meca: 'choix' },
-    { id: 'encore-un', cat: 'chiffres', nom: 'Encore un !', icone: '➕', meca: 'choix' }
+    { id: 'encore-un', cat: 'chiffres', nom: 'J’en ajoute', icone: '➕', meca: 'choix' }
   ];
   var IDS = JEUX.map(function (j) { return j.id; });
   function jeu(id) { return JEUX.filter(function (j) { return j.id === id; })[0] || null; }
@@ -80,10 +80,13 @@
   // Rangée de sons de la fabrique à mots : chaque bouton ajoute ces lettres d'un coup.
   var SONS_FABRIQUE = ['OU', 'ON', 'AN', 'IN', 'AIN', 'UN', 'OI', 'AU', 'EAU', 'É', 'È', 'CH', 'GN', 'PH'];
 
-  // Objets à compter : emoji et nom au pluriel (pour la voix).
+  // Objets à compter : emoji, nom au pluriel (n) et au singulier (s), genre (g : f ou m) pour dire « une pomme »,
+  // « un ballon » (consignes de « J’en ajoute »).
   var OBJETS = [
-    { e: '🍎', n: 'pommes' }, { e: '⭐', n: 'étoiles' }, { e: '🐟', n: 'poissons' }, { e: '🦆', n: 'canards' },
-    { e: '🎈', n: 'ballons' }, { e: '🐞', n: 'coccinelles' }, { e: '🌸', n: 'fleurs' }, { e: '🚗', n: 'voitures' }
+    { e: '🍎', n: 'pommes', s: 'pomme', g: 'f' }, { e: '⭐', n: 'étoiles', s: 'étoile', g: 'f' },
+    { e: '🐟', n: 'poissons', s: 'poisson', g: 'm' }, { e: '🦆', n: 'canards', s: 'canard', g: 'm' },
+    { e: '🎈', n: 'ballons', s: 'ballon', g: 'm' }, { e: '🐞', n: 'coccinelles', s: 'coccinelle', g: 'f' },
+    { e: '🌸', n: 'fleurs', s: 'fleur', g: 'f' }, { e: '🚗', n: 'voitures', s: 'voiture', g: 'f' }
   ];
 
   // Syllabes : consonnes qui se lisent bien suivies d'une voyelle (b-a ba…), voyelles simples.
@@ -166,7 +169,7 @@
   }
 
   // ---------- Génération ----------
-  // Renvoie une carte, ou null si le jeu ne peut rien faire avec ces réglages (ex. « Encore un ! » avec seulement 1).
+  // Renvoie une carte, ou null si le jeu ne peut rien faire avec ces réglages (aucun cas pour l’instant : tous les jeux savent faire avec n’importe quel chiffre).
   function generer(id, reg, r) {
     r = r || Math.random;
     reg = reglagesValides(reg);
@@ -390,16 +393,23 @@
         break;
       }
       case 'encore-un': {
-        var ok = N.filter(function (x) { return x >= 2; });
-        if (!ok.length) return null;
-        cible = tirer(ok, r);
-        c.objet = tirer(OBJETS, r).e;
-        c.avant = cible - 1;
-        c.bonne = String(cible);
-        c.choix = choixDe(c.bonne, leurres(cible, CHIFFRES, N, 2, r), r);
-        c.consigne = 'Il y en a ' + (cible - 1) + ', et encore un arrive ! Combien maintenant ?';
-        c.oral = 'Il y en a ' + NOMS[cible - 1] + ', et encore un arrive ! Combien y en a-t-il maintenant ?';
-        c.cle = id + cible;
+        // « J’en ajoute » (v10.7, demande du 17/11/2026) : le départ est un chiffre travaillé, on en ajoute 1, 2 ou 3.
+        // Les mauvaises réponses sont des erreurs qu’un petit fait vraiment : oublier d’ajouter (le départ),
+        // ou se tromper de 1 ou de 2.
+        var dep = tirer(N, r);
+        var ajout = 1 + Math.floor(r() * 3);
+        var total = dep + ajout;
+        var ob = tirer(OBJETS, r);
+        var pieges = sauf([dep, total + 1, total - 1, total + 2], [total]).filter(function (x, i, t) { return x >= 1 && t.indexOf(x) === i; });
+        c.objet = ob.e; c.avant = dep; c.ajout = ajout;
+        c.bonne = String(total);
+        c.choix = choixDe(c.bonne, melanger(pieges, r).slice(0, 2), r);
+        var nomObjet = function (n) { return n === 1 ? ob.s : ob.n; };
+        var dire = function (n) { return n === 1 ? (ob.g === 'f' ? 'une' : 'un') : NOMS[n]; };
+        var de = /^[aeiouyéèêh]/i.test(ob.n) ? 'd’' : 'de ';
+        c.consigne = 'Tu as ' + dep + ' ' + nomObjet(dep) + '. Tu en reçois ' + ajout + ' de plus. Combien ' + de + ob.n + ' as-tu maintenant ?';
+        c.oral = 'Tu as ' + dire(dep) + ' ' + nomObjet(dep) + '. Tu en reçois ' + dire(ajout) + ' de plus. Combien ' + de + ob.n + ' as-tu maintenant ?';
+        c.cle = id + dep + '+' + ajout + ob.e;
         break;
       }
     }

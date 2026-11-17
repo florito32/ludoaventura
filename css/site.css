@@ -1982,6 +1982,7 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .baby-objets { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 6px; max-width: 15em; font-size: clamp(1.5rem, 6vw, 2rem); line-height: 1.15; }
 .baby-encore { margin: 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; }
 .baby-encore .baby-objets { max-width: 9em; }
+.baby-ajout { display: inline-flex; align-items: center; gap: 8px; } /* le « + » reste avec les objets reçus, même quand ça passe à la ligne */
 .baby-plus { font: 800 2rem/1 system-ui, sans-serif; }
 .baby-objets.arrive { animation: baby-arrive 1s ease-out; }
 @keyframes baby-arrive { from { transform: translateX(60px); opacity: 0; } }
