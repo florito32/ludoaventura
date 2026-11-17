@@ -4,6 +4,8 @@
 (function (racine) {
   'use strict';
   var S = typeof module !== 'undefined' && module.exports ? require('./savoirs.js') : racine.Savoirs;
+  // Articles des noms de pays (« avec le Togo », « avec Cuba ») : js/articles.js.
+  var A = typeof module !== 'undefined' && module.exports ? require('./articles.js') : racine.Articles;
 
   // ---------- Départements ----------
   // [numéro, nom, préfecture, région, population]. Préfectures : Insee (code officiel géographique).
@@ -199,9 +201,9 @@
       if (!v) return;
       var nom = nomDu(c), non = pasVoisins(c).map(nomDu), oui = v.map(nomDu);
       if (non.length < 3) return;
-      oui.forEach(function (y) { qcm[n].push(['Quel pays a une frontière avec ce pays : ' + nom + ' ?', y, non]); });
-      if (oui.length >= 3) non.slice(0, 3).forEach(function (z) { qcm[n].push(['Lequel de ces pays n’a pas de frontière avec ce pays : ' + nom + ' ?', z, oui]); });
-      if (oui.length >= 2) classer[n].push({ q: 'Range ces pays : ont-ils une frontière avec ce pays : ' + nom + ' ?', colonnes: ['Voisin', 'Pas voisin'],
+      oui.forEach(function (y) { qcm[n].push(['Quel pays a une frontière avec ' + A.le(nom) + ' ?', y, non]); });
+      if (oui.length >= 3) non.slice(0, 3).forEach(function (z) { qcm[n].push(['Lequel de ces pays n’a pas de frontière avec ' + A.le(nom) + ' ?', z, oui]); });
+      if (oui.length >= 2) classer[n].push({ q: 'Ces pays ont-ils une frontière avec ' + A.le(nom) + ' ?', colonnes: ['Voisin', 'Pas voisin'],
         items: oui.map(function (y) { return [y, 0]; }).concat(non.slice(0, Math.max(3, oui.length)).map(function (z) { return [z, 1]; })) });
     });
     return [{ k: 'qcm', niveaux: qcm }, { k: 'classer', quiz: false, niveaux: classer }];
@@ -213,19 +215,19 @@
     // le nom ou la préfecture ; 25 départements par niveau (population).
     { id: 'g01', matiere: 'geographie', famille: 'france', nom: 'Départements', court: 'Départ.', icone: '🔢', series: [
       { k: 'paires', gauche: 'Numéro', droite: 'Département', consigneR: 'Relie chaque numéro à son département.',
-        q: 'Quel département porte le numéro {a} ?', qi: 'Quel est le numéro de ce département : {b} ?',
+        q: 'Quel département porte le numéro {a} ?', qi: 'Quel est le numéro {de:b} ?',
         niveaux: parNiveau(function (d) { return [d[0], d[1]]; }) },
       { k: 'paires', gauche: 'Département', droite: 'Préfecture', consigneR: 'Relie chaque département à sa préfecture.',
-        q: 'Quelle est la préfecture de ce département : {a} ?', qi: '{b} est la préfecture de quel département ?',
+        q: 'Quelle est la préfecture {de:a} ?', qi: '{b} est la préfecture de quel département ?',
         niveaux: parNiveau(function (d) { return [d[1], d[2]]; }) },
       { k: 'paires', gauche: 'Numéro', droite: 'Préfecture', consigneR: 'Relie chaque numéro de département à sa préfecture.',
-        q: 'Quelle est la préfecture du département numéro {a} ?', qi: '{b} est la préfecture du département numéro… ?',
+        q: 'Quelle est la préfecture du département numéro {a} ?', qi: 'Quel est le numéro du département dont {b} est la préfecture ?',
         niveaux: parNiveau(function (d) { return [d[0], d[2]]; }) }
     ] },
     { id: 'g03', matiere: 'geographie', famille: 'france', nom: 'Régions', court: 'Régions', icone: '🗺️', series: [
       // Département ↔ région : les 25 départements du niveau (population), dans les deux sens.
       { k: 'paires', gauche: 'Département', droite: 'Région', consigneR: 'Relie chaque département à sa région.',
-        q: 'Dans quelle région se trouve ce département : {a} ?', qi: 'Lequel de ces départements se trouve en région {b} ?', qiOuverte: false,
+        q: 'Quelle est la région {de:a} ?', qi: 'Lequel de ces départements se trouve en région {b} ?', qiOuverte: false,
         niveaux: parNiveau(function (d) { return [d[1], REGIONS[d[3]]]; }) },
       { k: 'paires', gauche: 'Région', droite: 'Chef-lieu', consigneR: 'Relie chaque région à son chef-lieu.',
         q: 'Quel est le chef-lieu de la région {a} ?', qi: '{b} est le chef-lieu de quelle région ?',
@@ -246,7 +248,7 @@
     // ---------- Monde ----------
     { id: 'g04', matiere: 'geographie', famille: 'monde', nom: 'Pays et capitales', court: 'Capitales', icone: '🏙️', series: [
       { k: 'paires', gauche: 'Pays', droite: 'Capitale', consigneR: 'Relie chaque pays à sa capitale.',
-        q: 'Quelle est la capitale de ce pays : {a} ?', qi: '{b} est la capitale de quel pays ?',
+        q: 'Quelle est la capitale {de:a} ?', qi: '{b} est la capitale de quel pays ?',
         niveaux: mondeParNiveau(4, function (p) { return [p[1], p[2]]; }) }
     ] },
     { id: 'g05', matiere: 'geographie', famille: 'monde', nom: 'Drapeaux', court: 'Drapeaux', icone: '🚩', series: [
@@ -257,7 +259,7 @@
     // v8.1 : 50 monuments et lieux célèbres par niveau (du plus connu au plus rare), dans les deux sens.
     { id: 'g11', matiere: 'geographie', famille: 'monde', nom: 'Monuments du monde', court: 'Monuments', icone: '🗼', series: [
       { k: 'paires', gauche: 'Monument', droite: 'Pays', consigneR: 'Relie chaque monument à son pays.',
-        q: 'Dans quel pays se trouve ce monument : {a} ?', qi: 'Quel monument se trouve dans ce pays : {b} ?', qiOuverte: false, niveaux: {
+        q: 'Dans quel pays peut-on voir {le:a} ?', qi: 'Quel monument peut-on voir {en:b} ?', qiOuverte: false, niveaux: {
           facile: [["La tour Eiffel", "France"],
             ["L’Arc de triomphe", "France"],
             ["Le château de Versailles", "France"],
@@ -464,7 +466,7 @@
     // ---------- Nature ----------
     // v8.1 : environ 50 questions par niveau (villes traversées, continents, embouchures, vocabulaire), du plus connu au plus rare.
     { id: 'g06', matiere: 'geographie', famille: 'nature', nom: 'Fleuves et rivières', court: 'Fleuves', icone: '🌊', series: [
-      { k: 'paires', gauche: 'Cours d’eau', droite: 'Ville', consigneR: 'Relie chaque cours d’eau à une ville qu’il traverse.', q: 'Quelle ville ce cours d’eau traverse-t-il : {a} ?', qi: 'Quel cours d’eau traverse cette ville : {b} ?', niveaux: {
+      { k: 'paires', gauche: 'Cours d’eau', droite: 'Ville', consigneR: 'Relie chaque cours d’eau à une ville qu’il traverse.', q: 'Quelle ville est traversée par {le:a} ?', qi: 'Quel cours d’eau traverse {le:b} ?', niveaux: {
         facile: [
           ["La Seine", "Paris"],
           ["La Loire", "Nantes"],
@@ -580,7 +582,7 @@
           ["L’Adour", "Dax"],
           ["La Vilaine", "Rennes"]]
       } },
-      { k: 'paires', gauche: 'Fleuve', droite: 'Continent', ouverte: false, consigneR: 'Relie chaque fleuve à son continent.', q: 'Sur quel continent coule ce fleuve : {a} ?', qi: 'Quel fleuve coule sur ce continent : {b} ?', niveaux: {
+      { k: 'paires', gauche: 'Fleuve', droite: 'Continent', ouverte: false, consigneR: 'Relie chaque fleuve à son continent.', q: 'Sur quel continent coule {le:a} ?', qi: 'Quel fleuve coule {en:b} ?', niveaux: {
         facile: [
           ["L’Amazone", "L’Amérique du Sud"],
           ["Le Nil", "L’Afrique"],
@@ -597,7 +599,7 @@
           ["Le Mékong", "L’Asie"],
           ["La Loire", "L’Europe"]]
       } },
-      { k: 'paires', gauche: 'Fleuve', droite: 'Mer', ouverte: false, consigneR: 'Relie chaque fleuve à la mer (ou l’océan) où il se jette.', q: 'Où se jette ce fleuve : {a} ?', qi: 'Quel fleuve se jette ici : {b} ?', niveaux: {
+      { k: 'paires', gauche: 'Fleuve', droite: 'Mer', ouverte: false, consigneR: 'Relie chaque fleuve à la mer (ou l’océan) où il se jette.', q: 'Où se jette {le:a} ?', qi: 'Quel fleuve se jette dans {le:b} ?', niveaux: {
         moyen: [
           ["Le Danube", "La mer Noire"],
           ["La Volga", "La mer Caspienne"],
@@ -707,7 +709,7 @@
     // v8.1 : environ 50 questions par niveau. Sommets à cheval sur une frontière (mont Blanc, Cervin, K2…) : jamais
     // demandés avec un seul pays.
     { id: 'g09', matiere: 'geographie', famille: 'nature', nom: 'Montagnes et sommets', court: 'Montagnes', icone: '⛰️', series: [
-      { k: 'paires', gauche: 'Sommet', droite: 'Massif', consigneR: 'Relie chaque sommet à son massif (ou sa chaîne de montagnes).', q: 'Dans quel massif se trouve ce sommet : {a} ?', qi: 'Quel sommet se trouve ici : {b} ?', qiOuverte: false, ouverte: false, niveaux: {
+      { k: 'paires', gauche: 'Sommet', droite: 'Massif', consigneR: 'Relie chaque sommet à son massif (ou sa chaîne de montagnes).', q: 'Dans quel massif trouve-t-on {le:a} ?', qi: 'Quel sommet trouve-t-on dans {le:b} ?', qiOuverte: false, ouverte: false, niveaux: {
         facile: [
           ["Le mont Blanc", "Les Alpes"],
           ["L’Everest", "L’Himalaya"],
@@ -736,7 +738,7 @@
           ["Le Plomb du Cantal", "Les monts du Cantal"],
           ["Le Grand Colombier", "Le massif du Jura"]]
       } },
-      { k: 'paires', gauche: 'Sommet', droite: 'Pays', consigneR: 'Relie chaque sommet à son pays.', q: 'Dans quel pays se trouve ce sommet : {a} ?', qi: 'Quel sommet se trouve dans ce pays : {b} ?', qiOuverte: false, niveaux: {
+      { k: 'paires', gauche: 'Sommet', droite: 'Pays', consigneR: 'Relie chaque sommet à son pays.', q: 'Dans quel pays trouve-t-on {le:a} ?', qi: 'Quel sommet trouve-t-on {en:b} ?', qiOuverte: false, niveaux: {
         moyen: [
           ["Le Kilimandjaro", "Tanzanie"],
           ["Le mont Fuji", "Japon"],
@@ -818,7 +820,7 @@
           ["L’Hekla", "Islande"],
           ["Le mont Moco", "Angola"]]
       } },
-      { k: 'paires', gauche: 'Chaîne', droite: 'Continent', ouverte: false, consigneR: 'Relie chaque chaîne de montagnes à son continent.', q: 'Sur quel continent se trouve cette chaîne de montagnes : {a} ?', qi: 'Quelle chaîne de montagnes se trouve sur ce continent : {b} ?', niveaux: {
+      { k: 'paires', gauche: 'Chaîne', droite: 'Continent', ouverte: false, consigneR: 'Relie chaque chaîne de montagnes à son continent.', q: 'Sur quel continent trouve-t-on {le:a} ?', qi: 'Quelle chaîne de montagnes trouve-t-on {en:b} ?', niveaux: {
         facile: [
           ["Les Alpes", "L’Europe"],
           ["L’Himalaya", "L’Asie"],
@@ -828,14 +830,14 @@
           ["Les Pyrénées", "L’Europe"],
           ["La cordillère australienne", "L’Océanie"]]
       } },
-      { k: 'paires', gauche: 'Description', droite: 'Massif', ouverte: false, consigneR: 'Relie chaque description à son massif.', q: 'Quel massif correspond à cette description : {a} ?', niveaux: {
+      { k: 'paires', gauche: 'Description', droite: 'Massif', ouverte: false, consigneR: 'Relie chaque description à son massif.', q: 'Quel massif correspond à {min:a} ?', niveaux: {
         facile: [
-          ["Le mont Blanc, plus haut sommet de France", "Les Alpes"],
-          ["La frontière avec l’Espagne", "Les Pyrénées"],
-          ["Les anciens volcans d’Auvergne", "Le Massif central"],
-          ["Entre la Lorraine et l’Alsace", "Les Vosges"],
-          ["La frontière avec la Suisse, au nord des Alpes", "Le Jura"],
-          ["Une île très montagneuse", "La Corse"]]
+          ["Le mont Blanc, plus haut sommet de France", "Les Alpes", 'Dans quel massif se trouve le mont Blanc, plus haut sommet de France ?'],
+          ["La frontière avec l’Espagne", "Les Pyrénées", 'Quel massif forme la frontière avec l’Espagne ?'],
+          ["Les anciens volcans d’Auvergne", "Le Massif central", 'Dans quel massif se trouvent les anciens volcans d’Auvergne ?'],
+          ["Entre la Lorraine et l’Alsace", "Les Vosges", 'Quel massif se dresse entre la Lorraine et l’Alsace ?'],
+          ["La frontière avec la Suisse, au nord des Alpes", "Le Jura", 'Quel massif forme la frontière avec la Suisse, au nord des Alpes ?'],
+          ["Une île très montagneuse", "La Corse", 'Quelle île très montagneuse forme un massif à elle seule ?']]
       } },
       { k: 'qcm', niveaux: {
         facile: [
@@ -1101,18 +1103,18 @@
     ] },
     // v8.2 : environ 45 éléments par niveau (paysages, animaux et milieux, climats de France, météo, vents, vocabulaire).
     { id: 'g17', matiere: 'geographie', famille: 'nature', nom: 'Climats et paysages', court: 'Climats', icone: '🌦️', series: [
-      { k: 'paires', gauche: 'Description', droite: 'Paysage', ouverte: false, consigneR: 'Relie chaque description à son paysage.', q: 'Quel paysage correspond à cette description : {a} ?', niveaux: {
+      { k: 'paires', gauche: 'Description', droite: 'Paysage', ouverte: false, consigneR: 'Relie chaque description à son paysage.', q: 'Quel paysage est {min:a} ?', niveaux: {
         facile: [
-          ["Très sec, très chaud le jour", "Le désert"],
-          ["De la glace sur la mer, très froid", "La banquise"],
-          ["Chaud et humide toute l’année, des arbres immenses", "La forêt équatoriale"],
-          ["De hautes herbes, une saison sèche et une saison des pluies", "La savane"],
-          ["Un sol gelé et de petites plantes, près des pôles", "La toundra"],
-          ["Des sommets, de la neige et des glaciers", "La haute montagne"],
-          ["Du sable, des vagues et la mer", "La plage"],
-          ["De grands champs de blé à perte de vue", "La plaine agricole"]]
+          ["Très sec, très chaud le jour", "Le désert", 'Quel paysage est très sec et très chaud le jour ?'],
+          ["De la glace sur la mer, très froid", "La banquise", 'Quel paysage est fait de glace sur la mer, dans un grand froid ?'],
+          ["Chaud et humide toute l’année, des arbres immenses", "La forêt équatoriale", 'Quel paysage est chaud et humide toute l’année, avec des arbres immenses ?'],
+          ["De hautes herbes, une saison sèche et une saison des pluies", "La savane", 'Quel paysage a de hautes herbes, une saison sèche et une saison des pluies ?'],
+          ["Un sol gelé et de petites plantes, près des pôles", "La toundra", 'Quel paysage a un sol gelé et de petites plantes, près des pôles ?'],
+          ["Des sommets, de la neige et des glaciers", "La haute montagne", 'Quel paysage a des sommets, de la neige et des glaciers ?'],
+          ["Du sable, des vagues et la mer", "La plage", 'Quel paysage a du sable, des vagues et la mer ?'],
+          ["De grands champs de blé à perte de vue", "La plaine agricole", 'Quel paysage a de grands champs de blé à perte de vue ?']]
       } },
-      { k: 'paires', gauche: 'Animal', droite: 'Milieu', ouverte: false, consigneR: 'Relie chaque animal au milieu où il vit.', q: 'Où vit cet animal : {a} ?', qi: 'Quel animal vit ici : {b} ?', niveaux: {
+      { k: 'paires', gauche: 'Animal', droite: 'Milieu', ouverte: false, consigneR: 'Relie chaque animal au milieu où il vit.', q: 'Où vit {le:a} ?', qi: 'Quel animal a pour milieu de vie {le:b} ?', niveaux: {
         facile: [
           ["L’ours polaire", "La banquise"],
           ["Le dromadaire", "Le désert"],
@@ -1126,7 +1128,7 @@
           ["Le phoque", "La banquise"],
           ["Le koala", "La forêt d’eucalyptus"]]
       } },
-      { k: 'paires', gauche: 'Lieu', droite: 'Paysage', ouverte: false, consigneR: 'Relie chaque lieu à son paysage.', q: 'Quel paysage trouve-t-on ici : {a} ?', qi: 'Quel lieu correspond à ce paysage : {b} ?', niveaux: {
+      { k: 'paires', gauche: 'Lieu', droite: 'Paysage', ouverte: false, consigneR: 'Relie chaque lieu à son paysage.', q: 'Quel paysage caractérise {le:a} ?', qi: 'Où trouve-t-on {min:b} ?', niveaux: {
         moyen: [
           ["Le Sahara", "Un désert chaud"],
           ["L’Amazonie", "Une forêt équatoriale"],
@@ -1170,7 +1172,7 @@
           ["Les dolomites", "Des montagnes calcaires aux falaises pâles"],
           ["Les cheminées de fée de Cappadoce", "Des colonnes de roche volcanique sculptées par l’érosion"]]
       } },
-      { k: 'paires', gauche: 'Ville', droite: 'Climat', ouverte: false, consigneR: 'Relie chaque ville à son climat.', q: 'Quel est le climat de cette ville : {a} ?', qi: 'Quelle ville a ce climat : {b} ?', niveaux: {
+      { k: 'paires', gauche: 'Ville', droite: 'Climat', ouverte: false, consigneR: 'Relie chaque ville à son climat.', q: 'Quel est le climat {de:a} ?', qi: 'Quelle ville a un climat {min:b} ?', niveaux: {
         moyen: [
           ["Brest", "Océanique"],
           ["Marseille", "Méditerranéen"],

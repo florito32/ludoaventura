@@ -198,6 +198,11 @@ js = """// Cartes des jeux Carte France, Carte Europe et Carte Monde (Géographi
     for (var i = t.length - 1; i > 0; i--) { var k = Math.floor(h() * (i + 1)); var x = t[i]; t[i] = t[k]; t[k] = x; }
     return t;
   }
+  // « Touche le Finistère sur la carte. » (une phrase, sans deux-points : demande du 17/11/2026) ; js/articles.js.
+  function leNom(nom) {
+    var A = racine && racine.Articles ? racine.Articles : (typeof module !== 'undefined' && module.exports ? require('./articles.js') : null);
+    return A ? A.le(nom) : nom;
+  }
   function zonesDu(id, niveau) { return (CARTES[id] || { zones: [] }).zones.filter(function (z) { return z.cible && z.niv === niveau; }); }
   // carte : 'france', 'europe' ou 'monde' ; niveau : 'facile'… ; mode : 'normal' (toucher la zone nommée)
   // ou 'quiz' (la zone est en vert, 4 noms au choix dont un seul bon, choix de l'utilisateur du 13/11/2026).
@@ -207,7 +212,7 @@ js = """// Cartes des jeux Carte France, Carte Europe et Carte Monde (Géographi
     if (!carte || !cibles.length) return null;
     var z = auHasard(cibles, hasard);
     if (mode !== 'quiz') {
-      return { format: 'C', consigne: 'Touche ' + carte.quoi + ' : ' + z.nom, carte: id, bonne: z.id, bonneNom: z.nom, touche: null };
+      return { format: 'C', consigne: 'Touche ' + leNom(z.nom) + ' sur la carte.', carte: id, bonne: z.id, bonneNom: z.nom, touche: null };
     }
     // Mauvais choix : du même niveau, de préférence du même continent (monde) ; sinon des niveaux voisins.
     var autres = cibles.filter(function (x) { return x.id !== z.id && (!z.cont || id !== 'monde' || x.cont === z.cont); });
