@@ -2,6 +2,9 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.8', date: '2026-11-17', changes: [
+    "Baby jeux « La lettre qui manque » et « Le chiffre qui manque » : la suite en haut est à plat dans un bandeau (on ne la touche pas), puis une ligne pointillée et « Touche ta réponse » annoncent les gros boutons en relief du bas, comme dans « Remettre la phrase »."
+  ] },
   { v: '10.7', date: '2026-11-17', changes: [
     "Crédits (en bas de page) : les illustrations du jeu sont de Stuki San."
   ] },

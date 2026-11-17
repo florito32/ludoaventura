@@ -76,7 +76,11 @@
   function choix(c, fait, o) {
     var h = '', gros = function (v) { return '<span class="baby-gros">' + echapper(v) + '</span>'; };
     switch (c.jeu) {
-      case 'lettre-manque': case 'chiffre-manque': h += suite(c, fait); break;
+      case 'lettre-manque': case 'chiffre-manque':
+        // v10.8 : la suite (à plat, non cliquable) est séparée des réponses (boutons en relief) par une ligne pointillée et une invite.
+        h += suite(c, fait);
+        if (!fait) h += '<p class="baby-invite"><span aria-hidden="true">👇</span> Touche ta réponse</p>';
+        break;
       case 'entends-lettre': case 'entends-chiffre': case 'syllabes':
         h += '<p class="baby-oreille" aria-hidden="true">👂</p>'; break;
       case 'premiere-lettre':

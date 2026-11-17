@@ -314,3 +314,42 @@ test('les jetons se baladent (animation) quand l’appareil n’a pas demandé m
   const anim = await page.locator('.baby-jeton').first().evaluate((e) => getComputedStyle(e).animationName);
   expect(anim).toBe('baby-balade');
 });
+
+// v10.8 (demande du 17/11/2026) : « La lettre qui manque » et « Le chiffre qui manque » — on ne comprenait pas sur quoi toucher.
+// La suite (en haut) est à plat, non cliquable ; les réponses (en bas) sont des boutons en relief ; une ligne pointillée et
+// « Touche ta réponse » les séparent, comme dans « Remettre la phrase ».
+for (const id of ['lettre-manque', 'chiffre-manque']) {
+  test('« ' + id + ' » : la suite et les boutons de réponse se distinguent nettement, sans déborder', async ({ page }) => {
+    await ouvrirBaby(page);
+    await page.getByRole('button', { name: 'Choisir les jeux' }).click();
+    await page.getByRole('button', { name: 'Lancer la partie' }).click();
+    await page.evaluate(([x, k]) => { const b = window.Aventura.partie.rapide.baby; b.jeux = [x]; b.categories = [k]; }, [id, B.jeu(id).cat]);
+    await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
+    const boite = page.locator('#carte-gram');
+    await expect(boite.locator('.baby-suite')).toBeVisible();
+    await expect(boite.locator('.baby-invite')).toContainText('Touche ta réponse');
+    const m = await page.evaluate(() => {
+      const q = (s) => document.querySelector('#carte-gram ' + s), r = (e) => e.getBoundingClientRect();
+      const cs = (e) => getComputedStyle(e);
+      return {
+        casesBoutons: document.querySelectorAll('#carte-gram .baby-case button').length,
+        ombreCase: cs(q('.baby-case')).boxShadow, ombreTrou: cs(q('.baby-case.trou')).boxShadow, ombreBouton: cs(q('.gram-bouton')).boxShadow,
+        curseurCase: cs(q('.baby-case')).cursor,
+        bas: r(q('.baby-suite')).bottom, invite: r(q('.baby-invite')), haut: r(q('.gram-choix')).top,
+        large: document.documentElement.scrollWidth - window.innerWidth,
+      };
+    });
+    expect(m.casesBoutons).toBe(0);
+    expect(m.ombreCase).toBe('none');
+    expect(m.ombreTrou).toBe('none');
+    expect(m.ombreBouton).not.toBe('none');
+    expect(m.curseurCase).toBe('default');
+    expect(m.invite.top).toBeGreaterThanOrEqual(m.bas);       // la suite est au-dessus de l'invite…
+    expect(m.haut).toBeGreaterThanOrEqual(m.invite.bottom);   // …qui est au-dessus des boutons
+    expect(m.large).toBeLessThanOrEqual(0);
+    // Toucher la bonne réponse marche toujours et l'invite disparaît.
+    await resoudre(page);
+    await expect(page.locator('#carte-reponse')).toContainText('Bravo !');
+    await expect(boite.locator('.baby-invite')).toHaveCount(0);
+  });
+}
