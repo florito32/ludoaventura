@@ -1,4 +1,4 @@
-// Pseudos des joueurs (v10.9, demande du 17/11/2026, backlog ligne 414).
+// Pseudos des joueurs (v10.9, demande du 17/11/2026, backlog lignes 416 à 419).
 // Règles : pseudo unique de 4 à 20 caractères (lettres, chiffres, - et _, sans espace), choisi à la création d'un compte
 // e-mail, modifiable dans « Mon compte » ; pseudo automatique (compte Google) proposé à la prochaine ouverture du jeu.
 // Le service Supabase est imité (page.route) : aucun appel réseau réel. Les règles de la base (unicité, pseudo automatique,

@@ -2,6 +2,11 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.11', date: '2026-11-17', changes: [
+    "Pseudo : chaque compte a un pseudo unique de 4 à 20 caractères (lettres, chiffres, - et _, sans espace). Tu le choisis en créant ton compte par e-mail ; avec Google, le jeu t’en donne un (prénom + initiale + 01) et te propose d’en choisir un à la prochaine ouverture.",
+    "Mon compte : ton pseudo s’affiche et tu peux le changer quand tu veux.",
+    "Les étoiles, pierres précieuses et niveaux de chaque joueur sont suivis dans Supabase (tables profils, stats_joueur, etoiles_jour) pour des classements de la semaine, du mois et du niveau général."
+  ] },
   { v: '10.10', date: '2026-11-17', changes: [
     "Baby jeux : « Encore un ! » devient « J’en ajoute ». Tu pars d’un des chiffres que tu travailles et on t’en ajoute 1, 2 ou 3 (le total peut dépasser 10).",
     "La phrase est plus naturelle : « Tu as 5 pommes. Tu en reçois 2 de plus. Combien de pommes as-tu maintenant ? » (avec « une pomme », « un ballon », « d’étoiles » bien accordés)."
