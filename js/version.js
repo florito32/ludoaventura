@@ -4,9 +4,13 @@
 (function () {
   'use strict';
 
-  var VERSION = '9.7';
+  var VERSION = '9.8';
 
   var HISTORY = [
+    { v: '9.8', date: '2026-11-17', changes: [
+      "Après une aventure gagnée, « Retour à l’accueil » garde « ⭐ +19 étoiles » au milieu de l’écran : les étoiles s’envolent une à une vers le compteur du haut, qui grandit à chaque arrivée (1 seconde pour 10 étoiles).",
+      "« Rejouer » ou « Nouvelle partie » : les étoiles sont ajoutées au compte sans animation."
+    ] },
     { v: '9.7', date: '2026-11-17', changes: [
       "Cartes à toucher (départements, Europe, monde) : on peut zoomer beaucoup plus fort, jusqu’à ce que le plus petit pays ou département à trouver (Israël, Liban, Paris…) soit aussi large qu’un doigt.",
       "Les petits pays gardent leur forme quand on zoome : contours dix fois plus précis qu’avant.",
