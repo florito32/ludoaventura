@@ -20,7 +20,7 @@ test('le bouton s\'appelle « Question suivante »', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Piocher une carte' })).toHaveCount(0);
 });
 
-test('le dé et ses points ne cachent ni le message ni l\'encadré des points', async ({ page }) => {
+test('le dé ne cache pas l\'encadré des points (et plus de message de fin de tour sur le plateau, v10.5)', async ({ page }) => {
   await rapide(page, { pause: 600000 }); // le message reste affiché pendant la mesure
   await page.goto('./');
   await versReglages(page, 1); // 1 joueur : chaque tour finit la manche, message le plus long (« en route vers le lac »)
@@ -29,16 +29,8 @@ test('le dé et ses points ne cachent ni le message ni l\'encadré des points', 
   await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await repondre(page, true);
   await lancerLeDe(page);
-  await expect(page.locator('#bandeau')).toContainText('en route vers le lac');
-  // Le dé glisse en 0,3 s : on attend qu'il soit dégagé.
-  await expect.poll(async () => page.evaluate(() => {
-    const r = (el) => el.getBoundingClientRect();
-    const m = r(document.getElementById('bandeau'));
-    const d = r(document.getElementById('de-plateau')), g = r(document.getElementById('de-gain'));
-    const de = { top: Math.min(d.top, g.top), bottom: d.bottom, left: d.left, right: Math.max(d.right, g.right) };
-    const ch = (a, b) => a.top < b.bottom - 1 && a.bottom > b.top + 1 && a.left < b.right - 1 && a.right > b.left + 1;
-    return ch(de, m);
-  }), { timeout: 3000 }).toBe(false);
+  await expect(page.locator('#bandeau')).toBeHidden(); // v10.5 : plus d'encadré de progression
+  await page.waitForTimeout(500); // le dé finit de glisser
   const z = await page.evaluate(() => {
     const r = (el) => { const b = el.getBoundingClientRect(); return { top: b.top, bottom: b.bottom, left: b.left, right: b.right }; };
     return { de: r(document.getElementById('de-plateau')), pts: r(document.querySelector('.points-plateau')),

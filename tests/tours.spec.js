@@ -58,9 +58,8 @@ test('un tour complet : piocher, répondre, lancer, message écrit puis joueur s
   const pts = Number(await page.locator('#points').textContent());
   expect(pts).toBeGreaterThanOrEqual(4);
   expect(pts).toBeLessThanOrEqual(6);
-  // C'est écrit sur le plateau (bandeau), puis on passe tout seul au joueur suivant.
-  await expect(page.locator('#bandeau')).toHaveText(`Léa taille ${pts} pierres ! Au tour de Tom.`);
-  await expect(page.locator('#bandeau')).toBeVisible();
+  // v10.5 : plus d'encadré de progression sur le plateau à la fin du tour ; on passe tout seul au joueur suivant.
+  await expect(page.locator('#bandeau')).toBeHidden();
   // v5.2 : plus écrit dans l'encadré Tour de jeu (seulement pour les lecteurs d'écran).
   await expect(page.locator('#tour-consigne .visually-hidden')).toHaveText(`Léa taille ${pts} pierres ! Au tour de Tom.`);
   expect(await page.locator('#tour-consigne').evaluate((el) => el.offsetHeight > 0 && [...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim()))).toBe(false);
@@ -248,8 +247,9 @@ test('v6.21 : fin de manche, « en route vers le lac / le marais / les collines 
     await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
     await repondre(page, true);
     await lancerLeDe(page);
-    await expect(page.locator('#bandeau')).toContainText('Au tour de Léa, en route vers ' + lieu + '.');
-    await expect(page.locator('#bandeau')).not.toContainText('croix suivante');
+    // v10.5 : le message n'est plus affiché sur le plateau, seulement annoncé aux lecteurs d'écran.
+    await expect(page.locator('#tour-consigne .visually-hidden')).toContainText('Au tour de Léa, en route vers ' + lieu + '.');
+    await expect(page.locator('#bandeau')).toBeHidden();
     await attendreJoueur(page, 'Léa');
   }
 });

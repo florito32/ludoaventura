@@ -145,7 +145,8 @@
         // Légère variation d'une phrase à l'autre (évite la lecture monotone) ; une question monte un peu.
         hauteur: question ? 1.08 : (i % 2 ? 1.03 : 1),
         // Un peu plus lent que la normale pour les enfants, et encore un peu plus quand il y a des nombres.
-        vitesse: /\d/.test(m) ? 0.85 : 0.92
+        // Un tout petit morceau (« U. », « mi. », « in. ») est une lettre, une syllabe ou un son à faire entendre : plus lent.
+        vitesse: m.replace(/[.!?…,\s]/g, '').length <= 3 ? 0.7 : /\d/.test(m) ? 0.85 : 0.92
       };
     });
   }

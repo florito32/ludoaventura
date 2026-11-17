@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  var VERSION = '10.4';
+  var VERSION = '10.5';
 
   // L'historique (ce qui a changé à chaque version) est dans js/version-historique.js, chargé au premier clic.
 

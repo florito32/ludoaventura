@@ -1401,10 +1401,9 @@
       } else {
         suite = 'Tout le monde est arrivé au volcan !';
       }
-      // Écrit sur le plateau (bandeau) seulement : plus dans le Tour de jeu (demande du 03/11/2026),
-      // mais toujours annoncé aux lecteurs d'écran (le bandeau leur est masqué).
+      // v10.5 (demande du 17/11/2026) : plus d'encadré de progression sur le plateau à la fin du tour
+      // (une autre animation viendra) ; le message reste annoncé aux lecteurs d'écran.
       annoncer(gain + ' ' + suite);
-      bandeau(gain + ' ' + suite);
     }
     majPlein(); // v9.0 : question en plein écran sur téléphone et tablette
     ajusterTour();
