@@ -81,13 +81,22 @@ class Carte:
                 continue
             xs += [x for x, _ in pts]; ys += [y for _, y in pts]
             # Chemin en coordonnées relatives (plus court) : M x,y puis l dx dy…
-            q = [(round(x), round(y)) for x, y in pts]
-            rel = ['%d %d' % (q[i][0] - q[i - 1][0], q[i][1] - q[i - 1][1]) for i in range(1, len(q))]
-            rel = [r for r in rel if r != '0 0']
-            morceaux.append('M%d %dl' % q[0] + ' '.join(rel).replace(' -', '-') + 'z')
+            # v9.5 : coordonnées au dixième (au lieu de l'unité) pour que les petits pays (Israël, Liban…)
+            # gardent leur vraie forme quand on zoome très fort.
+            q = [(round(x * 10), round(y * 10)) for x, y in pts]
+            rel = [(q[i][0] - q[i - 1][0], q[i][1] - q[i - 1][1]) for i in range(1, len(q))]
+            rel = [nb(a) + ' ' + nb(b) for a, b in rel if (a, b) != (0, 0)]
+            morceaux.append('M' + nb(q[0][0]) + ' ' + nb(q[0][1]) + 'l' + ' '.join(rel).replace(' -', '-') + 'z')
         if not morceaux:
             return None, None
         return ''.join(morceaux), (min(xs), min(ys), max(xs), max(ys))
+
+def nb(n):
+    """Entier en dixièmes → texte SVG le plus court : 12 → « 1.2 », 30 → « 3 », -4 → « -.4 »."""
+    if n < 0:
+        return '-' + nb(-n)
+    t = '%d' % (n // 10) if n % 10 == 0 else '%.1f' % (n / 10)
+    return t[1:] if t.startswith('0.') else t
 
 def zone(id_, nom, d, bbox, carte, cible):
     return {'id': id_, 'nom': nom, 'd': d, 'cible': cible}
@@ -127,7 +136,7 @@ france = Carte(-5.3, 9.7, 41.2, 51.2)
 zs = []
 for f in dep['features']:
     code = f['properties']['code']
-    d, bb = france.chemin(f['geometry'], 0.9)
+    d, bb = france.chemin(f['geometry'], 0.5)
     if not d:
         continue
     zs.append({'id': 'd' + code, 'nom': f['properties']['nom'], 'd': d, 'cible': assez_grande(bb, france, 0.006), 'niv': rang[code]})
@@ -178,8 +187,8 @@ def carte_pays(c, choix, seuil, tol, titre, cle):
     CARTES[cle] = {'vb': '0 0 %d %d' % (LARGEUR, round(c.h)), 'titre': titre, 'quoi': 'le pays', 'zones': zs}
 
 EUROPE = lambda p: p.get('CONTINENT') == 'Europe' or iso(p) == 'CY'
-carte_pays(Carte(-25, 50, 34, 71.5), EUROPE, 0.0035, 1.0, 'l’Europe', 'europe')
-carte_pays(Carte(-170, 180, -57, 83.7), lambda p: True, 0.0028, 0.9, 'le monde', 'monde')
+carte_pays(Carte(-25, 50, 34, 71.5), EUROPE, 0.0035, 0.4, 'l’Europe', 'europe')
+carte_pays(Carte(-170, 180, -57, 83.7), lambda p: True, 0.0028, 0.25, 'le monde', 'monde')
 
 for c in CARTES.values():
     for z in c['zones']:
