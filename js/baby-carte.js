@@ -84,7 +84,7 @@
       case 'compter': h += objets(c.objet, c.nombre); break;
       case 'doigts': h += mains(c.nombre); break;
       case 'encore-un':
-        h += '<p class="baby-encore">' + objets(c.objet, c.avant) + '<span class="baby-plus" aria-hidden="true">+</span>' + objets(c.objet, 1, 'arrive') + '</p>';
+        h += '<p class="baby-encore">' + objets(c.objet, c.avant) + '<span class="baby-ajout"><span class="baby-plus" aria-hidden="true">+</span>' + objets(c.objet, c.ajout, 'arrive') + '</span></p>';
         break;
       case 'plus':
         return h + o.boutons(c, c.choix, fait, null, function (v) { var n = c.paniers[v === 'g' ? 0 : 1]; return '<span class="baby-panier">' + objets(c.objet, n) + '</span>'; },
