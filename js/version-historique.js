@@ -2,6 +2,9 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.7', date: '2026-11-17', changes: [
+    "Crédits (en bas de page) : les illustrations du jeu sont de Stuki San."
+  ] },
   { v: '10.6', date: '2026-11-17', changes: [
     "Le jeu te tutoie partout. Quand tu joues seul, l’histoire de l’aventure s’adresse à toi (« Ton pire ennemi, Ragnar, t’a volé des troncs… ») ; à plusieurs, elle parle à l’équipe (« vous »).",
     "« Choisis ton aventure » quand tu joues seul ; Ludo dit « Continue jusqu’au volcan »."
