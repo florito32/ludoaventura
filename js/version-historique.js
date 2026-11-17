@@ -2,6 +2,9 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.3', date: '2026-11-17', changes: [
+    "Au lancement, tant que tu n’es pas connecté, une fenêtre au centre de l’écran propose « Se connecter », « Créer un compte » ou « Jouer en invité ». Elle revient à chaque ouverture du jeu."
+  ] },
   { v: '10.2', date: '2026-11-17', changes: [
     "Coulisses : cet historique n’est plus téléchargé par les joueurs, il se charge au clic sur le numéro de version.",
     "Tests automatiques plus rapides (4 en parallèle) et suivi du projet allégé."
