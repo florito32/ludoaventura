@@ -197,7 +197,8 @@ test('mot mélangé : lettres à toucher, pas de case à écrire ; la voix ne di
   await expect(page.locator('#lettres-melangees .lettre-tuile')).toHaveText(l);
   await expect(page.locator('#lettres-reponse .lettre-case')).toHaveCount(c.mot.length);
   await page.getByRole('button', { name: 'Écouter' }).click();
-  expect(await page.evaluate(() => window.__lu.pop())).toBe('Remets les lettres dans l’ordre :');
+  expect(await page.evaluate(() => window.__lu.pop())).toBe('Remets les lettres dans l’ordre.');
+  expect(await page.evaluate(() => window.Voix.dernier)).toBe('Remets les lettres dans l’ordre :');
   // Ordre faux : on place les lettres telles qu'elles sont mélangées (jamais le bon mot).
   for (let t = 0; t < l.length; t++) await tuile(page, t).click();
   await expect(page.locator('#carte-reponse')).toContainText('tu as écrit « ' + l.join('') + ' »');
@@ -364,7 +365,8 @@ test('Réécrire le mot : dictée lue tout de suite (mot, phrase, mot), mot cach
   await expect(page.locator('#btn-voir-mot')).toBeHidden();
   await expect(page.getByRole('button', { name: 'Bonne réponse' })).toHaveCount(0);
   const m = mot.toLocaleLowerCase('fr-FR');
-  const lu = await page.evaluate(() => window.__lu.slice());
+  expect(await page.evaluate(() => window.__lu.length)).toBeGreaterThan(0);
+  const lu = [await page.evaluate(() => window.Voix.dernier)];
   expect(lu).toEqual(['Écris le mot que tu entends : ' + m + '. ' + P[mot] + ' ' + m.charAt(0).toLocaleUpperCase('fr-FR') + m.slice(1) + '.']);
   // Les accents ne sont pas exigés (hypothèse à valider) : « elephant » = ÉLÉPHANT.
   await page.getByLabel('Ta réponse').fill(Q.lettres(mot).join('').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase());

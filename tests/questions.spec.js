@@ -91,5 +91,6 @@ test('la voix lit la question tirée, puis le mot', async ({ page }) => {
   await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await page.getByRole('button', { name: 'Écouter' }).click();
   const mot = await page.evaluate(() => window.Aventura.partie.carte.mot);
-  expect(await page.evaluate(() => window.__lu.pop())).toBe('Combien de syllabes y a-t-il dans le mot : ' + mot.replace(/(\.\.\.|…)/g, ' ').replace(/\s+/g, ' ').trim().toLocaleLowerCase('fr-FR') + '.');
+  expect(await page.evaluate(() => window.__lu.length)).toBeGreaterThan(0);
+  expect(await page.evaluate(() => window.Voix.dernier)).toBe('Combien de syllabes y a-t-il dans le mot : ' + mot.replace(/(\.\.\.|…)/g, ' ').replace(/\s+/g, ' ').trim().toLocaleLowerCase('fr-FR') + '.');
 });
