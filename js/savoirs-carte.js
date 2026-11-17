@@ -149,7 +149,7 @@
     var carte = racine.CartesGeo && racine.CartesGeo.CARTES[c.carte];
     if (!carte) return '<p>Carte indisponible.</p>';
     var zones = carte.zones.map(function (z) {
-      var cl = 'zone' + (z.cible && !verte ? ' cible' : '');
+      var cl = 'zone' + (z.cible ? ' demandable' : '') + (z.cible && !verte && !fait ? ' cible' : ''); // v9.5 : plus de survol jaune une fois répondu
       if (verte ? z.id === verte : fait && z.id === c.bonne) cl += ' bonne';
       else if (fait && z.id === c.touche) cl += ' fausse';
       var acces = z.cible && !fait && !verte ? ' role="button" tabindex="0" aria-label="' + esc(z.nom) + '"' : ' aria-hidden="true"';
@@ -164,49 +164,78 @@
     return '<div class="carte-geo' + (verte ? ' carte-quiz' : '') + '"><svg viewBox="' + carte.vb + '" role="' + (verte ? 'img' : 'group') + '" aria-label="' + esc(nom) + '">' + zones + '</svg>' + zoom + '</div>';
   }
 
-  // ---------- Zoom de la carte à toucher (v7.2) ----------
+  // ---------- Zoom de la carte à toucher (v7.2, zoom bien plus fort en v9.5) ----------
   // On change le viewBox du SVG : seule la carte grossit, la page garde sa taille (touch-action: none sur la carte,
   // donc le navigateur ne zoome pas la page quand on pince dessus). Pincer à deux doigts ou la molette : zoom autour
   // des doigts / du pointeur ; un doigt glissé : déplace la carte zoomée. Un toucher sans glisser choisit une zone.
-  var ZOOM_MAX = 8, SEUIL = 8; // seuil en pixels : au-delà, c'est un glissé (pas un toucher)
+  // v9.5 : le zoom maximal dépend de la carte : on peut zoomer jusqu'à ce que la plus petite zone à trouver
+  // (Israël, Liban, Paris…) fasse au moins CIBLE_PX pixels de large, la taille d'un doigt. La carte du monde,
+  // très large, est aussi plus haute sur téléphone (mer en haut et en bas) pour laisser de la place au zoom.
+  var ZOOM_MIN_MAX = 8, ZOOM_PLAFOND = 400, CIBLE_PX = 44, SEUIL = 8; // SEUIL en pixels : au-delà, c'est un glissé
   function zoomCarte(geo) {
     var svg = geo.querySelector('svg');
     if (!svg) return;
     var v0 = svg.getAttribute('viewBox').split(/\s+/).map(Number);
-    var v = v0.slice();
+    var z = 1, cx = v0[0] + v0[2] / 2, cy = v0[1] + v0[3] / 2; // niveau de zoom et centre de la vue (unités de la carte)
     var doigts = {}, depart = null, bouge = false, ecart = 0, milieu = null;
 
+    // Plus petit côté de la plus petite zone qu'on peut demander (ou de la zone verte du quiz), en unités de la carte.
+    var petit = Infinity;
+    Array.prototype.forEach.call(svg.querySelectorAll('.zone.demandable, .zone.bonne'), function (p) {
+      try { var bb = p.getBBox(); if (bb.width && bb.height) petit = Math.min(petit, bb.width, bb.height); } catch (err) { /* rien */ }
+    });
+
+    // Hauteur de la carte : au moins les 3/4 de sa largeur (carte du monde sur téléphone) ; le plafond
+    // max-height du CSS s'applique toujours.
+    function hauteur() {
+      var l = svg.clientWidth;
+      if (l) svg.style.height = Math.round(Math.max(l * v0[3] / v0[2], l * 0.75)) + 'px';
+    }
+    // Rapport largeur / hauteur de la carte à l'écran (la vue a toujours ce rapport : pas de bande perdue).
+    function rapport() {
+      var l = svg.clientWidth, h = svg.clientHeight;
+      return l && h ? l / h : v0[2] / v0[3];
+    }
+    // Vue à zoom 1 : toute la carte, centrée (de la mer autour si l'écran n'a pas la même forme).
+    function base() { var r = rapport(), w = Math.max(v0[2], v0[3] * r); return [w, w / r]; }
+    function zoomMax() {
+      var l = svg.clientWidth;
+      if (!l || !isFinite(petit)) return ZOOM_MIN_MAX;
+      var pxParUnite = l / base()[0]; // à zoom 1
+      return Math.min(ZOOM_PLAFOND, Math.max(ZOOM_MIN_MAX, Math.ceil(CIBLE_PX / (petit * pxParUnite))));
+    }
     function appliquer() {
-      var w = Math.min(v0[2], Math.max(v0[2] / ZOOM_MAX, v[2]));
-      var h = w * v0[3] / v0[2];
-      v[2] = w; v[3] = h;
-      v[0] = Math.min(v0[0] + v0[2] - w, Math.max(v0[0], v[0]));
-      v[1] = Math.min(v0[1] + v0[3] - h, Math.max(v0[1], v[1]));
-      svg.setAttribute('viewBox', v.map(function (n) { return Math.round(n * 100) / 100; }).join(' '));
-      var zoome = w < v0[2] - 0.01;
+      var b = base(), zm = zoomMax();
+      z = Math.min(zm, Math.max(1, z));
+      var w = b[0] / z, h = b[1] / z;
+      // Le centre reste dans la carte (ou au milieu si la vue est plus grande que la carte).
+      cx = w >= v0[2] ? v0[0] + v0[2] / 2 : Math.min(v0[0] + v0[2] - w / 2, Math.max(v0[0] + w / 2, cx));
+      cy = h >= v0[3] ? v0[1] + v0[3] / 2 : Math.min(v0[1] + v0[3] - h / 2, Math.max(v0[1] + h / 2, cy));
+      svg.setAttribute('viewBox', [cx - w / 2, cy - h / 2, w, h].map(function (n) { return Math.round(n * 1000) / 1000; }).join(' '));
+      var zoome = z > 1.001;
       geo.classList.toggle('zoomee', zoome);
       geo.querySelector('[data-zoom="moins"]').disabled = !zoome;
-      geo.querySelector('[data-zoom="plus"]').disabled = w <= v0[2] / ZOOM_MAX + 0.01;
+      geo.querySelector('[data-zoom="plus"]').disabled = z >= zm - 0.001;
       geo.querySelector('[data-zoom="tout"]').hidden = !zoome;
     }
-    // Point de l'écran → point de la carte (tient compte des bandes vides de preserveAspectRatio).
+    // Point de l'écran → point de la carte.
     function versCarte(x, y) {
       var m = svg.getScreenCTM();
-      if (!m) return { x: v[0] + v[2] / 2, y: v[1] + v[3] / 2 };
+      if (!m) return { x: cx, y: cy };
       var p = svg.createSVGPoint(); p.x = x; p.y = y;
       return p.matrixTransform(m.inverse());
     }
     // Zoom d'un facteur f autour du point (x, y) de l'écran : ce point reste sous le doigt.
     function zoomer(f, x, y) {
-      var c = versCarte(x, y);
-      var w = Math.min(v0[2], Math.max(v0[2] / ZOOM_MAX, v[2] / f)), k = w / v[2];
-      v[0] = c.x - (c.x - v[0]) * k; v[1] = c.y - (c.y - v[1]) * k;
-      v[2] = w; v[3] *= k;
+      var p = versCarte(x, y);
+      var nz = Math.min(zoomMax(), Math.max(1, z * f)), k = z / nz;
+      cx = p.x - (p.x - cx) * k; cy = p.y - (p.y - cy) * k;
+      z = nz;
       appliquer();
     }
     function deplacer(dx, dy) {
-      var m = svg.getScreenCTM(), a = m ? m.a : 1;
-      v[0] -= dx / a; v[1] -= dy / a;
+      var m = svg.getScreenCTM(), a = m && m.a ? m.a : 1;
+      cx -= dx / a; cy -= dy / a;
       appliquer();
     }
     function centreEcran() { var r = svg.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; }
@@ -218,7 +247,7 @@
       var c = centreEcran();
       if (b.dataset.zoom === 'plus') zoomer(2, c[0], c[1]);
       else if (b.dataset.zoom === 'moins') zoomer(0.5, c[0], c[1]);
-      else { v = v0.slice(); appliquer(); }
+      else { z = 1; appliquer(); }
     });
     svg.addEventListener('wheel', function (e) {
       e.preventDefault();
@@ -268,15 +297,23 @@
       if (bouge && !e.target.closest('.carte-zoom')) { e.stopPropagation(); e.preventDefault(); }
       if (!liste().length) bouge = false;
     }, true);
+    // Écran tourné ou redimensionné : même zoom et même centre, la vue suit la nouvelle forme de la carte.
+    if (typeof ResizeObserver === 'function') {
+      var vue = new ResizeObserver(function () { if (!svg.isConnected) { vue.disconnect(); return; } hauteur(); appliquer(); });
+      vue.observe(geo);
+    }
+    hauteur();
     // Quiz (v8.0) : une petite zone verte serait invisible sur toute la carte ; on zoome d'abord autour d'elle
-    // (assez large pour voir les pays voisins). Le bouton ⤢ remontre toute la carte.
-    var verte = geo.classList.contains('carte-quiz') && svg.querySelector('.zone.bonne');
-    if (verte && verte.getBBox) {
-      var bb = verte.getBBox(), cote = Math.max(bb.width, bb.height * v0[2] / v0[3]) * 7;
-      var w = Math.min(v0[2], Math.max(v0[2] / 6, cote));
-      if (w < v0[2] * 0.9) {
-        v[2] = w; v[3] = w * v0[3] / v0[2];
-        v[0] = bb.x + bb.width / 2 - v[2] / 2; v[1] = bb.y + bb.height / 2 - v[3] / 2;
+    // (assez large pour voir les pays voisins). v9.5 : pareil après une réponse, autour de la bonne zone (en vert)
+    // et de la zone touchée (en rouge), pour bien voir où était la réponse. Le bouton ⤢ remontre toute la carte.
+    var vues = Array.prototype.slice.call(svg.querySelectorAll('.zone.bonne, .zone.fausse'));
+    if (vues.length && vues[0].getBBox) {
+      var x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+      vues.forEach(function (p) { var bb = p.getBBox(); x0 = Math.min(x0, bb.x); y0 = Math.min(y0, bb.y); x1 = Math.max(x1, bb.x + bb.width); y1 = Math.max(y1, bb.y + bb.height); });
+      var r = rapport(), cote = Math.max(x1 - x0, (y1 - y0) * r) * (vues.length > 1 ? 1.6 : 7);
+      if (cote < base()[0] * 0.9) {
+        z = base()[0] / cote;
+        cx = (x0 + x1) / 2; cy = (y0 + y1) / 2;
       }
     }
     appliquer();

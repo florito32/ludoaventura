@@ -4,9 +4,16 @@
 (function () {
   'use strict';
 
-  var VERSION = '9.6';
+  var VERSION = '9.7';
 
   var HISTORY = [
+    { v: '9.7', date: '2026-11-17', changes: [
+      "Cartes à toucher (départements, Europe, monde) : on peut zoomer beaucoup plus fort, jusqu’à ce que le plus petit pays ou département à trouver (Israël, Liban, Paris…) soit aussi large qu’un doigt.",
+      "Les petits pays gardent leur forme quand on zoome : contours dix fois plus précis qu’avant.",
+      "Sur téléphone, la carte du monde est plus haute : plus de place pour zoomer et viser, et les boutons + et − ne dépassent plus de la carte.",
+      "Après une réponse, la carte se zoome toute seule sur le bon pays (en vert) et sur celui touché (en rouge).",
+      "Une fois la réponse donnée, le pays touché reste rouge : il ne passe plus en jaune sous le doigt ou la souris."
+    ] },
     { v: '9.6', date: '2026-11-17', changes: [
       "Téléphone : barre du haut de l’accueil plus compacte. Le défi du jour, le coffre et le compte deviennent des boutons ronds à icône seule ; le bouton du compte est de nouveau visible.",
       "Le bloc des étoiles est sur trois lignes : niveau, puis étoiles, puis pierres précieuses.",
