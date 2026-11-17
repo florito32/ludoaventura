@@ -1987,12 +1987,15 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .baby-objets.arrive { animation: baby-arrive 1s ease-out; }
 @keyframes baby-arrive { from { transform: translateX(60px); opacity: 0; } }
 .baby-panier .baby-objets { font-size: 1.25rem; max-width: 6.5em; }
-.baby-suite { margin: 0; display: flex; gap: 8px; justify-content: center; }
-.baby-case { display: inline-flex; align-items: center; justify-content: center; min-width: 52px; height: 58px; padding: 0 6px;
-  border: 3px solid var(--encre); border-radius: 12px; background: #fff; font: 800 1.8rem/1 system-ui, sans-serif; }
-.baby-case.trou { border-style: dashed; border-color: var(--bleu); color: var(--bleu); background: #eef2fb; }
-.baby-case.juste { border: 3px solid #1e7b45; color: #1f5a2f; background: #e3f3e6; }
-.baby-case.fausse { border: 3px solid #1e7b45; color: #1f5a2f; background: #e3f3e6; }
+/* Suite à compléter (v10.8) : à plat dans un bandeau, sans relief ni ombre, pour ne pas ressembler aux boutons de réponse (en relief, plus bas). */
+.baby-suite { margin: 0; padding: 10px 12px; width: 100%; box-sizing: border-box; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+  background: var(--parchemin); border-radius: 14px; }
+.baby-case { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; height: 50px; padding: 0 6px;
+  border: 2px solid var(--parchemin-bord); border-radius: 10px; background: transparent; color: var(--encre-douce); font: 700 1.6rem/1 system-ui, sans-serif; cursor: default; }
+.baby-case.trou { border: 3px dashed var(--bleu); color: var(--bleu); background: #fff; font-weight: 800; }
+.baby-case.juste, .baby-case.fausse { border: 3px solid #1e7b45; color: #1f5a2f; background: #e3f3e6; font-weight: 800; }
+/* Invite entre la suite et les réponses : même ligne pointillée que dans « Remettre la phrase ». */
+.baby-invite { margin: 0; width: 100%; padding-top: 10px; border-top: 2px dashed var(--parchemin-bord); text-align: center; font-weight: 700; color: var(--encre-douce); }
 .baby-oreille { margin: 0; font-size: 3rem; line-height: 1; }
 .baby-image { margin: 0; font-size: clamp(3.5rem, 14vw, 4.5rem); line-height: 1; }
 .baby-motimage { margin: 0; font-size: 1.5rem; }
