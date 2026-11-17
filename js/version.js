@@ -4,9 +4,15 @@
 (function () {
   'use strict';
 
-  var VERSION = '9.8';
+  var VERSION = '9.9';
 
   var HISTORY = [
+    { v: '9.9', date: '2026-11-17', changes: [
+      "Histoire et géographie : toutes les questions sont de vraies phrases, sans deux-points. « Quelle est la capitale de ce pays : Togo ? » devient « Quelle est la capitale du Togo ? », « Touche le département : Finistère » devient « Touche le Finistère sur la carte. ».",
+      "Les questions « Lequel va avec : … ? » n’existent plus : chaque série à classer a ses propres questions, par exemple « Lequel de ces gestes se faisait déjà à la cour de Louis XIV ? ».",
+      "Les dates (« En quelle année Jules César a-t-il été assassiné ? ») et les devinettes sur les personnages (« Qui a fondé Québec en 1608 ? ») sont écrites une à une.",
+      "Les articles s’accordent tout seuls avec les noms de pays, de départements, de fleuves et de monuments (du Togo, de la France, de l’Iran, des Pays-Bas, de Cuba, au Japon, aux États-Unis)."
+    ] },
     { v: '9.8', date: '2026-11-17', changes: [
       "Après une aventure gagnée, « Retour à l’accueil » garde « ⭐ +19 étoiles » au milieu de l’écran : les étoiles s’envolent une à une vers le compteur du haut, qui grandit à chaque arrivée (1 seconde pour 10 étoiles).",
       "« Rejouer » ou « Nouvelle partie » : les étoiles sont ajoutées au compte sans animation."
