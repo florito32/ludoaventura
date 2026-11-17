@@ -2,6 +2,9 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.4', date: '2026-11-17', changes: [
+    "Partie rapide : toutes les questions des matières peuvent tomber, hors Baby jeux. En français, les phonèmes s’ajoutent à l’orthographe, la conjugaison et la grammaire ; en maths, un calcul sur deux est raconté comme un problème."
+  ] },
   { v: '10.3', date: '2026-11-17', changes: [
     "Au lancement, tant que tu n’es pas connecté, une fenêtre au centre de l’écran propose « Se connecter », « Créer un compte » ou « Jouer en invité ». Elle revient à chaque ouverture du jeu."
   ] },
