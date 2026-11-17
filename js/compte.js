@@ -11,7 +11,13 @@
 // Service : Supabase (projet « ludo jeu »), table public.progression (une ligne par compte, sécurité par ligne :
 // chacun ne lit et n'écrit que la sienne). Aucune bibliothèque : appels HTTP directs (fetch) à l'API d'authentification
 // (GoTrue, /auth/v1) et à l'API de données (PostgREST, /rest/v1). La clé « publishable » est publique par nature.
-// Partie logique (fusion) utilisable dans les tests Node : module.exports.
+// Pseudo (v10.9, demande du 17/11/2026) : chaque compte a un pseudo UNIQUE de 4 à 20 caractères (lettres, chiffres, - et _,
+// sans espace ; majuscules et accents ne comptent pas pour l'unicité). Choisi à la création d'un compte e-mail ; pour un
+// compte Google, le jeu en fabrique un (prénom + initiale du nom + 01) et propose d'en changer à la prochaine ouverture,
+// tant que le joueur ne l'a pas changé. Modifiable dans « Mon compte ». Tout est rangé dans Supabase (tables profils,
+// stats_joueur, etoiles_jour : outils/supabase/20261117_pseudos_stats_classements.sql) ; les étoiles, pierres et niveaux
+// y sont recopiés par la base à chaque sauvegarde de la progression : le jeu n'envoie rien de plus.
+// Partie logique (fusion, règles du pseudo) utilisable dans les tests Node : module.exports.
 (function (racine) {
   'use strict';
 
@@ -20,6 +26,7 @@
   var CLE_ETOILES = 'ludoaventura-etoiles';
   var CLE_SESSION = 'ludoaventura-session'; // jetons de connexion (localStorage : on reste connecté)
   var CLE_BASE = 'ludoaventura-compte';     // { uid, total, gemmes, quand } : dernière progression envoyée au compte
+  var CLE_PLUS_TARD = 'ludoaventura-pseudo-plus-tard'; // sessionStorage : « Plus tard » touché, on ne redemande pas avant la prochaine ouverture
 
   // ---------- Fusion de deux progressions (logique pure) ----------
   // local : progression de l'appareil ; distant : celle du compte ; base : ce que l'appareil a déjà envoyé au compte
@@ -69,7 +76,27 @@
     return r;
   }
 
-  var C = { fusionner: fusionner, URL: URL_SUPABASE, CLE_SESSION: CLE_SESSION, CLE_BASE: CLE_BASE };
+  // ---------- Règles du pseudo (mêmes règles que la base : fonction public.pseudo_valide) ----------
+  var PSEUDO_MIN = 4, PSEUDO_MAX = 20;
+  var PSEUDO_CARACTERES = /^[A-Za-z0-9_àáâãäåçèéêëìíîïñòóôõöùúûüýÿœÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝŸŒ-]*$/;
+  var MESSAGES_PSEUDO = {
+    court: 'Ton pseudo doit avoir au moins ' + PSEUDO_MIN + ' caractères.',
+    long: 'Ton pseudo doit avoir ' + PSEUDO_MAX + ' caractères au plus.',
+    caracteres: 'Utilise seulement des lettres, des chiffres, le tiret (-) et le tiret bas (_), sans espace.',
+    pris: 'Ce pseudo est déjà pris : choisis-en un autre.',
+    invalide: 'Utilise seulement des lettres, des chiffres, le tiret (-) et le tiret bas (_), sans espace.',
+    identique: 'C’est déjà ton pseudo actuel : choisis-en un autre.'
+  };
+  // Renvoie null si le pseudo est correct, sinon la raison : 'court' | 'long' | 'caracteres'.
+  function verifierPseudo(texte) {
+    var p = String(texte == null ? '' : texte).trim();
+    if (!PSEUDO_CARACTERES.test(p)) return 'caracteres';
+    if (p.length < PSEUDO_MIN) return 'court';
+    if (p.length > PSEUDO_MAX) return 'long';
+    return null;
+  }
+
+  var C = { fusionner: fusionner, verifierPseudo: verifierPseudo, MESSAGES_PSEUDO: MESSAGES_PSEUDO, URL: URL_SUPABASE, CLE_SESSION: CLE_SESSION, CLE_BASE: CLE_BASE };
   if (typeof module !== 'undefined' && module.exports) module.exports = C;
   racine.Compte = C;
   if (typeof document === 'undefined') return; // tests Node : la logique suffit
@@ -168,12 +195,57 @@
   var ecrireOrigine = window.Etoiles.Compte.prototype.ecrire;
   window.Etoiles.Compte.prototype.ecrire = function () { ecrireOrigine.call(this); planifier(); };
 
+  // ---------- Pseudo (v10.9) ----------
+  // profil : { pseudo, pseudo_auto, a_proposer } lu sur le compte (null tant qu'il n'est pas lu, ou hors connexion).
+  // a_proposer (calculé par la base) : le pseudo est celui du jeu ET le compte a plus de 10 minutes : on ne le propose
+  // donc pas pendant la création du compte, mais à la prochaine ouverture du jeu.
+  var profil = null, editionPseudo = false;
+  function lireProfil() {
+    return jeton().then(function (j) {
+      if (!j) return null;
+      return appel('/rest/v1/rpc/mon_profil', { methode: 'POST', jeton: j, corps: {} });
+    }).then(function (p) {
+      profil = p && p.pseudo ? p : null;
+      majPage();
+      proposerPseudo();
+      return profil;
+    }).catch(function () { return null; }); // pseudo illisible : le reste du jeu continue
+  }
+  // Change le pseudo (fenêtre ou écran Mon compte). Renvoie une promesse : null si c'est fait, sinon le message à montrer.
+  function enregistrerPseudo(texte) {
+    var raison = verifierPseudo(texte);
+    if (raison) return Promise.resolve(MESSAGES_PSEUDO[raison]);
+    return jeton().then(function (j) {
+      if (!j) return 'Connecte-toi pour changer ton pseudo.';
+      return appel('/rest/v1/rpc/changer_pseudo', { methode: 'POST', jeton: j, corps: { p_pseudo: String(texte).trim() } }).then(function (r) {
+        if (r && r.ok) { profil = { pseudo: r.pseudo, pseudo_auto: false, a_proposer: false }; return null; }
+        return MESSAGES_PSEUDO[r && r.raison] || 'Ton pseudo n’a pas pu être changé : réessaie.';
+      });
+    }).catch(function (e) { return traduire(e); });
+  }
+  function messagePseudo(id, texte) { var m = $(id); if (m) { m.textContent = texte || ''; m.hidden = !texte; } }
+  var fenetrePseudo = $('fenetre-pseudo');
+  function proposerPseudo() {
+    if (!fenetrePseudo || !profil || !profil.a_proposer || fenetrePseudo.open) return;
+    try { if (sessionStorage.getItem(CLE_PLUS_TARD) === '1') return; } catch (e) { /* stockage interdit */ }
+    $('fenetre-pseudo-actuel').textContent = profil.pseudo;
+    $('fenetre-pseudo-champ').value = '';
+    messagePseudo('fenetre-pseudo-message', '');
+    fenetrePseudo.showModal();
+    $('fenetre-pseudo-champ').focus();
+  }
+  function pseudoPlusTard() {
+    try { sessionStorage.setItem(CLE_PLUS_TARD, '1'); } catch (e) { /* stockage interdit */ }
+    if (fenetrePseudo.open) fenetrePseudo.close();
+  }
+
   // ---------- Connexion, inscription, mot de passe ----------
   function connecteAvec(s, message) {
     garderSession(s);
     return (s.user ? Promise.resolve(s.user) : appel('/auth/v1/user', { jeton: s.access_token })).then(function (u) {
       garderSession(Object.assign({}, session, { user: u }));
       dire(message || 'Tu es connecté. Ta progression est maintenant sauvegardée sur ton compte.', 'ok');
+      lireProfil(); // pseudo du compte (sans attendre la synchronisation)
       return synchroniser();
     });
   }
@@ -214,14 +286,20 @@
   // Création de compte (v9.9) : formulaire à part (e-mail, mot de passe, confirmation). Une fois la demande
   // acceptée, l'écran ne montre plus que « Vérifie tes e-mails » (mode « attente »).
   function creer() {
-    var email = $('creation-email').value.trim(), mdp = $('creation-mdp').value, mdp2 = $('creation-mdp2').value;
+    var email = $('creation-email').value.trim(), pseudo = $('creation-pseudo').value.trim(), mdp = $('creation-mdp').value, mdp2 = $('creation-mdp2').value;
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { dire('Écris ton adresse e-mail (exemple : prenom@gmail.com).', 'erreur'); $('creation-email').focus(); return; }
+    var raison = verifierPseudo(pseudo);
+    if (raison) { dire(MESSAGES_PSEUDO[raison], 'erreur'); $('creation-pseudo').focus(); return; }
     if (mdp.length < 6) { dire('Choisis un mot de passe d’au moins 6 caractères.', 'erreur'); $('creation-mdp').focus(); return; }
     if (mdp !== mdp2) { dire('Les deux mots de passe ne sont pas pareils : écris le même dans les deux cases.', 'erreur'); $('creation-mdp2').focus(); return; }
-    action(appel('/auth/v1/signup?redirect_to=' + encodeURIComponent(adresseRetour()), { methode: 'POST', corps: { email: email, password: mdp } }).then(function (r) {
-      $('creation-mdp').value = ''; $('creation-mdp2').value = '';
-      if (r && r.access_token) return connecteAvec(r, 'Compte créé, tu es connecté.');
-      emailAttente = email; mode = 'attente'; dire('');
+    // Pseudo libre ? (vérifié avant la création ; la base le revérifie : s'il est pris entre-temps, elle en donne un automatique.)
+    action(appel('/rest/v1/rpc/pseudo_disponible', { methode: 'POST', corps: { p_pseudo: pseudo } }).then(function (dispo) {
+      if (dispo !== 'ok') { dire(MESSAGES_PSEUDO[dispo === 'pris' ? 'pris' : 'invalide'], 'erreur'); $('creation-pseudo').focus(); return; }
+      return appel('/auth/v1/signup?redirect_to=' + encodeURIComponent(adresseRetour()), { methode: 'POST', corps: { email: email, password: mdp, data: { pseudo: pseudo } } }).then(function (r) {
+        $('creation-mdp').value = ''; $('creation-mdp2').value = '';
+        if (r && r.access_token) return connecteAvec(r, 'Compte créé, tu es connecté.');
+        emailAttente = email; mode = 'attente'; dire('');
+      });
     }));
   }
   // « Renvoyer l'e-mail » de validation (écran d'attente, ou connexion refusée car adresse pas encore validée).
@@ -249,6 +327,7 @@
     clearTimeout(minuterie);
     var fin = function () {
       garderSession(null); ecrireJSON(CLE_BASE, null);
+      profil = null; editionPseudo = false; // le pseudo reste sur le compte
       poserLocal({ v: 1, total: 0 });
       etat.synchro = 'aucune';
       dire('Tu es déconnecté. Ta progression reste sur ton compte ; sur cet appareil tu joues maintenant en invité.', 'ok');
@@ -286,6 +365,15 @@
     var qui = session && session.user && session.user.email ? session.user.email : 'ton compte';
     $('bienvenue-email').textContent = qui;
     $('bienvenue-titre').textContent = bienvenueDeja ? 'Ton compte est déjà validé' : 'Ton compte est validé !';
+    // Pseudo : montré dès qu'il est lu sur le compte ; le formulaire de changement s'ouvre à la demande.
+    var avecPseudo = co && !!profil;
+    $('compte-pseudo-bloc').hidden = !avecPseudo;
+    if (avecPseudo) {
+      $('compte-pseudo').textContent = profil.pseudo;
+      $('compte-pseudo-note').hidden = !profil.pseudo_auto;
+      $('compte-pseudo-form').hidden = !editionPseudo;
+      $('compte-pseudo-changer').hidden = editionPseudo;
+    }
     if (co) {
       $('compte-qui').textContent = qui;
       $('compte-etat').textContent = attente ? 'Sauvegarde en cours…'
@@ -312,12 +400,46 @@
   $('compte-invite-ok').addEventListener('click', function () { window.Aventura.afficher('ecran-accueil'); });
   $('compte-synchro').addEventListener('click', function () { action(synchroniser()); });
   $('compte-sortir').addEventListener('click', seDeconnecter);
+  // Changer de pseudo depuis « Mon compte » (mis à jour tout de suite dans Supabase).
+  $('compte-pseudo-changer').addEventListener('click', function () {
+    editionPseudo = true; messagePseudo('compte-pseudo-message', ''); majPage();
+    $('compte-pseudo-champ').value = ''; $('compte-pseudo-champ').focus();
+  });
+  $('compte-pseudo-annuler').addEventListener('click', function () { editionPseudo = false; majPage(); $('compte-pseudo-changer').focus(); });
+  $('compte-pseudo-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var champ = $('compte-pseudo-champ');
+    occupe(true);
+    enregistrerPseudo(champ.value).then(function (probleme) {
+      occupe(false);
+      if (probleme) { messagePseudo('compte-pseudo-message', probleme); champ.focus(); return; }
+      editionPseudo = false; messagePseudo('compte-pseudo-message', '');
+      dire('Ton pseudo est maintenant « ' + profil.pseudo + ' ».', 'ok');
+      majPage(); $('compte-pseudo-changer').focus();
+    });
+  });
+  // Fenêtre « Choisis ton pseudo » (pseudo automatique, proposé à la prochaine ouverture).
+  if (fenetrePseudo) {
+    $('fenetre-pseudo-plus-tard').addEventListener('click', pseudoPlusTard);
+    fenetrePseudo.addEventListener('cancel', function (e) { e.preventDefault(); pseudoPlusTard(); }); // Échap = « Plus tard »
+    $('fenetre-pseudo-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var champ = $('fenetre-pseudo-champ'), ok = $('fenetre-pseudo-ok');
+      ok.disabled = true;
+      enregistrerPseudo(champ.value).then(function (probleme) {
+        ok.disabled = false;
+        if (probleme) { messagePseudo('fenetre-pseudo-message', probleme); champ.focus(); return; }
+        fenetrePseudo.close();
+        majPage();
+      });
+    });
+  }
   $('compte-nouveau-form').addEventListener('submit', function (e) { e.preventDefault(); nouveauMdp(); });
   $('compte-voir').addEventListener('change', function () { $('compte-mdp').type = this.checked ? 'text' : 'password'; });
   // En quittant « Mon compte », l'écran revient à la connexion (sauf « nouveau mot de passe », pas encore choisi).
   document.addEventListener('aventura-ecran', function (e) {
     if (e.detail === 'ecran-compte') majPage();
-    else if (mode !== 'nouveau') { mode = 'connexion'; dire(''); }
+    else if (mode !== 'nouveau') { mode = 'connexion'; editionPseudo = false; dire(''); }
   });
 
   // ---------- Retour d'un lien reçu par e-mail ou de Google ----------
@@ -408,7 +530,7 @@
 
   majPage();
   if (!lireRetour()) {
-    if (session) synchroniser(); // ouverture du jeu : on récupère ce qui a été gagné ailleurs
+    if (session) { synchroniser(); lireProfil(); } // ouverture du jeu : on récupère ce qui a été gagné ailleurs, et le pseudo
     else fenetreAuLancement();
   }
   window.Compte = Object.assign(C, { synchroniser: synchroniser, session: function () { return session; }, etat: etat });
