@@ -41,3 +41,4 @@ Numéros : toujours relire la dernière ligne de `main` juste avant la fusion (d
 | 407 | Retirer le dossier `undefined/` (captures de test enregistrées par erreur) et corriger le test qui l'écrit | à faire — repéré le 17/11/2026 | — |
 | 408 | Demande du 17/11/2026 (17 h 58) : Baby jeux « J’entends la lettre », « Les syllabes », « Un son, des écritures » : la lettre / syllabe / son à trouver doit être bien audible (mieux isolé par la ponctuation) | fait à valider (v10.5) — cible dite seule, deux fois, lecture lente (js/baby.js, js/voix.js) | ✅ local (4 formats) + CI |
 | 409 | Ne plus afficher l'encadré de progression à la fin du tour (une autre animation viendra plus tard) | fait à valider (v10.5) — bandeau retiré, message gardé pour les lecteurs d'écran | ✅ local (4 formats) + CI |
+| 410 | Supprimer la branche fusionnée `claude/baby-voix-isolee` | question en attente — suppression refusée par le proxy : à supprimer à la main sur GitHub (onglet Branches) | — |
