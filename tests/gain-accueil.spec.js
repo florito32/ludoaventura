@@ -57,6 +57,25 @@ test('accueil : les étoiles gagnées partent du centre vers le compteur, qui gr
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
 
+test('gros gain : 200 étoiles arrivent en 3 secondes au plus (v10.0), le compteur grandit au fur et à mesure', async ({ page }) => {
+  await page.goto('./');
+  await page.evaluate((etat) => {
+    localStorage.setItem('ludo-vu', '1');
+    localStorage.setItem('ludoaventura-etoiles', etat);
+    sessionStorage.setItem('ludoaventura-gain-accueil', JSON.stringify({ n: 200 }));
+  }, ETAT(500));
+  await page.reload();
+  await expect(page.locator('.gain-accueil')).toHaveText('+200 étoiles');
+  const t0 = Date.now();
+  const total = page.locator('#accueil-total');
+  await expect.poll(async () => Number(await total.textContent()), { intervals: [50] }).toBeGreaterThan(300);
+  expect(Number(await total.textContent())).toBeLessThan(500);
+  await expect(total).toHaveText('500', { timeout: 5000 });
+  expect(Date.now() - t0).toBeLessThan(3800);
+  expect(Date.now() - t0).toBeGreaterThan(2000);
+  await expect(page.locator('.gain-accueil')).toHaveCount(0);
+});
+
 test('fin de partie → « Retour à l’accueil » : animation et total exact', async ({ page }) => {
   const pts = await gagner(page);
   await page.getByRole('button', { name: 'Retour à l’accueil' }).click();

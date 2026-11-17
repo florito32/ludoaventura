@@ -384,10 +384,11 @@
   // ---------- Envol des étoiles gagnées vers le compteur de l'accueil (v9.8, demande du 17/11/2026) ----------
   // Après « Retour à l'accueil » sur l'écran de fin (js/plateau.js → accueilApresFin), « ⭐ +19 étoiles » reste au
   // centre de l'écran (sans encadré) ; de là, une étoile par étoile gagnée vole jusqu'au compteur du haut, qui
-  // grandit d'une unité à chaque arrivée. Durée : 1 seconde pour 10 étoiles (choix de l'utilisateur).
+  // grandit à chaque arrivée. Durée : 1 seconde pour 10 étoiles, 3 secondes au plus (choix de l'utilisateur).
   // Mouvement réduit demandé par l'appareil : pas d'étoiles volantes, le nombre grandit pendant la même durée.
   var vol = null; // { n, vu, minuteurs, etiquette }
   var CLE_GAIN = 'ludoaventura-gain-accueil';
+  var DUREE_GAIN_MAX = 3000; // ms
   (function () {
     var g = null;
     try { g = JSON.parse(sessionStorage.getItem(CLE_GAIN) || 'null'); sessionStorage.removeItem(CLE_GAIN); } catch (e) { g = null; }
@@ -426,20 +427,25 @@
     et.innerHTML = ico('i-etoile', 'ico-gain') + '<strong>+' + etoiles(n) + '</strong>';
     document.body.appendChild(et);
     vol.etiquette = et;
-    var D = typeof window.AVENTURA_DUREE_GAIN === 'number' ? window.AVENTURA_DUREE_GAIN * n : n * 100; // 1 s pour 10 étoiles
+    // 1 s pour 10 étoiles, 3 s au plus (demande du 17/11/2026, 13 h 34 : 20 s pour 200 étoiles, c'était trop long).
+    var D = Math.min(DUREE_GAIN_MAX, typeof window.AVENTURA_DUREE_GAIN === 'number' ? window.AVENTURA_DUREE_GAIN * n : n * 100);
+    // Au plus une étoile volante toutes les 100 ms (30 en 3 s) : au-delà, chacune apporte plusieurs étoiles au compteur.
+    var nv = Math.max(1, Math.min(n, Math.round(D / 100)));
     var vole = reduit ? 0 : Math.min(700, D * 0.6); // durée du vol d'une étoile
-    var ecart = n > 1 ? (D - vole) / (n - 1) : 0;   // la dernière étoile arrive au bout de D
+    var ecart = nv > 1 ? (D - vole) / (nv - 1) : 0; // la dernière étoile arrive au bout de D
     var a = et.querySelector('.ico').getBoundingClientRect(), b = cible.getBoundingClientRect();
     var dx = (b.left + b.width / 2) - (a.left + a.width / 2), dy = (b.top + b.height / 2) - (a.top + a.height / 2);
     var total = $('btn-etoiles-haut').querySelector('.pe-total');
+    // Étoile volante k : elle apporte sa part des n étoiles (1 en général, plusieurs pour un gros gain).
     function arrivee() {
       if (!vol) return;
-      vol.vu++;
+      var k = vol.arrivees++;
+      vol.vu += Math.floor((k + 1) * n / nv) - Math.floor(k * n / nv);
       majCompteur();
       total.classList.remove('recoit'); void total.offsetWidth; total.classList.add('recoit');
-      if (++vol.arrivees >= vol.n) finirGain();
+      if (vol.arrivees >= nv) finirGain();
     }
-    for (var i = 0; i < n; i++) {
+    for (var i = 0; i < nv; i++) {
       vol.minuteurs.push(setTimeout(function () {
         if (!vol) return;
         if (reduit || !document.body.animate) { arrivee(); return; }
