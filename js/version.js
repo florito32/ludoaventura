@@ -4,9 +4,16 @@
 (function () {
   'use strict';
 
-  var VERSION = '10.0';
+  var VERSION = '10.1';
 
   var HISTORY = [
+    { v: '10.1', date: '2026-11-17', changes: [
+      "Mon compte : « Se connecter » et « Créer un compte » sont séparés. « Créer un compte » ouvre un formulaire à part : adresse e-mail, mot de passe et confirmation du mot de passe, puis « Créer mon compte ».",
+      "Après « Créer mon compte », l’écran n’affiche plus que « Vérifie tes e-mails » : le compte attend sa validation (avec « Renvoyer l’e-mail »).",
+      "Nouvel e-mail de validation en français, avec le logo du jeu et un bouton « Valider mon compte » ; ce bouton ramène dans le jeu sur « Ton compte est validé ! » puis « Commencer à jouer ».",
+      "Un lien de validation déjà utilisé n’affiche plus « lien expiré » : si l’appareil est connecté, le jeu indique que le compte est déjà validé.",
+      "E-mail « Mot de passe oublié » aussi en français, avec le même habillage."
+    ] },
     { v: '10.0', date: '2026-11-17', changes: [
       "L’envol des étoiles gagnées vers le compteur de l’accueil dure 3 secondes au plus (toujours 1 seconde pour 10 étoiles en dessous) : pour un gros gain, chaque étoile qui arrive en apporte plusieurs."
     ] },

@@ -132,24 +132,28 @@
     </header>
     <div class="page-corps" id="compte-corps">
       <p class="compte-message" id="compte-message" role="status" aria-live="polite" hidden></p>
+      <!-- v9.9 (17/11/2026) : « Se connecter » et « Créer un compte » sont deux parcours séparés.
+           Le bouton « Créer un compte » est seul dans sa carte et ouvre un formulaire à part (#compte-creation). -->
       <div id="compte-invite">
         <section class="carte-page compte-carte">
-          <h3>Garder ma progression partout</h3>
+          <h3>Se connecter</h3>
           <p class="petit">Connecte-toi pour retrouver tes étoiles, coffres et niveaux sur l’ordinateur, la tablette ou le téléphone. Ce que tu as déjà gagné sur cet appareil est ajouté à ton compte.</p>
           <button type="button" class="btn btn-secondaire btn-google" id="compte-google"><span class="g-logo" aria-hidden="true">G</span> Continuer avec Google</button>
           <p class="compte-ou"><span>ou avec ton adresse e-mail</span></p>
           <form id="compte-form" class="compte-form" novalidate>
             <label for="compte-email">Adresse e-mail</label>
             <input type="email" id="compte-email" name="email" autocomplete="email" inputmode="email" spellcheck="false" autocapitalize="off">
-            <label for="compte-mdp">Mot de passe <span class="petit-inline">(au moins 6 caractères)</span></label>
-            <input type="password" id="compte-mdp" name="password" autocomplete="current-password" minlength="6">
+            <label for="compte-mdp">Mot de passe</label>
+            <input type="password" id="compte-mdp" name="password" autocomplete="current-password">
             <label class="compte-voir"><input type="checkbox" id="compte-voir"> Afficher le mot de passe</label>
-            <div class="compte-boutons">
-              <button type="submit" class="btn btn-principal" id="compte-entrer">Se connecter</button>
-              <button type="button" class="btn btn-secondaire" id="compte-creer">Créer un compte</button>
-            </div>
+            <button type="submit" class="btn btn-principal compte-large" id="compte-entrer">Se connecter</button>
             <button type="button" class="lien-bouton" id="compte-oublie">Mot de passe oublié ?</button>
           </form>
+        </section>
+        <section class="carte-page compte-carte">
+          <h3>Pas encore de compte ?</h3>
+          <p class="petit">Crée ton compte en une minute avec ton adresse e-mail.</p>
+          <button type="button" class="btn btn-secondaire compte-large" id="compte-creer">Créer un compte</button>
         </section>
         <section class="carte-page compte-carte">
           <h3>Jouer en invité</h3>
@@ -158,6 +162,41 @@
           <button type="button" class="btn btn-bleu" id="compte-invite-ok">Jouer en invité</button>
         </section>
       </div>
+      <!-- Création de compte (v9.9) : e-mail, mot de passe, confirmation du mot de passe. -->
+      <section class="carte-page compte-carte" id="compte-creation" hidden>
+        <h3>Créer mon compte</h3>
+        <form id="compte-creation-form" class="compte-form" novalidate>
+          <label for="creation-email">Adresse e-mail</label>
+          <input type="email" id="creation-email" name="email" autocomplete="email" inputmode="email" spellcheck="false" autocapitalize="off">
+          <label for="creation-mdp">Mot de passe <span class="petit-inline">(au moins 6 caractères)</span></label>
+          <input type="password" id="creation-mdp" name="password" autocomplete="new-password" minlength="6">
+          <label for="creation-mdp2">Confirmer le mot de passe</label>
+          <input type="password" id="creation-mdp2" name="password2" autocomplete="new-password" minlength="6">
+          <label class="compte-voir"><input type="checkbox" id="creation-voir"> Afficher les mots de passe</label>
+          <button type="submit" class="btn btn-principal compte-large" id="creation-ok">Créer mon compte</button>
+        </form>
+        <button type="button" class="lien-bouton" id="creation-annuler">J’ai déjà un compte : me connecter</button>
+      </section>
+      <!-- Après « Créer mon compte » (v9.9) : plus que ce message, le temps que la personne valide son adresse. -->
+      <section class="carte-page compte-carte compte-annonce" id="compte-attente" hidden>
+        <p class="compte-icone" aria-hidden="true">📬</p>
+        <h3>Vérifie tes e-mails</h3>
+        <p>Ton compte est créé et <strong>attend ta validation</strong>.</p>
+        <p>Nous avons envoyé un e-mail à <strong id="attente-email"></strong>. Ouvre-le et touche le bouton <strong>« Valider mon compte »</strong> : tu reviendras ici, connecté, prêt à jouer.</p>
+        <p class="petit">Pas d’e-mail au bout de quelques minutes ? Regarde dans les courriers indésirables (spam) ou « Promotions ». L’expéditeur est « Aventura ».</p>
+        <button type="button" class="lien-bouton" id="attente-renvoyer">Renvoyer l’e-mail</button>
+      </section>
+      <!-- Validation en cours, puis compte validé (v9.9) : arrivée depuis le bouton de l'e-mail. -->
+      <section class="carte-page compte-carte compte-annonce" id="compte-validation" hidden>
+        <p class="compte-icone" aria-hidden="true">⏳</p>
+        <h3>Validation de ton compte…</h3>
+      </section>
+      <section class="carte-page compte-carte compte-annonce" id="compte-bienvenue" hidden>
+        <p class="compte-icone" aria-hidden="true">🎉</p>
+        <h3 id="bienvenue-titre">Ton compte est validé !</h3>
+        <p>Tu es connecté avec <strong id="bienvenue-email"></strong>. Tes étoiles, coffres et niveaux sont maintenant sauvegardés sur ton compte.</p>
+        <button type="button" class="btn btn-principal compte-large" id="bienvenue-jouer">Commencer à jouer</button>
+      </section>
       <section class="carte-page compte-carte" id="compte-connecte" hidden>
         <h3>Tu es connecté</h3>
         <p class="compte-qui">Compte : <strong id="compte-qui"></strong></p>

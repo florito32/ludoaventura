@@ -12,8 +12,8 @@ function progression(total, gemmes = 0) {
 }
 
 // Imite le service : connexion, utilisateur, lecture et écriture de la progression. Renvoie les envois reçus.
-async function service(page, { distant = null, connexion = SESSION, erreurConnexion = null } = {}) {
-  const envois = { progression: [], deconnexion: 0, inscription: [], oubli: [] };
+async function service(page, { distant = null, connexion = SESSION, erreurConnexion = null, verifOk = true } = {}) {
+  const envois = { progression: [], deconnexion: 0, inscription: [], oubli: [], verif: [], renvoi: [] };
   await page.route(SERVICE + '/**', async (route) => {
     const req = route.request(), url = new URL(req.url()), m = req.method();
     const json = (status, corps) => route.fulfill({ status, contentType: 'application/json', body: corps === undefined ? '' : JSON.stringify(corps) });
@@ -23,6 +23,11 @@ async function service(page, { distant = null, connexion = SESSION, erreurConnex
     }
     if (url.pathname === '/auth/v1/user') return json(200, UTILISATEUR);
     if (url.pathname === '/auth/v1/signup') { envois.inscription.push(req.postDataJSON()); return json(200, { id: 'nouveau', email: req.postDataJSON().email }); }
+    if (url.pathname === '/auth/v1/verify') {
+      envois.verif.push(req.postDataJSON());
+      return verifOk ? json(200, SESSION) : json(403, { code: 403, error_code: 'otp_expired', msg: 'Email link is invalid or has expired' });
+    }
+    if (url.pathname === '/auth/v1/resend') { envois.renvoi.push(req.postDataJSON()); return json(200, {}); }
     if (url.pathname === '/auth/v1/recover') { envois.oubli.push(req.postDataJSON()); return json(200, {}); }
     if (url.pathname === '/auth/v1/logout') { envois.deconnexion++; return json(204); }
     if (url.pathname === '/rest/v1/progression' && m === 'GET') return json(200, distant ? [{ donnees: distant }] : []);
@@ -94,7 +99,7 @@ test('accueil : bouton « Se connecter », écran Mon compte, retour en invité,
   await bouton.click();
   await expect(page.getByRole('heading', { name: 'Mon compte' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Continuer avec Google' })).toBeVisible();
-  await expect(page.getByLabel('Adresse e-mail')).toBeVisible();
+  await expect(page.locator('#compte-email')).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
   const r = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
   expect(r.violations.map((v) => v.id + ' : ' + v.nodes.slice(0, 3).map((n) => n.target.join(' ')).join(' | '))).toEqual([]);
@@ -107,8 +112,8 @@ test('connexion par e-mail : la progression de l’appareil est ajoutée à cell
   const envois = await service(page, { distant: progression(50, 2) });
   await page.goto('./');
   await page.locator('#btn-compte').click();
-  await page.getByLabel('Adresse e-mail').fill('joueur@example.com');
-  await page.getByLabel(/^Mot de passe/).fill('secret123');
+  await page.locator('#compte-email').fill('joueur@example.com');
+  await page.locator('#compte-mdp').fill('secret123');
   await page.getByRole('button', { name: 'Se connecter', exact: true }).click();
   await expect(page.locator('#compte-message')).toContainText('Tu es connecté');
   await expect(page.locator('#compte-qui')).toHaveText('joueur@example.com');
@@ -128,29 +133,110 @@ test('connexion refusée : message clair en français', async ({ page }) => {
   await service(page, { erreurConnexion: { error_code: 'invalid_credentials', msg: 'Invalid login credentials' } });
   await page.goto('./');
   await page.locator('#btn-compte').click();
-  await page.getByLabel('Adresse e-mail').fill('joueur@example.com');
-  await page.getByLabel(/^Mot de passe/).fill('mauvais1');
+  await page.locator('#compte-email').fill('joueur@example.com');
+  await page.locator('#compte-mdp').fill('mauvais1');
   await page.getByRole('button', { name: 'Se connecter', exact: true }).click();
   await expect(page.locator('#compte-message')).toHaveText('Adresse e-mail ou mot de passe incorrect.');
   await expect(page.locator('#compte-invite')).toBeVisible();
 });
 
-test('création de compte et mot de passe oublié : e-mail envoyé, explication affichée', async ({ page }) => {
-  test.skip(test.info().project.name === 'telephone-carre', 'parcours de formulaire testé sur les autres formats');
+test('création de compte : bouton seul, formulaire à part (e-mail + 2 mots de passe), puis seulement « Vérifie tes e-mails »', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await preparer(page);
   const envois = await service(page);
   await page.goto('./');
   await page.locator('#btn-compte').click();
-  await page.getByLabel('Adresse e-mail').fill('nouveau@example.com');
-  await page.getByRole('button', { name: 'Créer un compte' }).click();
-  await expect(page.locator('#compte-message')).toContainText('mot de passe'); // mot de passe manquant
-  await page.getByLabel(/^Mot de passe/).fill('secret123');
-  await page.getByRole('button', { name: 'Créer un compte' }).click();
-  await expect(page.locator('#compte-message')).toContainText('Presque fini');
+  // « Créer un compte » n'est pas à côté de « Se connecter » : il est seul dans sa carte.
+  const creer = page.getByRole('button', { name: 'Créer un compte' });
+  const entrer = page.getByRole('button', { name: 'Se connecter', exact: true });
+  expect(await creer.evaluate((b) => b.closest('section').contains(document.getElementById('compte-entrer')))).toBe(false);
+  await expect(entrer).toBeVisible();
+  await creer.click();
+  await expect(page.getByRole('heading', { name: 'Créer mon compte' })).toBeVisible();
+  await expect(page.locator('#compte-invite')).toBeHidden();
+  await expect(page.locator('#creation-mdp2')).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
+  const r = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
+  expect(r.violations.map((v) => v.id)).toEqual([]);
+  await page.locator('#creation-email').fill('nouveau@example.com');
+  await page.locator('#creation-mdp').fill('secret123');
+  await page.locator('#creation-mdp2').fill('secret124');
+  await page.getByRole('button', { name: 'Créer mon compte' }).click();
+  await expect(page.locator('#compte-message')).toContainText('pas pareils');
+  expect(envois.inscription).toEqual([]);
+  await page.locator('#creation-mdp2').fill('secret123');
+  await page.getByRole('button', { name: 'Créer mon compte' }).click();
+  await expect(page.getByRole('heading', { name: 'Vérifie tes e-mails' })).toBeVisible();
+  await expect(page.locator('#compte-attente')).toContainText('nouveau@example.com');
+  await expect(page.locator('#compte-attente')).toContainText('attend ta validation');
   expect(envois.inscription).toEqual([{ email: 'nouveau@example.com', password: 'secret123' }]);
+  // Plus rien d'autre à l'écran : ni formulaire, ni message, ni Google, ni invité.
+  for (const id of ['compte-invite', 'compte-creation', 'compte-connecte', 'compte-message']) await expect(page.locator('#' + id)).toBeHidden();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
+  await page.getByRole('button', { name: 'Renvoyer l’e-mail' }).click();
+  await expect(page.locator('#compte-message')).toContainText('nouvel e-mail');
+  expect(envois.renvoi).toEqual([{ type: 'signup', email: 'nouveau@example.com' }]);
+});
+
+test('mot de passe oublié : e-mail envoyé, explication affichée', async ({ page }) => {
+  test.skip(test.info().project.name !== 'ordinateur', 'un format suffit');
+  await preparer(page);
+  const envois = await service(page);
+  await page.goto('./');
+  await page.locator('#btn-compte').click();
+  await page.locator('#compte-email').fill('nouveau@example.com');
   await page.getByRole('button', { name: 'Mot de passe oublié ?' }).click();
   await expect(page.locator('#compte-message')).toContainText('un e-mail vient de partir');
   expect(envois.oubli).toEqual([{ email: 'nouveau@example.com' }]);
+});
+
+test('connexion avant validation : l’écran « Vérifie tes e-mails » revient, avec « Renvoyer l’e-mail »', async ({ page }) => {
+  test.skip(test.info().project.name !== 'ordinateur', 'un format suffit');
+  await preparer(page);
+  await service(page, { erreurConnexion: { error_code: 'email_not_confirmed', msg: 'Email not confirmed' } });
+  await page.goto('./');
+  await page.locator('#btn-compte').click();
+  await page.locator('#compte-email').fill('nouveau@example.com');
+  await page.locator('#compte-mdp').fill('secret123');
+  await page.getByRole('button', { name: 'Se connecter', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Vérifie tes e-mails' })).toBeVisible();
+  await expect(page.locator('#compte-message')).toContainText('attend encore sa validation');
+});
+
+test('bouton « Valider mon compte » de l’e-mail : le jeu valide, connecte et souhaite la bienvenue', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await preparer(page);
+  const envois = await service(page, { distant: progression(0) });
+  await page.goto('./?valider=hash-de-test');
+  await expect(page.getByRole('heading', { name: 'Ton compte est validé !' })).toBeVisible();
+  await expect(page.locator('#bienvenue-email')).toHaveText('joueur@example.com');
+  expect(envois.verif).toEqual([{ type: 'email', token_hash: 'hash-de-test' }]);
+  expect(page.url()).not.toContain('valider');
+  await expect(page.locator('#compte-message')).toBeHidden();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
+  const r = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
+  expect(r.violations.map((v) => v.id)).toEqual([]);
+  await page.getByRole('button', { name: 'Commencer à jouer' }).click();
+  await expect(page.locator('#ecran-accueil')).toBeVisible();
+  await expect(page.locator('#btn-compte')).toHaveClass(/connecte/);
+});
+
+test('lien de validation déjà utilisé alors qu’on est connecté : « déjà validé », jamais « expiré »', async ({ page }) => {
+  test.skip(test.info().project.name !== 'ordinateur', 'un format suffit');
+  await preparer(page, { session: sessionValide() });
+  await service(page, { verifOk: false, distant: progression(0) });
+  await page.goto('./?valider=hash-deja-servi');
+  await expect(page.getByRole('heading', { name: 'Ton compte est déjà validé' })).toBeVisible();
+  await expect(page.locator('#compte-message')).toBeHidden();
+});
+
+test('mot de passe oublié : le lien de l’e-mail ouvre « Nouveau mot de passe »', async ({ page }) => {
+  test.skip(test.info().project.name !== 'ordinateur', 'un format suffit');
+  await preparer(page);
+  const envois = await service(page);
+  await page.goto('./?mdp=hash-mdp');
+  await expect(page.getByRole('heading', { name: 'Nouveau mot de passe' })).toBeVisible();
+  expect(envois.verif).toEqual([{ type: 'recovery', token_hash: 'hash-mdp' }]);
 });
 
 test('retour de Google : connecté, jetons retirés de l’adresse, progression récupérée', async ({ page }) => {
@@ -165,12 +251,22 @@ test('retour de Google : connecté, jetons retirés de l’adresse, progression 
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('ludoaventura-etoiles')).total)).toBe(120);
 });
 
-test('lien expiré reçu par e-mail : message d’erreur', async ({ page }) => {
+test('ancien lien déjà utilisé, sans être connecté : explication sans mot technique, formulaire de connexion', async ({ page }) => {
   test.skip(test.info().project.name !== 'ordinateur', 'un format suffit');
   await preparer(page);
   await service(page);
   await page.goto('./#error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid');
-  await expect(page.locator('#compte-message')).toContainText('expiré');
+  await expect(page.locator('#compte-message')).toContainText('déjà servi');
+  await expect(page.locator('#compte-invite')).toBeVisible();
+});
+
+test('ancien lien déjà utilisé alors qu’on est connecté (capture du 17/11/2026) : « déjà validé »', async ({ page }) => {
+  test.skip(test.info().project.name !== 'ordinateur', 'un format suffit');
+  await preparer(page, { session: sessionValide() });
+  await service(page, { distant: progression(0) });
+  await page.goto('./#error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid');
+  await expect(page.getByRole('heading', { name: 'Ton compte est déjà validé' })).toBeVisible();
+  await expect(page.locator('#compte-message')).toBeHidden();
 });
 
 test('connecté : chaque gain est envoyé au compte, et la déconnexion remet l’appareil en invité', async ({ page }) => {
