@@ -31,12 +31,26 @@
   var PERIODES = [];   // périodes d'histoire, dans l'ordre (js/histoire.js)
 
   function ajouter(liste) { liste.forEach(function (j) { JEUX.push(j); }); }
+  // v10.14 (demande du 18/11/2026, BACKLOG ligne 425) : ajouter des séries à un jeu déjà déclaré. Les nouvelles questions
+  // d'histoire (js/histoire-*.js, produites par outils/histoire_questions.py) arrivent ainsi dans les jeux existants.
+  function ajouterSeries(id, series) {
+    var j = trouver(id);
+    if (!j) throw new Error('Jeu inconnu : ' + id);
+    series.forEach(function (s) { j.series.push(s); });
+  }
   function trouver(id) { return JEUX.filter(function (j) { return j.id === id; })[0] || null; }
   function jeuxDe(matiere) { return JEUX.filter(function (j) { return j.matiere === matiere; }); }
 
   // ---------- Hasard (remplaçable par les tests) ----------
   var hasard = Math.random;
   function auHasard(t) { return t[Math.floor(hasard() * t.length)]; }
+  // Tirage d'une série, à poids : `poids` (1 par défaut) donne aux grandes séries de questions ajoutées en v10.14
+  // une part plus grande qu'aux petites séries de paires. Sans `poids` partout, c'est le tirage uniforme d'avant.
+  function auPoids(series) {
+    var total = series.reduce(function (a, s) { return a + (s.poids || 1); }, 0), r = hasard() * total;
+    for (var i = 0; i < series.length; i++) { r -= series[i].poids || 1; if (r < 0) return series[i]; }
+    return series[series.length - 1];
+  }
   function melanger(t) {
     t = t.slice();
     for (var i = t.length - 1; i > 0; i--) { var k = Math.floor(hasard() * (i + 1)); var x = t[i]; t[i] = t[k]; t[k] = x; }
@@ -92,7 +106,7 @@
       var jeu = auHasard(choisis);
       var series = jeu.series.filter(function (s) { return utilisable(s, niveau, mode); });
       if (!series.length) continue;
-      var s = auHasard(series);
+      var s = auPoids(series);
       var c = tirages[s.k](s, niveau, jeu);
       if (!c) continue;
       c.type = 'savoir';
@@ -227,8 +241,14 @@
     },
     // Questions à choix : niveaux = [[question, bonne réponse, [fausses]]] ; en mode normal → vrai ou faux
     // (« Quel est le plus grand océan ? » puis une réponse proposée, vraie ou fausse).
+    // v10.14 : une série « ouverte: true » (les nouvelles questions d'histoire) se pose aussi en question ouverte,
+    // comme les paires : à partir de Difficile, une fois sur deux, si la réponse est un nom et non une phrase.
+    // « A|B » : A s'affiche, B est aussi accepté.
     qcm: function (s, niveau) {
       var x = auHasard(contenu(s, niveau));
+      if (s.ouverte && FORMATS_PAIRES[niveau].indexOf('O') >= 0 && !phrase(x[1]) && hasard() < 0.5) {
+        return { format: 'O', consigne: x[0], image: null, sujet: null, attendu: x[1], bonne: affiche(x[1]) };
+      }
       var vrai = hasard() < 0.5, montre = vrai ? x[1] : auHasard(x[2]);
       return {
         format: 'V', consigne: 'Vrai ou faux ?', question: x[0], affirmation: affiche(montre),
@@ -333,7 +353,7 @@
 
   var api = {
     NIVEAUX: NIVEAUX, MODES: MODES, TAILLE: TAILLE, modeDe: modeDe, NOMS_FORMATS: NOMS_FORMATS, JEUX: JEUX, PERIODES: PERIODES,
-    ajouter: ajouter, trouver: trouver, jeuxDe: jeuxDe, generer: generer, juste: juste, pointsIndices: pointsIndices,
+    ajouter: ajouter, ajouterSeries: ajouterSeries, trouver: trouver, jeuxDe: jeuxDe, generer: generer, juste: juste, pointsIndices: pointsIndices,
     normaliser: normaliser, ouverteJuste: ouverteJuste, affiche: affiche, utilisable: utilisable,
     regler: function (f) { hasard = f || Math.random; }
   };
