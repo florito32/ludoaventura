@@ -2,6 +2,9 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.22', date: '2026-11-18', changes: [
+    "Accueil : le « +N étoiles » gagné est écrit en jaune clair avec un contour brun foncé, lisible même au-dessus du bouton rouge « Commencer l’aventure »."
+  ] },
   { v: '10.21', date: '2026-11-18', changes: [
     "Histoire, Temps modernes : 604 nouvelles questions ajoutées aux jeux « Écrivains et Lumières », « Révolution, Napoléon et République », « Industrie, inventions et monuments » et « Arts et lettres du XIXe », à tous les niveaux (questions de 15 mots au plus).",
     "Mode Quiz : chaque nouvelle question a ses 4 choix. Mode Normal : question ouverte dès Difficile quand la réponse est un nom, vrai ou faux avant ; les dates s’ajoutent à la frise chronologique."

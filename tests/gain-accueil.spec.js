@@ -182,3 +182,26 @@ test('coffre ouvert sur l\'écran de fin : un seul envol pour la partie et le co
   await expect(page.locator('#accueil-total')).toHaveText(String(fin), { timeout: 6000 });
   await expect(page.locator('.gain-accueil')).toHaveCount(0);
 });
+
+// v10.22 (demande du 18/11/2026, 15 h 36) : « +N étoiles » au centre de l'accueil se lisait mal sur le bouton rouge
+// « Commencer l'aventure » (texte rouge). Il est maintenant jaune clair avec un contour brun foncé.
+test('accueil : « +N étoiles » est jaune clair à contour foncé, lisible sur le bouton rouge (v10.22)', async ({ page }) => {
+  await page.goto('./');
+  await page.evaluate((etat) => {
+    localStorage.setItem('ludo-vu', '1');
+    localStorage.setItem('ludoaventura-etoiles', etat);
+    sessionStorage.setItem('ludoaventura-gain-accueil', JSON.stringify({ n: 18 }));
+  }, ETAT(100));
+  await page.reload();
+  const texte = page.locator('.gain-accueil strong');
+  await expect(texte).toBeVisible();
+  const s = await texte.evaluate((e) => { const c = getComputedStyle(e); return { couleur: c.color, contour: parseFloat(c.webkitTextStrokeWidth), couleurContour: c.webkitTextStrokeColor }; });
+  const [r, g, b] = s.couleur.match(/\d+/g).map(Number);
+  // Texte clair (pas le rouge d'avant) ...
+  expect(r).toBeGreaterThan(220); expect(g).toBeGreaterThan(200); expect(b).toBeGreaterThan(120);
+  // ... entouré d'un contour foncé épais : lisible sur le ciel, l'herbe et le rouge.
+  expect(s.contour).toBeGreaterThan(2);
+  const [r2, g2, b2] = s.couleurContour.match(/\d+/g).map(Number);
+  expect(r2 + g2 + b2).toBeLessThan(250);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+});
