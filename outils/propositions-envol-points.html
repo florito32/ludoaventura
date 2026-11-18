@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ludoaventura — Envol des points : propositions A / B</title>
+<link rel="icon" href="data:,">
+<style>
+/* Page de test A / B : à la fin d'un tour, les points gagnés prennent la forme de l'aventure (flamme, pierre…),
+   apparaissent au centre du plateau, puis volent vers l'image des points. Chaque côté est un plateau miniature
+   avec la vraie image de construction du jeu ; les réglages se changent en direct ; « Copier mes choix » en bas.
+   Couleurs reprises du jeu (css/site.css de ludoaventura). */
+:root{--vert:#3f7a46;--vert-fonce:#2c5a33;--parchemin:#f6eedb;--parchemin-bord:#d8c7a0;--encre:#3b2a1e;--encre-douce:#5e4a3a;--rouge:#e3262a;--rouge-texte:#a8161b;--jaune:#ffe600;--vert-ok:#1f7a3a}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:#efe7d3;color:var(--encre);font:400 1rem/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:hidden}
+h1,h2,h3{font-family:"Rockwell","Roboto Slab",Georgia,serif;line-height:1.15;margin:0}
+:focus-visible{outline:3px solid var(--jaune);outline-offset:2px;box-shadow:0 0 0 6px var(--encre)}
+.visually-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+header.page{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;background:var(--vert);color:#fff}
+header.page h1{font-size:clamp(1.05rem,3.5vw,1.5rem)}
+#version{font:700 .85rem system-ui;background:#fff;color:var(--encre);border:2px solid var(--encre);border-radius:999px;padding:3px 10px;cursor:pointer;flex:none}
+.intro{max-width:1200px;margin:12px auto 0;padding:0 16px;color:var(--encre-douce)}
+.intro p{margin:0 0 6px}
+.commun{max-width:1200px;margin:10px auto;padding:10px 16px;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:end}
+.commun label,.reglages label{display:flex;flex-direction:column;gap:3px;font-size:.82rem;font-weight:700;min-width:0}
+select{font:inherit;font-weight:400;padding:5px 6px;border:2px solid var(--parchemin-bord);border-radius:8px;background:#fff;color:var(--encre);min-height:38px;max-width:100%}
+button.action{font:800 .95rem system-ui;background:var(--parchemin);color:var(--encre);border:2px solid var(--encre);border-radius:10px;padding:7px 14px;box-shadow:0 3px 0 var(--encre);cursor:pointer;min-height:40px}
+button.action:active{transform:translateY(2px);box-shadow:0 1px 0 var(--encre)}
+button.principal{background:var(--vert);color:#fff}
+main{max-width:1200px;margin:0 auto;padding:0 16px 16px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+@media (max-width:860px){main{grid-template-columns:minmax(0,1fr)}}
+.cote{background:#fff;border:2px solid var(--parchemin-bord);border-radius:14px;padding:12px;min-width:0}
+.cote h2{font-size:1.2rem;display:flex;align-items:center;gap:8px;margin-bottom:2px}
+.cote h2 .pastille{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--encre);color:#fff;font-family:system-ui;flex:none}
+.cote .devise{margin:0 0 8px;font-size:.88rem;color:var(--encre-douce)}
+.reglages{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px 10px;margin-bottom:12px}
+.titre-reglages{font-size:1rem;margin:14px 0 8px}
+.barre{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-top:10px}
+.info{font-size:.82rem;color:var(--encre-douce);margin:0}
+
+/* ---------- Plateau miniature (mêmes proportions que le jeu : tailles en cqw) ---------- */
+.cadre{width:min(100%,var(--lp,9999px));margin-inline:auto;background:#fff}
+/* Sur grand écran, le plateau reste collé en haut pendant qu'on change les réglages dessous. */
+@media (min-width:861px) and (min-height:720px){.cadre{position:sticky;top:8px;z-index:10;padding:4px 0 6px}}
+.plateau{position:relative;container-type:inline-size;aspect-ratio:1600/1071;border:3px solid var(--encre);border-radius:10px;overflow:hidden;background:#7bb369 url("../img/plateau-jour.webp") center/cover no-repeat}
+.points-plateau{position:absolute;left:1.4%;top:2.2%;width:clamp(196px,40%,400px);z-index:3;display:grid;grid-template-columns:42% 1fr;gap:clamp(5px,1.2cqw,14px);align-items:center;padding:clamp(4px,.8cqw,10px) clamp(6px,1.1cqw,14px);text-align:center;background:rgb(246 238 219 / .95);border:3px solid var(--encre);border-radius:12px;box-shadow:0 3px 0 rgb(0 0 0 / .25)}
+@container (max-width:420px){.points-plateau{width:min(62%,250px)}}
+.points-titre{margin:0;font:700 clamp(.62rem,1.45cqw,1rem)/1.15 "Rockwell","Roboto Slab",Georgia,serif}
+.points-valeur{margin:1px 0 0;font:800 clamp(1.2rem,3.6cqw,2.4rem)/1 "Rockwell","Roboto Slab",Georgia,serif}
+.points-sur{font-size:clamp(.75rem,1.9cqw,1.3rem);font-weight:600}
+.jauge{height:clamp(6px,1cqw,12px);margin-top:clamp(3px,.5cqw,8px);background:#e7dcc2;border:2px solid var(--encre);border-radius:999px;overflow:hidden}
+.jauge span{display:block;height:100%;background:var(--vert);transition:width .25s}
+.points-valeur.gagne{animation:gonfle .45s ease-out}
+@keyframes gonfle{40%{transform:scale(1.3)}}
+/* Construction de l'aventure (copie de css/site.css) */
+.construction{border-radius:8px;overflow:hidden;background:#dcefd8;border:2px solid var(--encre)}
+.construction svg{display:block;width:100%;height:auto}
+.construction .etape{opacity:.14;filter:grayscale(1);transition:opacity .4s,filter .4s}
+.construction .etape.vue{opacity:1;filter:none}
+.construction .etape.nouvelle{animation:pose-etape .7s ease-out;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes pose-etape{from{transform:translateY(-18px) scale(.8);opacity:0}}
+.construction.recoit{animation:recoit .34s ease-out}
+@keyframes recoit{40%{transform:scale(1.08);box-shadow:0 0 0 5px #ffd23f}}
+/* Couche des formes qui volent */
+.couche{position:absolute;inset:0;z-index:5;pointer-events:none;overflow:hidden}
+.forme{position:absolute;transform-origin:50% 50%;will-change:transform;filter:drop-shadow(0 3px 3px rgb(0 0 0 / .35))}
+.eclat{position:absolute;border:4px solid #ffd23f;border-radius:50%;transform-origin:50% 50%}
+@media (prefers-reduced-motion:reduce){.points-valeur.gagne,.construction.recoit,.construction .etape.nouvelle{animation:none}}
+
+/* Les 10 formes */
+.formes{max-width:1200px;margin:0 auto;padding:6px 16px 10px}
+.formes h2{font-size:1.15rem;margin:8px 0 4px}
+.formes p{margin:0 0 8px;color:var(--encre-douce);font-size:.9rem}
+.grille-formes{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.carte-forme{background:#fff;border:2px solid var(--parchemin-bord);border-radius:12px;padding:8px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;font-size:.82rem}
+.carte-forme svg{width:64px;height:64px}
+.carte-forme label{display:flex;align-items:center;gap:6px;font-weight:700}
+.carte-forme input{width:20px;height:20px}
+
+/* Bas de page */
+.choix{max-width:1200px;margin:0 auto;padding:0 16px 30px}
+.choix fieldset{border:2px solid var(--parchemin-bord);border-radius:12px;background:#fff;padding:10px 14px;display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin:0}
+.choix legend{font-weight:800;padding:0 6px}
+.choix textarea{width:100%;min-height:70px;font:inherit;border:2px solid var(--parchemin-bord);border-radius:10px;padding:8px;margin-top:10px}
+.btn-copier{display:block;margin:12px auto 0;font:800 1.1rem system-ui;background:var(--rouge);color:#fff;border:2px solid var(--encre);border-radius:12px;padding:12px 26px;box-shadow:0 3px 0 var(--encre);cursor:pointer;max-width:100%}
+#copie-etat{text-align:center;min-height:1.4em;font-weight:700;color:var(--vert-ok)}
+dialog{border:2px solid var(--encre);border-radius:14px;max-width:min(560px,92vw);padding:16px}
+dialog::backdrop{background:rgba(0,0,0,.45)}
+dialog h2{margin-bottom:8px}
+dialog button{font:700 1rem system-ui;padding:8px 16px;border-radius:10px;border:2px solid var(--encre);background:var(--parchemin);cursor:pointer}
+</style>
+</head>
+<body>
+<!-- Les 10 formes (une par aventure), dessinées dans le style des étoiles du jeu : contour à l'encre. -->
+<svg class="visually-hidden" width="0" height="0" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="f-flamme" viewBox="0 0 48 48">
+      <path d="M24 3.5C26.5 11 36.5 15.5 36.5 28.5C36.5 37.5 31 43.5 24 43.5C17 43.5 11.5 37.5 11.5 29C11.5 23.5 14.5 20 17.5 16.5C18 21 20.5 22.5 22 22.5C19.5 15 21 9 24 3.5Z" fill="#ff8a1f" stroke="#3b2a1e" stroke-width="2.6" stroke-linejoin="round"/>
+      <path d="M24 23C26.5 27 31 29.5 31 34.5C31 38.5 28 41 24 41C20 41 17 38.5 17 34.5C17 29.5 21.5 27 24 23Z" fill="#ffd23f"/>
+      <path d="M22 34c0 3 1.5 4.5 3 5" stroke="#fff6c8" stroke-width="2" fill="none" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="f-tronc" viewBox="0 0 48 48">
+      <g transform="rotate(-28 24 24)" stroke="#3b2a1e" stroke-width="2.6" stroke-linejoin="round">
+        <rect x="5" y="14" width="32" height="20" rx="3" fill="#8a5530"/>
+        <path d="M10 19h20M9 24h22M10 29h20" stroke="#5b3418" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+        <ellipse cx="37" cy="24" rx="6" ry="10" fill="#d9a566"/>
+        <ellipse cx="37" cy="24" rx="3" ry="5.6" fill="none" stroke="#a0683a" stroke-width="1.6"/>
+        <circle cx="37" cy="24" r="1" fill="#a0683a" stroke="none"/>
+      </g>
+    </symbol>
+    <symbol id="f-epee" viewBox="0 0 48 48">
+      <g transform="rotate(35 24 24)" stroke="#3b2a1e" stroke-width="2.6" stroke-linejoin="round">
+        <path d="M24 2.5L28.5 8V30H19.5V8Z" fill="#dfe6ec"/>
+        <path d="M24 6V29" stroke="#9aa7b2" stroke-width="1.6" stroke-linecap="round"/>
+        <rect x="11" y="30" width="26" height="5.5" rx="2.4" fill="#ffd23f"/>
+        <rect x="21.5" y="35.5" width="5" height="8" fill="#6b3d1c"/>
+        <circle cx="24" cy="45" r="2.8" fill="#ffd23f"/>
+      </g>
+    </symbol>
+    <symbol id="f-pierre-maya" viewBox="0 0 48 48">
+      <g stroke="#3b2a1e" stroke-width="2.6" stroke-linejoin="round">
+        <path d="M8 18L24 9L40 18L24 27Z" fill="#c9cdb8"/>
+        <path d="M8 18L24 27V43L8 34Z" fill="#9aa393"/>
+        <path d="M40 18L24 27V43L40 34Z" fill="#737c6f"/>
+      </g>
+      <path d="M12 27l5 2.8M12 31.5l7 4M17 25.5v-0.5" stroke="#4d5547" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+      <path d="M13 21l8-4.4" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".6"/>
+    </symbol>
+    <symbol id="f-gazelle" viewBox="0 0 48 48">
+      <g fill="none" stroke-linecap="round">
+        <path d="M12 31L10.5 44M17.5 32L17.5 44M28 32L30 44M32 30L36 43" stroke="#3b2a1e" stroke-width="5.4"/>
+        <path d="M12 31L10.5 44M17.5 32L17.5 44M28 32L30 44M32 30L36 43" stroke="#d9a05b" stroke-width="2.2"/>
+        <path d="M10 22L5.5 19.5" stroke="#3b2a1e" stroke-width="3"/>
+      </g>
+      <g stroke="#3b2a1e" stroke-width="2.6" stroke-linejoin="round">
+        <ellipse cx="22" cy="26" rx="12.5" ry="7.5" fill="#d9a05b"/>
+        <path d="M30 22L35.5 9L40.5 9.5L46 14L45 17L39 16.5L36 27Z" fill="#d9a05b"/>
+      </g>
+      <path d="M12.5 29.5q9.5 5.5 20 0" stroke="#fff6e0" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M14 23.5H31" stroke="#8a5530" stroke-width="2" stroke-linecap="round"/>
+      <path d="M36.5 8.5C35 2.5 31 2 30 4.5M39 8.5C40 2.5 36 1.5 34.5 2.5" stroke="#3b2a1e" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+      <path d="M35 10L31 8L34.5 13Z" fill="#8a5530" stroke="#3b2a1e" stroke-width="1.6" stroke-linejoin="round"/>
+      <circle cx="41.5" cy="12" r="1.2" fill="#3b2a1e"/><circle cx="45" cy="15" r="1.2" fill="#3b2a1e"/>
+    </symbol>
+    <symbol id="f-bloc-egypte" viewBox="0 0 48 48">
+      <g stroke="#3b2a1e" stroke-width="2.6" stroke-linejoin="round">
+        <path d="M8 18L24 9L40 18L24 27Z" fill="#f0d9a0"/>
+        <path d="M8 18L24 27V43L8 34Z" fill="#d9b66c"/>
+        <path d="M40 18L24 27V43L40 34Z" fill="#b8924d"/>
+      </g>
+      <path d="M12 28h6M12 32l6 3M20.5 31v5" stroke="#7a5a24" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+      <circle cx="31" cy="30" r="2" fill="none" stroke="#6b4c1c" stroke-width="1.6"/>
+      <path d="M13 21l8-4.4" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".6"/>
+    </symbol>
+    <symbol id="f-brique" viewBox="0 0 48 48">
+      <g transform="rotate(-12 24 24)">
+        <rect x="5" y="14" width="38" height="20" rx="2.5" fill="#c4553a" stroke="#3b2a1e" stroke-width="2.6" stroke-linejoin="round"/>
+        <path d="M9 18.5h30" stroke="#e48a6e" stroke-width="2" stroke-linecap="round" opacity=".85"/>
+        <path d="M10 30h6M22 29.5h9M34 30h4" stroke="#8f3722" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+      </g>
+    </symbol>
+    <symbol id="f-rail" viewBox="0 0 48 48">
+      <g transform="rotate(-20 24 24)" stroke="#3b2a1e" stroke-width="2.4" stroke-linejoin="round">
+        <rect x="3" y="8" width="42" height="7" rx="1.6" fill="#8a5530"/>
+        <rect x="3" y="20.5" width="42" height="7" rx="1.6" fill="#8a5530"/>
+        <rect x="3" y="33" width="42" height="7" rx="1.6" fill="#8a5530"/>
+        <rect x="12" y="3" width="5" height="42" rx="1.5" fill="#c9ced3"/>
+        <rect x="31" y="3" width="5" height="42" rx="1.5" fill="#c9ced3"/>
+      </g>
+    </symbol>
+    <symbol id="f-menhir" viewBox="0 0 48 48">
+      <path d="M15 44.5L13.5 21C13.5 11 18.5 3.5 25 3.5C31 3.5 34.5 11 34.5 21L33 44.5Z" fill="#9aa3a8" stroke="#3b2a1e" stroke-width="2.6" stroke-linejoin="round"/>
+      <path d="M14.8 38.5c3 1.5 5 1 8 2.5s6 .5 9.6-1.2L33 44.5H15Z" fill="#5f9a4a"/>
+      <path d="M21 14c0 5 3 8 6 8c2.5 0 3-3 1-4" stroke="#5d666b" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+      <path d="M19 28h8M24 32h6" stroke="#5d666b" stroke-width="1.8" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="f-pierre-inca" viewBox="0 0 48 48">
+      <path d="M8 15L21 6.5L38 10L43 25L37 40L20 44L7 34Z" fill="#a9a08c" stroke="#3b2a1e" stroke-width="2.6" stroke-linejoin="round"/>
+      <path d="M21 6.5L24 22L8 34M24 22L43 25M24 22L20 44" stroke="#6f6652" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+      <path d="M12 16L21 10L24 18Z" fill="#d6cfbb"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="page">
+  <h1>Envol des points — propositions</h1>
+  <button id="version" type="button" aria-haspopup="dialog">v1.0</button>
+</header>
+
+<div class="intro">
+  <p>À la fin d'un tour, les points gagnés (1 à 6) prennent <strong>la forme de l'aventure</strong> (flamme, pierre…) : <strong>une forme par point</strong>, grosses, au centre du plateau, puis elles volent vers l'image à côté du comptage en rétrécissant, jusqu'à devenir minuscules dans l'image. Comme les étoiles de l'accueil.</p>
+  <p>Les deux plateaux sont des miniatures avec la vraie image du jeu. <strong>Change un réglage : l'animation se rejoue toute seule.</strong> Puis copie tes choix en bas.</p>
+</div>
+
+<div class="commun" role="group" aria-label="Réglages communs">
+  <label>Aventure
+    <select id="aventure"></select>
+  </label>
+  <label>Points gagnés au tour
+    <select id="points">
+      <option value="1">1 point (dé faible)</option>
+      <option value="2">2 points (dé faible)</option>
+      <option value="3">3 points (dé faible)</option>
+      <option value="4" selected>4 points (dé fort)</option>
+      <option value="5">5 points (dé fort)</option>
+      <option value="6">6 points (dé fort)</option>
+    </select>
+  </label>
+  <label>Écran simulé
+    <select id="ecran">
+      <option value="9999">Ordinateur (plateau large)</option>
+      <option value="700">Tablette</option>
+      <option value="440">Téléphone carré</option>
+      <option value="360">Téléphone</option>
+    </select>
+  </label>
+  <button type="button" class="action principal" id="rejouer-tout">▶ Rejouer les deux</button>
+</div>
+
+<main>
+  <section class="cote" id="cote-A" aria-labelledby="titre-A"></section>
+  <section class="cote" id="cote-B" aria-labelledby="titre-B"></section>
+</main>
+
+<section class="formes" aria-labelledby="titre-formes">
+  <h2 id="titre-formes">Les 10 formes (une par aventure)</h2>
+  <p>La flamme (Préhistoire) et la pierre (Mayas) viennent de ta demande ; les 8 autres sont mes propositions, à valider. Coche celles à refaire.</p>
+  <div class="grille-formes" id="grille-formes"></div>
+</section>
+
+<section class="choix" aria-label="Mes choix">
+  <fieldset>
+    <legend>Je garde</legend>
+    <label><input type="radio" name="garde" value="A"> la proposition A</label>
+    <label><input type="radio" name="garde" value="B"> la proposition B</label>
+    <label><input type="radio" name="garde" value="un mélange" checked> un mélange (réglages de chaque côté)</label>
+  </fieldset>
+  <label for="remarques" class="visually-hidden">Remarques</label>
+  <textarea id="remarques" placeholder="Remarques (facultatif) : ex. « le tourbillon de B, mais les formes du centre de A »"></textarea>
+  <button type="button" class="btn-copier" id="copier">Copier mes choix</button>
+  <p id="copie-etat" role="status"></p>
+</section>
+
+<dialog id="historique" aria-labelledby="hist-titre">
+  <h2 id="hist-titre">Historique des versions</h2>
+  <p><strong>v1.0</strong> (18/11/2026) — Première page : deux envols des points côte à côte sur un plateau miniature (vraie image de construction), 10 formes (flamme, pierre maya, tronc, épée, gazelle, bloc, brique, rail, menhir, pierre inca), 12 réglages en direct par côté, bouton « Copier mes choix ».</p>
+  <form method="dialog"><button>Fermer</button></form>
+</dialog>
+
+<script src="../js/constructions.js"></script>
+<script>
+(function () {
+  'use strict';
+  var VERSION = '1.0';
+  var P0 = 6, OBJECTIF = 24; // démo : 6 points avant le tour, objectif 24
+
+  // ---------- Aventures : une forme par aventure (flamme et pierre demandées ; les autres, hypothèses à valider) ----------
+  var AVENTURES = [
+    { id: 'prehistoire', nom: 'Préhistoire', titre: 'Silex trouvés', forme: 'f-flamme', label: 'Flamme' },
+    { id: 'mayas', nom: 'Mayas', titre: 'Pierres taillées', forme: 'f-pierre-maya', label: 'Pierre taillée' },
+    { id: 'viking', nom: 'Viking', titre: 'Troncs coupés', forme: 'f-tronc', label: 'Tronc' },
+    { id: 'chevalier', nom: 'Chevalier', titre: 'Épées forgées', forme: 'f-epee', label: 'Épée' },
+    { id: 'savane', nom: 'Savane', titre: 'Gazelles chassées', forme: 'f-gazelle', label: 'Gazelle' },
+    { id: 'egypte', nom: 'Égypte', titre: 'Blocs hissés', forme: 'f-bloc-egypte', label: 'Bloc de grès' },
+    { id: 'chine', nom: 'Chine', titre: 'Briques posées', forme: 'f-brique', label: 'Brique' },
+    { id: 'far-west', nom: 'Far West', titre: 'Rails posés', forme: 'f-rail', label: 'Rail' },
+    { id: 'druides', nom: 'Druides', titre: 'Menhirs dressés', forme: 'f-menhir', label: 'Menhir' },
+    { id: 'incas', nom: 'Incas', titre: 'Pierres ajustées', forme: 'f-pierre-inca', label: 'Pierre ajustée' }
+  ];
+
+  // ---------- Réglages : valeurs proposées, puis valeurs de départ de A et B ----------
+  var REGLAGES = [
+    { id: 'layout', nom: 'Disposition au centre', options: [['tas', 'En tas'], ['ligne', 'En ligne'], ['cercle', 'En cercle']] },
+    { id: 'taille', nom: 'Taille au centre (% du plateau)', options: [['12', '12 %'], ['16', '16 %'], ['20', '20 %'], ['26', '26 %'], ['32', '32 %']] },
+    { id: 'fin', nom: 'Taille à l’arrivée (% de l’image)', options: [['14', '14 %'], ['22', '22 %'], ['30', '30 %'], ['40', '40 %']] },
+    { id: 'pause', nom: 'Pause au centre', options: [['0', 'Aucune'], ['200', '0,2 s'], ['450', '0,45 s'], ['800', '0,8 s']] },
+    { id: 'ecart', nom: 'Écart entre deux formes', options: [['0', 'Toutes ensemble'], ['60', '0,06 s'], ['130', '0,13 s'], ['250', '0,25 s'], ['400', '0,4 s']] },
+    { id: 'duree', nom: 'Durée du vol d’une forme', options: [['600', '0,6 s'], ['800', '0,8 s'], ['1000', '1 s'], ['1300', '1,3 s'], ['2000', '2 s']] },
+    { id: 'courbe', nom: 'Courbe du trajet', options: [['0', 'Droit'], ['8', 'Légère'], ['15', 'Moyenne'], ['25', 'Forte']] },
+    { id: 'spirale', nom: 'Spirale autour de l’image', options: [['0', 'Aucune'], ['0.25', '¼ de tour'], ['0.5', '½ tour'], ['0.75', '¾ de tour'], ['1', '1 tour']] },
+    { id: 'rotation', nom: 'Rotation de la forme en vol', options: [['0', 'Aucune'], ['0.5', '½ tour'], ['1', '1 tour'], ['2', '2 tours']] },
+    { id: 'ease', nom: 'Rythme du vol', options: [['in', 'Part doucement, finit vite'], ['inout', 'Doux au départ et à l’arrivée'], ['out', 'Part vite, finit doucement'], ['lin', 'Régulier']] },
+    { id: 'arrivee', nom: 'À l’arrivée dans l’image', options: [['fond', 'Se fond dans l’image'], ['eclat', 'Se fond avec un éclat'], ['reste', 'Reste un instant dans l’image']] },
+    { id: 'compteur', nom: 'Le comptage des points', options: [['chaque', 'Monte à chaque arrivée'], ['fin', 'Monte d’un coup à la dernière']] }
+  ];
+  var DEPART = {
+    A: { layout: 'tas', taille: '20', fin: '22', pause: '200', ecart: '130', duree: '1000', courbe: '15', spirale: '0', rotation: '0.5', ease: 'inout', arrivee: 'eclat', compteur: 'chaque' },
+    B: { layout: 'cercle', taille: '16', fin: '30', pause: '450', ecart: '0', duree: '1000', courbe: '0', spirale: '0.5', rotation: '1', ease: 'in', arrivee: 'reste', compteur: 'fin' }
+  };
+  var NOMS = { A: 'Cascade (une par une, comme les étoiles)', B: 'Tourbillon (toutes ensemble, en spirale)' };
+  var DEVISES = {
+    A: 'Les formes se posent en tas au centre, puis partent l’une après l’autre en arc et se fondent dans l’image avec un éclat ; le comptage monte à chaque arrivée.',
+    B: 'Les formes se posent en cercle, attendent un peu, puis foncent toutes ensemble en spirale et restent un instant dans l’image ; le comptage monte d’un coup.'
+  };
+
+  // ---------- Rythmes ----------
+  var EASE = {
+    in: function (t) { return Math.pow(t, 2.2); },
+    out: function (t) { return 1 - Math.pow(1 - t, 2.2); },
+    inout: function (t) { return t * t * (3 - 2 * t); },
+    lin: function (t) { return t; }
+  };
+
+  // ---------- État des deux côtés ----------
+  var cotes = {};
+  ['A', 'B'].forEach(function (k) { cotes[k] = { r: Object.assign({}, DEPART[k]), anims: [], timers: [], els: [], vues: 0, debounce: 0 }; });
+  var reduit = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+
+  function el(id) { return document.getElementById(id); }
+  function aventure() { return AVENTURES[+el('aventure').value]; }
+  function nbPoints() { return +el('points').value; }
+  function lib(g, v) { var o = g.options.filter(function (x) { return x[0] === v; })[0]; return o ? o[1] : v; }
+
+  // ---------- Construction de la page ----------
+  function construireCote(k) {
+    var s = el('cote-' + k);
+    // Ordre : titre, plateau (toujours en vue), bouton Rejouer, puis les réglages juste dessous.
+    var h = '<h2 id="titre-' + k + '"><span class="pastille" aria-hidden="true">' + k + '</span> ' + NOMS[k] + '</h2><p class="devise">' + DEVISES[k] + '</p>' +
+      '<div class="cadre"><div class="plateau" role="img" aria-label="Plateau de jeu miniature">' +
+      '<div class="points-plateau"><div class="construction" role="img"></div><div class="points-textes">' +
+      '<p class="points-titre"></p><p class="points-valeur"><span class="pts">0</span><span class="points-sur"> / ' + OBJECTIF + '</span></p>' +
+      '<div class="jauge"><span></span></div></div></div><div class="couche"></div></div></div>' +
+      '<div class="barre"><button type="button" class="action principal" data-rejouer>▶ Rejouer ' + k + '</button><p class="info" role="status"></p></div>' +
+      '<h3 class="titre-reglages">Réglages de ' + k + '</h3><div class="reglages">';
+    REGLAGES.forEach(function (g) {
+      h += '<label>' + g.nom + '<select data-reglage="' + g.id + '">';
+      g.options.forEach(function (o) { h += '<option value="' + o[0] + '"' + (cotes[k].r[g.id] === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; });
+      h += '</select></label>';
+    });
+    h += '</div>';
+    s.innerHTML = h;
+    s.addEventListener('change', function (e) {
+      var id = e.target.getAttribute('data-reglage');
+      if (!id) return;
+      cotes[k].r[id] = e.target.value;
+      clearTimeout(cotes[k].debounce);
+      cotes[k].debounce = setTimeout(function () { jouer(k); }, 250);
+    });
+    s.addEventListener('click', function (e) { if (e.target.closest('[data-rejouer]')) jouer(k); });
+  }
+
+  function remplirAventure(k) {
+    var s = el('cote-' + k), av = aventure();
+    s.querySelector('.construction').innerHTML = window.Constructions.svg(av.id);
+    s.querySelector('.points-titre').textContent = av.titre;
+    cotes[k].vues = window.Constructions.etapesVisibles(av.id, P0, OBJECTIF);
+    afficher(k, P0, false);
+  }
+
+  // Compteur, jauge et construction pour p points. Les étapes nouvelles sont posées avec leur petite animation.
+  function afficher(k, p, anime) {
+    var s = el('cote-' + k), c = cotes[k], av = aventure();
+    s.querySelector('.pts').textContent = p;
+    s.querySelector('.jauge span').style.width = Math.min(100, p / OBJECTIF * 100) + '%';
+    var vues = window.Constructions.etapesVisibles(av.id, p, OBJECTIF);
+    s.querySelectorAll('.construction .etape').forEach(function (g, i) {
+      var vis = i < vues;
+      g.classList.toggle('vue', vis);
+      if (!vis) g.classList.remove('nouvelle');
+      else if (anime && i >= c.vues && !reduit.matches) g.classList.add('nouvelle');
+    });
+    c.vues = vues;
+    s.querySelector('.construction').setAttribute('aria-label', 'Construction : ' + vues + ' étape' + (vues > 1 ? 's' : ''));
+  }
+
+  function impulsion(k) {
+    var s = el('cote-' + k), cons = s.querySelector('.construction'), pv = s.querySelector('.points-valeur');
+    if (reduit.matches) return;
+    cons.classList.remove('recoit'); pv.classList.remove('gagne'); void cons.offsetWidth;
+    cons.classList.add('recoit'); pv.classList.add('gagne');
+  }
+
+  function nettoyer(k) {
+    var c = cotes[k], s = el('cote-' + k);
+    c.timers.forEach(clearTimeout); c.timers = [];
+    c.anims.forEach(function (a) { try { a.cancel(); } catch (e) { /* déjà finie */ } }); c.anims = [];
+    c.els.forEach(function (x) { if (x.parentNode) x.parentNode.removeChild(x); }); c.els = [];
+    s.querySelector('.couche').innerHTML = '';
+    s.querySelector('.construction').classList.remove('recoit');
+    s.querySelector('.points-valeur').classList.remove('gagne');
+    s.querySelectorAll('.construction .etape').forEach(function (g) { g.classList.remove('nouvelle'); });
+  }
+
+  // ---------- Disposition des formes au centre ----------
+  // Renvoie la taille (réduite si besoin pour tenir dans le plateau) et les positions relatives au centre.
+  function disposer(mode, N, taille, bw, bh) {
+    var P = [], i, a, R;
+    if (N === 1) P = [{ x: 0, y: 0 }];
+    else if (mode === 'ligne') { for (i = 0; i < N; i++) P.push({ x: (i - (N - 1) / 2) * taille * 1.05, y: 0 }); }
+    else if (mode === 'cercle') {
+      R = Math.max(taille * 0.62, taille * N / (2 * Math.PI));
+      for (i = 0; i < N; i++) { a = -Math.PI / 2 + i * 2 * Math.PI / N; P.push({ x: R * Math.cos(a), y: R * Math.sin(a) }); }
+    } else { for (i = 0; i < N; i++) { a = i * 2.39996; R = taille * 0.34 * Math.sqrt(i); P.push({ x: R * Math.cos(a), y: R * Math.sin(a) }); } }
+    var x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+    P.forEach(function (p) { x0 = Math.min(x0, p.x - taille / 2); x1 = Math.max(x1, p.x + taille / 2); y0 = Math.min(y0, p.y - taille / 2); y1 = Math.max(y1, p.y + taille / 2); });
+    var f = Math.min(1, bw * 0.9 / (x1 - x0), bh * 0.8 / (y1 - y0));
+    P.forEach(function (p) { p.x *= f; p.y *= f; });
+    return { taille: taille * f, pos: P };
+  }
+
+  function secondes(ms) { return (ms / 1000).toFixed(1).replace('.', ','); }
+
+  // ---------- L'animation ----------
+  function jouer(k) {
+    var c = cotes[k], r = c.r, s = el('cote-' + k);
+    nettoyer(k);
+    var av = aventure(), N = nbPoints();
+    remplirAventure(k);
+    var plateau = s.querySelector('.plateau'), couche = s.querySelector('.couche');
+    var pb = plateau.getBoundingClientRect(), cb = s.querySelector('.construction').getBoundingClientRect();
+    if (!pb.width || !cb.width) return;
+    // Les mesures du plateau sont faites sans la bordure : la couche des formes est dans la zone intérieure.
+    var cl = couche.getBoundingClientRect();
+    var bw = cl.width, bh = cl.height, cx = bw / 2, cy = bh / 2;
+    var tx = cb.left + cb.width / 2 - cl.left, ty = cb.top + cb.height / 2 - cl.top;
+    var fin = +r.fin / 100 * cb.width;
+    var dis = disposer(r.layout, N, +r.taille / 100 * bw, bw, bh);
+    var dur = +r.duree, pause = +r.pause, ecart = +r.ecart, POP = 80, POPD = 260;
+    var debutVol = POP * (N - 1) + POPD + pause;
+    var total = debutVol + (N - 1) * ecart + dur;
+    s.querySelector('.info').textContent = 'De la pose au dernier arrivé : ' + secondes(total) + ' s (vol d’une forme : ' + secondes(dur) + ' s).';
+    var dessous = r.layout === 'tas'; // en tas, la forme du dessus part la première
+    var pts = P0, arrivees = 0;
+    var ease = EASE[r.ease], arc = +r.courbe / 100 * bw, spir = +r.spirale, rot = +r.rotation;
+    var espace = Math.min(fin * 0.8, cb.width * 0.8 / N);
+
+    // Fondu puis retrait de l'élément (rien ne reste dans la page une fois l'animation finie).
+    function fondre(x, ms) {
+      var a = x.animate([{ opacity: 1 }, { opacity: 0 }], { duration: ms, fill: 'forwards' });
+      a.onfinish = function () { if (x.parentNode) x.parentNode.removeChild(x); };
+      c.anims.push(a);
+    }
+    function terminer() {
+      if (r.arrivee === 'reste') {
+        c.timers.push(setTimeout(function () {
+          c.els.forEach(function (x) { fondre(x, 220); });
+        }, 450));
+      }
+    }
+    function arrive(i, x, bx, by) {
+      arrivees++;
+      if (r.compteur === 'chaque') { pts++; afficher(k, pts, true); impulsion(k); }
+      else if (arrivees === N) { pts = P0 + N; afficher(k, pts, true); impulsion(k); }
+      else if (arrivees === 1) impulsion(k);
+      if (x && r.arrivee !== 'reste') fondre(x, 180);
+      if (x && r.arrivee === 'eclat') {
+        var e = document.createElement('div');
+        e.className = 'eclat'; e.style.cssText = 'left:' + (bx - fin * 0.6) + 'px;top:' + (by - fin * 0.6) + 'px;width:' + fin * 1.2 + 'px;height:' + fin * 1.2 + 'px';
+        couche.appendChild(e); c.els.push(e);
+        var ae = e.animate([{ transform: 'scale(.3)', opacity: .95 }, { transform: 'scale(1.7)', opacity: 0 }], { duration: 420, easing: 'ease-out', fill: 'forwards' });
+        ae.onfinish = function () { if (e.parentNode) e.parentNode.removeChild(e); };
+        c.anims.push(ae);
+      }
+      if (arrivees === N) terminer();
+    }
+
+    for (var i = 0; i < N; i++) (function (i) {
+      var rang = dessous ? N - 1 - i : i; // ordre de départ
+      var cible = { x: tx + (r.arrivee === 'reste' ? (rang - (N - 1) / 2) * espace : 0), y: ty };
+      if (reduit.matches) { c.timers.push(setTimeout(function () { arrive(i, null, cible.x, cible.y); }, 200 + rang * ecart)); return; }
+      var tailleF = dis.taille, sx = cx + dis.pos[i].x, sy = cy + dis.pos[i].y;
+      var x = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      x.setAttribute('class', 'forme'); x.setAttribute('aria-hidden', 'true');
+      x.setAttribute('viewBox', '0 0 48 48');
+      x.innerHTML = '<use href="#' + av.forme + '"/>';
+      x.style.cssText = 'left:' + (sx - tailleF / 2) + 'px;top:' + (sy - tailleF / 2) + 'px;width:' + tailleF + 'px;height:' + tailleF + 'px;z-index:' + (dessous ? i : N - i);
+      couche.appendChild(x); c.els.push(x);
+      // 1. la forme se pose au centre (petit rebond)
+      c.anims.push(x.animate([{ transform: 'scale(0)', opacity: 0 }, { transform: 'scale(1.18)', opacity: 1, offset: .7 }, { transform: 'scale(1)', opacity: 1 }], { duration: POPD, delay: i * POP, easing: 'ease-out', fill: 'both' }));
+      // 2. elle vole vers l'image en rétrécissant (courbe, spirale et rotation selon les réglages)
+      var v0x = sx - cible.x, v0y = sy - cible.y, len = Math.hypot(v0x, v0y) || 1, nx = -v0y / len, ny = v0x / len;
+      var finScale = fin / tailleF, kf = [], n = 32, j;
+      for (j = 0; j <= n; j++) {
+        var u = j / n, e = ease(u), px = v0x * (1 - e), py = v0y * (1 - e);
+        if (spir) { var an = spir * 2 * Math.PI * e, co = Math.cos(an), si = Math.sin(an), qx = px * co - py * si; py = px * si + py * co; px = qx; }
+        var h = arc * Math.sin(Math.PI * e); px += nx * h; py += ny * h;
+        // La forme reste toujours dans le plateau (la spirale autour d'une image située dans un coin sortirait sinon).
+        var demi = tailleF * (1 + (finScale - 1) * e) / 2;
+        px = Math.max(demi - cible.x, Math.min(bw - demi - cible.x, px)); py = Math.max(demi - cible.y, Math.min(bh - demi - cible.y, py));
+        kf.push({ transform: 'translate(' + (cible.x + px - sx).toFixed(1) + 'px,' + (cible.y + py - sy).toFixed(1) + 'px) rotate(' + (rot * 360 * e).toFixed(1) + 'deg) scale(' + (1 + (finScale - 1) * e).toFixed(4) + ')', offset: u });
+      }
+      var vol = x.animate(kf, { duration: dur, delay: debutVol + rang * ecart, easing: 'linear', fill: 'forwards' });
+      vol.onfinish = function () { arrive(i, x, cible.x, cible.y); };
+      c.anims.push(vol);
+    })(i);
+    if (reduit.matches) s.querySelector('.info').textContent += ' (Mouvement réduit demandé par l’appareil : seuls les points montent.)';
+  }
+
+  // ---------- Les 10 formes ----------
+  function construireFormes() {
+    el('grille-formes').innerHTML = AVENTURES.map(function (a, i) {
+      return '<div class="carte-forme"><svg viewBox="0 0 48 48" aria-hidden="true"><use href="#' + a.forme + '"/></svg><strong>' + a.nom + '</strong><span>' + a.label + '</span>' +
+        '<label><input type="checkbox" data-forme="' + i + '"> À refaire</label></div>';
+    }).join('');
+  }
+
+  // ---------- Copier mes choix ----------
+  function resume(k) {
+    return REGLAGES.map(function (g) { return '  - ' + g.nom + ' : ' + lib(g, cotes[k].r[g.id]); }).join('\n');
+  }
+  el('copier').addEventListener('click', function () {
+    var garde = document.querySelector('input[name=garde]:checked').value;
+    var refaire = Array.prototype.map.call(document.querySelectorAll('[data-forme]:checked'), function (b) { var a = AVENTURES[+b.getAttribute('data-forme')]; return a.nom + ' (' + a.label + ')'; });
+    var txt = 'Envol des points — mes choix (page v' + VERSION + ')\nJe garde : ' + garde +
+      '\n\nProposition A — ' + NOMS.A + ' :\n' + resume('A') + '\n\nProposition B — ' + NOMS.B + ' :\n' + resume('B') +
+      '\n\nFormes à refaire : ' + (refaire.length ? refaire.join(', ') : 'aucune') +
+      '\n\nRemarques : ' + (el('remarques').value.trim() || '(aucune)');
+    var etat = el('copie-etat');
+    function secours() {
+      var ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select();
+      var ok = false; try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+      document.body.removeChild(ta);
+      etat.textContent = ok ? 'Copié ! Colle-le dans la discussion.' : 'Copie impossible ici : le texte est dans la case ci-dessus, copie-le à la main.';
+      if (!ok) el('remarques').value = txt;
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function () { etat.textContent = 'Copié ! Colle-le dans la discussion.'; }, secours);
+    else secours();
+  });
+
+  // ---------- Version ----------
+  el('version').addEventListener('click', function () { el('historique').showModal(); });
+
+  // ---------- Démarrage ----------
+  AVENTURES.forEach(function (a, i) { var o = document.createElement('option'); o.value = i; o.textContent = a.nom + ' — ' + a.label.toLowerCase(); el('aventure').appendChild(o); });
+  function tout() { ['A', 'B'].forEach(jouer); }
+  el('aventure').addEventListener('change', tout);
+  el('points').addEventListener('change', tout);
+  el('ecran').addEventListener('change', function () {
+    document.querySelectorAll('.cadre').forEach(function (c) { c.style.setProperty('--lp', el('ecran').value + 'px'); });
+    tout();
+  });
+  el('rejouer-tout').addEventListener('click', tout);
+  ['A', 'B'].forEach(construireCote);
+  construireFormes();
+  ['A', 'B'].forEach(remplirAventure);
+  window.addEventListener('load', function () { setTimeout(tout, 300); });
+  var attente; window.addEventListener('resize', function () { clearTimeout(attente); attente = setTimeout(function () { ['A', 'B'].forEach(function (k) { nettoyer(k); remplirAventure(k); }); }, 200); });
+  window.AnimationPoints = { cotes: cotes, jouer: jouer }; // pour les tests automatiques
+})();
+</script>
+</body>
+</html>
