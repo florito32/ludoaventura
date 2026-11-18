@@ -93,3 +93,92 @@ test('fin de partie → « Rejouer » : étoiles comptées sans animation', asyn
   expect(await page.evaluate(() => window.Recompenses.compte.etat.total)).toBe(pts);
   await expect(page.locator('.gain-accueil')).toHaveCount(0);
 });
+
+// ---------- v10.3 : coffres ----------
+// Plusieurs coffres à ouvrir : coffre du jour + niveaux 2, 3, 4 (simples) et 5 (argent).
+async function accueilAvecCoffres(page, total = 175) {
+  await page.addInitScript(([etat]) => {
+    window.AVENTURA_DUREE_COFFRE = 0;
+    try { localStorage.setItem('ludo-vu', '1'); if (!localStorage.getItem('ludoaventura-etoiles')) localStorage.setItem('ludoaventura-etoiles', etat); } catch (e) { /* */ }
+  }, [ETAT(total)]);
+  await page.goto('./');
+  await expect(page.locator('#btn-commencer')).toBeVisible();
+}
+// Ouvre tous les coffres de la file, l'un après l'autre, puis ferme la fenêtre.
+async function ouvrirTous(page) {
+  const fenetre = page.locator('#coffre');
+  let ouverts = 0;
+  for (let k = 0; k < 12; k++) {
+    await page.locator('#btn-coffre-ouvrir').click();
+    ouverts++;
+    // Attend la fin de l'ouverture : « Coffre suivant » ou « Super ! » apparaît.
+    await page.locator('#btn-coffre-suivant:visible, #btn-coffre-fermer:visible').first().waitFor();
+    if (await page.locator('#btn-coffre-fermer').isVisible()) break;
+    await page.locator('#btn-coffre-suivant').click();
+  }
+  await page.locator('#btn-coffre-fermer').click();
+  await expect(fenetre).toBeHidden();
+  return ouverts;
+}
+
+test('coffres : le cumul des étoiles de tous les coffres ouverts s\'envole d\'un coup vers le compteur', async ({ page }) => {
+  await accueilAvecCoffres(page);
+  const total = page.locator('#accueil-total');
+  await expect(total).toHaveText('175');
+  await page.locator('#btn-coffre-haut').click();
+  await expect(page.locator('#coffre')).toBeVisible();
+  const ouverts = await ouvrirTous(page);
+  expect(ouverts).toBeGreaterThan(1);
+  const apres = await page.evaluate(() => window.Recompenses.compte.etat.total);
+  const gain = apres - 175;
+  expect(gain).toBeGreaterThan(0);
+  // Un seul « +N étoiles » : la somme de tous les coffres ; le compteur ne montait pas pendant les ouvertures.
+  await expect(page.locator('.gain-accueil')).toHaveCount(1);
+  await expect(page.locator('.gain-accueil')).toHaveText('+' + gain + ' étoiles');
+  expect(Number(await total.textContent())).toBeLessThan(apres);
+  await expect(total).toHaveText(String(apres), { timeout: 6000 });
+  await expect(page.locator('.gain-accueil')).toHaveCount(0);
+});
+
+test('coffre ouvert ailleurs que sur l\'accueil : l\'envol attend le retour à l\'accueil', async ({ page }) => {
+  await accueilAvecCoffres(page, 40);
+  await page.locator('#btn-etoiles-haut').click();
+  await expect(page.locator('#ecran-etoiles')).toBeVisible();
+  await page.evaluate(() => window.Recompenses.ouvrirCoffres(window.Recompenses.compte.coffresAOuvrir()));
+  await ouvrirTous(page);
+  await expect(page.locator('.gain-accueil')).toHaveCount(0); // pas d'accueil à l'écran : rien ne vole
+  const apres = await page.evaluate(() => window.Recompenses.compte.etat.total);
+  await page.locator('#ecran-etoiles [data-retour-accueil]').first().click();
+  await expect(page.locator('.gain-accueil')).toHaveText('+' + (apres - 40) + ' étoiles');
+  await expect(page.locator('#accueil-total')).toHaveText(String(apres), { timeout: 6000 });
+  await expect(page.locator('.gain-accueil')).toHaveCount(0);
+});
+
+test('coffres : l\'envol ne se rejoue pas (rien ne reste en attente, même après rechargement)', async ({ page }) => {
+  await accueilAvecCoffres(page);
+  await page.locator('#btn-coffre-haut').click();
+  await ouvrirTous(page);
+  await expect(page.locator('.gain-accueil')).toHaveCount(1);
+  await expect(page.locator('.gain-accueil')).toHaveCount(0, { timeout: 8000 });
+  expect(await page.evaluate(() => sessionStorage.getItem('ludoaventura-gain-accueil'))).toBeNull();
+  const apres = await page.evaluate(() => window.Recompenses.compte.etat.total);
+  await page.reload();
+  await expect(page.locator('#accueil-total')).toHaveText(String(apres));
+  await expect(page.locator('.gain-accueil')).toHaveCount(0);
+});
+
+test('coffre ouvert sur l\'écran de fin : un seul envol pour la partie et le coffre ensemble', async ({ page }) => {
+  await page.addInitScript(([etat]) => {
+    window.AVENTURA_DUREE_COFFRE = 0;
+    try { if (!localStorage.getItem('ludoaventura-etoiles')) localStorage.setItem('ludoaventura-etoiles', etat); } catch (e) { /* */ }
+  }, [ETAT(175)]);
+  await gagner(page);
+  await page.getByRole('button', { name: 'Ouvrir le coffre d’argent' }).click();
+  await ouvrirTous(page);
+  const fin = await page.evaluate(() => window.Recompenses.compte.etat.total);
+  expect(await page.locator('.gain-accueil').count()).toBe(0); // pas d'accueil à l'écran : rien ne vole encore
+  await page.getByRole('button', { name: 'Retour à l’accueil' }).click();
+  await expect(page.locator('.gain-accueil')).toHaveText('+' + (fin - 175) + ' étoiles');
+  await expect(page.locator('#accueil-total')).toHaveText(String(fin), { timeout: 6000 });
+  await expect(page.locator('.gain-accueil')).toHaveCount(0);
+});

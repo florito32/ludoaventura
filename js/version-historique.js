@@ -2,6 +2,10 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.12', date: '2026-11-18', changes: [
+    "Coffres : à la fermeture de la fenêtre, les étoiles de tous les coffres ouverts à la suite s’envolent ensemble vers le compteur de l’accueil (« +N étoiles » au centre, le compteur grandit au fur et à mesure, 3 secondes au plus).",
+    "Un coffre ouvert depuis « Mes étoiles », « Ma progression » ou l’écran de fin attend l’arrivée sur l’accueil ; avec le gain d’une partie, un seul envol pour le tout."
+  ] },
   { v: '10.11', date: '2026-11-17', changes: [
     "Pseudo : chaque compte a un pseudo unique de 4 à 20 caractères (lettres, chiffres, - et _, sans espace). Tu le choisis en créant ton compte par e-mail ; avec Google, le jeu t’en donne un (prénom + initiale + 01) et te propose d’en choisir un à la prochaine ouverture.",
     "Mon compte : ton pseudo s’affiche et tu peux le changer quand tu veux.",
