@@ -2,6 +2,10 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.14', date: '2026-11-18', changes: [
+    "Histoire, Renaissance : 362 nouvelles questions ajoutées aux jeux « Arts, découvertes et châteaux » et « Louis XIV et son temps », à tous les niveaux (questions de 15 mots au plus).",
+    "Mode Quiz : chaque nouvelle question a ses 4 choix. Mode Normal : question ouverte dès Difficile quand la réponse est un nom, vrai ou faux avant ; les dates de Louis XIV s’ajoutent à la frise chronologique."
+  ] },
   { v: '10.13', date: '2026-11-18', changes: [
     "Histoire et Géographie : l’écran des jeux est présenté comme celui des temps de la conjugaison. Chaque période (ou famille) est un cadre avec ses jeux l’un sous l’autre et son bouton « Tout » ; les cadres se rangent côte à côte pour que tout tienne sans défiler.",
     "Sur un téléphone en hauteur, les cadres se rangent sur 2 colonnes (3 sur un petit écran peu haut) ; sur ordinateur, un cadre par famille."
