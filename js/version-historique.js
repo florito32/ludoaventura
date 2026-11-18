@@ -2,6 +2,10 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.24', date: '2026-11-18', changes: [
+    "Histoire, Antiquité : 693 nouvelles questions ajoutées aux jeux « Dieux et mythes », « L’Égypte des pharaons », « Rome et la Gaule » et « Vie antique et JO » (une partie seulement : Monuments, merveilles, Olympie et chiffres romains arrivent ensuite).",
+    "Mode Quiz : 4 choix par question. Mode Normal : question ouverte dès Difficile quand la réponse est courte, vrai ou faux avant ; les dates (avant J.-C. comprises) s’ajoutent aux frises chronologiques."
+  ] },
   { v: '10.23', date: '2026-11-18', changes: [
     "Plateau : le bouton « plein écran » est maintenant en bas à droite de l’écran, à côté de « Mentions légales » et « Crédits » : il ne cache plus rien du plateau de jeu.",
     "Téléphone : après ta réponse, la correction (« Bonne réponse ! … ») n’est plus coupée en bas. Le drapeau d’une question rétrécit un peu pour que tout tienne, et si la place manque encore, l’encadré descend jusqu’à la correction."
