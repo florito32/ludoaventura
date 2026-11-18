@@ -2,6 +2,10 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.23', date: '2026-11-18', changes: [
+    "Plateau : le bouton « plein écran » est maintenant en bas à droite de l’écran, à côté de « Mentions légales » et « Crédits » : il ne cache plus rien du plateau de jeu.",
+    "Téléphone : après ta réponse, la correction (« Bonne réponse ! … ») n’est plus coupée en bas. Le drapeau d’une question rétrécit un peu pour que tout tienne, et si la place manque encore, l’encadré descend jusqu’à la correction."
+  ] },
   { v: '10.22', date: '2026-11-18', changes: [
     "Accueil : le « +N étoiles » gagné est écrit en jaune clair avec un contour brun foncé, lisible même au-dessus du bouton rouge « Commencer l’aventure »."
   ] },

@@ -2167,6 +2167,21 @@
   window.addEventListener('resize', ajusterTour);
   window.addEventListener('resize', degagerDe);
 
+  // Correction jamais coupée en bas (v10.21, demande du 18/11/2026) : quand la phrase de correction apparaît ou change
+  // et que l'encadré du tour défile (téléphone bas), il descend jusqu'au bout : on voit la correction en entier.
+  (function () {
+    var rep = $('carte-reponse'), tour = $('tour');
+    if (!rep || !tour || !window.MutationObserver) return;
+    var attente = null;
+    new MutationObserver(function () {
+      if (rep.hidden || attente) return;
+      attente = window.requestAnimationFrame(function () {
+        attente = null;
+        if (tour.scrollHeight > tour.clientHeight + 1) tour.scrollTop = tour.scrollHeight;
+      });
+    }).observe(rep, { attributes: true, attributeFilter: ['hidden', 'class'], childList: true, characterData: true, subtree: true });
+  })();
+
   // ---------- Pavé numérique (v9.0, demande du 16/11/2026) ----------
   // Toute réponse en nombre se tape sur le pavé de la carte : plus besoin du clavier du téléphone ni de l'ordinateur.
   // Sur écran tactile, la case ne fait plus apparaître le clavier du système (inputmode="none", Safari iOS 13 et plus,

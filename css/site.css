@@ -1138,7 +1138,10 @@ body:has(#ecran-plateau:not([hidden])) .pied { padding-block: 2px calc(2px + env
 /* Boutons posés sur le plateau, en haut à droite (v10.18) : plein écran et menu. */
 .plateau-outils { position: absolute; z-index: 5; top: 6px; right: 6px; display: flex; gap: 6px; }
 .plateau-outils .btn-retour { min-height: 38px; padding: 2px 12px; box-shadow: 0 2px 6px rgb(0 0 0 / .35); }
-.plateau-outils .btn-outil { min-width: 38px; padding: 2px 8px; }
+/* Plein écran (v10.21) : en bas à droite de l'écran, dans la zone du pied de page, pour ne rien cacher du plateau.
+   Posé en « fixed » : il est hors de .table (qui contient sa mise en page), donc il reste calé sur l'écran. */
+.btn-plein-ecran { position: fixed; z-index: 5; right: max(10px, env(safe-area-inset-right)); bottom: calc(8px + env(safe-area-inset-bottom)); min-width: 38px; min-height: 38px; padding: 2px 8px; box-shadow: 0 2px 6px rgb(0 0 0 / .35); }
+.btn-plein-ecran[hidden] { display: none; }
 /* Écrans larges (ordinateur, tablette et téléphone en paysage) : plateau à gauche, aussi grand que la hauteur
    le permet, tour de jeu à droite sur toute la hauteur. Si le contenu du tour ne tient plus (correction,
    tableau « ? »), l'encadré s'élargit vers la gauche, par-dessus le plateau (.tour-monte, js/plateau.js). */
@@ -2265,4 +2268,10 @@ body:has(#ecran-baby:not([hidden])) .pied { padding-block: 4px calc(4px + env(sa
   .onglet-texte { flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 0 5px; }
   .avec-rail > .reglage-ligne.ouvert { padding: 8px; gap: 4px; }
   .reglages-joueur .choix-matiere.avec-rail .pack span { min-height: 38px; padding: 4px 10px; }
+}
+
+/* v10.21 : sur téléphone (zone de jeu sur une colonne), le drapeau d'une question suit la hauteur de la zone de jeu
+   (.table est un conteneur, cqh) : la carte tient mieux sous le plateau, la correction n'est plus coupée en bas. */
+@media (max-width: 899px) {
+  .table .drapeau.grand { height: clamp(36px, 9cqh, 72px); width: auto; aspect-ratio: 4 / 3; }
 }
