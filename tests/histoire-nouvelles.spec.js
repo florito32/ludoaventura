@@ -7,8 +7,8 @@ require('../js/histoire.js');
 const { rapide, versReglages, valider, lancer, ouvrirNeuf } = require('./aide');
 
 const NIVEAUX = ['facile', 'moyen', 'difficile', 'expert'];
-// Jeux qui ont reçu des questions, avec le nombre minimal de questions ajoutées (Renaissance : 'ren' ; Louis XIV : 'mod').
-const AJOUTS = { r01: 195, t01: 167 };
+// Jeux qui ont reçu des questions, avec le nombre minimal de questions ajoutées (Préhistoire : 'pre' ; Renaissance : 'ren' ; Louis XIV : 'mod').
+const AJOUTS = { r01: 195, t01: 167, p01: 144, p03: 114 };
 
 // Les séries ajoutées par js/histoire-*.js : les séries de questions « ouverte: true ».
 function seriesAjoutees(jeu) { return S.trouver(jeu).series.filter((s) => s.k === 'qcm' && s.ouverte); }

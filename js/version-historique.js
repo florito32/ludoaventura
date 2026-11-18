@@ -2,6 +2,10 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.15', date: '2026-11-18', changes: [
+    "Histoire, Préhistoire : 258 nouvelles questions ajoutées aux jeux « Nos ancêtres et les périodes » et « Art, outils et mégalithes », à tous les niveaux (questions de 15 mots au plus).",
+    "Mode Quiz : chaque nouvelle question a ses 4 choix. Mode Normal : question ouverte dès Difficile quand la réponse est un nom, vrai ou faux avant ; de vraies questions « vrai ou faux » s’ajoutent."
+  ] },
   { v: '10.14', date: '2026-11-18', changes: [
     "Histoire, Renaissance : 362 nouvelles questions ajoutées aux jeux « Arts, découvertes et châteaux » et « Louis XIV et son temps », à tous les niveaux (questions de 15 mots au plus).",
     "Mode Quiz : chaque nouvelle question a ses 4 choix. Mode Normal : question ouverte dès Difficile quand la réponse est un nom, vrai ou faux avant ; les dates de Louis XIV s’ajoutent à la frise chronologique."
