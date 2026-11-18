@@ -1,0 +1,43 @@
+# jeu: a10
+# famille: ant
+# source: histoire antiquité.docx, thème « XII I, V, X… » (questions de règles et de culture ; les conversions de nombres sont déjà produites par le jeu)
+facile	Les chiffres romains ont-ils un symbole pour le zéro ?	Non, aucun	Oui, le O	Oui, le Z	Oui, le N
+facile	Que fait-on quand une petite lettre précède une grande, comme dans IV ?	On soustrait	On additionne	On multiplie	On divise
+facile	Que fait-on quand une petite lettre suit une grande, comme dans VI ?	On additionne	On soustrait	On multiplie	On divise
+facile	Combien de fois répète-t-on au plus I, X, C ou M de suite ?	Trois fois	Deux fois	Quatre fois	Cinq fois
+facile	Quelles lettres romaines ne se répètent jamais de suite ?	V, L et D	I, X et C	M et C	I et V
+facile	Quel peuple transmet des symboles de comptage aux Romains ?	Les Étrusques	Les Égyptiens	Les Mayas	Les Gaulois
+facile	Que signifie « Ve siècle » ?	Le 5e siècle	Le 15e siècle	Le 50e siècle	Le 4e siècle
+facile	Que signifie « XXe siècle » ?	Le 20e siècle	Le 19e siècle	Le 21e siècle	Le 2e siècle
+facile	Quel nombre est souvent noté IIII sur les cadrans d’horloge ?	Quatre	Six	Neuf	Douze
+facile	Que vaut le nombre romain MCMLXXXIV ?	1 984	1 884	1 994	2 084
+moyen	Pourquoi écrit-on XL plutôt que XXXX pour 40 ?	Pour éviter quatre signes identiques	Parce que L vaut 40	Pour écrire plus gros	Par superstition
+moyen	Quel nombre romain obtient-on en additionnant XXV et XIV ?	XXXIX	XXXVI	XXXIV	XL
+moyen	Comment s’appelle la barre au-dessus d’un chiffre romain qui multiplie par 1 000 ?	Le vinculum	Le calculus	L’abacus	Le semis
+moyen	Que vaut un V surmonté d’une barre ?	5 000	50	500	5 000 000
+moyen	Que vaut un X surmonté d’une barre ?	10 000	100	1 000	100 000
+moyen	Quel instrument à jetons aidait les Romains à compter ?	L’abaque	L’astrolabe	La clepsydre	Le sextant
+moyen	Quel mathématicien, auteur du Liber Abaci, introduit les chiffres arabes en Europe ?	Fibonacci	Euclide	Archimède	Pythagore	ordre=Fibonacci publie le Liber Abaci|1202
+moyen	Quel nombre romain vient juste après CCXCIX ?	CCC	CCXC	CD	CCCI
+moyen	Que vaut le nombre romain DCLXVI ?	666	616	656	766
+moyen	Les chiffres romains ont-ils une valeur de position comme nos chiffres ?	Non	Oui	Seulement pour M	Seulement pour I
+difficile	Quel nombre romain vient juste avant DC ?	DXCIX	DCI	DCIX	DXC
+difficile	Comment écrit-on 1492 en chiffres romains ?	MCDXCII	MCCDXCII	MCDCXII	MDCXCII	ordre=Christophe Colomb atteint l’Amérique|1492
+difficile	Comment écrit-on 1789 en chiffres romains ?	MDCCLXXXIX	MDCCLXXIX	MCDLXXXIX	MDCCCLXXXIX	ordre=Début de la Révolution française|1789
+difficile	Quel nombre romain obtient-on en soustrayant L de C ?	L	XL	LX	C
+difficile	Quel nombre romain obtient-on en additionnant XL et LX ?	C	CC	L	XC
+difficile	Quel nombre romain obtient-on en divisant MM par II ?	M	D	MM	C
+difficile	Jusqu’à quel nombre écrit-on avec les lettres usuelles, sans barre ?	3 999	1 000	9 999	10 000
+difficile	Que vaut MDCLXVI, qui contient chaque symbole une fois ?	1 666	1 566	1 656	1 766
+difficile	Comment appelle-t-on le douzième d’un as ?	L’once	Le semis	Le denier	Le sesterce
+difficile	Comment appelle-t-on la moitié d’un as ?	Le semis	L’uncia	Le quadrans	Le triens
+expert	Comment écrit-on 753, année de la fondation légendaire de Rome ?	DCCLIII	DCCLXIII	DCLIII	DCCXLIII	ordre=Fondation légendaire de Rome|-753
+expert	Comment écrit-on 44, année de la mort de César ?	XLIV	XXXXIV	LXIV	XIV	ordre=Assassinat de Jules César|-44
+expert	Comment écrit-on 476, année de la chute de l’Empire d’Occident ?	CDLXXVI	CCCCLXXVI	CDLXVI	CDXXVI	ordre=Chute de l’Empire romain d’Occident|476
+expert	Comment écrit-on 459 en chiffres romains ?	CDLIX	CDXLIX	CCCCLIX	CDLVIIII
+expert	Comment écrit-on 944 en chiffres romains ?	CMXLIV	CMXXXXIV	DCCCCXLIV	CMLIV
+expert	Comment écrit-on 3 888 en chiffres romains ?	MMMDCCCLXXXVIII	MMMDCCCLXXXIIX	MMDCCCCLXXXVIII	MMMCDCCLXXXVIII
+expert	Quel nombre obtient-on en multipliant XIV par VII ?	XCVIII	XCVII	CVIII	XCIX
+expert	Quel nombre obtient-on en multipliant XIII par V ?	LXV	LV	LXX	LX
+expert	Quel nombre obtient-on en additionnant DCCCLXXXVIII et CXII ?	M	CM	MD	DCCC
+expert	Pourquoi l’absence de zéro gêne-t-elle les calculs romains ?	On ne peut pas poser les opérations en colonne	On ne peut pas compter jusqu’à dix	On ne peut pas écrire de dates	On ne peut pas utiliser de lettres

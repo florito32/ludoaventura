@@ -104,7 +104,7 @@ moyen	Quel titre le Sénat décerne-t-il à Octave en 27 avant J.-C. ?	Auguste	C
 moyen	Comment s’appelle la garde personnelle des empereurs romains ?	La garde prétorienne	La garde nationale	La légion Alaudae	La garde suisse
 moyen	Quel empereur étend la citoyenneté romaine à tous les hommes libres ?	Caracalla	Hadrien	Marc Aurèle	Septime Sévère	ordre=Citoyenneté pour tous les hommes libres|212
 moyen	Quel édit de 313 met fin aux persécutions contre les chrétiens ?	L’édit de Milan	L’édit de Nantes	L’édit de Thessalonique	L’édit de Caracalla
-moyen	Quelle ville d’Asie mineure accueille le premier concile œcuménique en 325 ?	Nicée	Éphèse	Chalcédoine	Antioche	ordre=Concile de Nicée|325
+moyen	Quelle ville d’Asie mineure accueille le premier concile œcuménique en 325 ?	Nicée	Éphèse	Chalcédoine	Antioche
 moyen	Quel ancien nom portait la ville devenue Constantinople ?	Byzance	Troie	Nicée	Antioche
 moyen	Quel orateur finit ses discours par « Carthage doit être détruite » ?	Caton l’Ancien|Caton	Cicéron	César	Scipion
 moyen	En quelle année Carthage est-elle détruite par Scipion Émilien ?	146 av. J.-C.	202 av. J.-C.	218 av. J.-C.	133 av. J.-C.	ordre=Destruction de Carthage par Scipion Émilien|-146
@@ -160,3 +160,72 @@ moyen	Quel aqueduc à trois étages amenait l’eau d’Uzès à Nîmes ?	Le pon
 moyen	Quel autel, à Lyon, rassemblait chaque année les délégués des cités gauloises ?	L’autel de Rome et d’Auguste	L’Ara Pacis	L’autel de Pergame	L’autel de Jupiter Capitolin
 moyen	Quelle sainte gauloise est martyrisée à Lyon en 177, avec l’évêque Pothin ?	Blandine	Geneviève	Clotilde	Radegonde	ordre=Martyrs de Lyon|177
 moyen	Quel auteur de l’Histoire naturelle décrit les richesses de la Gaule ?	Pline l’Ancien	Pline le Jeune	Tacite	Strabon
+difficile	Quelle colline de Rome portait le temple de Jupiter Capitolin ?	Le Capitole	Le Palatin	L’Aventin	Le Quirinal
+difficile	Quel général romain bat Hannibal à Zama ?	Scipion l’Africain	Fabius Maximus	Paul Émile	Marius	ordre=Bataille de Zama contre Hannibal|-202
+difficile	Comment appelle-t-on, à Rome, les fermiers des impôts dans les provinces ?	Les publicains	Les questeurs	Les édiles	Les licteurs
+difficile	Quels prêtres romains lisaient la volonté des dieux dans le vol des oiseaux ?	Les augures	Les vestales	Les flamines	Les haruspices
+difficile	Quel collège de prêtres, dirigé par le grand pontife, fixait le calendrier romain ?	Les pontifes	Les augures	Les décemvirs	Les saliens
+difficile	Comment appelle-t-on l’esclave grec chargé d’instruire les enfants des riches familles ?	Le pédagogue	Le lanista	Le licteur	Le tribun
+expert	Quelle magistrature romaine évaluait la fortune des citoyens et veillait sur les mœurs ?	La censure	La questure	L’édilité	La préture
+expert	Quel tribun de la plèbe, auteur de lois agraires, est assassiné en 133 ?	Tiberius Gracchus	Caius Gracchus	Drusus	Saturninus	ordre=Assassinat de Tiberius Gracchus|-133
+expert	Quel frère de Tiberius Gracchus poursuit ses réformes et meurt en 121 avant J.-C. ?	Caius Gracchus	Marius	Sylla	Drusus	ordre=Mort de Caius Gracchus|-121
+expert	Quel décret du Sénat donnait les pleins pouvoirs aux consuls en cas de danger ?	Le sénatus-consulte ultime|Le senatus consultum ultimum	La lex Titia	Le plébiscite	Le veto
+expert	Comment appelle-t-on la révolte de Spartacus, de 73 à 71 avant J.-C. ?	La troisième guerre servile	La guerre sociale	La guerre des Gaules	La guerre de Jugurtha
+expert	Quel général élimine les pirates de Méditerranée en trois mois ?	Pompée	César	Crassus	Lucullus
+expert	Comment appelle-t-on l’alliance de César, Pompée et Crassus, vers 60 avant J.-C. ?	Le premier triumvirat	Le second triumvirat	La tétrarchie	Le décemvirat
+expert	Quel accord de 43 avant J.-C. donne le pouvoir à Octave, Antoine et Lépide ?	Le second triumvirat	Le premier triumvirat	La tétrarchie	Le décemvirat	ordre=Second triumvirat d’Octave, Antoine et Lépide|-43
+expert	Quelle loi de 43 avant J.-C. institue officiellement le second triumvirat ?	La lex Titia	La lex Julia	La lex Hortensia	La lex Canuleia
+expert	Quelle bataille de 42 avant J.-C. permet de vaincre Brutus et Cassius ?	Philippes	Pharsale	Actium	Zama	ordre=Bataille de Philippes contre Brutus et Cassius|-42
+expert	Quel ami d’Octave remporte pour lui les victoires de Nauloque et d’Actium ?	Agrippa	Mécène	Antoine	Tibère
+expert	Quel monument du Champ de Mars, fondé par Agrippa, Hadrien reconstruit-il ?	Le Panthéon	Le Colisée	Le théâtre de Marcellus	Le Circus Maximus
+expert	Quelle défaite de l’an 9 fait crier Auguste contre Varus et ses légions ?	La bataille de la forêt de Teutoburg|Teutoburg	La bataille de Cannes	La bataille d’Andrinople	La bataille de Carrhes	ordre=Désastre de Varus en Germanie|9
+expert	Quel neveu de Tibère venge Varus par ses campagnes en Germanie ?	Germanicus	Drusus	Agrippa	Caligula
+expert	Quel empereur est soupçonné d’avoir fait brûler Rome en 64 ?	Néron	Caligula	Domitien	Commode	ordre=Grand incendie de Rome sous Néron|64
+expert	Quel palais somptueux Néron fait-il bâtir après l’incendie de Rome ?	La Domus Aurea|La Maison dorée	La villa d’Hadrien	Le palais de Domitien	La Maison Carrée
+expert	Comment appelle-t-on l’an 69, où quatre empereurs se succèdent ?	L’année des quatre empereurs	La Grande Persécution	L’anarchie militaire	La tétrarchie	ordre=Année des quatre empereurs|69
+expert	Quel fils de Vespasien détruit le Temple de Jérusalem en 70 ?	Titus	Domitien	Trajan	Hadrien	ordre=Prise de Jérusalem par Titus|70
+expert	Quel arc de la Voie sacrée commémore la prise de Jérusalem ?	L’arc de Titus	L’arc de Constantin	L’arc de Septime Sévère	L’arc de Trajan
+expert	Quel frère de Titus, tyran soupçonneux, est assassiné en 96 ?	Domitien	Néron	Commode	Caligula	ordre=Assassinat de Domitien|96
+expert	Quel empereur est adopté par Nerva ?	Trajan	Hadrien	Antonin	Marc Aurèle
+expert	Quelle région Trajan conquiert-il entre 101 et 106 ?	La Dacie	La Gaule	La Bretagne	La Parthie
+expert	Quel chef mène la révolte juive de 132 à 135 contre Hadrien ?	Bar Kokhba	Josèphe	Hérode	Judas Maccabée	ordre=Révolte de Bar Kokhba|132
+expert	Quel nom Hadrien donne-t-il à la Judée après la révolte ?	La Syrie-Palestine|Syria Palaestina	La Samarie	La Galilée	L’Idumée
+expert	Quelle épidémie frappe l’Empire sous Marc Aurèle à partir de 165 ?	La peste antonine	La peste noire	La peste de Justinien	La grippe espagnole	ordre=Début de la peste antonine|165
+expert	Quel fils de Marc Aurèle se prend pour Hercule avant d’être étranglé ?	Commode	Caracalla	Néron	Domitien	ordre=Assassinat de Commode|192
+expert	Quel empereur fait assassiner son frère Geta en 211 ?	Caracalla	Commode	Titus	Domitien	ordre=Caracalla fait tuer son frère Geta|211
+expert	Quel juriste, préfet du prétoire, est tué par les prétoriens sous Sévère Alexandre ?	Ulpien	Papinien	Gaius	Cicéron
+expert	Comment nomme-t-on la période d’anarchie militaire de 235 à 284 ?	La crise du IIIe siècle	La Pax Romana	Le Haut-Empire	La tétrarchie
+expert	Quel empereur, « Restaurateur du monde », vainc Palmyre et l’Empire des Gaules ?	Aurélien	Gallien	Probus	Dioclétien
+expert	Quel César de Dioclétien est le père de Constantin ?	Constance Chlore	Galère	Maxence	Licinius
+expert	Comment nomme-t-on la dernière grande persécution des chrétiens, à partir de 303 ?	La Grande Persécution	La persécution de Dèce	La persécution de Néron	L’affaire de Lyon	ordre=Début de la Grande Persécution|303
+expert	Quelle bataille de 312 permet à Constantin de vaincre Maxence ?	Le pont Milvius	Philippes	Andrinople	Pharsale	ordre=Bataille du pont Milvius|312
+expert	Quel concile réuni par Constantin en 325 combat l’arianisme ?	Nicée	Chalcédoine	Éphèse	Constantinople
+expert	Quelle bataille de 378 voit mourir l’empereur Valens face aux Goths ?	Andrinople	Zama	Teutoburg	Cannes	ordre=Défaite d’Andrinople contre les Goths|378
+difficile	Quel rôle jouaient les bardes dans la société gauloise ?	Chanter la mémoire et les exploits	Rendre la justice	Forger les armes	Soigner les malades
+difficile	Quel rôle jouaient les vates aux côtés des druides ?	Les sacrifices et la divination	Le commandement des armées	Le commerce du vin	La construction des oppida
+difficile	Pourquoi les druides refusaient-ils de mettre leur savoir par écrit ?	Pour cultiver la mémoire et garder les secrets	Parce qu’ils ne connaissaient aucun alphabet	Par manque de papyrus	Sur ordre de César
+difficile	Quel animal, symbole de courage, orne casques et chaudrons celtes ?	Le sanglier	Le lion	Le dauphin	Le chameau
+difficile	Quel récipient en bois cerclé, inventé par les Celtes, remplace l’amphore pour le vin ?	Le tonneau	La jarre	L’outre	Le dolium
+difficile	Comment nomme-t-on le manteau de laine des Gaulois ?	La saie|Le sagum	La toge	Le pallium	La stola
+difficile	Comment nomme-t-on le pantalon large des Gaulois, que les Romains raillaient ?	Les braies	La toge	La tunique	Les sandales
+expert	Selon César, quel peuple vit en Gaule avec les Belges et les Celtes ?	Les Aquitains	Les Ibères	Les Germains	Les Ligures
+expert	Comment s’appelle le magistrat suprême annuel de certaines cités gauloises ?	Le vergobret	Le consul	Le druide	Le tribun
+expert	Quelle tombe princière allemande de Hallstatt a livré un char à quatre roues ?	Hochdorf	Vix	Alésia	Tintignac
+expert	Comment nomme-t-on l’art celtique aux enroulements et aux figures fantastiques ?	L’art de La Tène	L’art roman	L’art gothique	L’art baroque
+expert	Quel sanctuaire de Corrèze a livré des carnyx et des armes déposés ?	Tintignac	Gournay-sur-Aronde	Corent	Bibracte
+expert	Qu’est-ce que le carnyx pour les guerriers gaulois ?	Une trompette de guerre	Une épée courte	Un char de combat	Un casque à cornes
+expert	Quel oppidum d’Auvergne a livré une esplanade cultuelle pour les assemblées ?	Corent	Alésia	Bibracte	Avaricum
+expert	Quel roi arverne, vaincu par Rome en 121 avant J.-C., défile à son triomphe ?	Bituit	Vercingétorix	Celtillos	Orgetorix
+expert	Comment appelle-t-on le rempart gaulois de poutres et de pierres décrit par César ?	Le murus gallicus	Le limes	Le mur d’Hadrien	Le rempart de Servius
+expert	Comment nomme-t-on la fusion des pierres des remparts gaulois incendiés ?	La vitrification	La calcination	La fossilisation	La pétrification
+expert	Quel noble éduen tente de soulever les siens contre César à Gergovie ?	Litaviccos	Orgetorix	Ambiorix	Diviciac
+expert	Quel peuple gaulois possède l’oppidum d’Alésia ?	Les Mandubiens	Les Éduens	Les Arvernes	Les Bituriges
+expert	Quel cousin de Vercingétorix commande l’assaut extérieur contre les Romains à Alésia ?	Vercassivellaunos	Commios	Litaviccos	Camulogène
+expert	Quel ouvrage romain, long d’environ 15 kilomètres, protégeait César des assiégés d’Alésia ?	La contrevallation	La circonvallation	Le limes	Le rempart de Servius
+expert	Quel ouvrage romain, long d’environ 21 kilomètres, protégeait César de l’armée de secours ?	La circonvallation	La contrevallation	Le limes	Le rempart de Servius
+expert	Quels pièges d’Alésia étaient des crochets de fer enfouis dans le sol ?	Les stimuli	Les lilia	Les cippi	Les ballistes
+expert	Quel peuple gaulois de la vallée du Rhône a Vienne pour capitale ?	Les Allobroges	Les Arvernes	Les Voconces	Les Helvètes
+expert	Quelle ville de Charente-Maritime conserve un arc de triomphe élevé sous Tibère ?	Saintes	La Rochelle	Rochefort	Royan
+expert	Quel évêque de Lyon, disciple de Polycarpe, écrit Contre les hérésies ?	Irénée	Augustin	Cyprien	Ambroise
+expert	Quel général fonde l’Empire des Gaules en 260 ?	Postume	Aurélien	Tétricus	Gallien	ordre=Naissance de l’Empire des Gaules|260
+expert	Comment nomme-t-on les paysans et colons révoltés de la Gaule romaine tardive ?	Les bagaudes	Les vergobrets	Les ambactes	Les druides

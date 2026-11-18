@@ -8,7 +8,7 @@ const { rapide, versReglages, valider, lancer, ouvrirNeuf, cocher } = require('.
 
 const NIVEAUX = ['facile', 'moyen', 'difficile', 'expert'];
 // Jeux qui ont reçu des questions, avec le nombre minimal de questions ajoutées (Préhistoire : 'pre' ; Moyen Âge : 'mag' ; Renaissance : 'ren' ; Louis XIV : 'mod' ; XXe siècle : 'xx' ; Antiquité : 'ant' ; Écrivains, Révolution, Inventions, Arts : 'mod' et 'xix').
-const AJOUTS = { r01: 195, t01: 167, p01: 144, p03: 114, m01: 189, m02: 173, m07: 181, z05: 180, z03: 190, z08: 174, t05: 131, x01: 190, x05: 123, x06: 160, a01: 235, a03: 218, a05: 159, a11: 81 };
+const AJOUTS = { r01: 195, t01: 167, p01: 144, p03: 114, m01: 189, m02: 173, m07: 181, z05: 180, z03: 190, z08: 174, t05: 131, x01: 190, x05: 123, x06: 160, a01: 235, a03: 218, a05: 228, a07: 166, a10: 40, a11: 266 };
 
 // Les séries ajoutées par js/histoire-*.js : les séries de questions « ouverte: true ».
 function seriesAjoutees(jeu) { return S.trouver(jeu).series.filter((s) => s.k === 'qcm' && s.ouverte); }
@@ -117,7 +117,7 @@ test.describe('nouvelles questions d\'histoire (contenu)', () => {
   test('frise Antiquité : les dates (avant J.-C. comprises) se rangent dans le bon ordre', () => {
     // « 753 av. J.-C. » vaut -753 ; « vers 2560 av. J.-C. » vaut -2560.
     const annee = (v) => (/av\. J\.-C\./.test(v) ? -1 : 1) * parseInt(/\d+/.exec(v)[0], 10);
-    for (const jeu of ['a01', 'a03', 'a05', 'a11']) for (const niveau of NIVEAUX) {
+    for (const jeu of ['a01', 'a03', 'a05', 'a07', 'a10', 'a11']) for (const niveau of NIVEAUX) {
       let vues = 0;
       for (let k = 0; k < 400; k++) {
         const c = S.generer({ jeux: [jeu], niveau, mode: 'normal' }, 'histoire');
