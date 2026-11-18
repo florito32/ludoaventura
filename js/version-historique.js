@@ -2,6 +2,10 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.13', date: '2026-11-18', changes: [
+    "Histoire et Géographie : l’écran des jeux est présenté comme celui des temps de la conjugaison. Chaque période (ou famille) est un cadre avec ses jeux l’un sous l’autre et son bouton « Tout » ; les cadres se rangent côte à côte pour que tout tienne sans défiler.",
+    "Sur un téléphone en hauteur, les cadres se rangent sur 2 colonnes (3 sur un petit écran peu haut) ; sur ordinateur, un cadre par famille."
+  ] },
   { v: '10.12', date: '2026-11-18', changes: [
     "Coffres : à la fermeture de la fenêtre, les étoiles de tous les coffres ouverts à la suite s’envolent ensemble vers le compteur de l’accueil (« +N étoiles » au centre, le compteur grandit au fur et à mesure, 3 secondes au plus).",
     "Un coffre ouvert depuis « Mes étoiles », « Ma progression » ou l’écran de fin attend l’arrivée sur l’accueil ; avec le gain d’une partie, un seul envol pour le tout."
