@@ -215,6 +215,58 @@
 
   // Une famille encadrée de cases à cocher (questions v6.33, thèmes v6.39) : son icône, son nom, son bouton « Tout ».
   // f = { id, nom, icone } ; liste = [{ id, nom, court }] ; nom = nom des cases (« pack » ou « type »).
+  // v10.13 : écran des jeux d'Histoire et de Géographie, comme les temps de la conjugaison : les familles visibles sont
+  // rangées en colonnes (.colonne), dans leur ordre, par groupes qui font à peu près la même hauteur. Le CSS donne le nombre
+  // de colonnes voulu (--c, selon la place) et calcule la hauteur des boutons d'après --col-fam / --col-jeux (le plus chargé).
+  function repartir(poids, k) { // groupes contigus de somme maximale la plus petite : tailles des groupes
+    var n = poids.length, memo = {};
+    function somme(i, j) { var t = 0; for (var q = i; q < j; q++) t += poids[q]; return t; }
+    function meilleur(i, g) { // plus petite « plus grande somme » pour poids[i..] en g groupes
+      if (g === 1) return { max: somme(i, n), tailles: [n - i] };
+      var cle = i + ',' + g;
+      if (memo[cle]) return memo[cle];
+      var res = null;
+      for (var j = i + 1; j <= n - (g - 1); j++) {
+        var r = meilleur(j, g - 1), m = Math.max(somme(i, j), r.max);
+        if (!res || m < res.max - 1e-9) res = { max: m, tailles: [j - i].concat(r.tailles) };
+      }
+      memo[cle] = res;
+      return res;
+    }
+    return meilleur(0, k).tailles;
+  }
+  function rangerSavoir() {
+    var liste = $('savoir-liste');
+    if (!liste) return;
+    var toutes = Array.prototype.slice.call(liste.querySelectorAll('.famille'));
+    var vis = toutes.filter(function (f) { return !f.hidden; });
+    if (!vis.length) return;
+    liste.style.setProperty('--nb-fam', vis.length);
+    var c = parseInt(getComputedStyle(liste).getPropertyValue('--c'), 10) || vis.length;
+    var nb = Math.max(1, Math.min(c, vis.length));
+    var nbJeux = vis.map(function (f) { return f.querySelectorAll('.pack:not([hidden])').length; });
+    var tailles = repartir(nbJeux.map(function (n) { return n + 1.7; }), nb); // une famille = ses jeux + son en-tête (≈ 1,7 jeu)
+    var cle = vis.map(function (f) { return f.id || f.dataset.famille || f.querySelector('.famille-nom').id; }).join() + '|' + tailles.join();
+    var colFam = Math.max.apply(null, tailles), colJeux = 0, k = 0;
+    tailles.forEach(function (t) { var n = 0; for (var q = 0; q < t; q++) n += nbJeux[k + q]; colJeux = Math.max(colJeux, n); k += t; });
+    liste.style.setProperty('--nc', nb);
+    liste.style.setProperty('--col-fam', colFam);
+    liste.style.setProperty('--col-jeux', colJeux);
+    if (liste.dataset.rangement === cle) return; // même rangement : on ne déplace rien (le focus reste où il est)
+    liste.dataset.rangement = cle;
+    toutes.forEach(function (f) { liste.appendChild(f); }); // sort les familles des anciennes colonnes
+    Array.prototype.slice.call(liste.querySelectorAll('.colonne')).forEach(function (col) { col.remove(); });
+    var groupes = [], q = 0;
+    tailles.forEach(function (t) { groupes.push(vis.slice(q, q + t)); q += t; });
+    for (var g = groupes.length - 1; g >= 0; g--) { // colonnes en tête de liste, de gauche à droite ; familles masquées derrière
+      var col = document.createElement('div');
+      col.className = 'colonne';
+      groupes[g].forEach(function (f) { col.appendChild(f); });
+      liste.insertBefore(col, liste.firstChild);
+    }
+  }
+  window.addEventListener('resize', function () { if (!$('savoir-jeux').hidden) { $('savoir-liste').dataset.rangement = ''; rangerSavoir(); } });
+
   function famille(f, liste, nom) {
     var boite = document.createElement('div');
     boite.className = 'famille';
@@ -813,13 +865,7 @@
       $('savoir-liste').querySelectorAll('.pack').forEach(function (l) { var i = l.querySelector('input'); l.hidden = !!i && proposes.indexOf(i.value) < 0; });
       $('savoir-liste').querySelectorAll('.famille').forEach(function (f) { f.hidden = f.dataset.matiere !== mat || !f.querySelector('.pack:not([hidden])'); });
       $('savoir-liste').querySelectorAll('input').forEach(function (i) { i.checked = rs.jeux.indexOf(i.value) >= 0; });
-      // v10.13 : le CSS range les familles en colonnes (comme les temps de la conjugaison) et dimensionne les boutons
-      // d'après le nombre de familles, de jeux et la plus grande famille, pour que tout tienne sans défiler.
-      var fams = Array.prototype.filter.call($('savoir-liste').querySelectorAll('.famille'), function (f) { return !f.hidden; });
-      var nbJeux = fams.map(function (f) { return f.querySelectorAll('.pack:not([hidden])').length; });
-      $('savoir-liste').style.setProperty('--nb-fam', fams.length);
-      $('savoir-liste').style.setProperty('--nb-jeux', nbJeux.reduce(function (a, b) { return a + b; }, 0));
-      $('savoir-liste').style.setProperty('--max-jeux', Math.max.apply(null, nbJeux.concat([1])));
+      rangerSavoir();
       var tousJ = proposes.length, pleinJ = rs.jeux.length === tousJ, bt = $('btn-tout-savoir');
       bt.innerHTML = pleinJ ? '<span class="long">Tout désélectionner</span><span class="court">Aucun</span>'
         : '<span class="long">Tout sélectionner</span><span class="court">Tout</span>';
