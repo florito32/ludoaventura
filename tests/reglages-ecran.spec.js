@@ -1,7 +1,7 @@
 // Étape 3 : les écrans de réglages remplissent la place (v6.4, lignes 81 à 85 du backlog) :
 // choix centrés, grands, rangés en lignes régulières, sans défiler ni laisser l'écran presque vide.
 const { test, expect } = require('@playwright/test');
-const { rapide, versReglages, maths, orthographe, matiere, conjugaison, cocher } = require('./aide');
+const { rapide, versReglages, maths, orthographe, matiere, conjugaison, cocher, valider } = require('./aide');
 
 // Boîtes (x, y, largeur, hauteur) des choix visibles d'un groupe.
 async function boites(page, sel) {
@@ -54,12 +54,12 @@ test('mathématiques : signes sur une ligne, unités, dizaines et centaines en l
   for (const nv of ['facile', 'moyen', 'expert']) {
     await page.getByRole('button', { name: /Retour/ }).click();
     await cocher(page, '#niveau-maths', nv);
-    await page.locator('#btn-valider-reglages').click();
+    await valider(page); // (le « Valider » est dans le dernier bandeau)
     await remplit(page, '#reglages-maths', nv === 'facile' ? 0.3 : 0.5);
   }
   await page.getByRole('button', { name: /Retour/ }).click();
   await cocher(page, '#niveau-maths', 'difficile');
-  await page.locator('#btn-valider-reglages').click();
+  await valider(page); // (le « Valider » est dans le dernier bandeau)
   // Les choix restent utilisables.
   await page.locator('#signes label').nth(2).click();
   await page.locator('#nombres label').nth(9).click();

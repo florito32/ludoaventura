@@ -1,13 +1,13 @@
 // Histoire et Géographie, écran des jeux (v10.13, demande du 18/11/2026) : présenté comme les temps de la conjugaison,
 // une colonne (un cadre) par famille, tout visible sans défiler. Noms entiers sur une ligne, rien ne dépasse en largeur.
 const { test, expect } = require('@playwright/test');
-const { rapide, versReglages, valider, ouvrirNeuf } = require('./aide');
+const { rapide, versReglages, valider, ouvrirNeuf, cocher } = require('./aide');
 
 async function versJeux(page, matiere) {
   await rapide(page);
   await ouvrirNeuf(page);
   await versReglages(page, 1);
-  await page.locator('#matieres input[value="' + matiere + '"]').check();
+  await cocher(page, '#matieres', matiere);
   await valider(page);
   await page.locator('#savoir-jeux').waitFor();
   await page.locator('#btn-tout-savoir').click(); // état « choisi » (fond foncé) : mêmes dimensions

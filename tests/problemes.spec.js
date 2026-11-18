@@ -87,7 +87,7 @@ test.describe('Calcul mental ou Problèmes', () => {
     await expect(page.getByRole('radio', { name: 'Problèmes' })).not.toBeChecked();
     // L'un ou l'autre : choisir « Problèmes » retire « Calcul mental ».
     await page.getByRole('radio', { name: 'Problèmes' }).check();
-    await expect(page.getByRole('radio', { name: 'Calcul mental' })).not.toBeChecked();
+    await expect(page.locator('#type-maths input[value="calcul"]')).not.toBeChecked(); // (le bandeau s'est refermé)
     expect(await page.evaluate(() => window.Aventura.partie.maths[0].type)).toBe('probleme');
   });
 

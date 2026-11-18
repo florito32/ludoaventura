@@ -2,7 +2,7 @@
 // onglets à gauche (Matière, Exercice, Niveau, Signes par calcul) ; un seul bandeau déroulant est ouvert, à droite de l'onglet.
 // Un choix unique ferme le bandeau et ouvre le suivant ; le choix reste écrit dans l'onglet et se change en le touchant.
 const { test, expect } = require('@playwright/test');
-const { rapide, versReglages, valider, cocher } = require('./aide');
+const { rapide, versReglages, valider, cocher, choisir } = require('./aide');
 
 const onglet = (page, cle) => page.locator('.onglet[data-etape="' + cle + '"]');
 // Rien ne déborde de l'écran ni de la zone des réglages.
@@ -22,21 +22,21 @@ test('mathématiques : le parcours onglets → bandeaux, le choix marqué dans l
   await expect(page.locator('#reglage-matiere')).toBeVisible();
   await expect(onglet(page, 'type')).toBeDisabled();
   // Mathématiques → le bandeau « En mathématiques » (Calcul mental / Problèmes) s'ouvre tout seul.
-  await page.locator('#matieres label', { hasText: 'Mathématiques' }).click();
+  await choisir(page, '#matieres', 'Mathématiques');
   await expect(page.locator('#reglage-type-maths')).toBeVisible();
   await expect(page.locator('#reglage-matiere')).toBeHidden();
   await expect(onglet(page, 'matiere')).toContainText('Mathématiques');
   // Problèmes → le bandeau du niveau (4 choix l'un sous l'autre) ; l'onglet garde le choix.
-  await page.locator('#type-maths label', { hasText: 'Problèmes' }).click();
+  await choisir(page, '#type-maths', 'Problèmes');
   await expect(onglet(page, 'type')).toContainText('Problèmes');
   await expect(page.locator('#reglage-niveau-maths')).toBeVisible();
   const n = await page.locator('#niveau-maths .pack span').evaluateAll((l) => l.map((e) => { const r = e.getBoundingClientRect(); return Math.round(r.x); }));
   expect(n).toHaveLength(4);
   expect(new Set(n).size).toBe(1);
   // Niveau Moyen → le bandeau des signes (plusieurs possibles : il reste ouvert) avec son « Valider ».
-  await page.locator('#niveau-maths label', { hasText: 'Moyen' }).click();
+  await choisir(page, '#niveau-maths', 'Moyen');
   await expect(page.locator('#reglage-nb-signes')).toBeVisible();
-  await page.locator('#nb-signes label', { hasText: '2' }).click();
+  await choisir(page, '#nb-signes', '2');
   await expect(page.locator('#reglage-nb-signes')).toBeVisible();
   await expect(onglet(page, 'signes')).toContainText('1, 2');
   await sansDebordement(page);
@@ -50,10 +50,10 @@ test('mathématiques : le parcours onglets → bandeaux, le choix marqué dans l
   await expect(page.locator('#niveau-maths input[value="moyen"]')).toBeChecked();
   const coche = page.locator('#niveau-maths label', { hasText: 'Moyen' }).locator('span');
   expect(await coche.evaluate((e) => getComputedStyle(e).color)).toBe('rgb(59, 42, 30)');
-  await page.locator('#niveau-maths label', { hasText: 'Difficile' }).click();
+  await choisir(page, '#niveau-maths', 'Difficile');
   await expect(onglet(page, 'niveau')).toContainText('Difficile');
   // Un seul « Valider » visible à la fois ; celui du bandeau passe à l'écran suivant.
-  await onglet(page, 'signes').click();
+  if (!(await page.locator('#reglage-nb-signes').isVisible())) await onglet(page, 'signes').click(); // (déjà ouvert après le niveau)
   await expect(page.getByRole('button', { name: 'Valider mes choix' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Valider', exact: true })).toHaveCount(0);
   await valider(page);
@@ -82,10 +82,10 @@ test('géographie : l\'onglet s\'appelle « Mode » ; l\'écran tient sans défi
   await rapide(page);
   await page.goto('./');
   await versReglages(page, 1);
-  await page.locator('#matieres label', { hasText: 'Géographie' }).click();
+  await choisir(page, '#matieres', 'Géographie');
   await expect(onglet(page, 'type')).toContainText('Mode');
   await expect(page.locator('#reglage-mode-savoir')).toBeVisible();
-  await page.locator('#mode-savoir label', { hasText: 'Normal' }).click();
+  await choisir(page, '#mode-savoir', 'Normal');
   await expect(page.locator('#reglage-niveau-savoir')).toBeVisible();
   await sansDebordement(page);
 });

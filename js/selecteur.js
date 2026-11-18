@@ -191,7 +191,7 @@
 
   // Le bouton « Valider » à montrer maintenant (celui du dernier bandeau s'il est ouvert, sinon celui du bas) : pour Ludo.
   function boutonValider() {
-    var b = conteneur && conteneur.querySelector('.reglage-ligne.ouvert .btn-valider-bandeau');
+    var b = conteneur && !conteneur.hidden && conteneur.querySelector('.reglage-ligne.ouvert .btn-valider-bandeau');
     return b || $('btn-valider-reglages');
   }
   window.Selecteur = { maj: maj, boutonValider: boutonValider, onglet: function (cle) { return onglets[cle]; } };
