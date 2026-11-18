@@ -381,7 +381,7 @@ test('question ouverte : chiffres romains écrits en minuscules → juste', asyn
 });
 
 test('qui suis-je ? : un indice de plus, la bonne réponse → 5 points sans lancer de dé', async ({ page }) => {
-  await versHistoire(page, { niveau: 'facile', jeux: ['a03'], hasard: 0.99 });
+  await versHistoire(page, { niveau: 'facile', jeux: ['a03'], hasard: 0.6 });
   const c = await piocher(page);
   expect(c.format).toBe('I');
   await expect(page.locator('.indices li')).toHaveCount(1);
