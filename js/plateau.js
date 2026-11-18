@@ -1142,7 +1142,7 @@
   var PAUSE = typeof window.AVENTURA_PAUSE === 'number' ? window.AVENTURA_PAUSE : 2200;
   var minuteurs = [];
   function plusTard(fn, ms) { minuteurs.push(setTimeout(fn, ms)); }
-  function annulerMinuteurs() { minuteurs.forEach(clearTimeout); minuteurs = []; }
+  function annulerMinuteurs() { minuteurs.forEach(clearTimeout); minuteurs = []; annulerEnvol(); }
 
   function lancerPartie() {
     annulerMinuteurs();
@@ -1368,11 +1368,7 @@
     var j = partie.joueurs[r.joueur];
 
     if (!(options && options.sansDeplacement)) placerPions();
-    $('points').textContent = r.points;
-    $('jauge').setAttribute('aria-valuenow', r.points);
-    $('jauge-barre').style.width = Math.min(100, r.points / r.objectif * 100) + '%';
-    $('jauge').classList.toggle('atteint', r.points >= r.objectif);
-    majConstruction(r.points);
+    majPoints(pointsAffiches(r));
 
     $('tour-portrait').src = j.aventurier.image;
     $('tour-portrait').className = 'joueur-' + j.couleur;
@@ -1466,6 +1462,58 @@
     sauver();
   }
 
+  // Comptage, jauge et construction pour p points.
+  function majPoints(p) {
+    var r = partie.regles;
+    $('points').textContent = p;
+    $('jauge').setAttribute('aria-valuenow', p);
+    $('jauge-barre').style.width = Math.min(100, p / r.objectif * 100) + '%';
+    $('jauge').classList.toggle('atteint', p >= r.objectif);
+    majConstruction(p);
+  }
+
+  // ---------- Envol des points (v10.15, demande du 18/11/2026, backlog ligne 429) ----------
+  // En fin de tour, les points gagnés prennent la forme de l'aventure et volent du centre du plateau vers l'image des
+  // points (js/envol.js). Pendant l'envol, le comptage garde les points d'avant et monte à chaque arrivée ; la suite du
+  // jeu (joueur suivant, écran de fin) attend la dernière arrivée. Pas d'envol avec « mouvement réduit », ni dans les
+  // tests qui raccourcissent le dé (window.AVENTURA_DUREE_DE < 100), sauf window.AVENTURA_ENVOL = true.
+  var envol = null; // envol en cours : { vu (points déjà comptés), h (poignée de js/envol.js), apres (suite à lancer à la fin) }
+  function pointsAffiches(r) { return envol ? envol.vu : r.points; }
+  function envolActif() {
+    if (window.AVENTURA_ENVOL === true) return !!window.Envol;
+    if (window.AVENTURA_ENVOL === false || !window.Envol || DUREE_DE < 100 || !document.body.animate) return false;
+    return !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }
+  // Petit gonflement du comptage et de l'image à chaque arrivée (ou d'un coup quand il n'y a pas d'envol).
+  function impulsion() {
+    var cons = $('construction'), pv = document.querySelector('.points-plateau .points-valeur');
+    cons.classList.remove('recoit'); pv.classList.remove('gagne'); void cons.offsetWidth;
+    cons.classList.add('recoit'); pv.classList.add('gagne');
+  }
+  // À appeler AVANT rendre() quand r.points vient d'augmenter de gain : le comptage garde les points d'avant.
+  // Renvoie false (rien retenu) quand il n'y a pas d'envol : les points s'affichent d'un coup.
+  function retenirPoints(avant, gain) {
+    if (gain < 1 || !envolActif()) return false;
+    envol = { vu: avant, h: null, apres: null };
+    return true;
+  }
+  // À appeler APRÈS rendre() : lance les formes (le plateau est affiché et mis en page).
+  function lancerEnvol(gain) {
+    var e = envol;
+    e.h = window.Envol.lancer({
+      couche: $('envol-couche'), cible: $('construction'), n: gain, symbole: window.Envol.symbole(partie.aventure.id),
+      auArrivee: function () { e.vu++; majPoints(e.vu); impulsion(); },
+      auFin: function () { if (envol === e) envol = null; if (e.apres) e.apres(); }
+    });
+  }
+  // Quitte la partie ou en recommence une : plus d'envol, les points s'affichent tels quels au prochain rendu.
+  function annulerEnvol() {
+    if (!envol) return;
+    var e = envol; envol = null;
+    if (e.h) e.h.annuler();
+    var c = $('envol-couche'); if (c) c.innerHTML = '';
+  }
+
   // La construction de l'aventure avance avec les points (complète quand l'objectif est atteint).
   function majConstruction(pts) {
     var av = partie.aventure, cst = window.Constructions;
@@ -1529,8 +1577,13 @@
     plusTard(function () {
       $('bandeau').hidden = true;
       $('de-plateau').hidden = true;
-      if (r.etape === 'suivant') { R.suivant(r); rendre(); }
-      else if (r.etape === 'fin') montrerFin();
+      function suite() {
+        if (r.etape === 'suivant') { R.suivant(r); rendre(); }
+        else if (r.etape === 'fin') montrerFin();
+      }
+      // v10.15 : si les formes volent encore, on attend la dernière arrivée (+ un court temps pour voir le résultat).
+      if (envol) envol.apres = function () { plusTard(suite, 450); };
+      else suite();
     }, PAUSE);
   }
 
@@ -1801,10 +1854,13 @@
     if (c.format === 'I') {
       // Qui suis-je ? (choix de l'utilisateur) : pas de dé ; 6 points au 1er indice… 1 point si c'est raté.
       c.attente = !c.juste;
-      R.gagner(r, SV.pointsIndices(c));
+      var avantQ = r.points, gainQ = SV.pointsIndices(c);
+      R.gagner(r, gainQ);
       montrerSavoir(c);
       reagir(c.juste);
+      var voleQ = retenirPoints(avantQ, gainQ);
       rendre();
+      if (voleQ) lancerEnvol(gainQ);
       if (!c.attente) plusTard(enchainer, DUREE_REACTION);
       ajusterTour();
       return;
@@ -2341,11 +2397,12 @@
       cube.style.transform = fin;
       $('de-gain').textContent = '+' + v;
       zone.classList.add('pose');
+      var avant = r.points;
       R.lancer(r, v);
       partie.roule = false;
+      var vole = retenirPoints(avant, v); // v10.15 : les points s'envolent vers l'image avant d'être comptés
       rendre();
-      var pv = document.querySelector('.points-plateau .points-valeur');
-      pv.classList.remove('gagne'); void pv.offsetWidth; pv.classList.add('gagne');
+      if (vole) lancerEnvol(v); else impulsion();
       enchainer();
     }
 
