@@ -672,9 +672,8 @@
         <p class="bandeau" id="bandeau" aria-hidden="true" hidden></p>
         <!-- Envol des points (v10.15) : les formes gagnées volent du centre vers l'image des points (js/envol.js). -->
         <div class="envol-couche" id="envol-couche" aria-hidden="true"></div>
-        <!-- Boutons sur le plateau, en haut à droite : plein écran (caché si le navigateur ne sait pas, ex. iPhone) et menu de la partie. -->
+        <!-- Bouton sur le plateau, en haut à droite : le menu de la partie. (Le plein écran est en bas à droite de l'écran, plus bas.) -->
         <div class="plateau-outils">
-          <button type="button" class="btn-retour btn-outil" id="btn-plein-ecran" aria-pressed="false" hidden><span class="menu-icone" id="plein-icone" aria-hidden="true">⛶</span><span class="visually-hidden" id="plein-texte">Plein écran</span></button>
           <button type="button" class="btn-retour btn-menu" id="btn-menu" aria-haspopup="dialog" aria-controls="menu-partie"><span class="menu-icone" aria-hidden="true">☰</span> Menu</button>
         </div>
       </figure>
@@ -771,6 +770,8 @@
 
       </aside>
     </div>
+    <!-- Plein écran (v10.21) : en bas à droite de l'écran, hors du plateau. Caché si le navigateur ne sait pas (ex. iPhone). js/plein-ecran.js -->
+    <button type="button" class="btn-retour btn-outil btn-plein-ecran" id="btn-plein-ecran" aria-pressed="false" hidden><span class="menu-icone" id="plein-icone" aria-hidden="true">⛶</span><span class="visually-hidden" id="plein-texte">Plein écran</span></button>
   </section>
 </main>
 

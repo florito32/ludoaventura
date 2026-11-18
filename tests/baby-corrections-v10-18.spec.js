@@ -181,9 +181,10 @@ test.describe('Plateau sans bandeau, menu sur le plateau, plein écran', () => {
     await expect(b).toBeVisible();
     await expect(b).toHaveAccessibleName('Plein écran');
     await expect(b).toHaveAttribute('aria-pressed', 'false');
-    // Le bouton ne cache pas le menu et reste sur le plateau.
-    const [bb, bm] = await Promise.all([b.boundingBox(), page.locator('#btn-menu').boundingBox()]);
-    expect(bb.x + bb.width).toBeLessThanOrEqual(bm.x + 1);
+    // v10.21 : le bouton est en bas à droite de l'écran, hors du plateau (voir tests/plein-ecran-coin.spec.js).
+    const [bb, bp] = await Promise.all([b.boundingBox(), page.locator('#plateau').boundingBox()]);
+    const croise = bb.x < bp.x + bp.width && bb.x + bb.width > bp.x && bb.y < bp.y + bp.height && bb.y + bb.height > bp.y;
+    expect(croise).toBe(false);
     await page.evaluate(() => { document.fullscreenElement; });
     await b.click();
     // En test, le navigateur peut refuser : on vérifie seulement la cohérence de l'état affiché.
