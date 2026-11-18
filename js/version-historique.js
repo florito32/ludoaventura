@@ -2,6 +2,10 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.18', date: '2026-11-18', changes: [
+    "Histoire, Moyen Âge : environ 540 nouvelles questions ajoutées aux jeux « Rois, batailles et frise », « Châteaux, chevaliers et paysans » et « Églises, croisades et Vikings », à tous les niveaux (questions de 15 mots au plus).",
+    "Mode Quiz : chaque nouvelle question a ses 4 choix. Mode Normal : question ouverte dès Difficile quand la réponse est un nom, vrai ou faux avant ; les dates des rois et des conciles s’ajoutent à la frise chronologique."
+  ] },
   { v: '10.17', date: '2026-11-18', changes: [
     "Fin de tour : les points gagnés prennent la forme de l’aventure (flamme pour la Préhistoire, pierre pour les Mayas, tronc, épée, gazelle, bloc, brique, rail, menhir…). Une forme par point : elles se posent en tas au centre du plateau, puis volent l’une après l’autre vers l’image à côté du comptage, en rétrécissant jusqu’à devenir minuscules dans l’image ; le comptage monte à chaque arrivée.",
     "Réglages choisis sur la page de test (proposition A) : vol d’une seconde, courbe légère, un tour sur elles-mêmes, éclat à l’arrivée. Le joueur suivant arrive après la dernière arrivée. Pas d’envol quand l’appareil demande moins de mouvement."
