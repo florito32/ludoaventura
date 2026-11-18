@@ -2450,7 +2450,13 @@
   function accueilApresFin() {
     var r = partie.regles, rc = r && r.recompense;
     var n = rc && !rc.quitte && R.reussie(r) ? (rc.base || 0) + (rc.bonus || 0) : 0;
-    if (n > 0) { try { sessionStorage.setItem('ludoaventura-gain-accueil', JSON.stringify({ n: n })); } catch (e) { /* rien : pas d'animation */ } }
+    // v10.3 : s'ajoute aux étoiles déjà en attente (coffre ouvert sur l'écran de fin) : un seul envol pour le tout.
+    if (n > 0) {
+      try {
+        var avant = JSON.parse(sessionStorage.getItem('ludoaventura-gain-accueil') || 'null');
+        sessionStorage.setItem('ludoaventura-gain-accueil', JSON.stringify({ n: n + (avant && Number(avant.n) > 0 ? Math.floor(Number(avant.n)) : 0) }));
+      } catch (e) { /* rien : pas d'animation */ }
+    }
     retourAccueil();
   }
 

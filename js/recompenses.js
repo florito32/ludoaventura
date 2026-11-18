@@ -47,7 +47,8 @@
   // ---------- Accueil ----------
   function majAccueil() {
     // Pendant l'envol des étoiles (v9.8), le compteur montre le total atteint par les étoiles déjà arrivées.
-    var total = vol ? vol.vu : compte.etat.total, nv = E.niveau(total);
+    // Les étoiles gagnées mais pas encore envolées (retenu : coffres ouverts, v10.3) ne sont pas encore comptées non plus.
+    var total = vol ? vol.vu : Math.max(0, compte.etat.total - retenu), nv = E.niveau(total);
     if (window.Defis) {
       // Défis encore à faire : ni réussis ni quittés (v6.47).
       var reste = ['solo', 'equipe'].filter(function (t) { return compte.defiAFaire(t); }).length;
@@ -84,6 +85,7 @@
   // ---------- Fenêtre d'ouverture d'un coffre ----------
   var file = [], actuel = null, ouvertDepuis = null;
   function ouvrirCoffres(liste) {
+    if (vol) finirGain(); // un envol en cours est terminé d'un coup avant d'ouvrir
     file = liste.slice();
     ouvertDepuis = document.activeElement;
     montrerCoffre(file.shift());
@@ -107,6 +109,7 @@
     if (!actuel || actuel.ouvert) return;
     actuel.ouvert = true;
     var g = compte.ouvrir(actuel.coffre);
+    if (g && g.n > 0) retenir(retenu + g.n); // v10.3 : le cumul des coffres s'envole à la fermeture de la fenêtre
     $('btn-coffre-ouvrir').hidden = true;
     $('coffre-scene').classList.add('tremble');
     setTimeout(function () {
@@ -142,6 +145,7 @@
   $('coffre').addEventListener('close', function () {
     file = []; actuel = null;
     majTout();
+    demarrerGain(); // v10.3 : sur l'accueil, les étoiles de tous les coffres ouverts s'envolent vers le compteur
     if (ouvertDepuis && document.contains(ouvertDepuis) && !ouvertDepuis.closest('[hidden]')) ouvertDepuis.focus();
   });
 
@@ -386,18 +390,36 @@
   // centre de l'écran (sans encadré) ; de là, une étoile par étoile gagnée vole jusqu'au compteur du haut, qui
   // grandit à chaque arrivée. Durée : 1 seconde pour 10 étoiles, 3 secondes au plus (choix de l'utilisateur).
   // Mouvement réduit demandé par l'appareil : pas d'étoiles volantes, le nombre grandit pendant la même durée.
-  var vol = null; // { n, vu, minuteurs, etiquette }
+  var vol = null; // envol en cours : { n, vu, arrivees, minuteurs, etiquette }
+  var retenu = 0; // étoiles déjà gagnées (déjà dans le compte) qui attendent d'être envolées vers le compteur de l'accueil
   var CLE_GAIN = 'ludoaventura-gain-accueil';
   var DUREE_GAIN_MAX = 3000; // ms
+  // v10.3 : ce qui attend est gardé dans l'onglet (sessionStorage) : js/plateau.js y ajoute le gain d'une partie avant de
+  // recharger l'accueil, et un coffre ouvert ailleurs que sur l'accueil (fin de partie, « Ma progression ») attend d'y arriver.
+  function retenir(n) {
+    retenu = n > 0 ? n : 0;
+    try { if (retenu) sessionStorage.setItem(CLE_GAIN, JSON.stringify({ n: retenu })); else sessionStorage.removeItem(CLE_GAIN); } catch (e) { /* rien */ }
+  }
+  // Lance l'envol si des étoiles attendent et que l'accueil est affiché (sinon elles attendent : voir l'écouteur plus bas).
+  function demarrerGain() {
+    if (vol || !retenu) return;
+    if (!window.Aventura || (window.Aventura.partie.ecran || 'ecran-accueil') !== 'ecran-accueil') return; // écran vide = accueil (comme js/plateau.js)
+    var n = Math.floor(retenu);
+    if (n < 1 || n > compte.etat.total) { retenir(0); majAccueil(); return; }
+    retenir(0);
+    vol = { n: n, vu: compte.etat.total - n, arrivees: 0, minuteurs: [], etiquette: null };
+    majAccueil();
+    // Petite pause : l'accueil (ou la fenêtre qui se ferme) doit être affiché et mis en page.
+    vol.minuteurs.push(setTimeout(animerGain, 250));
+  }
   (function () {
     var g = null;
-    try { g = JSON.parse(sessionStorage.getItem(CLE_GAIN) || 'null'); sessionStorage.removeItem(CLE_GAIN); } catch (e) { g = null; }
+    try { g = JSON.parse(sessionStorage.getItem(CLE_GAIN) || 'null'); } catch (e) { g = null; }
     var n = g && Math.floor(Number(g.n));
-    if (!n || n < 1 || n > compte.etat.total) return;
-    vol = { n: n, vu: compte.etat.total - n, arrivees: 0, minuteurs: [], etiquette: null };
-    // On attend que l'accueil soit affiché et mis en page (js/plateau.js est chargé après ce fichier).
-    var partir = function () { setTimeout(animerGain, 250); };
-    if (document.readyState === 'complete') partir(); else window.addEventListener('load', partir, { once: true });
+    if (!n || n < 1 || n > compte.etat.total) { retenir(0); return; }
+    retenu = n;
+    // js/plateau.js est chargé après ce fichier : on attend la fin du chargement.
+    if (document.readyState === 'complete') demarrerGain(); else window.addEventListener('load', demarrerGain, { once: true });
   })();
 
   function majCompteur() {
@@ -468,7 +490,10 @@
     }
   }
   // On quitte l'accueil pendant l'envol : tout est compté d'un coup.
-  document.addEventListener('aventura-ecran', function (e) { if (vol && e.detail !== 'ecran-accueil') finirGain(); });
+  document.addEventListener('aventura-ecran', function (e) {
+    if (e.detail === 'ecran-accueil') demarrerGain(); // des étoiles attendaient d'arriver à l'accueil (coffre ouvert ailleurs)
+    else if (vol) finirGain();
+  });
 
   compte.visite(); // venue du jour (série de jours d'affilée, méga coffre)
   majAccueil();
