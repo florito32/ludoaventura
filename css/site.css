@@ -2125,3 +2125,65 @@ body:has(#ecran-baby:not([hidden])) .pied { padding-block: 4px calc(4px + env(sa
   .baby-jeux { gap: 4px 6px !important; }
   .baby-actions .btn { padding-block: 5px; font-size: .95rem; }
 }
+
+/* ---------- v10.13 (demande du 18/11/2026) : Histoire et Géographie présentées comme les temps de la conjugaison ----------
+   Une colonne (un cadre) par famille : son nom et « Tout » en haut, ses jeux l'un sous l'autre. Les boutons ont la
+   hauteur que la place permet, pour que tout tienne sans défiler (js/plateau.js calcule --nb-fam, --nb-jeux, --max-jeux).
+   En largeur : un cadre par famille côte à côte. En hauteur (téléphone) et sur écran bas (format carré, paysage) :
+   les cadres se rangent en 2 à 6 colonnes, chacun d'un seul tenant (CSS columns). Si la place manque vraiment
+   (téléphone en paysage), la zone défile comme avant : rien n'est coupé. */
+#savoir-jeux { --larg: min(100cqi, 1100px); height: auto; min-height: 100%; justify-content: flex-start; }
+#savoir-jeux .reglage { display: flex; flex-direction: column; flex: 1 0 auto; }
+#savoir-liste {
+  --c: var(--nb-fam, 7);
+  --ht: clamp(24px, calc((100cqh - 11.5rem) / var(--max-jeux, 6) - 1cqh), 56px);
+  --gap-col: clamp(5px, 1.2cqi, 14px);
+  --res: 26px; /* bordure et marges d'un cadre + marges d'un bouton : largeur qui n'est pas pour le texte */
+  flex: 1 0 auto; display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr);
+  gap: var(--gap-col); align-items: start; align-content: safe center;
+}
+#savoir-liste .famille[hidden] { display: none; }
+#savoir-jeux .famille { min-width: 0; display: flex; flex-direction: column; gap: clamp(2px, .7cqh, 8px); border: 3px solid var(--encre); border-radius: 16px; background: rgb(255 255 255 / .55); padding: clamp(4px, 1cqh, 10px) clamp(4px, 1cqi, 10px); }
+#savoir-jeux .famille-tete { flex-direction: column; justify-content: flex-start; align-items: center; gap: 3px; margin: 0; }
+#savoir-jeux .famille-nom { text-align: center; color: var(--encre); line-height: 1.1;
+  font-size: clamp(.7rem, min(calc(var(--ht) * .32), calc(var(--larg) / var(--c) / 12)), 1.05rem); }
+.reglages-joueur #savoir-jeux .btn-tout-famille { min-height: 24px; padding: 0 10px; font-size: .72rem; line-height: 1; }
+#savoir-jeux .famille .packs { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(2px, .7cqh, 8px); }
+#savoir-jeux .pack { min-width: 0; }
+.reglages-joueur #savoir-jeux .pack span {
+  flex-direction: row; justify-content: flex-start; gap: .35em; text-align: left; height: var(--ht); min-height: 0; min-width: 0;
+  padding: 0 clamp(3px, .8cqi, 8px); border-radius: 12px; line-height: 1; overflow: hidden;
+  font-size: clamp(.62rem, min(calc(var(--ht) * .4), calc((var(--larg) / var(--c) - var(--gap-col) - var(--res)) / 9.4)), 1.1rem);
+}
+#savoir-jeux .pack-icone { font-size: 1.15em; flex: none; }
+#savoir-jeux .pack-nom { min-width: 0; }
+/* En hauteur : 2 colonnes (3 sur une tablette), les cadres chacun d'un seul tenant. */
+@container (max-aspect-ratio: 1/1) {
+  #savoir-liste {
+    --c: 2;
+    display: block; column-count: var(--c); column-gap: var(--gap-col);
+    --ht: clamp(24px, calc((100cqh - 4.2rem - (var(--nb-fam) / var(--c) + .6) * 3.4rem) / (var(--nb-jeux) / var(--c) + 1.2) - 1cqh), 54px);
+  }
+  #savoir-liste .famille { break-inside: avoid; margin-bottom: var(--gap-col); }
+  #savoir-jeux .famille-tete { flex-direction: row; flex-wrap: wrap; justify-content: space-between; gap: 2px 6px; }
+  #savoir-jeux .famille-nom { text-align: left; }
+}
+@container (max-aspect-ratio: 1/1) and (min-width: 600px) { #savoir-liste { --c: 3; } }
+/* Zone peu haute (format carré, petit téléphone, paysage) : cadres plus serrés, 3 colonnes ; 4 si la zone fait 400 px de large ; 6 à partir de 600. */
+@container (max-height: 480px) {
+  #savoir-liste {
+    --c: 3;
+    display: block; column-count: var(--c); column-gap: var(--gap-col);
+    --ht: clamp(24px, calc((100cqh - 3rem - (var(--nb-fam) / var(--c) + .5) * 2.4rem) / (var(--nb-jeux) / var(--c) + 1) - 1cqh), 40px);
+  }
+  #savoir-liste .famille { break-inside: avoid; margin-bottom: var(--gap-col); }
+  #savoir-liste { --res: 18px; }
+  #savoir-jeux .famille { border-width: 2px; border-radius: 12px; padding: 3px 4px; gap: 2px; }
+  #savoir-jeux .famille-tete { flex-direction: row; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1px 4px; }
+  #savoir-jeux .famille-nom { text-align: left; font-size: .66rem; }
+  .reglages-joueur #savoir-jeux .btn-tout-famille { min-height: 24px; padding: 0 6px; font-size: .62rem; }
+  #savoir-jeux .famille .packs { gap: 2px; }
+  .reglages-joueur #savoir-jeux .pack span { font-size: clamp(.58rem, min(calc(var(--ht) * .4), calc((var(--larg) / var(--c) - var(--gap-col) - var(--res)) / 9.4)), .95rem); gap: .25em; padding: 0 3px; border-radius: 9px; }
+}
+@container (max-height: 480px) and (min-width: 400px) { #savoir-liste { --c: 4; } }
+@container (max-height: 480px) and (min-width: 600px) { #savoir-liste { --c: 6; } }

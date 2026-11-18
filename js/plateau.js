@@ -813,6 +813,13 @@
       $('savoir-liste').querySelectorAll('.pack').forEach(function (l) { var i = l.querySelector('input'); l.hidden = !!i && proposes.indexOf(i.value) < 0; });
       $('savoir-liste').querySelectorAll('.famille').forEach(function (f) { f.hidden = f.dataset.matiere !== mat || !f.querySelector('.pack:not([hidden])'); });
       $('savoir-liste').querySelectorAll('input').forEach(function (i) { i.checked = rs.jeux.indexOf(i.value) >= 0; });
+      // v10.13 : le CSS range les familles en colonnes (comme les temps de la conjugaison) et dimensionne les boutons
+      // d'après le nombre de familles, de jeux et la plus grande famille, pour que tout tienne sans défiler.
+      var fams = Array.prototype.filter.call($('savoir-liste').querySelectorAll('.famille'), function (f) { return !f.hidden; });
+      var nbJeux = fams.map(function (f) { return f.querySelectorAll('.pack:not([hidden])').length; });
+      $('savoir-liste').style.setProperty('--nb-fam', fams.length);
+      $('savoir-liste').style.setProperty('--nb-jeux', nbJeux.reduce(function (a, b) { return a + b; }, 0));
+      $('savoir-liste').style.setProperty('--max-jeux', Math.max.apply(null, nbJeux.concat([1])));
       var tousJ = proposes.length, pleinJ = rs.jeux.length === tousJ, bt = $('btn-tout-savoir');
       bt.innerHTML = pleinJ ? '<span class="long">Tout désélectionner</span><span class="court">Aucun</span>'
         : '<span class="long">Tout sélectionner</span><span class="court">Tout</span>';
