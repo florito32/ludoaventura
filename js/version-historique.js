@@ -2,6 +2,10 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.20', date: '2026-11-18', changes: [
+    "Histoire, XXe siècle : 544 nouvelles questions ajoutées aux jeux « Le XXe siècle en dates », « Sciences et espace » et « Grandes figures », à tous les niveaux (questions de 15 mots au plus).",
+    "Mode Quiz : chaque nouvelle question a ses 4 choix. Mode Normal : question ouverte dès Difficile quand la réponse est un nom, vrai ou faux avant ; les dates s’ajoutent à la frise chronologique."
+  ] },
   { v: '10.19', date: '2026-11-18', changes: [
     "Baby jeux › Les doigts : la main n’est plus coupée sur la droite (le pouce de la main à 5 doigts était rogné).",
     "Baby jeux › Les bulles : chaque chiffre a sa couleur et plus le chiffre est grand, plus la bulle est grosse. Quand tu touches une bulle (juste ou fausse), les autres ne repartent plus de leur place de départ ; même chose pour « Attrape le chiffre ».",
