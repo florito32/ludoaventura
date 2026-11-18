@@ -1609,6 +1609,8 @@
     var boite = $('carte-gram');
     boite.hidden = false;
     window.GrammaireCarte.afficher(c);
+    // Baby jeux, réponse donnée (v10.18) : sur téléphone et tablette, le jeu se cache (css) et ne reste que le message.
+    $('carte-piochee').classList.toggle('baby-repondue', c.module === 'baby' && c.reponseDonnee != null);
     var rep = $('carte-reponse');
     if (c.reponseDonnee == null) { rep.hidden = true; rep.className = 'carte-reponse'; return; }
     rep.hidden = false;
@@ -2263,11 +2265,12 @@
   // ---------- Question en plein écran sur téléphone et tablette (v9.0, demande du 16/11/2026) ----------
   // Dès qu'une question apparaît, elle prend tout l'écran (plus de plateau) ; la correction reste en plein écran,
   // le plateau revient quand le dé se lance (choix de l'utilisateur). L'ordinateur garde le plateau à côté.
+  // v10.18 (demande du 18/11/2026) : bonne réponse = le plateau revient tout de suite ; mauvaise = la correction et « J'ai compris » restent en plein écran.
   var ecranPlein = window.matchMedia('(pointer: coarse), (max-width: 899px)');
   function majPlein() {
     var r = partie.regles, c = partie.carte;
     var question = !!(r && c && !$('ecran-plateau').hidden && !$('carte-piochee').hidden &&
-      (r.etape === 'repondre' || (r.etape === 'lancer' && !partie.roule) || ((r.etape === 'suivant' || r.etape === 'fin') && c.attente)));
+      (r.etape === 'repondre' || (r.etape === 'lancer' && !partie.roule && c.attente) || ((r.etape === 'suivant' || r.etape === 'fin') && c.attente)));
     var oui = question && ecranPlein.matches;
     if (oui === document.body.classList.contains('question-plein')) return;
     document.body.classList.toggle('question-plein', oui);

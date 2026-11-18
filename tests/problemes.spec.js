@@ -161,7 +161,9 @@ test.describe('pavé numérique', () => {
 });
 
 test.describe('question en plein écran', () => {
-  test('téléphone et tablette : plus de plateau pendant la question et la correction ; il revient avec le dé', async ({ page }, info) => {
+  // v10.15 (choix de l'utilisateur, 18/11/2026) : bonne réponse = le plateau revient tout de suite ;
+  // mauvaise = la correction reste en plein écran, avec « J'ai compris » toujours visible, jusqu'au dé.
+  test('téléphone et tablette : plus de plateau pendant la question ; bonne réponse : il revient tout de suite avec le dé', async ({ page }, info) => {
     await partieMaths(page);
     const plein = info.project.name !== 'ordinateur';
     await expect(page.locator('body')).toHaveClass(plein ? /question-plein/ : /^(?!.*question-plein)/);
@@ -177,11 +179,22 @@ test.describe('question en plein écran', () => {
     const c = await page.evaluate(() => window.Aventura.partie.carte);
     await taper(page, c.resultatTexte);
     await page.getByRole('button', { name: /^(OK|Valider)$/ }).click();
-    // La correction reste en plein écran jusqu'au dé.
+    // Bonne réponse : plus de plein écran, le plateau est de retour.
+    await expect(page.locator('body')).not.toHaveClass(/question-plein/);
+    await expect(page.locator('.plateau')).toBeInViewport();
+  });
+
+  test('téléphone et tablette : mauvaise réponse, la correction reste en plein écran avec « J\u2019ai compris » visible ; le plateau revient avec le dé', async ({ page }, info) => {
+    await partieMaths(page);
+    const plein = info.project.name !== 'ordinateur';
+    await taper(page, '99999');
+    await page.getByRole('button', { name: /^(OK|Valider)$/ }).click();
     await expect(page.locator('#carte-reponse')).toBeVisible();
     if (plein) await expect(page.locator('body')).toHaveClass(/question-plein/);
-    await page.evaluate(() => window.Aventura.lancerDe(window.Aventura.partie.regles.de));
+    const jai = page.getByRole('button', { name: 'J’ai compris' });
+    await expect(jai).toBeInViewport({ ratio: 1 });
+    await jai.click(); // « J'ai compris » lance le dé tout seul
     await expect(page.locator('body')).not.toHaveClass(/question-plein/);
-    await expect(page.locator('#de-plateau')).toBeVisible();
+    await expect(page.locator('.plateau')).toBeInViewport();
   });
 });
