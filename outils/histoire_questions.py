@@ -15,6 +15,7 @@ Format d'un fichier .tsv (séparateur : tabulation ; les lignes qui commencent p
   - bonne réponse : « A|B » = A s'affiche, B est aussi accepté en question ouverte ;
   - extra (facultatif) : « ordre=Libellé|année » (frise chronologique : année négative avant J.-C.)
     ou « paire=Gauche|Droite » (à relier : un écrivain et son livre…).
+  - ligne « vrai ou faux » : niveau  @vf  affirmation  vrai|faux  [explication si faux]
 
 Usage : python3 outils/histoire_questions.py [--verifier]   (--verifier : contrôle seulement, n'écrit rien)
 """
@@ -64,6 +65,14 @@ def lire(chemin, erreurs):
                 continue
             c = brut.split('\t')
             nom = os.path.basename(chemin) + ':' + str(n)
+            if len(c) >= 4 and c[1].strip() == '@vf':
+                if c[0].strip() not in NIVEAUX:
+                    erreurs.append(nom + ' : niveau inconnu « %s »' % c[0])
+                if c[3].strip() not in ('vrai', 'faux'):
+                    erreurs.append(nom + ' : « vrai » ou « faux » attendu')
+                lignes.append({'vf': True, 'niveau': c[0].strip(), 'q': typo(c[2]), 'vrai': c[3].strip() == 'vrai',
+                               'explication': typo(c[4]) if len(c) > 4 else '', 'nom': nom})
+                continue
             if len(c) < 6:
                 erreurs.append(nom + ' : 6 colonnes attendues, %d trouvées' % len(c))
                 continue
@@ -138,9 +147,15 @@ def main():
     for famille, jeux in par_famille.items():
         sorties = []
         for jeu, lignes in jeux.items():
-            niv = {n: [[l['q'], l['bonne'], l['fausses']] for l in lignes if l['niveau'] == n] for n in NIVEAUX}
+            qs = [l for l in lignes if not l.get('vf')]
+            niv = {n: [[l['q'], l['bonne'], l['fausses']] for l in qs if l['niveau'] == n] for n in NIVEAUX}
             niv = {n: t for n, t in niv.items() if t}
             series = [{'k': 'qcm', 'ouverte': True, 'poids': POIDS_QUESTIONS, 'niveaux': niv}]
+            vf = {n: [[l['q'], l['vrai'], l['explication']] for l in lignes if l.get('vf') and l['niveau'] == n] for n in NIVEAUX}
+            vf = {n: t for n, t in vf.items() if t}
+            if vf:
+                series.append({'k': 'vf', 'niveaux': vf})
+            lignes = qs
             ordre = serie_ordre(lignes, famille)
             if ordre:
                 series.append(ordre)
