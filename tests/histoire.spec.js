@@ -3,7 +3,7 @@
 const { test, expect } = require('@playwright/test');
 const S = require('../js/savoirs.js');
 const H = require('../js/histoire.js');
-const { rapide, versReglages, valider, lancer, ouvrirNeuf } = require('./aide');
+const { rapide, versReglages, valider, lancer, ouvrirNeuf, cocher, choisir } = require('./aide');
 
 const NIVEAUX = ['facile', 'moyen', 'difficile', 'expert'];
 
@@ -270,9 +270,9 @@ async function versHistoire(page, { niveau = 'facile', jeux = ['a01'], hasard = 
   await rapide(page);
   await ouvrirNeuf(page);
   await versReglages(page, 1);
-  await page.locator('#matieres input[value="histoire"]').check();
-  await page.locator('#niveau-savoir input[value="' + niveau + '"]').check();
-  await page.locator('#mode-savoir input[value="' + mode + '"]').check();
+  await cocher(page, '#matieres', 'histoire');
+  await cocher(page, '#niveau-savoir', niveau);
+  await cocher(page, '#mode-savoir', mode);
   await valider(page);
   await page.locator('#savoir-jeux').waitFor();
   for (const j of jeux) await page.locator('#savoir-liste input[value="' + j + '"]').check();
@@ -294,10 +294,10 @@ test('écran des réglages : la matière Histoire, son niveau, ses jeux rangés 
   await rapide(page);
   await ouvrirNeuf(page);
   await versReglages(page, 1);
-  await page.locator('#matieres label', { hasText: 'Histoire' }).click();
-  await expect(page.locator('#reglage-niveau-savoir')).toBeVisible();
-  await page.locator('#niveau-savoir label', { hasText: 'Moyen' }).click();
-  await page.locator('#mode-savoir label', { hasText: 'Normal' }).click();
+  await choisir(page, '#matieres', 'Histoire');
+  await expect(page.locator('#reglage-niveau-savoir')).not.toHaveAttribute('hidden', '');
+  await choisir(page, '#niveau-savoir', 'Moyen');
+  await choisir(page, '#mode-savoir', 'Normal');
   await valider(page);
   await expect(page.locator('#reglages-titre')).toContainText('Histoire, les jeux');
   // Préhistoire (v7.6), Antiquité, Moyen Âge (v7.7), Renaissance (v7.8), Temps modernes (v7.9), Révolution et XIXe (v7.10), XXe (v7.11), dans l'ordre ; les familles de Géographie sont cachées.

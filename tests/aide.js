@@ -10,15 +10,36 @@ async function rapide(page, { autoDe = 600000, pause = 80 } = {}) {
 // Préparation en écrans successifs (v4.6) : 1 nombre de joueurs → 2 aventuriers → 3 cartes → 4 aventure.
 // Le bouton « Valider » visible fait passer au joueur suivant, puis à l'écran suivant.
 async function valider(page) {
-  await page.getByRole('button', { name: 'Valider', exact: true }).click();
+  // v10.13 : à l'écran « matière », le dernier bandeau déroulant ouvert a son propre « Valider » (« Valider mes choix »).
+  const bandeau = page.getByRole('button', { name: 'Valider mes choix' });
+  if (await bandeau.isVisible()) await bandeau.click();
+  else await page.getByRole('button', { name: 'Valider', exact: true }).click();
+}
+
+// v10.13 : à l'écran « matière », les choix sont dans des bandeaux déroulants (un seul ouvert à la fois, js/selecteur.js).
+// ouvrirChoix ouvre celui du conteneur voulu (ex. '#niveau-maths') s'il n'est pas déjà ouvert ; cocher / choisir agissent ensuite.
+const ONGLET_DE = { matieres: 'matiere', francais: 'type', 'type-maths': 'type', 'mode-savoir': 'type', 'niveau-maths': 'niveau',
+  'niveau-ortho': 'niveau', 'niveau-conj': 'niveau', 'niveau-gram': 'niveau', 'niveau-savoir': 'niveau', 'nb-signes': 'signes' };
+async function ouvrirChoix(page, conteneur) {
+  if (await page.locator(conteneur).isVisible()) return;
+  await page.locator('.onglet[data-etape="' + ONGLET_DE[conteneur.slice(1)] + '"]').click();
+  await page.locator(conteneur).waitFor();
+}
+async function cocher(page, conteneur, valeur, etat = true) {
+  await ouvrirChoix(page, conteneur);
+  await page.locator(conteneur + ' input[value="' + valeur + '"]').setChecked(etat);
+}
+async function choisir(page, conteneur, texte) {
+  await ouvrirChoix(page, conteneur);
+  await page.locator(conteneur + ' label', { hasText: texte }).click();
 }
 
 // Écran 3 (v5.7, deux écrans depuis v5.8) : choisit la matière, valide, et arrive sur ses réglages.
 async function matiere(page, valeur) {
-  if (valeur === 'maths') await page.locator('#matieres input[value="maths"]').check();
+  if (valeur === 'maths') await cocher(page, '#matieres', 'maths');
   else {
-    await page.locator('#matieres input[value="francais"]').check();
-    await page.locator('#francais input[value="' + valeur + '"]').check();
+    await cocher(page, '#matieres', 'francais');
+    await cocher(page, '#francais', valeur);
   }
   await valider(page);
   await page.locator(valeur === 'maths' ? '#reglages-maths' : valeur === 'orthographe' ? '#ortho-packs' : '#conj-temps').waitFor();
@@ -55,12 +76,12 @@ async function repondre(page, juste = true) {
 // Écran 3 : Mathématiques avec les signes, nombres et niveau donnés.
 // Depuis v5.9, le niveau se choisit sur l'écran de la matière ; au niveau Facile, les nombres sont des tables.
 async function maths(page, { signes = ['plus'], nombres = [2, 3], dizaines = [], centaines = [], milliers = [], niveau = 'facile', nbSignes = null } = {}) {
-  await page.locator('#matieres input[value="maths"]').check();
-  await page.locator('#niveau-maths input[value="' + niveau + '"]').check();
+  await cocher(page, '#matieres', 'maths');
+  await cocher(page, '#niveau-maths', niveau);
   // v6.14 : nombres de signes par calcul (1 coché au départ).
   const max = { facile: 1, moyen: 2, difficile: 3, expert: 4 }[niveau];
   if (nbSignes) for (const n of [...nbSignes, 1, 2, 3, 4].filter((n, i, t) => n <= max && t.indexOf(n) === i)) {
-    await page.locator('#nb-signes input[value="' + n + '"]').setChecked(nbSignes.includes(n));
+    await cocher(page, '#nb-signes', n, nbSignes.includes(n));
   }
   await valider(page);
   await page.locator('#reglages-maths').waitFor();
@@ -133,9 +154,9 @@ async function attendreJoueur(page, nom) {
 // Écran 3 : Français → Conjugaison avec les temps, groupes et niveau donnés.
 // v6.49 : le niveau se choisit sur l'écran de la matière ; modes, groupes et temps sur un seul écran ensuite.
 async function conjugaison(page, { temps = ['indicatif.present'], groupes = [1], niveau = 'facile' } = {}) {
-  await page.locator('#matieres input[value="francais"]').check();
-  await page.locator('#francais input[value="conjugaison"]').check();
-  await page.locator('#niveau-conj input[value="' + niveau + '"]').check();
+  await cocher(page, '#matieres', 'francais');
+  await cocher(page, '#francais', 'conjugaison');
+  await cocher(page, '#niveau-conj', niveau);
   await valider(page);
   await page.locator('#conj-temps').waitFor();
   for (const m of [...new Set(temps.map((t) => t.split('.')[0]))]) await page.locator('#modes-conj input[value="' + m + '"]').check();
@@ -145,9 +166,9 @@ async function conjugaison(page, { temps = ['indicatif.present'], groupes = [1],
 
 // Écran 3 : Français → Grammaire (v6.54) au niveau donné ; jeux = liste des jeux gardés (tous cochés au départ).
 async function grammaire(page, { jeux = null, niveau = 'facile' } = {}) {
-  await page.locator('#matieres input[value="francais"]').check();
-  await page.locator('#francais input[value="grammaire"]').check();
-  await page.locator('#niveau-gram input[value="' + niveau + '"]').check();
+  await cocher(page, '#matieres', 'francais');
+  await cocher(page, '#francais', 'grammaire');
+  await cocher(page, '#niveau-gram', niveau);
   await valider(page);
   await page.locator('#reglages-gram').waitFor();
   if (jeux) {
@@ -155,4 +176,4 @@ async function grammaire(page, { jeux = null, niveau = 'facile' } = {}) {
   }
 }
 
-module.exports = { grammaire, repondre, valider, cocherJoueur, orthographe, maths, conjugaison, matiere, versReglages, lancer, lancerLeDe, lancerPartie, rapide, attendreJoueur, cocherTout, ouvrirNeuf };
+module.exports = { ouvrirChoix, cocher, choisir, grammaire, repondre, valider, cocherJoueur, orthographe, maths, conjugaison, matiere, versReglages, lancer, lancerLeDe, lancerPartie, rapide, attendreJoueur, cocherTout, ouvrirNeuf };

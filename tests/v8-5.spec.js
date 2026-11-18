@@ -4,7 +4,7 @@
 //  - la toute première question de la partie s'appelle « Première question ».
 const { test, expect } = require('@playwright/test');
 const R = require('../js/rapide.js');
-const { rapide, versReglages, cocherJoueur, lancer, repondre, lancerLeDe } = require('./aide');
+const { rapide, versReglages, cocherJoueur, lancer, repondre, lancerLeDe, cocher } = require('./aide');
 
 test.describe('tirage de la partie rapide avec Géographie et Histoire', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
@@ -91,7 +91,7 @@ test('réglages : plus de commentaire sous les niveaux ni dans les titres', asyn
     await expect(page.locator('#' + id)).toHaveCount(0);
   }
   await expect(page.locator('#reglages-joueur')).not.toContainText('(au moins un)');
-  await page.locator('#matieres input[value="maths"]').check();
+  await cocher(page, '#matieres', 'maths');
   await page.getByRole('button', { name: 'Valider', exact: true }).click();
   await expect(page.locator('#nombres-titre')).toHaveText('Tables');
   await expect(page.locator('#signes-titre')).toHaveText('Signes');

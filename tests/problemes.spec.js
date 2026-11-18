@@ -3,7 +3,7 @@
 const { test, expect } = require('@playwright/test');
 const K = require('../js/calcul.js');
 const P = require('../js/problemes.js');
-const { rapide, versReglages, valider, lancer, cocherJoueur } = require('./aide');
+const { rapide, versReglages, valider, lancer, cocherJoueur, cocher } = require('./aide');
 
 const REGLAGES = [
   { niveau: 'facile', signes: ['plus', 'moins', 'fois', 'divise'], nombres: [2, 7, 10], nbSignes: [1] },
@@ -61,9 +61,9 @@ async function partieMaths(page, { type = 'probleme', niveau = 'moyen', signes =
   await rapide(page, { autoDe: 600000 });
   await page.goto('./');
   await versReglages(page, 1);
-  await page.locator('#matieres input[value="maths"]').check();
+  await cocher(page, '#matieres', 'maths');
   if (type) await page.getByRole('radio', { name: type === 'probleme' ? 'Problèmes' : 'Calcul mental' }).check();
-  await page.locator('#niveau-maths input[value="' + niveau + '"]').check();
+  await cocher(page, '#niveau-maths', niveau);
   await valider(page);
   await page.locator('#reglages-maths').waitFor();
   for (const s of signes) await page.locator('#signes input[value="' + s + '"]').check();
@@ -82,7 +82,7 @@ test.describe('Calcul mental ou Problèmes', () => {
     await rapide(page);
     await page.goto('./');
     await versReglages(page, 1);
-    await page.locator('#matieres input[value="maths"]').check();
+    await cocher(page, '#matieres', 'maths');
     await expect(page.getByRole('radio', { name: 'Calcul mental' })).toBeChecked();
     await expect(page.getByRole('radio', { name: 'Problèmes' })).not.toBeChecked();
     // L'un ou l'autre : choisir « Problèmes » retire « Calcul mental ».

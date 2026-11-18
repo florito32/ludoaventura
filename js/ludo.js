@@ -93,20 +93,22 @@
         texte: 'Choisis ton aventure. Chacune a son objectif à atteindre ensemble avant d’arriver au volcan (pierres à tailler, épées à forger…). Puis « Lancer la partie ».' };
     }
     // Étape 3 : la matière, puis ses réglages (un écran ou deux selon la matière).
-    valider = $('btn-valider-reglages');
+    // v10.13 : « Valider » du dernier bandeau déroulant s'il est ouvert, sinon celui du bas ; les niveaux se choisissent via leur onglet.
+    valider = (window.Selecteur && window.Selecteur.boutonValider()) || $('btn-valider-reglages');
+    var ongletNiveau = window.Selecteur && window.Selecteur.onglet('niveau');
     var mat = p.matiere[p.actif];
     if (p.sousEtape === 'matiere') {
       if (!mat && !p.francais[p.actif]) return { cle: cle + '-a', cible: $('matieres'),
         texte: nom + ', choisis ta matière : Mathématiques ou Français. Les questions de tes cartes viendront de là.' };
       if (!mat) return { cle: cle + '-b', cible: $('francais'),
         texte: 'En français, choisis Orthographe (des mots à écrire, compter, découper…), Conjugaison (des verbes à conjuguer) ou Grammaire (des phrases à remettre en ordre, des contraires, des erreurs à trouver…).' };
-      if (mat === 'maths') return { cle: cle + '-c', choix: $('niveau-maths'), cible: valider,
+      if (mat === 'maths') return { cle: cle + '-c', choix: ongletNiveau || $('niveau-maths'), cible: valider,
         texte: 'Choisis ton niveau : Facile, ce sont les tables ; plus c’est dur, plus les nombres sont grands. Puis le nombre de signes par calcul, et « Valider ».' };
-      if (mat === 'conjugaison') return { cle: cle + '-e', choix: $('niveau-conj'), cible: valider,
+      if (mat === 'conjugaison') return { cle: cle + '-e', choix: ongletNiveau || $('niveau-conj'), cible: valider,
         texte: 'Choisis ton niveau : plus il est haut, plus les verbes sont rares ou pièges. Puis « Valider ».' };
-      if (mat === 'grammaire') return { cle: cle + '-g', choix: $('niveau-gram'), cible: valider,
+      if (mat === 'grammaire') return { cle: cle + '-g', choix: ongletNiveau || $('niveau-gram'), cible: valider,
         texte: 'Choisis ton niveau : plus il est haut, plus les phrases sont longues et les pièges nombreux. Puis « Valider » pour choisir tes jeux.' };
-      if (mat === 'orthographe') return { cle: cle + '-f', choix: $('niveau-ortho'), cible: valider,
+      if (mat === 'orthographe') return { cle: cle + '-f', choix: ongletNiveau || $('niveau-ortho'), cible: valider,
         texte: 'Choisis ton niveau : plus il est haut, plus les mots sont longs, rares ou pièges. Puis « Valider » pour choisir tes thèmes.' };
       return { cle: cle + '-d', cible: valider, texte: 'C’est noté ! Touche « Valider » pour régler tes questions.' };
     }

@@ -3,7 +3,7 @@
 // Difficile = série 4 et Expert = série 5 (nouveaux mots, outils/mots_niveaux.py).
 // Le niveau se choisit sur l'écran de la matière, tout de suite sous « Orthographe / Conjugaison ».
 const { test, expect } = require('@playwright/test');
-const { rapide, versReglages, valider, ouvrirNeuf } = require('./aide');
+const { rapide, versReglages, valider, ouvrirNeuf, cocher, choisir } = require('./aide');
 const C = require('../js/cartes.js');
 const D = require('../js/defis.js');
 const P = require('../js/phrases.js');
@@ -62,13 +62,13 @@ test('le niveau d\'orthographe se choisit sur l\'écran de la matière, et Exper
   await page.goto('./');
   await versReglages(page, 1);
   await expect(page.locator('#niveau-ortho')).toBeHidden();
-  await page.locator('#matieres input[value="francais"]').check();
-  await page.locator('#francais input[value="orthographe"]').check();
+  await cocher(page, '#matieres', 'francais');
+  await cocher(page, '#francais', 'orthographe');
   await expect(page.locator('#niveau-ortho input')).toHaveCount(4);
   await expect(page.locator('#niveau-ortho input[value="facile"]')).toBeChecked();
   await expect(page.locator('#niveau-ortho-aide')).toHaveCount(0); // v8.5
   await expect(page.locator('#niveau-conj')).toBeHidden();
-  await page.locator('#niveau-ortho label', { hasText: 'Expert' }).click();
+  await choisir(page, '#niveau-ortho', 'Expert');
   await expect(page.locator('#niveau-ortho input[value="expert"]')).toBeChecked();
   // Tout tient sans défiler.
   const deborde = await page.evaluate(() => {
@@ -100,9 +100,9 @@ test('Moyen pioche la série 3 ; « Mêmes réglages pour tous » copie le nivea
   await rapide(page);
   await ouvrirNeuf(page);
   await versReglages(page, 2);
-  await page.locator('#matieres input[value="francais"]').check();
-  await page.locator('#francais input[value="orthographe"]').check();
-  await page.locator('#niveau-ortho label', { hasText: 'Moyen' }).click();
+  await cocher(page, '#matieres', 'francais');
+  await cocher(page, '#francais', 'orthographe');
+  await choisir(page, '#niveau-ortho', 'Moyen');
   await valider(page);
   await page.locator('#packs input[value="pays"]').check();
   await valider(page);

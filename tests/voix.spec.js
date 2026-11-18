@@ -2,7 +2,7 @@
 // meilleure voix française choisie, et le même bouton « Écouter » pour les maths, le français et l'histoire.
 const { test, expect } = require('@playwright/test');
 const V = require('../js/voix.js');
-const { rapide, versReglages, valider, maths, lancer, ouvrirNeuf } = require('./aide');
+const { rapide, versReglages, valider, maths, lancer, ouvrirNeuf, cocher } = require('./aide');
 
 const textes = (t) => V.preparer(t).map((m) => m.texte);
 
@@ -94,9 +94,9 @@ test('histoire : « Écouter » lit la carte avec la même voix, phrase par phra
   await rapide(page);
   await ouvrirNeuf(page);
   await versReglages(page, 1);
-  await page.locator('#matieres input[value="histoire"]').check();
-  await page.locator('#niveau-savoir input[value="facile"]').check();
-  await page.locator('#mode-savoir input[value="normal"]').check();
+  await cocher(page, '#matieres', 'histoire');
+  await cocher(page, '#niveau-savoir', 'facile');
+  await cocher(page, '#mode-savoir', 'normal');
   await valider(page);
   await page.locator('#savoir-jeux').waitFor();
   await page.locator('#savoir-liste input[value="a01"]').check();

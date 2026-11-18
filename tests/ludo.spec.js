@@ -72,10 +72,10 @@ test('didacticiel : préparation et premier tour, flèche et bulle à chaque ét
 
   await expect(texte(page)).toContainText('choisis ta matière');
   await flecheSur(page, '#matieres');
-  await page.locator('#matieres input[value="francais"]').check();
+  await A.cocher(page, '#matieres', 'francais');
   await expect(texte(page)).toContainText('Orthographe');
   await flecheSur(page, '#francais');
-  await page.locator('#francais input[value="orthographe"]').check();
+  await A.cocher(page, '#francais', 'orthographe');
   await A.valider(page);
 
   await expect(texte(page)).toContainText('thèmes');
