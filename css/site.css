@@ -2178,3 +2178,67 @@ body:has(#ecran-baby:not([hidden])) .pied { padding-block: 4px calc(4px + env(sa
 }
 @container (max-height: 480px) and (min-width: 400px) { #savoir-liste { --c: 4; } }
 @container (max-height: 480px) and (min-width: 600px) { #savoir-liste { --c: 6; } }
+/* ===== v10.13 : choix de la partie en onglets (demande du 18/11/2026, proposition A) =====
+   js/selecteur.js : onglets à gauche, une seule rangée .reglage-ligne ouverte en bandeau à droite de l'onglet cliqué. */
+.reglages-joueur .reglage.choix-matiere.avec-rail {
+  position: relative; display: flex; flex-direction: row; align-items: stretch; justify-content: flex-start;
+  gap: 0; min-height: 100%; --rail-l: 150px;
+}
+.rail-choix {
+  position: relative; flex: none; align-self: flex-start; max-height: 100%; width: clamp(130px, 38cqi, 180px); display: flex; flex-direction: column; gap: 8px;
+  padding: 8px; background: #efe2c4; border-radius: 12px; overflow-y: auto; overflow-x: hidden;
+}
+.onglet {
+  position: relative; display: flex; align-items: center; gap: 6px; width: 100%; min-height: 44px; padding: 8px 14px 8px 8px;
+  font: inherit; font-size: .95rem; text-align: left; color: var(--encre); cursor: pointer;
+  background: rgba(59, 42, 30, .12); border: 2px solid transparent; border-radius: 10px;
+}
+.onglet:hover:not(:disabled) { background: rgba(59, 42, 30, .22); }
+.onglet:disabled { opacity: .45; cursor: not-allowed; }
+.onglet.ouvert { background: var(--encre); color: #fff; }
+.onglet-icone { flex: none; font-size: 1.15em; line-height: 1; }
+.onglet-texte { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.onglet-titre { font-weight: 700; overflow-wrap: break-word; hyphens: auto; }
+.onglet-valeur { font-size: .85em; opacity: .9; overflow-wrap: break-word; hyphens: auto; }
+.onglet-coche { position: absolute; top: 3px; right: 6px; font-size: .7em; font-weight: 800; visibility: hidden; }
+.onglet.fait .onglet-coche { visibility: visible; }
+.zone-choix { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; padding: 12px; text-align: center; color: var(--encre-douce); }
+
+/* Les rangées sont cachées sauf celle qui est ouverte : elle devient un bandeau, choix l'un sous l'autre. */
+.avec-rail > .reglage-ligne { display: none; }
+.avec-rail > .reglage-ligne.ouvert {
+  display: flex; flex-direction: column; align-items: stretch; flex-wrap: nowrap; gap: 8px;
+  position: absolute; z-index: 5; left: var(--rail-l); top: 0; width: min(230px, calc(100% - var(--rail-l)));
+  max-height: 100%; padding: 10px; background: #fffaf0; color: var(--encre);
+  border: 2px solid var(--encre); border-radius: 0 14px 14px 0; box-shadow: 4px 6px 18px rgba(59, 42, 30, .28);
+  animation: bandeau-glisse .22s ease both;
+}
+.avec-rail > .reglage-ligne.ouvert::before {
+  content: ""; position: absolute; left: -9px; top: var(--fleche, 18px); width: 14px; height: 14px; background: #fffaf0;
+  border-left: 2px solid var(--encre); border-bottom: 2px solid var(--encre); transform: rotate(45deg);
+}
+@keyframes bandeau-glisse { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .avec-rail > .reglage-ligne.ouvert { animation: none; } }
+/* Le titre du bandeau reste visible (les règles « écran bas » le masquaient à l'œil). */
+#choix-matiere .reglage-titre { position: static; width: auto; height: auto; overflow: visible; clip-path: none; white-space: normal; margin: 0; font-weight: 800; font-size: .95rem; }
+.avec-rail .packs { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; flex-wrap: nowrap; justify-content: flex-start; gap: 0; }
+/* Choix en liste : le choix retenu est écrit en noir, gras, avec un ✓ à droite (demande du 18/11/2026). */
+.reglages-joueur .choix-matiere.avec-rail .pack span {
+  display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 44px; padding: 8px 10px; font-size: 1rem;
+  background: transparent; color: var(--encre); border: 0; border-bottom: 1px solid rgba(59, 42, 30, .25); border-radius: 0; font-weight: 600;
+}
+.reglages-joueur .choix-matiere.avec-rail .pack:hover span { background: rgba(59, 42, 30, .07); }
+.reglages-joueur .choix-matiere.avec-rail .pack input:checked + span { background: transparent; color: var(--encre); font-weight: 800; }
+.reglages-joueur .choix-matiere.avec-rail .pack input:checked + span::after { content: "✓"; margin-left: 8px; font-weight: 800; }
+.btn-valider-bandeau { width: 100%; margin-top: 4px; }
+/* Un seul « Valider » à l'écran : celui du bas se retire tant que le dernier bandeau (qui a le sien) est ouvert. */
+.valider-masque { display: none; }
+/* Écran peu haut (téléphone carré, paysage) : onglets compacts, le titre et le choix côte à côte, pour que les 4 tiennent sans défiler. */
+@container (max-height: 420px) {
+  .rail-choix { gap: 4px; padding: 6px; }
+  .onglet { min-height: 38px; padding: 4px 14px 4px 6px; font-size: .85rem; gap: 4px; }
+  .onglet-icone { font-size: 1em; }
+  .onglet-texte { flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 0 5px; }
+  .avec-rail > .reglage-ligne.ouvert { padding: 8px; gap: 4px; }
+  .reglages-joueur .choix-matiere.avec-rail .pack span { min-height: 38px; padding: 4px 10px; }
+}

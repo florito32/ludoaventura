@@ -3,7 +3,7 @@
 // temps de la conjugaison), écran des jeux, puis 6 petits jeux joués en touchant la réponse dans la carte.
 const { test, expect } = require('@playwright/test');
 const P = require('../js/phonemes.js');
-const { rapide, versReglages, valider, lancer } = require('./aide');
+const { rapide, versReglages, valider, lancer, cocher } = require('./aide');
 
 test.describe('moteur des phonèmes', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
@@ -93,8 +93,8 @@ async function versPhonemes(page) {
   await rapide(page);
   await page.goto('./');
   await versReglages(page, 1);
-  await page.locator('#matieres input[value="francais"]').check();
-  await page.locator('#francais input[value="phonemes"]').check();
+  await cocher(page, '#matieres', 'francais');
+  await cocher(page, '#francais', 'phonemes');
   await valider(page);
   await page.locator('#phon-sons').waitFor();
 }

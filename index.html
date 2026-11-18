@@ -328,8 +328,12 @@
              Les choix sont « entourés » (pas de case à cocher visible, v5.6). -->
         <div class="etape-corps reglages-joueur" id="reglages-joueur">
           <!-- Premier écran de l'étape 3 : la matière (Mathématiques, ou Français puis Orthographe / Conjugaison). -->
-          <div class="reglage choix-matiere" id="choix-matiere">
-          <div class="reglage-ligne">
+          <!-- v10.13 (demande du 18/11/2026) : onglets à gauche (js/selecteur.js), un seul bandeau déroulant ouvert à droite
+               (la rangée .reglage-ligne du choix en cours). Les rangées ci-dessous restent la source de vérité (js/plateau.js). -->
+          <div class="reglage choix-matiere avec-rail" id="choix-matiere">
+          <nav class="rail-choix" id="rail-choix" aria-label="Choix de la partie"></nav>
+          <div class="zone-choix" id="zone-choix" aria-live="polite"></div>
+          <div class="reglage-ligne" id="reglage-matiere">
             <p class="reglage-titre" id="matiere-titre">Matière</p>
             <div class="packs" id="matieres" role="radiogroup" aria-labelledby="matiere-titre">
               <label class="pack"><input type="radio" name="matiere" value="maths"><span>Mathématiques</span></label>
@@ -893,6 +897,7 @@
 <script src="js/defis.js"></script>
 <script src="js/recompenses.js"></script>
 <script src="js/figurines.js"></script>
+<script src="js/selecteur.js"></script>
 <script src="js/plateau.js"></script>
 <script src="js/rapide.js"></script>
 <script src="js/baby-ecran.js"></script>

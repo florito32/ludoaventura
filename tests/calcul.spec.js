@@ -2,7 +2,7 @@
 // formule à la pioche, réponse écrite par le joueur et corrigée par le jeu, puis dé automatique.
 const { test, expect } = require('@playwright/test');
 const K = require('../js/calcul.js');
-const { rapide, versReglages, valider, maths, cocherJoueur, lancer, lancerLeDe, ouvrirNeuf } = require('./aide');
+const { rapide, versReglages, valider, maths, cocherJoueur, lancer, lancerLeDe, ouvrirNeuf, cocher, choisir } = require('./aide');
 
 test.describe('logique des calculs', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
@@ -72,16 +72,16 @@ async function versMaths(page, joueurs = 1) {
 
 test('étape 3 : Mathématiques et son niveau sur le même écran, puis signes et tables (Facile) ; il faut un signe et une table', async ({ page }) => {
   await versMaths(page);
-  await expect(page.locator('#reglage-niveau-maths')).toBeHidden();
-  await page.locator('#matieres label', { hasText: 'Mathématiques' }).click();
+  await expect(page.locator('#reglage-niveau-maths')).toHaveAttribute('hidden', ''); // rangée masquée tant que la matière n'est pas choisie
+  await choisir(page, '#matieres', 'Mathématiques');
   // v5.9 : le niveau est proposé tout de suite, sur l'écran de la matière.
-  await expect(page.locator('#reglage-niveau-maths')).toBeVisible();
+  await expect(page.locator('#reglage-niveau-maths')).not.toHaveAttribute('hidden', ''); // v10.13 : le niveau a son onglet (bandeau ouvert au toucher)
   await expect(page.locator('#niveau-maths input')).toHaveCount(4);
   await expect(page.locator('#niveau-maths input[value="facile"]')).toBeChecked();
   await expect(page.locator('#niveau-maths-aide')).toHaveCount(0); // v8.5 : plus de commentaire sous le niveau
-  await page.locator('#niveau-maths label', { hasText: 'Moyen' }).click();
+  await choisir(page, '#niveau-maths', 'Moyen');
   await expect(page.locator('#niveau-maths input[value="moyen"]')).toBeChecked();
-  await page.locator('#niveau-maths label', { hasText: 'Facile' }).click();
+  await choisir(page, '#niveau-maths', 'Facile');
   await valider(page); // deuxième écran : signes et tables
   await expect(page.locator('#reglages-maths')).toBeVisible();
   await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : Mathématiques');
@@ -105,7 +105,7 @@ test('étape 3 : Mathématiques et son niveau sur le même écran, puis signes e
   // Retour sur Léa à un autre niveau : les nombres ne sont plus des tables.
   await page.getByRole('button', { name: /Retour/ }).click();
   await page.getByRole('button', { name: /Retour/ }).click();
-  await page.locator('#niveau-maths label', { hasText: 'Expert' }).click();
+  await choisir(page, '#niveau-maths', 'Expert');
   await valider(page);
   await expect(page.locator('#nombres-titre')).toContainText('Unités');
 });
@@ -115,15 +115,15 @@ test('étape 3 : Mathématiques et son niveau sur le même écran, puis signes e
 // nombres de signes proposés (1 ; 1–2 ; 1–3 ; 1–4, plusieurs possibles).
 test('le niveau montre les groupes de nombres et les nombres de signes possibles ; « Tout sélectionner »', async ({ page }) => {
   await versMaths(page);
-  await page.locator('#matieres input[value="maths"]').check();
-  const visibles = async (sel) => (await page.locator(sel).evaluateAll((l) => l.filter((e) => e.offsetParent).map((e) => e.textContent.trim())));
+  await cocher(page, '#matieres', 'maths');
+  const visibles = async (sel) => (await page.locator(sel).evaluateAll((l) => l.filter((e) => !e.hidden).map((e) => e.textContent.trim())));
   for (const [niveau, nb] of [['facile', ['1']], ['moyen', ['1', '2']], ['difficile', ['1', '2', '3']], ['expert', ['1', '2', '3', '4']]]) {
-    await page.locator('#niveau-maths input[value="' + niveau + '"]').check();
+    await cocher(page, '#niveau-maths', niveau);
     expect(await visibles('#nb-signes .pack')).toEqual(nb);
   }
   // Moyen : 1 et 2 signes cochés ; les dizaines apparaissent, pas les centaines ni « 1000+ ».
-  await page.locator('#niveau-maths input[value="moyen"]').check();
-  await page.locator('#nb-signes input[value="2"]').check();
+  await cocher(page, '#niveau-maths', 'moyen');
+  await cocher(page, '#nb-signes', '2');
   expect(await page.evaluate(() => window.Aventura.partie.maths[0].nbSignes)).toEqual([1, 2]);
   await valider(page);
   await expect(page.locator('#signes .pack span')).toHaveText(['+', '−', '×', '÷']);
@@ -150,7 +150,7 @@ test('le niveau montre les groupes de nombres et les nombres de signes possibles
   // Retour : Expert montre « 1000+ » ; le nombre de signes 2 reste coché.
   await page.getByRole('button', { name: /Retour/ }).click();
   await page.getByRole('button', { name: /Retour/ }).click();
-  await page.locator('#niveau-maths input[value="expert"]').check();
+  await cocher(page, '#niveau-maths', 'expert');
   await expect(page.locator('#nb-signes input[value="2"]')).toBeChecked();
   await valider(page);
   await expect(page.locator('#centaines')).toBeVisible();

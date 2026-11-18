@@ -1,7 +1,7 @@
 // Cartes JEU : 5 packs × 3 niveaux depuis l'Excel, choix par joueur, dictée, lecture vocale.
 const { test, expect } = require('@playwright/test');
 const C = require('../js/cartes.js');
-const { repondre, rapide, lancerLeDe, versReglages, cocherJoueur, orthographe, valider, lancer } = require('./aide');
+const { repondre, rapide, lancerLeDe, versReglages, cocherJoueur, orthographe, valider, lancer, cocher } = require('./aide');
 
 // Remplace la synthèse vocale du navigateur par un enregistreur (les phrases « lues » sont gardées).
 async function voixEspion(page) {
@@ -135,10 +135,10 @@ test('packs et questions décochés au départ ; « Valider » demande au moins 
   // Aucune matière choisie au départ (v5.7) : message, puis Français demande Orthographe.
   await valider(page);
   await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir une matière.');
-  await page.locator('#matieres input[value="francais"]').check();
+  await cocher(page, '#matieres', 'francais');
   await valider(page);
   await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir Orthographe, Conjugaison, Grammaire ou Phonèmes.');
-  await page.locator('#francais input[value="orthographe"]').check();
+  await cocher(page, '#francais', 'orthographe');
   await valider(page); // écran des packs (v6.16)
   for (const c of await page.locator('#packs input, #types-questions input').all()) await expect(c).not.toBeChecked();
   // Aucun pack : on reste sur l'écran des packs avec un message.

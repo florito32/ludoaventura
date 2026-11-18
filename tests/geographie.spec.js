@@ -3,7 +3,7 @@
 const { test, expect } = require('@playwright/test');
 const S = require('../js/savoirs.js');
 require('../js/geographie.js');
-const { rapide, versReglages, valider, lancer, lancerLeDe, ouvrirNeuf } = require('./aide');
+const { rapide, versReglages, valider, lancer, lancerLeDe, ouvrirNeuf, cocher, choisir } = require('./aide');
 
 const NIVEAUX = ['facile', 'moyen', 'difficile', 'expert'];
 
@@ -145,7 +145,7 @@ test('écran des jeux (v7.2) : tuiles icône + nom, aucun nom coupé ni déborda
   await rapide(page);
   await ouvrirNeuf(page);
   await versReglages(page, 1);
-  await page.locator('#matieres input[value="geographie"]').check();
+  await cocher(page, '#matieres', 'geographie');
   await valider(page);
   await page.locator('#savoir-jeux').waitFor();
   await page.locator('#btn-tout-savoir').click(); // état « choisi » (fond foncé) : mêmes dimensions
@@ -171,9 +171,9 @@ async function versGeo(page, { niveau = 'facile', jeux = ['g04'], hasard = null,
   await rapide(page);
   await ouvrirNeuf(page);
   await versReglages(page, 1);
-  await page.locator('#matieres input[value="geographie"]').check();
-  await page.locator('#niveau-savoir input[value="' + niveau + '"]').check();
-  await page.locator('#mode-savoir input[value="' + mode + '"]').check();
+  await cocher(page, '#matieres', 'geographie');
+  await cocher(page, '#niveau-savoir', niveau);
+  await cocher(page, '#mode-savoir', mode);
   await valider(page);
   await page.locator('#savoir-jeux').waitFor();
   for (const j of jeux) await page.locator('#savoir-liste input[value="' + j + '"]').check();
@@ -197,16 +197,16 @@ test('écran des réglages : Géographie, son niveau, le mode Quiz / Normal (v8.
   await ouvrirNeuf(page);
   await versReglages(page, 1);
   // Le mode n'existe que pour la Géographie et l'Histoire.
-  await page.locator('#matieres label', { hasText: 'Mathématiques' }).click();
-  await expect(page.locator('#reglage-mode-savoir')).toBeHidden();
-  await page.locator('#matieres label', { hasText: 'Géographie' }).click();
-  await expect(page.locator('#reglage-niveau-savoir')).toBeVisible();
-  await expect(page.locator('#reglage-mode-savoir')).toBeVisible();
+  await choisir(page, '#matieres', 'Mathématiques');
+  await expect(page.locator('#reglage-mode-savoir')).toHaveAttribute('hidden', '');
+  await choisir(page, '#matieres', 'Géographie');
+  await expect(page.locator('#reglage-niveau-savoir')).not.toHaveAttribute('hidden', '');
+  await expect(page.locator('#reglage-mode-savoir')).not.toHaveAttribute('hidden', '');
   await expect(page.locator('#mode-savoir input[value="quiz"]')).toBeChecked();
   await expect(page.locator('#mode-savoir-aide, #niveau-savoir-aide')).toHaveCount(0); // v8.5 : plus de commentaires
-  await page.locator('#mode-savoir label', { hasText: 'Normal' }).click();
+  await choisir(page, '#mode-savoir', 'Normal');
   await expect(page.locator('#mode-savoir input[value="normal"]')).toBeChecked();
-  await page.locator('#niveau-savoir label', { hasText: 'Expert' }).click();
+  await choisir(page, '#niveau-savoir', 'Expert');
   await expect(page.locator('#niveau-savoir input[value="expert"]')).toBeChecked();
   await pasDeDebordement(page);
   await valider(page);
