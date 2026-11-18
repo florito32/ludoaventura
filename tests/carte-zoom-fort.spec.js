@@ -2,13 +2,13 @@
 // pays (Israël sur la carte du monde) sans se tromper ; la carte du monde est plus haute sur téléphone ;
 // après la réponse, la carte se zoome sur la bonne zone.
 const { test, expect } = require('@playwright/test');
-const { rapide, versReglages, valider, ouvrirNeuf, lancer } = require('./aide');
+const { rapide, versReglages, valider, ouvrirNeuf, lancer, cocher } = require('./aide');
 
 async function questionIsrael(page) {
   await rapide(page); await ouvrirNeuf(page); await versReglages(page, 1);
-  await page.locator('#matieres input[value="geographie"]').check();
-  await page.locator('#mode-savoir input[value="normal"]').check();
-  await page.locator('#niveau-savoir input[value="moyen"]').check();
+  await cocher(page, '#matieres', 'geographie');
+  await cocher(page, '#mode-savoir', 'normal');
+  await cocher(page, '#niveau-savoir', 'moyen');
   await valider(page); await page.locator('#savoir-jeux').waitFor();
   await page.locator('#savoir-liste input[value="g19"]').check();
   await lancer(page);

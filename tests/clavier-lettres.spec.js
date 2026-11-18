@@ -9,7 +9,7 @@ const S = require('../js/savoirs.js');
 require('../js/geographie.js');
 require('../js/histoire.js');
 const V = require('../js/conjugaison.js');
-const { rapide, versReglages, valider, conjugaison, lancer, cocherJoueur } = require('./aide');
+const { rapide, versReglages, valider, conjugaison, lancer, cocherJoueur, cocher } = require('./aide');
 
 // Tape un texte au clavier à lettres, comme un joueur : lettre de base, puis « é è ê » autant de fois que nécessaire.
 async function taper(page, texte) {
@@ -192,9 +192,9 @@ for (const mat of ['geographie', 'histoire']) {
     await rapide(page, { autoDe: 600000 });
     await page.goto('./');
     await versReglages(page, 1);
-    await page.locator('#matieres input[value="' + mat + '"]').check();
-    await page.locator('#niveau-savoir input[value="difficile"]').check();
-    await page.locator('#mode-savoir input[value="normal"]').check();
+    await cocher(page, '#matieres', mat);
+    await cocher(page, '#niveau-savoir', 'difficile');
+    await cocher(page, '#mode-savoir', 'normal');
     await valider(page);
     await page.locator('#savoir-jeux').waitFor();
     // Une carte « question ouverte » dont la réponse contient un espace, un tiret ou une apostrophe (tirée ici,
@@ -266,8 +266,8 @@ test('les réponses les plus longues de géographie et d’histoire tiennent à 
   await rapide(page, { autoDe: 600000 });
   await page.goto('./');
   await versReglages(page, 1);
-  await page.locator('#matieres input[value="histoire"]').check();
-  await page.locator('#niveau-savoir input[value="difficile"]').check();
+  await cocher(page, '#matieres', 'histoire');
+  await cocher(page, '#niveau-savoir', 'difficile');
   await valider(page);
   await page.locator('#savoir-jeux').waitFor();
   await page.locator('#savoir-liste input[value="' + S.jeuxDe('histoire')[0].id + '"]').check();

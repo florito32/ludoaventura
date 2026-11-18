@@ -939,6 +939,7 @@
     if (ecran === 'packs' && mat !== 'orthographe') ecran = partie.sousEtape = 'reglages';
     if (ecran === 'sons' && mat !== 'phonemes') ecran = partie.sousEtape = 'reglages';
     $('choix-matiere').hidden = !surMatiere;
+    if (window.Selecteur) window.Selecteur.maj(); // v10.13 : onglets du choix de la partie (js/selecteur.js), après les rangées
     $('conj-temps').hidden = ecran !== 'modes';
     $('ortho-packs').hidden = ecran !== 'packs';
     $('phon-sons').hidden = ecran !== 'sons';

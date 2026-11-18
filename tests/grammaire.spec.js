@@ -4,7 +4,7 @@ const { test, expect } = require('@playwright/test');
 const G = require('../js/grammaire.js');
 const Q = require('../js/questions.js');
 const D = require('../js/defis.js');
-const { rapide, versReglages, valider, lancer, grammaire } = require('./aide');
+const { rapide, versReglages, valider, lancer, grammaire, cocher } = require('./aide');
 
 const NIVEAUX = ['facile', 'moyen', 'difficile', 'expert'];
 const JEUX_CARTE = ['phrase', 'contraires', 'erreur', 'relier', 'nature', 'homophones'];
@@ -139,11 +139,11 @@ test('écran des réglages : Grammaire, niveau avec exemples, jeux tous cochés 
   await rapide(page);
   await page.goto('./');
   await versReglages(page, 1);
-  await page.locator('#matieres input[value="francais"]').check();
-  await page.locator('#francais input[value="grammaire"]').check();
-  await expect(page.locator('#reglage-niveau-gram')).toBeVisible();
+  await cocher(page, '#matieres', 'francais');
+  await cocher(page, '#francais', 'grammaire');
+  await expect(page.locator('#reglage-niveau-gram')).not.toHaveAttribute('hidden', '');
   await expect(page.locator('#niveau-gram-aide')).toHaveCount(0); // v8.5
-  await page.locator('#niveau-gram input[value="expert"]').check();
+  await cocher(page, '#niveau-gram', 'expert');
   await expect(page.locator('#niveau-gram input[value="expert"]')).toBeChecked();
   await valider(page);
   await expect(page.locator('#reglages-titre')).toContainText('Grammaire, les jeux');
@@ -162,8 +162,8 @@ test('orthographe : « Le ou la ? » et « Au pluriel » ne sont plus dans les q
   await rapide(page);
   await page.goto('./');
   await versReglages(page, 1);
-  await page.locator('#matieres input[value="francais"]').check();
-  await page.locator('#francais input[value="orthographe"]').check();
+  await cocher(page, '#matieres', 'francais');
+  await cocher(page, '#francais', 'orthographe');
   await valider(page);
   await page.locator('#packs input[value="animaux"]').check();
   await valider(page);

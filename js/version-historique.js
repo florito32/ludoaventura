@@ -2,6 +2,10 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.15', date: '2026-11-18', changes: [
+    "Choix de la partie : la matière, l’exercice, le niveau et le nombre de signes se choisissent dans des onglets à gauche. Un bandeau déroulant s’ouvre à droite de l’onglet touché, avec les choix l’un sous l’autre ; après un choix, il se ferme et le suivant s’ouvre.",
+    "Ton choix reste écrit dans l’onglet (avec un ✓) : touche l’onglet pour le changer. Le choix retenu est écrit en noir avec un ✓ à droite. Le bouton « Valider » est dans le dernier bandeau."
+  ] },
   { v: '10.14', date: '2026-11-18', changes: [
     "Histoire, Renaissance : 362 nouvelles questions ajoutées aux jeux « Arts, découvertes et châteaux » et « Louis XIV et son temps », à tous les niveaux (questions de 15 mots au plus).",
     "Mode Quiz : chaque nouvelle question a ses 4 choix. Mode Normal : question ouverte dès Difficile quand la réponse est un nom, vrai ou faux avant ; les dates de Louis XIV s’ajoutent à la frise chronologique."

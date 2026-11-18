@@ -4,7 +4,7 @@
 const { test, expect } = require('@playwright/test');
 const S = require('../js/savoirs.js');
 require('../js/histoire.js');
-const { rapide, versReglages, valider, lancer, ouvrirNeuf } = require('./aide');
+const { rapide, versReglages, valider, lancer, ouvrirNeuf, cocher } = require('./aide');
 
 const NIVEAUX = ['facile', 'moyen', 'difficile', 'expert'];
 // Jeux qui ont reçu des questions, avec le nombre minimal de questions ajoutées (Renaissance : 'ren' ; Louis XIV : 'mod').
@@ -118,9 +118,9 @@ async function versHistoire(page, { niveau, jeu, mode }) {
   await rapide(page);
   await ouvrirNeuf(page);
   await versReglages(page, 1);
-  await page.locator('#matieres input[value="histoire"]').check();
-  await page.locator('#niveau-savoir input[value="' + niveau + '"]').check();
-  await page.locator('#mode-savoir input[value="' + mode + '"]').check();
+  await cocher(page, '#matieres', 'histoire');
+  await cocher(page, '#niveau-savoir', niveau);
+  await cocher(page, '#mode-savoir', mode);
   await valider(page);
   await page.locator('#savoir-jeux').waitFor();
   await page.locator('#savoir-liste input[value="' + jeu + '"]').check();

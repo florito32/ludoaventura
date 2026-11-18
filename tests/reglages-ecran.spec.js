@@ -1,7 +1,7 @@
 // Étape 3 : les écrans de réglages remplissent la place (v6.4, lignes 81 à 85 du backlog) :
 // choix centrés, grands, rangés en lignes régulières, sans défiler ni laisser l'écran presque vide.
 const { test, expect } = require('@playwright/test');
-const { rapide, versReglages, maths, orthographe, matiere, conjugaison } = require('./aide');
+const { rapide, versReglages, maths, orthographe, matiere, conjugaison, cocher, valider } = require('./aide');
 
 // Boîtes (x, y, largeur, hauteur) des choix visibles d'un groupe.
 async function boites(page, sel) {
@@ -53,13 +53,13 @@ test('mathématiques : signes sur une ligne, unités, dizaines et centaines en l
   // Les autres niveaux tiennent aussi sans défiler (Expert : une ligne « 1000+ » en plus).
   for (const nv of ['facile', 'moyen', 'expert']) {
     await page.getByRole('button', { name: /Retour/ }).click();
-    await page.locator('#niveau-maths input[value="' + nv + '"]').check();
-    await page.locator('#btn-valider-reglages').click();
+    await cocher(page, '#niveau-maths', nv);
+    await valider(page); // (le « Valider » est dans le dernier bandeau)
     await remplit(page, '#reglages-maths', nv === 'facile' ? 0.3 : 0.5);
   }
   await page.getByRole('button', { name: /Retour/ }).click();
-  await page.locator('#niveau-maths input[value="difficile"]').check();
-  await page.locator('#btn-valider-reglages').click();
+  await cocher(page, '#niveau-maths', 'difficile');
+  await valider(page); // (le « Valider » est dans le dernier bandeau)
   // Les choix restent utilisables.
   await page.locator('#signes label').nth(2).click();
   await page.locator('#nombres label').nth(9).click();
@@ -135,10 +135,11 @@ test('conjugaison : groupes sur l\'écran des temps, niveau sur l\'écran de la 
   await rapide(page);
   await page.goto('./');
   await versReglages(page, 1);
-  await page.locator('#matieres input[value="francais"]').check();
-  await page.locator('#francais input[value="conjugaison"]').check();
+  await cocher(page, '#matieres', 'francais');
+  await cocher(page, '#francais', 'conjugaison');
   const n = await boites(page, '#niveau-conj');
-  expect([1, 2]).toContain(new Set(n.map((b) => b[1])).size); // les 4 niveaux sur 1 ligne (2 × 2 au plus)
+  expect(n).toHaveLength(4); // v10.13 : les 4 niveaux l'un sous l'autre, dans le bandeau déroulant
+  expect(new Set(n.map((b) => Math.round(b[0]))).size).toBe(1);
   await conjugaison(page, { groupes: [], temps: ['indicatif.present', 'subjonctif.present', 'conditionnel.present', 'imperatif.present'] });
   const g = await boites(page, '#groupes');
   expect(new Set(g.map((b) => b[1])).size).toBe(1); // les 3 groupes sur une ligne

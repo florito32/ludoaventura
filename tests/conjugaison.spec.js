@@ -2,7 +2,7 @@
 // carte = pronom + verbe + temps, réponse écrite et corrigée ; si faux : « ? » (tableau) et « J'ai compris ».
 const { test, expect } = require('@playwright/test');
 const V = require('../js/conjugaison.js');
-const { rapide, versReglages, valider, conjugaison, matiere, lancer, lancerLeDe } = require('./aide');
+const { rapide, versReglages, valider, conjugaison, matiere, lancer, lancerLeDe, cocher, choisir } = require('./aide');
 
 test.describe('moteur de conjugaison', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
@@ -102,13 +102,13 @@ test('conjugaison en 2 écrans : matière et niveau → modes, groupes et temps 
   await preparer(page);
   await expect(page.locator('#reglages-titre')).toHaveText('Léa (Joueur 1) : quelle matière ?');
   await expect(page.locator('#niveau-conj')).toBeHidden();
-  await page.locator('#matieres input[value="francais"]').check();
-  await page.locator('#francais input[value="conjugaison"]').check();
+  await cocher(page, '#matieres', 'francais');
+  await cocher(page, '#francais', 'conjugaison');
   // Écran 1 : le niveau apparaît tout de suite sous Orthographe / Conjugaison, Facile coché, avec une aide.
   await expect(page.locator('#niveau-conj input')).toHaveCount(4);
   await expect(page.locator('#niveau-conj input[value="facile"]')).toBeChecked();
   await expect(page.locator('#niveau-conj-aide')).toHaveCount(0); // v8.5 : plus de commentaire sous le niveau
-  await page.locator('#niveau-conj label', { hasText: 'Expert' }).click();
+  await choisir(page, '#niveau-conj', 'Expert');
   await expect(page.locator('#niveau-conj input[value="expert"]')).toBeChecked();
   await tient(page);
   await valider(page);
