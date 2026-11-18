@@ -2674,7 +2674,7 @@
   S.ajouter(JEUX);
   // v10.14 (demande du 18/11/2026, BACKLOG ligne 425) : nouvelles questions, une période par fichier (js/histoire-<période>.js,
   // fabriqués par outils/histoire_questions.py). Dans la page, index.html les charge après ce fichier ; sous Node, on les charge ici.
-  if (typeof module !== 'undefined' && module.exports) ['pre', 'mag', 'ren', 'mod'].forEach(function (p) { require('./histoire-' + p + '.js'); });
+  if (typeof module !== 'undefined' && module.exports) ['pre', 'mag', 'ren', 'mod', 'xx'].forEach(function (p) { require('./histoire-' + p + '.js'); });
   var api = { JEUX: JEUX, FAMILLES: FAMILLES, romain: romain };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else racine.Histoire = api;

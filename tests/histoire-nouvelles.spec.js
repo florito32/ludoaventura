@@ -7,8 +7,8 @@ require('../js/histoire.js');
 const { rapide, versReglages, valider, lancer, ouvrirNeuf, cocher } = require('./aide');
 
 const NIVEAUX = ['facile', 'moyen', 'difficile', 'expert'];
-// Jeux qui ont reçu des questions, avec le nombre minimal de questions ajoutées (Préhistoire : 'pre' ; Moyen Âge : 'mag' ; Renaissance : 'ren' ; Louis XIV : 'mod').
-const AJOUTS = { r01: 195, t01: 167, p01: 144, p03: 114, m01: 189, m02: 173, m07: 181 };
+// Jeux qui ont reçu des questions, avec le nombre minimal de questions ajoutées (Préhistoire : 'pre' ; Moyen Âge : 'mag' ; Renaissance : 'ren' ; Louis XIV : 'mod' ; XXe siècle : 'xx').
+const AJOUTS = { r01: 195, t01: 167, p01: 144, p03: 114, m01: 189, m02: 173, m07: 181, z05: 180, z03: 190, z08: 174 };
 
 // Les séries ajoutées par js/histoire-*.js : les séries de questions « ouverte: true ».
 function seriesAjoutees(jeu) { return S.trouver(jeu).series.filter((s) => s.k === 'qcm' && s.ouverte); }
@@ -97,8 +97,8 @@ test.describe('nouvelles questions d\'histoire (contenu)', () => {
     }
   });
 
-  test('frise : les dates ajoutées se rangent dans le bon ordre (Louis XIV, Rois du Moyen Âge)', () => {
-    for (const jeu of ['t01', 'm01']) for (const niveau of NIVEAUX) {
+  test('frise : les dates ajoutées se rangent dans le bon ordre (Louis XIV, Rois du Moyen Âge, XXe siècle en dates)', () => {
+    for (const jeu of ['t01', 'm01', 'z05']) for (const niveau of NIVEAUX) {
       let vues = 0;
       for (let k = 0; k < 400; k++) {
         const c = S.generer({ jeux: [jeu], niveau, mode: 'normal' }, 'histoire');

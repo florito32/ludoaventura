@@ -1,0 +1,183 @@
+# jeu: z05
+# famille: xx
+# source: histoire XXe.docx, thème « Dates »
+facile	En quelle année commence la Première Guerre mondiale ?	1914	1912	1916	1918	ordre=Début de la Première Guerre mondiale|1914
+facile	En quelle année se termine la Première Guerre mondiale ?	1918	1916	1920	1914	ordre=Fin de la Première Guerre mondiale|1918
+facile	En quelle année éclate la Seconde Guerre mondiale ?	1939	1936	1941	1944	ordre=Début de la Seconde Guerre mondiale|1939
+facile	En quelle année se termine la Seconde Guerre mondiale ?	1945	1943	1947	1941
+facile	En quelle année a lieu le débarquement allié en Normandie ?	1944	1942	1943	1945	ordre=Débarquement en Normandie|1944
+facile	En quelle année l’homme marche-t-il pour la première fois sur la Lune ?	1969	1961	1965	1972	ordre=Premiers pas sur la Lune|1969
+facile	En quelle année tombe le mur de Berlin ?	1989	1985	1991	1979	ordre=Chute du mur de Berlin|1989
+facile	En quelle année a lieu la Révolution russe menée par Lénine ?	1917	1905	1914	1921	ordre=Révolution russe de Lénine|1917
+facile	En quelle année le Titanic coule-t-il lors de son voyage inaugural ?	1912	1908	1914	1920	ordre=Naufrage du Titanic|1912
+facile	En quelle année a lieu le krach boursier de Wall Street ?	1929	1923	1933	1939	ordre=Krach de Wall Street|1929
+facile	En quelle année Adolf Hitler arrive-t-il au pouvoir en Allemagne ?	1933	1929	1936	1939	ordre=Hitler arrive au pouvoir|1933
+facile	En quelle année le traité de Versailles met-il fin à la Grande Guerre ?	1919	1918	1921	1925	ordre=Traité de Versailles|1919
+facile	En quelle année l’Organisation des Nations unies est-elle créée ?	1945	1939	1948	1955
+facile	En quelle année le traité de Rome crée-t-il la Communauté économique européenne ?	1957	1951	1962	1973	ordre=Traité de Rome|1957
+facile	En quelle année la guerre d’Algérie prend-elle fin avec les accords d’Évian ?	1962	1958	1960	1965	ordre=Accords d’Évian|1962
+facile	En quelle année a lieu la crise des missiles de Cuba ?	1962	1959	1965	1968
+facile	En quelle année la guerre du Viêt Nam se termine-t-elle ?	1975	1968	1971	1979	ordre=Fin de la guerre du Viêt Nam|1975
+facile	En quelle année l’Union soviétique disparaît-elle officiellement ?	1991	1985	1989	1993	ordre=Disparition de l’URSS|1991
+facile	En quelle année Nelson Mandela devient-il président de l’Afrique du Sud ?	1994	1990	1991	1998	ordre=Mandela devient président|1994
+facile	En quelle année l’Italie devient-elle une république après un référendum ?	1946	1943	1948	1950	ordre=L’Italie devient une république|1946
+facile	En quelle année les femmes obtiennent-elles le droit de vote en France ?	1944	1936	1946	1958
+facile	En quelle année la Cinquième République française est-elle fondée ?	1958	1946	1962	1969	ordre=Naissance de la Cinquième République|1958
+facile	En quelle année a lieu la révolte étudiante et ouvrière de mai en France ?	1968	1958	1962	1971	ordre=Mai 68|1968
+facile	En quelle année le président américain John F. Kennedy est-il assassiné ?	1963	1960	1965	1968	ordre=Assassinat de Kennedy|1963
+facile	En quelle année Martin Luther King prononce-t-il « I have a dream » ?	1963	1955	1968	1971
+facile	En quelle année a lieu le premier vol motorisé des frères Wright ?	1903	1895	1909	1914	ordre=Premier vol des frères Wright|1903
+facile	En quelle année Albert Einstein publie-t-il sa théorie de la relativité restreinte ?	1905	1895	1915	1925	ordre=Relativité restreinte d’Einstein|1905
+facile	En quelle année la première bombe atomique est-elle larguée sur Hiroshima ?	1945	1941	1943	1947
+facile	En quelle année a lieu l’accident nucléaire de Tchernobyl ?	1986	1979	1983	1991	ordre=Accident de Tchernobyl|1986
+facile	En quelle année Youri Gagarine est-il le premier homme dans l’espace ?	1961	1957	1965	1969
+facile	En quelle année le tunnel sous la Manche est-il inauguré ?	1994	1989	1991	1998
+facile	En quelle année le paquebot Lusitania est-il torpillé par un sous-marin allemand ?	1915	1912	1917	1919	ordre=Torpillage du Lusitania|1915
+facile	En quelle année l’Allemagne est-elle divisée en deux États, RFA et RDA ?	1949	1945	1955	1961
+facile	En quelle année le pacte de Varsovie est-il signé pendant la Guerre froide ?	1955	1949	1961	1968	ordre=Signature du pacte de Varsovie|1955
+facile	En quelle année l’OTAN est-elle fondée à Washington ?	1949	1945	1955	1961
+facile	En quelle année la Chine populaire est-elle proclamée par Mao Zedong ?	1949	1945	1953	1958
+facile	En quelle année un armistice met-il fin à la guerre de Corée ?	1953	1950	1956	1960	ordre=Armistice de la guerre de Corée|1953
+facile	En quelle année a lieu la guerre des Six Jours au Proche-Orient ?	1967	1956	1973	1979	ordre=Guerre des Six Jours|1967
+facile	En quelle année a lieu le premier choc pétrolier ?	1973	1967	1979	1985	ordre=Premier choc pétrolier|1973
+facile	En quelle année survient le second choc pétrolier ?	1979	1973	1983	1990
+facile	En quelle année Tim Berners-Lee invente-t-il le World Wide Web au CERN ?	1989	1979	1995	2001
+facile	En quelle année l’euro est-il créé sur les marchés financiers ?	1999	1992	1995	2002	ordre=Naissance de l’euro|1999
+facile	En quelle année l’Inde obtient-elle son indépendance du Royaume-Uni ?	1947	1939	1950	1955	ordre=Indépendance de l’Inde|1947
+facile	En quelle année l’État d’Israël est-il proclamé ?	1948	1945	1950	1956	ordre=Proclamation de l’État d’Israël|1948
+facile	En quelle année la Déclaration universelle des droits de l’homme est-elle adoptée par l’ONU ?	1948	1945	1950	1955
+facile	En quelle année commence la construction du mur de Berlin ?	1961	1949	1955	1968	ordre=Construction du mur de Berlin|1961
+facile	En quelle année meurt le dictateur espagnol Franco ?	1975	1968	1978	1982
+moyen	À quelle date l’armistice de la Première Guerre mondiale est-il signé ?	11 novembre 1918	28 juin 1919	8 mai 1945	14 juillet 1918
+moyen	À quelle date le krach de Wall Street plonge-t-il le monde dans la crise ?	29 octobre 1929	24 octobre 1931	11 novembre 1929	1er janvier 1930
+moyen	À quelle date les troupes alliées débarquent-elles en Normandie ?	6 juin 1944	8 mai 1944	14 juillet 1944	11 novembre 1944
+moyen	À quelle date la bombe atomique frappe-t-elle la ville d’Hiroshima ?	6 août 1945	9 août 1944	6 juin 1945	15 août 1945
+moyen	À quelle date l’Allemagne nazie capitule-t-elle officiellement en Europe ?	8 mai 1945	11 novembre 1945	6 juin 1945	2 septembre 1945
+moyen	À quelle date la République populaire de Chine est-elle proclamée par Mao ?	1er octobre 1949	14 juillet 1949	1er mai 1950	11 novembre 1949	ordre=Proclamation de la République populaire de Chine|1949
+moyen	À quelle date le mur de Berlin est-il ouvert ?	9 novembre 1989	3 octobre 1990	13 août 1989	11 novembre 1989
+moyen	À quelle date l’assassinat de l’archiduc François-Ferdinand a-t-il lieu ?	28 juin 1914	1er août 1914	11 novembre 1914	14 juillet 1914	ordre=Assassinat de l’archiduc François-Ferdinand|1914
+moyen	En quelle année la Société des Nations tient-elle sa première assemblée générale ?	1920	1919	1925	1930	ordre=Première assemblée de la Société des Nations|1920
+moyen	En quelle année Mussolini organise-t-il la marche sur Rome ?	1922	1914	1929	1936	ordre=Marche sur Rome de Mussolini|1922
+moyen	En quelle année Staline lance-t-il le premier plan quinquennal en URSS ?	1928	1917	1933	1941	ordre=Premier plan quinquennal soviétique|1928
+moyen	En quelle année commence la guerre d’Espagne, entre républicains et nationalistes ?	1936	1931	1939	1941	ordre=Début de la guerre d’Espagne|1936
+moyen	En quelle année les accords de Munich tentent-ils d’arrêter Hitler ?	1938	1933	1936	1940	ordre=Accords de Munich|1938
+moyen	En quelle année a lieu la Nuit de Cristal contre les Juifs d’Allemagne ?	1938	1933	1935	1941
+moyen	En quelle année le pacte germano-soviétique est-il signé ?	1939	1936	1941	1944	ordre=Pacte germano-soviétique|1939
+moyen	À quelle date le général de Gaulle lance-t-il son appel depuis Londres ?	18 juin 1940	22 juin 1940	14 juillet 1940	11 novembre 1940	ordre=Appel du 18 juin|1940
+moyen	En quelle année l’attaque de Pearl Harbor entraîne-t-elle l’entrée en guerre des États-Unis ?	1941	1939	1943	1945	ordre=Attaque de Pearl Harbor|1941
+moyen	En quelle année la bataille de Stalingrad s’achève-t-elle par la défaite nazie ?	1943	1941	1945	1947	ordre=Fin de la bataille de Stalingrad|1943
+moyen	En quelle année la conférence de Yalta réunit-elle Churchill, Roosevelt et Staline ?	1945	1941	1943	1948	ordre=Conférence de Yalta|1945
+moyen	En quelle année l’URSS teste-t-elle sa première bombe atomique ?	1949	1945	1953	1957
+moyen	En quelle année éclate la guerre de Corée ?	1950	1945	1953	1956	ordre=Début de la guerre de Corée|1950
+moyen	En quelle année la France subit-elle la défaite de Diên Biên Phu ?	1954	1949	1958	1962	ordre=Défaite de Diên Biên Phu|1954
+moyen	En quelle année les accords de Genève mettent-ils fin à la guerre d’Indochine ?	1954	1949	1958	1962
+moyen	En quelle année le pacte de Varsovie est-il créé ?	1955	1949	1961	1968
+moyen	En quelle année éclate la crise du canal de Suez ?	1956	1948	1962	1967	ordre=Crise du canal de Suez|1956
+moyen	En quelle année l’URSS lance-t-elle le premier satellite Spoutnik 1 ?	1957	1949	1961	1969	ordre=Lancement de Spoutnik 1|1957
+moyen	En quelle année la guerre du Kippour embrase-t-elle le Proche-Orient ?	1973	1967	1979	1982	ordre=Guerre du Kippour|1973
+moyen	En quelle année la dictature des colonels s’effondre-t-elle en Grèce ?	1974	1967	1981	1989	ordre=Fin de la dictature des colonels|1974
+moyen	En quelle année la révolution islamique renverse-t-elle le Chah d’Iran ?	1979	1973	1981	1989	ordre=Révolution islamique en Iran|1979
+moyen	En quelle année l’Union soviétique envahit-elle l’Afghanistan ?	1979	1973	1983	1989
+moyen	En quelle année Lech Wałęsa fonde-t-il le syndicat Solidarność à Gdańsk ?	1980	1976	1983	1989	ordre=Naissance de Solidarność|1980
+moyen	En quelle année la navette spatiale Challenger explose-t-elle au décollage ?	1986	1981	1990	1996	ordre=Explosion de la navette Challenger|1986
+moyen	En quelle année le traité de Maastricht crée-t-il l’Union européenne ?	1992	1986	1989	1999	ordre=Traité de Maastricht|1992
+moyen	En quelle année a lieu le génocide des Tutsi au Rwanda ?	1994	1989	1991	1998	ordre=Génocide des Tutsi au Rwanda|1994
+moyen	En quelle année l’accord de Dayton met-il fin à la guerre en Bosnie ?	1995	1991	1999	2001	ordre=Accord de Dayton|1995
+moyen	En quelle année Hong Kong est-elle rendue à la Chine par le Royaume-Uni ?	1997	1989	1993	2001	ordre=Rétrocession de Hong Kong|1997
+moyen	En quelle année le protocole de Kyoto est-il adopté ?	1997	1992	2001	2005
+moyen	En quelle année les pièces et billets en euros entrent-ils en circulation ?	2002	1999	1995	2005	ordre=Les euros en circulation|2002
+moyen	En quelle année la guerre civile espagnole s’achève-t-elle par la victoire de Franco ?	1939	1936	1941	1945
+moyen	En quelle année le Front populaire arrive-t-il au pouvoir en France ?	1936	1931	1939	1944
+moyen	En quelle année les accords de Matignon accordent-ils les congés payés en France ?	1936	1929	1945	1958
+moyen	En quelle année l’indépendance de l’Inde et du Pakistan est-elle proclamée ?	1947	1939	1950	1955
+moyen	En quelle année la révolution cubaine de Fidel Castro triomphe-t-elle ?	1959	1953	1962	1968	ordre=Triomphe de la révolution cubaine|1959
+moyen	En quelle année Soljenitsyne publie-t-il « Une journée d’Ivan Denissovitch » ?	1962	1953	1968	1974	ordre=Parution d’Une journée d’Ivan Denissovitch|1962
+moyen	En quelle année le vol inaugural du Concorde, avion supersonique commercial, a-t-il lieu ?	1969	1959	1973	1976	ordre=Premier vol du Concorde|1969
+difficile	En quelle année est signé le traité de Saint-Germain-en-Laye avec l’Autriche ?	1919	1914	1923	1929
+difficile	En quelle année est signé le traité de Lausanne avec la Turquie ?	1923	1914	1919	1929	ordre=Traité de Lausanne|1923
+difficile	En quelle année l’URSS est-elle officiellement fondée ?	1922	1917	1929	1936	ordre=Fondation de l’URSS|1922
+difficile	En quelle année l’Allemagne nazie adopte-t-elle les lois de Nuremberg ?	1935	1933	1938	1941	ordre=Lois de Nuremberg|1935
+difficile	En quelle année a lieu la conférence d’Évian sur les réfugiés juifs ?	1938	1933	1936	1941
+difficile	À quelle date l’armistice avec l’Allemagne est-il signé à Rethondes en 1940 ?	22 juin 1940	18 juin 1940	10 mai 1940	14 juin 1940	ordre=Armistice de Rethondes|1940
+difficile	En quelle année la conférence de Wannsee organise-t-elle la « solution finale » ?	1942	1939	1944	1946	ordre=Conférence de Wannsee|1942
+difficile	En quelle année la bataille navale de Midway oppose-t-elle Américains et Japonais ?	1942	1941	1944	1945
+difficile	En quelle année a lieu le débarquement de Provence ?	1944	1942	1943	1945
+difficile	En quelle année la conférence de Bretton Woods fonde-t-elle le système monétaire mondial ?	1944	1939	1948	1952	ordre=Conférence de Bretton Woods|1944
+difficile	En quelle année la charte des Nations unies est-elle signée à San Francisco ?	1945	1939	1948	1951
+difficile	En quelle année le plan Marshall est-il lancé ?	1947	1944	1950	1953	ordre=Plan Marshall|1947
+difficile	En quelle année le blocus de Berlin provoque-t-il le pont aérien allié ?	1948	1945	1953	1961	ordre=Blocus de Berlin et pont aérien|1948
+difficile	En quelle année la RFA est-elle créée avec sa Loi fondamentale ?	1949	1945	1955	1961	ordre=Création de la RFA|1949
+difficile	En quelle année l’Allemagne de l’Est (RDA) est-elle proclamée ?	1949	1945	1953	1961
+difficile	En quelle année les chars du pacte de Varsovie écrasent-ils le soulèvement de Budapest ?	1956	1948	1961	1968
+difficile	À quelle date Youri Gagarine devient-il le premier homme dans l’espace ?	12 avril 1961	4 octobre 1957	20 juillet 1969	12 avril 1965	ordre=Vol de Youri Gagarine|1961
+difficile	En quelle année l’incident du golfe du Tonkin précède-t-il l’engagement américain au Viêt Nam ?	1964	1959	1968	1973	ordre=Incident du golfe du Tonkin|1964
+difficile	En quelle année le Printemps de Prague est-il écrasé par les chars soviétiques ?	1968	1956	1961	1975	ordre=Printemps de Prague écrasé|1968
+difficile	En quelle année les accords de Paris mettent-ils fin à l’engagement américain ?	1973	1968	1975	1979
+difficile	En quelle année les accords d’Helsinki consacrent-ils la détente en Europe ?	1975	1968	1979	1983	ordre=Accords d’Helsinki|1975
+difficile	En quelle année les accords de Camp David amorcent-ils la paix israélo-égyptienne ?	1978	1973	1982	1987	ordre=Accords de Camp David|1978
+difficile	En quelle année le mouvement de la place Tiananmen est-il réprimé à Pékin ?	1989	1979	1986	1991	ordre=Répression de Tiananmen|1989
+difficile	À quelle date l’Allemagne est-elle officiellement réunifiée ?	3 octobre 1990	9 novembre 1989	11 novembre 1990	1er janvier 1991	ordre=Réunification de l’Allemagne|1990
+difficile	En quelle année la Tchécoslovaquie se sépare-t-elle en deux États pacifiquement ?	1993	1989	1991	1997	ordre=Séparation de la Tchécoslovaquie|1993
+difficile	En quelle année l’Afrique du Sud organise-t-elle ses premières élections multiraciales ?	1994	1990	1991	1998
+difficile	En quelle année l’accord de libre-échange nord-américain (ALENA) entre-t-il en vigueur ?	1994	1990	1997	2001
+difficile	En quelle année l’Organisation mondiale du commerce (OMC) est-elle créée ?	1995	1989	1991	1999	ordre=Création de l’OMC|1995
+difficile	En quelle année l’OTAN bombarde-t-elle la Yougoslavie lors de la guerre du Kosovo ?	1999	1991	1995	2003	ordre=Bombardements de l’OTAN au Kosovo|1999
+difficile	En quelle année les attentats du 11 septembre frappent-ils les États-Unis ?	2001	1998	2003	2005	ordre=Attentats du 11 septembre|2001
+difficile	En quelle année commence l’invasion de l’Irak par une coalition menée par les États-Unis ?	2003	1991	2001	2008	ordre=Invasion de l’Irak|2003
+difficile	En quelle année la Chine intègre-t-elle l’Organisation mondiale du commerce ?	2001	1995	1999	2005
+difficile	En quelle année le premier iPhone d’Apple est-il présenté ?	2007	2001	2004	2010	ordre=Premier iPhone|2007
+difficile	En quelle année la faillite de Lehman Brothers déclenche-t-elle la crise financière mondiale ?	2008	2001	2005	2011	ordre=Faillite de Lehman Brothers|2008
+difficile	En quelle année Barack Obama prête-t-il serment pour son premier mandat ?	2009	2005	2012	2013	ordre=Premier mandat de Barack Obama|2009
+difficile	En quelle année le traité de Lisbonne entre-t-il en vigueur ?	2009	2005	2012	2013
+difficile	En quelle année l’accord de Paris sur le climat est-il adopté ?	2015	2009	2012	2018	ordre=Accord de Paris sur le climat|2015
+difficile	En quelle année le Royaume-Uni vote-t-il en faveur du Brexit ?	2016	2012	2014	2019	ordre=Référendum sur le Brexit|2016
+difficile	En quelle année l’OMS déclare-t-elle la pandémie de Covid-19 ?	2020	2017	2019	2022	ordre=Pandémie de Covid-19 déclarée|2020
+difficile	En quelle année l’armée russe lance-t-elle son invasion à grande échelle de l’Ukraine ?	2022	2014	2018	2020	ordre=Invasion russe de l’Ukraine|2022
+difficile	En quelle année la reine Élisabeth II du Royaume-Uni meurt-elle ?	2022	2016	2019	2024
+difficile	En quelle année ChatGPT est-il mis à la disposition du grand public ?	2022	2016	2019	2024
+difficile	En quelle année Voyager 1 entre-t-elle dans l’espace interstellaire ?	2012	2004	2008	2016	ordre=Voyager 1 dans l’espace interstellaire|2012
+difficile	En quelle année le télescope spatial James Webb est-il lancé ?	2021	2015	2018	2023	ordre=Lancement du télescope James Webb|2021
+expert	À quelle date le traité de Versailles est-il signé dans la Galerie des Glaces ?	28 juin 1919	11 novembre 1918	8 mai 1920	14 juillet 1919
+expert	À quelle date les bolcheviks prennent-ils le pouvoir en Russie (calendrier grégorien) ?	7 novembre 1917	23 février 1917	3 mars 1918	25 octobre 1917	ordre=Révolution d’Octobre|1917
+expert	À quelle date le traité de Rapallo rapproche-t-il Weimar et l’URSS ?	16 avril 1922	28 juin 1919	1er décembre 1925	3 mars 1918	ordre=Traité de Rapallo|1922
+expert	À quelle date le pacte anti-Komintern est-il conclu entre l’Allemagne et le Japon ?	25 novembre 1936	23 août 1939	27 septembre 1940	7 décembre 1941	ordre=Pacte anti-Komintern|1936
+expert	À quelle date le pacte germano-soviétique est-il signé à Moscou ?	23 août 1939	1er septembre 1939	25 novembre 1936	22 juin 1941	ordre=Signature du pacte germano-soviétique|1939
+expert	À quelle date l’attaque de Pearl Harbor a-t-elle lieu ?	7 décembre 1941	22 juin 1941	1er septembre 1939	6 juin 1944	ordre=Pearl Harbor|1941
+expert	À quelle date la conférence de Wannsee planifie-t-elle le génocide des Juifs d’Europe ?	20 janvier 1942	9 novembre 1938	7 décembre 1941	2 février 1943
+expert	À quelle date la première capitulation allemande est-elle signée à Reims ?	7 mai 1945	8 mai 1945	30 avril 1945	6 juin 1945	ordre=Capitulation allemande de Reims|1945
+expert	À quelle date la seconde bombe atomique détruit-elle Nagasaki ?	9 août 1945	6 août 1945	15 août 1945	2 septembre 1945
+expert	À quelle date le Japon capitule-t-il formellement à bord de l’USS Missouri ?	2 septembre 1945	6 août 1945	15 août 1945	8 mai 1945
+expert	À quelle date la guerre de Corée commence-t-elle par le franchissement du 38e parallèle ?	25 juin 1950	27 juillet 1953	15 septembre 1950	1er octobre 1949
+expert	À quelle date Khrouchtchev prononce-t-il son « rapport secret » sur Staline ?	25 février 1956	5 mars 1953	4 novembre 1956	12 avril 1961	ordre=Rapport secret de Khrouchtchev|1956
+expert	À quelle date débute la construction du mur de Berlin ?	13 août 1961	9 novembre 1961	17 juin 1961	13 août 1962	ordre=Début du mur de Berlin|1961
+expert	À quelle date le cessez-le-feu des accords d’Évian est-il proclamé en Algérie ?	19 mars 1962	1er novembre 1954	5 juillet 1962	13 mai 1958	ordre=Cessez-le-feu des accords d’Évian|1962
+expert	À quelle date John F. Kennedy est-il assassiné à Dallas ?	22 novembre 1963	22 novembre 1962	4 avril 1968	5 juin 1968	ordre=Assassinat de John F. Kennedy|1963
+expert	À quelle date le module lunaire Eagle se pose-t-il sur la Lune ?	20 juillet 1969	16 juillet 1969	24 juillet 1969	21 décembre 1968	ordre=Alunissage d’Apollo 11|1969
+expert	À quelle date les accords de paix de Paris sont-ils signés ?	27 janvier 1973	30 avril 1975	2 août 1964	8 mars 1965	ordre=Accords de paix de Paris|1973
+expert	À quelle date l’Acte final d’Helsinki est-il signé par trente-cinq pays ?	1er août 1975	30 avril 1975	17 septembre 1978	1er septembre 1975	ordre=Acte final d’Helsinki|1975
+expert	À quelle date les accords de Camp David sont-ils signés ?	17 septembre 1978	26 mars 1979	6 octobre 1973	1er août 1975
+expert	À quelle date le traité de Maastricht est-il signé ?	7 février 1992	1er novembre 1993	1er janvier 1993	25 mars 1957	ordre=Signature du traité de Maastricht|1992
+expert	À quelle date Nelson Mandela prête-t-il serment comme président de l’Afrique du Sud ?	10 mai 1994	11 février 1990	27 avril 1994	16 juin 1994	ordre=Mandela président|1994
+expert	À quelle date l’accord de Dayton est-il signé à Paris ?	14 décembre 1995	21 novembre 1995	11 juillet 1995	1er janvier 1996	ordre=Accord de Dayton signé à Paris|1995
+expert	À quelle date Hong Kong est-elle officiellement rendue à la Chine ?	1er juillet 1997	1er octobre 1997	1er juillet 1999	20 décembre 1999
+expert	À quelle date les pièces et billets en euros apparaissent-ils dans la zone euro ?	1er janvier 2002	1er janvier 1999	1er mai 2004	1er juillet 2002	ordre=Apparition des pièces et billets en euros|2002
+expert	À quelle date a lieu l’attentat contre le World Trade Center ?	11 septembre 2001	11 mars 2004	7 octobre 2001	11 septembre 2002
+expert	À quelle date l’Organisation mondiale du commerce est-elle créée ?	1er janvier 1995	15 avril 1994	1er janvier 1999	1er mai 1995
+expert	À quelle date le télescope spatial Hubble est-il mis en orbite ?	24 avril 1990	20 juillet 1990	24 avril 1993	28 janvier 1986	ordre=Lancement du télescope Hubble|1990
+expert	À quelle date l’ISS accueille-t-elle son premier équipage permanent ?	2 novembre 2000	20 novembre 1998	1er janvier 2000	12 avril 2001	ordre=Premier équipage permanent de l’ISS|2000
+expert	À quelle date Wikipédia est-elle lancée ?	15 janvier 2001	11 septembre 2001	4 février 2004	1er janvier 2000
+expert	À quelle date Facebook est-il fondé à Harvard ?	4 février 2004	15 janvier 2001	1er mai 2006	4 février 2008	ordre=Fondation de Facebook|2004
+expert	À quelle date le premier bloc du Bitcoin est-il miné ?	3 janvier 2009	31 octobre 2008	15 septembre 2008	1er janvier 2010	ordre=Premier bloc du Bitcoin|2009
+expert	En quelle année la sonde New Horizons survole-t-elle Pluton ?	2015	2006	2010	2019	ordre=Survol de Pluton par New Horizons|2015
+expert	À quelle date le Royaume-Uni quitte-t-il officiellement l’Union européenne ?	31 janvier 2020	23 juin 2016	31 décembre 2020	29 mars 2019	ordre=Sortie effective du Royaume-Uni de l’UE|2020
+expert	En quelle année le génome humain est-il entièrement séquencé ?	2003	1990	1996	2010
+expert	À quelle date le CERN annonce-t-il la découverte du boson de Higgs ?	4 juillet 2012	10 septembre 2008	14 mars 2013	4 juillet 2010
+expert	En quelle année le rover Curiosity se pose-t-il sur Mars ?	2012	2004	2008	2016
+expert	En quelle année la première image d’un trou noir (M87*) est-elle dévoilée ?	2019	2012	2015	2022	ordre=Première image d’un trou noir|2019
+expert	En quelle année la dernière Coccinelle Volkswagen sort-elle d’usine au Mexique ?	2003	1978	1989	1998
+expert	En quelle année Philae se pose-t-il sur une comète ?	2014	2004	2009	2018	ordre=Philae se pose sur une comète|2014
+expert	En quelle année Stephen Hawking meurt-il à Cambridge ?	2018	2012	2015	2021	ordre=Mort de Stephen Hawking|2018
+expert	En quelle année les accords du Latran sont-ils signés entre Mussolini et le Vatican ?	1929	1922	1936	1939	ordre=Accords du Latran|1929
+expert	En quelle année le traité de Washington fonde-t-il l’OTAN ?	1949	1945	1951	1955	ordre=Création de l’OTAN|1949
+expert	À quelle date les accords d’Oslo sont-ils signés à la Maison-Blanche ?	13 septembre 1993	4 mai 1994	26 octobre 1994	4 novembre 1995	ordre=Accords d’Oslo|1993
+expert	À quelle date Joseph Staline meurt-il ?	5 mars 1953	6 mars 1953	21 décembre 1953	5 mars 1956	ordre=Mort de Staline|1953
