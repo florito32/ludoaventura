@@ -63,7 +63,9 @@
   function maj() {
     conteneur = conteneur || $('choix-matiere');
     if (!conteneur) return;
-    if (conteneur.hidden) { etaitVisible = false; ouverte = null; return; }
+    if (conteneur.hidden) { // autre écran : « Valider » du bas à nouveau visible
+      etaitVisible = false; ouverte = null; $('btn-valider-reglages').classList.remove('valider-masque'); return;
+    }
     var matiereChoisie = !!conteneur.querySelector('#matieres input:checked');
     if (!etaitVisible) { etaitVisible = true; ouverte = matiereChoisie ? null : 'matiere'; focaliser = false; }
 
