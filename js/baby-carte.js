@@ -93,6 +93,47 @@
     return h + o.boutons(c, c.choix, fait, null, gros);
   }
 
+  // Bulles (v10.18) : un chiffre = une couleur (teinte en degrés) et une taille (diamètre en px, de 44 à 76 pour 1 à 10).
+  var TEINTES = [210, 0, 130, 45, 280, 20, 175, 320, 80, 240];
+  function diametre(n) { return Math.round(40 + 3.6 * Math.min(10, Math.max(1, n))); }
+  // « Éclatées : 2 / 5 » ou « Trouvés : 1 / 3 · 1 erreur ».
+  function compteTexte(c) {
+    var bulles = c.meca === 'bulles';
+    var aTrouver = bulles ? c.jetons.length : c.jetons.filter(function (j) { return j.bon; }).length;
+    var trouves = bulles ? c.suivant : c.jetons.filter(function (j) { return j.bon && j.pris; }).length;
+    return (bulles ? 'Éclatées' : 'Trouvés') + ' : ' + trouves + ' / ' + aTrouver +
+      (c.erreurs ? ' · ' + c.erreurs + ' erreur' + (c.erreurs > 1 ? 's' : '') : '');
+  }
+  // Fige un jeton là où il est (sans le renvoyer à sa place de départ) : on coupe sa balade en gardant sa position du moment.
+  function figer(b) {
+    b.style.transform = getComputedStyle(b).transform;
+    b.style.animation = 'none';
+  }
+
+  // Place les bulles sans qu'elles se touchent, selon la taille réelle de l'arène (v10.18) : la plus grosse d'abord, des essais au hasard
+  // jusqu'à trouver un endroit libre (écart de 14 px au moins, pour la balade). La place est gardée dans la carte (fx, fy : 0 à 1),
+  // donc une bulle ne change plus de place quand la carte est redessinée. Sans place trouvée : la grille de js/baby.js sert de secours.
+  function disposer(c) {
+    var zone = document.getElementById('carte-gram');
+    var W = (zone && zone.clientWidth ? zone.clientWidth : 280) - 6; // moins la bordure de l'arène
+    var H = Math.min(290, Math.max(200, 0.34 * (window.innerHeight || 700))) - 6;
+    var libres = [];
+    c.jetons.map(function (j, i) { return { j: j, i: i, d: diametre(Number(j.t)) }; })
+      .sort(function (a, b) { return b.d - a.d; })
+      .forEach(function (b) {
+        var r = b.d / 2, ok = null;
+        for (var essai = 0; essai < 400 && !ok; essai++) {
+          var x = r + 10 + Math.random() * Math.max(0, W - b.d - 20), y = r + 8 + Math.random() * Math.max(0, H - b.d - 16);
+          if (libres.every(function (p) { return Math.hypot(p.x - x, p.y - y) >= p.r + r + 14; })) ok = { x: x, y: y, r: r };
+        }
+        if (ok) {
+          libres.push(ok);
+          b.j.fx = Math.max(0, Math.min(1, (ok.x - r - 10) / Math.max(1, W - b.d - 20)));
+          b.j.fy = Math.max(0, Math.min(1, (ok.y - r - 8) / Math.max(1, H - b.d - 16)));
+        }
+      });
+  }
+
   // Arène : les jetons se baladent (animation CSS, coupée si l'appareil demande moins d'animations).
   function arene(c, fait) {
     var h = '';
@@ -100,8 +141,7 @@
     else if (c.jeu === 'attrape-chiffre') h += '<p class="baby-modele">' + des(c.points) + '</p>';
     else if (c.jeu === 'son-ecritures') h += '<p class="baby-modele baby-son"><span aria-hidden="true">👂</span> « ' + echapper(c.son) + ' » <small>comme dans ' + echapper(c.exemple) + '</small></p>';
     var bulles = c.meca === 'bulles';
-    var aTrouver = bulles ? c.jetons.length : c.jetons.filter(function (j) { return j.bon; }).length;
-    var trouves = bulles ? c.suivant : c.jetons.filter(function (j) { return j.bon && j.pris; }).length;
+    if (bulles && c.jetons.some(function (j) { return j.fx == null && !j.pris; })) disposer(c);
     h += '<div class="baby-arene' + (bulles ? ' bulles' : '') + '" role="group" aria-label="' + (bulles ? 'Bulles à éclater' : 'Jetons qui se baladent') + '">';
     c.jetons.forEach(function (j, i) {
       var cl = 'baby-jeton';
@@ -109,12 +149,14 @@
       if ((j.t === '6' || j.t === '9') && !bulles) cl += ' souligne'; // 6 et 9 penchés : soulignés pour ne pas les confondre
       // Place dans l'arène, de 0 à 1 (les bords gardent la place d'un demi-jeton et de sa balade).
       var px = Math.min(1, Math.max(0, (j.x - 10) / 80)).toFixed(3), py = Math.min(1, Math.max(0, (j.y - 12) / 76)).toFixed(3);
+      if (bulles && j.fx != null) { px = j.fx.toFixed(3); py = j.fy.toFixed(3); } // place trouvée par disposer()
       var st = '--x:' + px + ';--y:' + py + ';--rot:' + (bulles ? 0 : j.rot) + 'deg;--dx:' + j.dx + 'px;--dy:' + j.dy + 'px;--dur:' + j.dur + 's';
+      // v10.18 (demande du 18/11/2026) : une bulle est d'autant plus grosse que son chiffre est grand, et chaque chiffre a sa couleur.
+      if (bulles) { var n = Number(j.t); st += ';--d:' + diametre(n) + 'px;--teinte:' + TEINTES[(n - 1) % TEINTES.length]; }
       if (bulles && j.pris) return; // bulle éclatée
       h += '<button type="button" class="' + cl + '" data-j="' + i + '" style="' + st + '"' + (fait || j.pris ? ' disabled' : '') + '>' + echapper(j.t) + '</button>';
     });
-    h += '</div><p class="baby-compte" aria-live="polite">' + (bulles ? 'Éclatées' : 'Trouvés') + ' : ' + trouves + ' / ' + aTrouver +
-      (c.erreurs ? ' · ' + c.erreurs + ' erreur' + (c.erreurs > 1 ? 's' : '') : '') + '</p>';
+    h += '</div><p class="baby-compte" aria-live="polite">' + compteTexte(c) + '</p>';
     return h;
   }
 
@@ -181,16 +223,21 @@
     var b;
     if (c.meca === 'attrape' || c.meca === 'bulles') {
       if (!(b = e.target.closest('.baby-jeton'))) return false;
-      var j = c.jetons[Number(b.dataset.j)];
+      var j = c.jetons[Number(b.dataset.j)], zone = b.closest('.baby');
       if (!j || j.pris) return true;
       if (c.meca === 'bulles') {
         if (j.t === c.bon[c.suivant]) { j.pris = true; j.bon = true; c.suivant++; }
-        else { c.erreurs++; secouer(b); o.sauver(); return true; }
+        else { c.erreurs++; secouer(b); majCompte(zone, c); o.sauver(); return true; }
       } else {
         j.pris = true;
         if (!j.bon) c.erreurs++;
       }
-      o.afficher(); o.sauver();
+      // v10.18 (demande du 18/11/2026) : la carte n'est plus redessinée à chaque toucher, sinon tous les jetons et toutes les bulles
+      // repartent de leur place de départ. On change seulement celui qu'on a touché et le compteur.
+      if (c.meca === 'bulles') b.remove();
+      else { figer(b); b.classList.add(j.bon ? 'trouve' : 'rate'); b.disabled = true; }
+      majCompte(zone, c);
+      o.sauver();
       var fini = c.meca === 'bulles' ? c.suivant === c.bon.length : c.jetons.every(function (x) { return !x.bon || x.pris; });
       if (fini) o.attendre(function () { o.repondre(c.erreurs, c.erreurs + ' erreur' + (c.erreurs > 1 ? 's' : '')); });
       return true;
@@ -245,11 +292,16 @@
     }
     return false;
   }
-  // Mauvaise bulle : elle tremble (rien d'autre ne change).
+  // Mauvaise bulle : elle tremble (rien d'autre ne change, elle reste où elle est).
   function secouer(b) {
     b.classList.remove('secoue');
     void b.offsetWidth; // relance l'animation
     b.classList.add('secoue');
+  }
+  // Met à jour le compteur de la carte (zone = .baby) sans la redessiner.
+  function majCompte(zone, c) {
+    var p = zone && zone.querySelector('.baby-compte');
+    if (p) p.textContent = compteTexte(c);
   }
 
   racine.BabyCarte = { html: html, toucher: toucher, des: des, mains: mains };

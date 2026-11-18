@@ -2,6 +2,12 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.19', date: '2026-11-18', changes: [
+    "Baby jeux › Les doigts : la main n’est plus coupée sur la droite (le pouce de la main à 5 doigts était rogné).",
+    "Baby jeux › Les bulles : chaque chiffre a sa couleur et plus le chiffre est grand, plus la bulle est grosse. Quand tu touches une bulle (juste ou fausse), les autres ne repartent plus de leur place de départ ; même chose pour « Attrape le chiffre ».",
+    "Après ta réponse, sur téléphone et tablette : si c’est juste, le plateau revient tout de suite ; si c’est faux, le jeu se cache et il ne reste que la correction et le bouton « J’ai compris », toujours visible.",
+    "Plateau : plus de bandeau en haut, le plateau monte en haut de l’écran et le bouton Menu est posé dessus, à droite. Un bouton « plein écran » apparaît à côté quand ton navigateur le permet (pas sur iPhone)."
+  ] },
   { v: '10.18', date: '2026-11-18', changes: [
     "Histoire, Moyen Âge : environ 540 nouvelles questions ajoutées aux jeux « Rois, batailles et frise », « Châteaux, chevaliers et paysans » et « Églises, croisades et Vikings », à tous les niveaux (questions de 15 mots au plus).",
     "Mode Quiz : chaque nouvelle question a ses 4 choix. Mode Normal : question ouverte dès Difficile quand la réponse est un nom, vrai ou faux avant ; les dates des rois et des conciles s’ajoutent à la frise chronologique."
