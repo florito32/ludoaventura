@@ -371,7 +371,7 @@ test('remettre dans l\'ordre : la frise de Rome', async ({ page }) => {
 });
 
 test('question ouverte : chiffres romains écrits en minuscules → juste', async ({ page }) => {
-  await versHistoire(page, { niveau: 'expert', jeux: ['a10'], hasard: 0.99 });
+  await versHistoire(page, { niveau: 'expert', jeux: ['a10'], hasard: 0.35 });
   const c = await piocher(page);
   expect(c.format).toBe('O');
   await page.getByLabel('Ta réponse').fill(c.bonne.toLowerCase());
