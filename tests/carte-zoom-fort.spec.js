@@ -64,9 +64,10 @@ test('carte du monde (v9.5) : zoom assez fort pour toucher Israël sans se tromp
   await page.mouse.click(x, y);
   expect(await page.evaluate(() => window.Aventura.partie.carte.touche)).toBe('pIL');
   await expect(page.locator('#carte-reponse')).toHaveClass(/juste/);
-  // Après la réponse, la carte reste zoomée sur Israël (en vert).
+  // Après la réponse, la carte reste zoomée sur Israël (en vert). Depuis la v10.15, une bonne réponse ramène le plateau tout de suite sur téléphone :
+  // la carte n'a plus à rester à l'écran, mais elle garde son zoom et sa zone verte.
   expect(await largeur()).toBeLessThan(w0 / 4);
-  await expect(page.locator('#carte-savoir .zone.bonne')).toBeInViewport();
+  await expect(page.locator('#carte-savoir .zone.bonne')).toBeAttached();
   // Une fois répondu, survoler ou toucher un pays ne le colore plus en jaune.
   await expect(page.locator('#carte-savoir .zone.cible')).toHaveCount(0);
   const d = await page.evaluate(() => ({ l: document.documentElement.scrollWidth, v: window.innerWidth }));

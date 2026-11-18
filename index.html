@@ -634,12 +634,9 @@
 
   <!-- ÉCRAN 3 : le plateau de jeu -->
   <section class="ecran plateau-ecran" id="ecran-plateau" aria-labelledby="titre-plateau" hidden>
-    <header class="barre">
-      <!-- Menu de la partie (v6.22) : ouvre au milieu de l'écran « Redémarrer partie », « Modifier les choix », « Retour à l'accueil ». -->
-      <button type="button" class="btn-retour btn-menu" id="btn-menu" aria-haspopup="dialog" aria-controls="menu-partie"><span class="menu-icone" aria-hidden="true">☰</span> Menu</button>
-      <h2 id="titre-plateau">Le plateau</h2>
-      <span class="barre-vide" aria-hidden="true"></span>
-    </header>
+    <!-- v10.18 (demande du 18/11/2026) : plus de bandeau en haut, le plateau monte en haut de l'écran. Le titre reste pour les lecteurs d'écran ;
+         le bouton Menu (v6.22 : « Redémarrer partie », « Modifier les choix », « Retour à l'accueil ») est posé sur le plateau, à droite. -->
+    <h2 id="titre-plateau" class="visually-hidden">Le plateau</h2>
 
     <div class="table">
       <!-- Plateau illustré + pions posés sur les cases (positions en % de l'image, voir js/plateau.js) -->
@@ -675,6 +672,11 @@
         <p class="bandeau" id="bandeau" aria-hidden="true" hidden></p>
         <!-- Envol des points (v10.15) : les formes gagnées volent du centre vers l'image des points (js/envol.js). -->
         <div class="envol-couche" id="envol-couche" aria-hidden="true"></div>
+        <!-- Boutons sur le plateau, en haut à droite : plein écran (caché si le navigateur ne sait pas, ex. iPhone) et menu de la partie. -->
+        <div class="plateau-outils">
+          <button type="button" class="btn-retour btn-outil" id="btn-plein-ecran" aria-pressed="false" hidden><span class="menu-icone" id="plein-icone" aria-hidden="true">⛶</span><span class="visually-hidden" id="plein-texte">Plein écran</span></button>
+          <button type="button" class="btn-retour btn-menu" id="btn-menu" aria-haspopup="dialog" aria-controls="menu-partie"><span class="menu-icone" aria-hidden="true">☰</span> Menu</button>
+        </div>
       </figure>
 
       <aside class="panneau" aria-label="Tour de jeu">
@@ -991,6 +993,7 @@
 <script src="js/figurines.js"></script>
 <script src="js/selecteur.js"></script>
 <script src="js/plateau.js"></script>
+<script src="js/plein-ecran.js"></script>
 <script src="js/rapide.js"></script>
 <script src="js/baby-ecran.js"></script>
 <script src="js/ludo.js"></script>

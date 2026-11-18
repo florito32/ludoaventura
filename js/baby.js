@@ -161,9 +161,19 @@
       };
     });
   }
-  function jetons(bons, mauvais, r) {
+  // Bulles (v10.18) : 6 places (3 colonnes × 2 rangées) pour 3 à 5 bulles, et une balade courte : elles sont plus grosses
+  // (la taille suit le chiffre, js/baby-carte.js) et ne doivent pas se chevaucher. x et y sont convertis en 0 à 1 par js/baby-carte.js.
+  function placerBulles(n, r) {
+    var cases = melanger([0, 1, 2, 3, 4, 5], r).slice(0, n);
+    return cases.map(function (k) {
+      var col = k % 3, lig = Math.floor(k / 3);
+      var px = [0.02, 0.5, 0.98][col] + (r() - 0.5) * 0.06, py = (lig ? 0.97 : 0.03) + (r() - 0.5) * 0.04;
+      return { x: 10 + px * 80, y: 12 + py * 76, rot: 0, dx: Math.round((r() - 0.5) * 10), dy: Math.round((r() - 0.5) * 8), dur: Math.round(30 + r() * 30) / 10 };
+    });
+  }
+  function jetons(bons, mauvais, r, bulles) {
     var t = melanger(bons.map(function (x) { return { t: x, bon: true }; }).concat(mauvais.map(function (x) { return { t: x, bon: false }; })), r);
-    var p = placer(t.length, r);
+    var p = bulles ? placerBulles(t.length, r) : placer(t.length, r);
     t.forEach(function (j, i) { for (var k in p[i]) j[k] = p[i][k]; j.pris = false; });
     return t;
   }
@@ -376,7 +386,7 @@
       case 'bulles': {
         var b = prendre(N, Math.min(5, Math.max(3, N.length)), r, CHIFFRES).sort(function (a, z) { return a - z; });
         c.bon = b.map(String);
-        c.jetons = jetons(c.bon, [], r);
+        c.jetons = jetons(c.bon, [], r, true);
         c.suivant = 0;
         c.consigne = 'Éclate les bulles dans l’ordre : ' + c.bon.join(', ') + '.';
         c.oral = 'Éclate les bulles dans l’ordre, du plus petit au plus grand.';

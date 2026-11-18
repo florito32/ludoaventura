@@ -1134,18 +1134,21 @@ span.gram-bulle.posee { display: inline-flex; align-items: center; cursor: defau
 body:has(#ecran-plateau:not([hidden])) { height: 100vh; height: 100dvh; overflow: hidden; }
 body:has(#ecran-plateau:not([hidden])) main { min-height: 0; }
 body:has(#ecran-plateau:not([hidden])) .pied { padding-block: 2px calc(2px + env(safe-area-inset-bottom)); font-size: .8rem; }
-.plateau-ecran:not([hidden]) { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: 6px 10px 4px; }
-.plateau-ecran .barre { margin-bottom: 6px; }
-.plateau-ecran .btn-retour { min-height: 38px; padding: 2px 12px; }
+.plateau-ecran:not([hidden]) { flex: 1; min-height: 0; display: flex; flex-direction: column; padding: env(safe-area-inset-top, 0px) 10px 4px; }
+/* Boutons posés sur le plateau, en haut à droite (v10.18) : plein écran et menu. */
+.plateau-outils { position: absolute; z-index: 5; top: 6px; right: 6px; display: flex; gap: 6px; }
+.plateau-outils .btn-retour { min-height: 38px; padding: 2px 12px; box-shadow: 0 2px 6px rgb(0 0 0 / .35); }
+.plateau-outils .btn-outil { min-width: 38px; padding: 2px 8px; }
 /* Écrans larges (ordinateur, tablette et téléphone en paysage) : plateau à gauche, aussi grand que la hauteur
    le permet, tour de jeu à droite sur toute la hauteur. Si le contenu du tour ne tient plus (correction,
    tableau « ? »), l'encadré s'élargit vers la gauche, par-dessus le plateau (.tour-monte, js/plateau.js). */
 @media (min-width: 900px) {
   .table { flex: 1; min-height: 0; position: relative; container-type: size; align-items: center; }
-  .table .plateau { justify-self: center; width: min(100%, 100cqh * 1.494); }
+  .table .plateau { justify-self: center; align-self: start; width: min(100%, 100cqh * 1.494); } /* v10.18 : le haut du plateau est en haut de l'écran */
   .panneau { align-self: stretch; min-height: 0; display: flex; flex-direction: column; justify-content: center; }
   .panneau .tour { flex: 0 1 auto; min-height: 0; overflow: auto; position: relative; }
-  .table.tour-monte .panneau { position: absolute; top: 0; right: 0; bottom: 0; width: min(100%, 560px); z-index: 6; }
+  /* top: 52px (v10.18) : le bouton Menu, sur le plateau en haut à droite, reste visible et touchable au-dessus de l'encadré élargi. */
+  .table.tour-monte .panneau { position: absolute; top: 52px; right: 0; bottom: 0; width: min(100%, 560px); z-index: 6; }
   .table.tour-monte .tour { box-shadow: -6px 0 18px rgb(0 0 0 / .35); }
 }
 /* Écrans larges mais bas (téléphone en paysage) : tour de jeu plus serré. */
@@ -1156,9 +1159,8 @@ body:has(#ecran-plateau:not([hidden])) .pied { padding-block: 2px calc(2px + env
   .tour .carte-piochee { margin-top: 6px; padding: 8px 10px; }
   .tour .tour-actions .btn { min-height: 40px; padding: 4px 12px; }
   .table.tour-monte .tour-joueur { display: none; }
-  .plateau-ecran .barre { margin-bottom: 4px; }
-  .plateau-ecran .barre h2 { font-size: 1.15rem; }
-  .plateau-ecran .btn-retour { min-height: 32px; }
+  .plateau-outils { top: 4px; right: 4px; }
+  .plateau-outils .btn-retour { min-height: 32px; }
   .table.tour-monte .panneau { width: min(100%, 640px); }
   .tour .carte-outils { flex-direction: row; } /* « Écouter » et « Voir le mot » côte à côte */
   .tour #btn-phrase .long { display: none; } /* « 💬 Phrase » : tient sur la même ligne (v6.40) */
@@ -1190,7 +1192,7 @@ body:has(#ecran-plateau:not([hidden])) .pied { padding-block: 2px calc(2px + env
   .tour .tour-actions .btn { min-height: 44px; padding: 6px 12px; }
   /* L'encadré remonte sur le plateau : il occupe toute la zone de jeu. */
   /* … seulement de la hauteur nécessaire : le haut du plateau reste visible si possible. */
-  .table.tour-monte .panneau { position: absolute; left: 0; right: 0; bottom: 0; max-height: 100%; z-index: 6; }
+  .table.tour-monte .panneau { position: absolute; left: 0; right: 0; bottom: 0; max-height: calc(100% - 48px); z-index: 6; } /* v10.18 : 48 px de plateau restent visibles en haut (bouton Menu) */
   .table.tour-monte .panneau .tour { flex: 0 1 auto; }
   .table.tour-monte .tour { box-shadow: 0 -6px 18px rgb(0 0 0 / .35); }
   /* v6.27 : la carte ne dit plus « Carte n° 1 de Léa » : « À Léa de jouer » reste visible, sur une ligne fine (sans portrait). */
@@ -2039,10 +2041,22 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .baby-jeton.trouve { background: #e3f3e6; border-color: #1e7b45; color: #1f5a2f; box-shadow: 0 0 0 4px #1e7b45; animation: none; cursor: default; }
 .baby-jeton.rate { opacity: .4; animation: none; cursor: default; text-decoration: line-through; }
 .baby-jeton.souligne { text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 4px; }
-.baby-arene.bulles .baby-jeton { width: 58px; height: 58px; border-radius: 50%; border-color: var(--bleu); color: var(--bleu);
-  background: radial-gradient(circle at 32% 30%, #fff 0 18%, #cfe8ff 60%, #9cc9f2); box-shadow: none; }
-.baby-jeton.secoue { animation: baby-secoue .4s; }
-@keyframes baby-secoue { 0%, 100% { transform: translate(-50%, -50%); } 25% { transform: translate(calc(-50% - 8px), -50%); } 75% { transform: translate(calc(-50% + 8px), -50%); } }
+/* Bulles (v10.18) : la taille (--d) suit le chiffre, la couleur (--teinte) change à chaque chiffre ; elles restent là où on les laisse. */
+.baby-arene.bulles { height: clamp(200px, 34vh, 290px); }
+.baby-arene.bulles .baby-jeton {
+  width: var(--d, 58px); height: var(--d, 58px); min-width: 0; padding: 0; border-radius: 50%;
+  left: calc(var(--d) / 2 + 10px + (100% - var(--d) - 20px) * var(--x)); top: calc(var(--d) / 2 + 8px + (100% - var(--d) - 16px) * var(--y));
+  font-size: calc(var(--d) * .42); border-color: hsl(var(--teinte, 210) 60% 32%); color: hsl(var(--teinte, 210) 75% 16%);
+  background: radial-gradient(circle at 32% 30%, #fff 0 16%, hsl(var(--teinte, 210) 90% 86%) 55%, hsl(var(--teinte, 210) 70% 64%)); box-shadow: none;
+}
+/* Mauvais jeton : il tremble sans quitter sa place (la secousse utilise « translate », la balade continue en dessous). */
+.baby-jeton.secoue { animation: baby-balade var(--dur) ease-in-out infinite alternate, baby-secoue .4s; }
+@keyframes baby-secoue { 0%, 100% { translate: 0 0; } 25% { translate: -8px 0; } 75% { translate: 8px 0; } }
+/* Baby jeux, réponse donnée (v10.18) : sur téléphone et tablette, le jeu (bulles, jetons, mains…) se cache et il ne reste que le message
+   (« Bravo ! » ou « Presque ! … ») et le bouton « J'ai compris » : rien n'est coupé, rien à faire défiler. */
+@media (max-width: 899px), (pointer: coarse) {
+  .carte-piochee.baby-repondue .carte-gram { display: none; }
+}
 /* Remettre dans l'ordre et ranger dans les paniers */
 .baby-rangee { width: 100%; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; min-height: 60px; }
 .baby-ligne { padding-top: 10px; border-top: 2px dashed var(--parchemin-bord); }
