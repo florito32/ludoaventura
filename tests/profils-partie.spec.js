@@ -19,7 +19,8 @@ const stockes = (page) => page.evaluate(() => JSON.parse(localStorage.getItem('l
 test('étape 2 : choix du profil (2 joueurs au compte) ; un profil pris par le joueur 1 est grisé pour le joueur 2 @smoke', async ({ page }) => {
   await rapide(page); await preparer(page, ETAT);
   await ouvrirNeuf(page);
-  await page.getByRole('radio', { name: '2 joueurs' }).check();
+  await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
+  await page.getByRole('radio', { name: /^2 joueurs?$/ }).check();
   await page.getByRole('button', { name: 'Valider', exact: true }).click();
   const chips = page.locator('#profils-joueur .profil-bouton');
   await expect(chips).toHaveCount(2);
@@ -35,6 +36,7 @@ test('étape 2 : choix du profil (2 joueurs au compte) ; un profil pris par le j
 test('un seul joueur au compte : pas de choix de profil, la partie compte pour lui', async ({ page }) => {
   await rapide(page); await preparer(page, { v: 1, total: 0, joueurs: [] });
   await ouvrirNeuf(page);
+  await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
   await page.getByRole('button', { name: 'Valider', exact: true }).click();
   await expect(page.locator('#profils-joueur')).toBeHidden();
 });
@@ -42,8 +44,11 @@ test('un seul joueur au compte : pas de choix de profil, la partie compte pour l
 test('fin de partie : +1 point à l\'orthographe pour chaque profil joué, réussie ou non, une seule fois', async ({ page }) => {
   await rapide(page); await preparer(page, ETAT);
   await lancerPartie(page, { joueurs: 2 });
-  for (let t = 0; t < 12 && !(await page.locator('#fin').isVisible()); t++) {
-    await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
+  const suite = page.getByRole('button', { name: /^(Première question|Question suivante)$/ });
+  for (let t = 0; t < 14; t++) {
+    await suite.or(page.locator('#fin[open]')).first().waitFor();
+    if (await page.locator('#fin').isVisible()) break;
+    await suite.click();
     await repondre(page, true);
     await lancerLeDe(page);
   }
