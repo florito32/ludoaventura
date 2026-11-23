@@ -2325,3 +2325,13 @@ body:has(#ecran-baby:not([hidden])) .pied { padding-block: 4px calc(4px + env(sa
 .profil-bouton img { border-radius: 50%; object-fit: cover; }
 .profil-bouton[aria-pressed="true"] { background: #2b2118; color: #fff; }
 .profil-bouton:disabled { opacity: .45; cursor: not-allowed; }
+
+/* v10.28 : réussite de chaque joueur sur l'écran de fin (backlog ligne 446) */
+.fin-joueurs { margin: .5rem 0 0; }
+.fin-joueurs-titre { margin: 0 0 .35rem; font-weight: 700; }
+.fin-joueurs-liste { list-style: none; margin: 0; padding: 0; display: grid; gap: .3rem; }
+.fin-joueurs-liste li { display: flex; align-items: center; gap: .5rem; padding: .3rem .6rem; border-radius: .6rem; background: #f3ece2; }
+.fin-joueurs-liste .fj-nom { font-weight: 700; flex: 1 1 auto; text-align: left; }
+.fin-joueurs-liste .fj-pts { font-variant-numeric: tabular-nums; }
+.fin-joueurs-liste li.reussi { background: #e3f3e0; }
+.fin-joueurs-liste li.manque { background: #f7ece3; }

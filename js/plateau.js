@@ -202,6 +202,31 @@
     majAventuriers();
   }
 
+  // ---------- Réussite individuelle (v10.28, backlog ligne 446) ----------
+  // À plusieurs, chaque joueur a sa part de l'objectif de l'équipe : objectif ÷ nombre de joueurs (ex. 30 à 2 = 15 chacun).
+  // Il la réussit s'il a récolté au moins autant de points que sa part (points notés joueur par joueur dans l'historique).
+  // La réussite de l'ÉQUIPE ne change pas : c'est toujours le total par rapport à l'objectif (js/regles.js).
+  function pointsParJoueur(r) {
+    var t = [];
+    for (var i = 0; i < r.nbJoueurs; i++) t.push(0);
+    (r.historique || []).forEach(function (h) { if (h.joueur >= 0 && h.joueur < t.length) t[h.joueur] += Number(h.points) || 0; });
+    return t;
+  }
+  function partIndividuelle(r) { return r.objectif / r.nbJoueurs; }
+  function montrerFinJoueurs(r) {
+    var box = $('fin-joueurs'); if (!box) return;
+    if (!r || r.nbJoueurs < 2) { box.hidden = true; box.innerHTML = ''; return; }
+    var pts = pointsParJoueur(r), part = partIndividuelle(r);
+    box.hidden = false;
+    box.innerHTML = '<p class="fin-joueurs-titre">Chacun devait récolter ' + Math.round(part * 10) / 10 + ' ' + partie.aventure.objet.des + ' :</p><ul class="fin-joueurs-liste">' +
+      partie.joueurs.map(function (j, i) {
+        var ok = pts[i] >= part;
+        return '<li class="joueur-' + j.couleur + (ok ? ' reussi' : ' manque') + '"><span class="fj-nom">' + j.nom + '</span>' +
+          '<span class="fj-pts">' + pts[i] + ' / ' + Math.round(part * 10) / 10 + '</span>' +
+          '<span class="fj-etat">' + (ok ? '✅ réussi' : '🔸 manqué') + '</span></li>';
+      }).join('') + '</ul>';
+  }
+
   // ---------- Profils du compte (v10.27, backlog lignes 446 et 448) ----------
   // Étape 2 : en plus de l'aventurier, chaque siège joue un profil du compte (nom, personnage, niveaux) ; un profil déjà
   // pris par un siège précédent est indisponible. Sans profil libre, le siège joue sans profil (rien n'est noté).
@@ -2608,6 +2633,7 @@
     var r = partie.regles, av = partie.aventure;
     var ok = R.reussie(r);
     noterNiveauxProfils(r);
+    montrerFinJoueurs(r);
     $('fin-icone').textContent = ok ? '🏆' : '🌋';
     $('fin-titre').textContent = ok ? 'Aventure réussie !' : 'Aventure manquée…';
     $('fin-texte').textContent = 'L’équipe a ' + av.objet.participe + ' ' + A.quantite(av, r.points) + ', il en fallait ' + r.objectif + '. ' +
