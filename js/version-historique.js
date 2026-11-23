@@ -2,6 +2,9 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.35', date: '2026-11-23', changes: [
+    "Histoire et Géographie : chaque question a maintenant un niveau de difficulté « progression » de 1 à 100 (100 niveaux par période d’Histoire et par famille de Géographie). Rien ne change à l’écran pour l’instant."
+  ] },
   { v: '10.34', date: '2026-11-23', changes: [
     "Orthographe, Grammaire, Conjugaison et Phonèmes : chaque carte possible a maintenant un niveau de difficulté « progression » de 1 à 100 (mot, verbe et temps, jeu, son). Rien ne change à l’écran pour l’instant."
   ] },
