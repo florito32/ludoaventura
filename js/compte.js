@@ -17,6 +17,11 @@
 // tant que le joueur ne l'a pas changé. Modifiable dans « Mon compte ». Tout est rangé dans Supabase (tables profils,
 // stats_joueur, etoiles_jour : outils/supabase/20261117_pseudos_stats_classements.sql) ; les étoiles, pierres et niveaux
 // y sont recopiés par la base à chaque sauvegarde de la progression : le jeu n'envoie rien de plus.
+// Invité (v10.27, demande du 23/11/2026) : « Jouer en invité » crée une connexion ANONYME Supabase (aucune adresse e-mail) ;
+// la base lui donne le pseudo « invité0001 », « invité0002 »… et la progression est sauvegardée comme pour un compte, ce qui
+// rend l'invité visible dans Supabase (Authentication › Users, e-mail vide). Quand il crée un compte ou se connecte, sa progression
+// est fusionnée dans le compte (même fusion que d'habitude), puis la ligne invité est supprimée (rpc supprimer_invite) : pas de
+// doublon dans les classements. Outils SQL : outils/supabase/20261123_invites_anonymes.sql.
 // Partie logique (fusion, règles du pseudo) utilisable dans les tests Node : module.exports.
 (function (racine) {
   'use strict';
@@ -136,11 +141,14 @@
     if (s && s.access_token) {
       session = { access_token: s.access_token, refresh_token: s.refresh_token,
         expires_at: s.expires_at || Math.floor(Date.now() / 1000) + (Number(s.expires_in) || 3600),
-        user: s.user ? { id: s.user.id, email: s.user.email } : (session && session.user) || null };
+        user: s.user ? { id: s.user.id, email: s.user.email, anonyme: !!s.user.is_anonymous } : (session && session.user) || null };
     } else session = null;
     ecrireJSON(CLE_SESSION, session);
     if (window.SiteVersion) window.SiteVersion.rafraichir(); // version visible seulement pour le compte de l'auteur (v9.5)
   }
+  // Invité = connexion anonyme (sans e-mail) ; « réel » = compte avec adresse e-mail ou Google.
+  function invite() { return !!(session && session.user && session.user.anonyme); }
+  function reel() { return !!session && !invite(); }
   // Jeton valable (renouvelé s'il expire dans moins d'une minute) ; null si pas connecté ou session perdue.
   function jeton() {
     if (!session) return Promise.resolve(null);
@@ -246,14 +254,35 @@
   }
 
   // ---------- Connexion, inscription, mot de passe ----------
+  // Si l'appareil jouait en invité, sa progression (gardée sur l'appareil) est fusionnée dans le compte par synchroniser(),
+  // puis la ligne invité est supprimée côté Supabase, seulement si cet envoi a réussi.
   function connecteAvec(s, message) {
-    garderSession(s);
-    return (s.user ? Promise.resolve(s.user) : appel('/auth/v1/user', { jeton: s.access_token })).then(function (u) {
-      garderSession(Object.assign({}, session, { user: u }));
-      dire(message || 'Tu es connecté. Ta progression est maintenant sauvegardée sur ton compte.', 'ok');
-      lireProfil(); // pseudo du compte (sans attendre la synchronisation)
-      return synchroniser();
+    var avant = invite() ? jeton().then(function (j) { return j ? { jeton: j, uid: session.user.id } : null; }) : Promise.resolve(null);
+    return avant.then(function (inv) {
+      garderSession(s);
+      return (s.user ? Promise.resolve(s.user) : appel('/auth/v1/user', { jeton: s.access_token })).then(function (u) {
+        garderSession(Object.assign({}, session, { user: u }));
+        dire(message || 'Tu es connecté. Ta progression est maintenant sauvegardée sur ton compte.', 'ok');
+        lireProfil(); // pseudo du compte (sans attendre la synchronisation)
+        return synchroniser().then(function () { return effacerInvite(inv); });
+      });
     });
+  }
+  function effacerInvite(inv) {
+    if (!inv || !session || inv.uid === session.user.id || etat.synchro !== 'ok') return null;
+    return appel('/rest/v1/rpc/supprimer_invite', { methode: 'POST', jeton: inv.jeton, corps: {} }).catch(function () { /* l'invité reste : sans gravité */ });
+  }
+  // « Jouer en invité » : crée la connexion anonyme (une seule par appareil : tant qu'elle existe, on la garde).
+  // Hors ligne ou service refusant : on joue quand même, l'invité sera créé à la prochaine ouverture.
+  function jouerInvite() {
+    if (session) return Promise.resolve();
+    return appel('/auth/v1/signup', { methode: 'POST', corps: { data: {} } }).then(function (s) {
+      if (!s || !s.access_token) return;
+      garderSession(s);
+      majPage();
+      lireProfil();
+      return synchroniser();
+    }).catch(function () { /* on joue sans sauvegarde en ligne */ });
   }
   function google() {
     location.href = URL_SUPABASE + '/auth/v1/authorize?provider=google&redirect_to=' + encodeURIComponent(adresseRetour());
@@ -352,15 +381,15 @@
   function heure(d) { return d ? d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : ''; }
   function majPastille() {
     var b = $('btn-compte'); if (!b) return;
-    b.classList.toggle('connecte', !!session);
-    $('compte-pastille-texte').textContent = session ? 'Mon compte' : 'Se connecter';
-    $('compte-pastille-aide').textContent = session ? ' : connecté, progression sauvegardée' : ' : sauvegarder ma progression';
+    b.classList.toggle('connecte', reel());
+    $('compte-pastille-texte').textContent = reel() ? 'Mon compte' : 'Se connecter';
+    $('compte-pastille-aide').textContent = reel() ? ' : connecté, progression sauvegardée' : ' : sauvegarder ma progression';
   }
   function majPage() {
     majPastille();
     if (window.JoueursEcran) window.JoueursEcran.rendre();
     var corps = $('compte-corps'); if (!corps) return;
-    var co = !!session, attente = etat.synchro === 'en-cours';
+    var co = reel(), attente = etat.synchro === 'en-cours';
     $('compte-invite').hidden = !(mode === 'connexion' && !co);
     $('compte-connecte').hidden = !(mode === 'connexion' && co);
     $('compte-creation').hidden = mode !== 'creation';
@@ -369,6 +398,9 @@
     $('compte-bienvenue').hidden = mode !== 'bienvenue';
     $('compte-nouveau-bloc').hidden = mode !== 'nouveau';
     $('attente-email').textContent = emailAttente;
+    // Invité : son pseudo (invité0001…) est rappelé dans la carte « Jouer en invité ».
+    var nomInvite = $('compte-invite-nom');
+    if (nomInvite) { nomInvite.hidden = !(invite() && profil); if (invite() && profil) $('compte-invite-pseudo').textContent = profil.pseudo; }
     var qui = session && session.user && session.user.email ? session.user.email : 'ton compte';
     $('bienvenue-email').textContent = qui;
     $('bienvenue-titre').textContent = bienvenueDeja ? 'Ton compte est déjà validé' : 'Ton compte est validé !';
@@ -404,7 +436,7 @@
   $('attente-renvoyer').addEventListener('click', function () { renvoyer(emailAttente); });
   $('bienvenue-jouer').addEventListener('click', function () { window.Aventura.afficher('ecran-accueil'); });
   $('compte-oublie').addEventListener('click', oublie);
-  $('compte-invite-ok').addEventListener('click', function () { window.Aventura.afficher('ecran-accueil'); });
+  $('compte-invite-ok').addEventListener('click', function () { window.Aventura.afficher('ecran-accueil'); jouerInvite(); });
   $('compte-synchro').addEventListener('click', function () { action(synchroniser()); });
   $('compte-sortir').addEventListener('click', seDeconnecter);
   // Changer de pseudo depuis « Mon compte » (mis à jour tout de suite dans Supabase).
@@ -460,7 +492,7 @@
     if (e && /failed to fetch|networkerror|load failed/i.test(e.message)) {
       mode = 'connexion'; dire('Pas de connexion à Internet : touche de nouveau le bouton de l’e-mail quand Internet revient.', 'erreur'); return;
     }
-    if (session) { bienvenueDeja = true; mode = 'bienvenue'; dire(''); if (!etat.quand) synchroniser(); return; }
+    if (reel()) { bienvenueDeja = true; mode = 'bienvenue'; dire(''); if (!etat.quand) synchroniser(); return; }
     mode = 'connexion';
     dire('Ce lien de validation a déjà servi ou n’est plus valable. Si tu as déjà validé ton compte, connecte-toi ci-dessous. Sinon, connecte-toi quand même : le jeu te proposera de recevoir un nouvel e-mail.', 'erreur');
     if (e) console.warn('Validation impossible :', e.message);
@@ -525,10 +557,10 @@
   if (fenetre) {
     $('fenetre-connecter').addEventListener('click', function () { ouvrirCompte('connexion', 'compte-email'); });
     $('fenetre-creer').addEventListener('click', function () { ouvrirCompte('creation', 'creation-email'); });
-    $('fenetre-invite').addEventListener('click', fermerFenetre);
+    $('fenetre-invite').addEventListener('click', function () { fermerFenetre(); jouerInvite(); });
   }
   function fenetreAuLancement() {
-    if (!fenetre || session) return;
+    if (!fenetre || reel()) return;
     var auto = typeof navigator !== 'undefined' && navigator.webdriver;
     if (auto && window.AVENTURA_FENETRE_COMPTE !== true) return;
     if (!fenetre.open) fenetre.showModal();
@@ -538,7 +570,7 @@
   majPage();
   if (!lireRetour()) {
     if (session) { synchroniser(); lireProfil(); } // ouverture du jeu : on récupère ce qui a été gagné ailleurs, et le pseudo
-    else fenetreAuLancement();
+    if (!reel()) fenetreAuLancement(); // pas de vrai compte (même en invité) : la fenêtre revient à chaque ouverture
   }
-  window.Compte = Object.assign(C, { synchroniser: synchroniser, session: function () { return session; }, etat: etat });
+  window.Compte = Object.assign(C, { synchroniser: synchroniser, session: function () { return session; }, invite: invite, etat: etat });
 })(typeof window !== 'undefined' ? window : globalThis);
