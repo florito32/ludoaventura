@@ -68,3 +68,23 @@ test('à 2 joueurs, partie gagnée : chacun reçoit ses propres étoiles, visibl
     await expect(carte.locator('.jt-etoiles strong')).toHaveText(String(pts[i]));
   }
 });
+
+// v10.32 (backlog ligne 462) : chaque partie jouée s'ajoute aux statistiques du joueur (jouées, réussies, d'affilée), par matière.
+test('statistiques : une partie finie compte pour le joueur, dans la matière jouée', async ({ page }) => {
+  await rapide(page);
+  await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); } catch (e) { /* */ } });
+  await lancerPartie(page, { joueurs: 1 });
+  await jouerJusquALaFin(page);
+  await expect(page.locator('#fin')).toBeVisible();
+  const total = await page.evaluate(() => { const J = window.Joueurs, j = J.duCompte()[0]; return J.statTotal(j); });
+  expect(total.jouees).toBe(1);
+  expect(total.reussies + total.record).toBeGreaterThanOrEqual(0);
+  const parMatiere = await page.evaluate(() => { const J = window.Joueurs, j = J.duCompte()[0]; return J.MATIERES.map((m) => J.statDe(j, m.id).jouees); });
+  expect(parMatiere.reduce((a, b) => a + b, 0)).toBe(1); // une seule matière a été jouée
+  // Affichée dans « Statistiques » de sa carte.
+  await page.locator('#fin').evaluate((d) => d.close());
+  await page.evaluate(() => window.Aventura.afficher('ecran-compte'));
+  await page.locator('#onglet-profil').click();
+  await page.locator('.joueur-carte').first().getByRole('button', { name: 'Statistiques' }).click();
+  await expect(page.locator('.joueur-carte').first().locator('.joueur-stats > .petit')).toContainText('1 partie jouée');
+});

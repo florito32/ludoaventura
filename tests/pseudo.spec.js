@@ -113,6 +113,7 @@ test('Mon compte : le pseudo est affiché et se change tout de suite, avec des m
   const etat = await service(page, { profil: { pseudo: 'FlorianB01', pseudo_auto: true, a_proposer: false } });
   await page.goto('./');
   await page.locator('#btn-compte').click();
+  await page.locator('#onglet-id').click(); // v10.32 : le pseudo est dans « Identifiant et connexion »
   await expect(page.locator('#compte-pseudo')).toHaveText('FlorianB01');
   await expect(page.locator('#compte-pseudo-note')).toBeVisible(); // pseudo choisi par le jeu
   await expect(page.locator('#compte-pseudo-form')).toBeHidden();
@@ -150,6 +151,7 @@ test('pas de pseudo affiché quand il n’est pas lisible ou hors connexion', as
   await service(page, { profil: null });
   await page.goto('./');
   await page.locator('#btn-compte').click();
+  await page.locator('#onglet-id').click(); // v10.32
   await expect(page.locator('#compte-connecte')).toBeVisible();
   await expect(page.locator('#compte-pseudo-bloc')).toBeHidden();
   await page.getByRole('button', { name: 'Se déconnecter' }).click();
@@ -225,6 +227,7 @@ for (const [nom, profil] of [
     await page.waitForTimeout(400);
     await expect(fenetre(page)).toBeHidden();
     await page.locator('#btn-compte').click();
+    await page.locator('#onglet-id').click(); // v10.32
     await expect(page.locator('#compte-pseudo')).toHaveText(profil.pseudo);
     if (profil.pseudo_auto) await expect(page.locator('#compte-pseudo-note')).toBeVisible();
     else await expect(page.locator('#compte-pseudo-note')).toBeHidden();

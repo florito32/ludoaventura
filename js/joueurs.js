@@ -89,7 +89,9 @@
   // Garantit au moins un joueur : « Joueur 1 », qui reçoit la progression déjà acquise sur le compte.
   function assurerPremier(etat, maintenant) {
     if (lister(etat).length) return false;
-    creer(etat, 'Joueur 1', PERSO_DEFAUT, maintenant, ID_PREMIER);
+    // Si l'ancien « Joueur 1 » a été supprimé (v10.32), son identifiant est « enterré » : le nouveau en prend un autre.
+    var enterre = (etat.supprimes || []).indexOf(ID_PREMIER) >= 0;
+    creer(etat, 'Joueur 1', PERSO_DEFAUT, maintenant, enterre ? undefined : ID_PREMIER);
     return true;
   }
   function trouver(etat, id) { var l = lister(etat); for (var i = 0; i < l.length; i++) if (l[i].id === id) return l[i]; return null; }
@@ -114,6 +116,44 @@
     return j.niv[cle(matiereId, sousId)];
   }
 
+  // ---------- Suppression (v10.32, demande du 23/11/2026) ----------
+  // Détruit le joueur, sa progression et ses gains (niveaux, étoiles, pierres, coffres, statistiques). Son identifiant est
+  // gardé dans « supprimes » : à la fusion avec un autre appareil, il ne revient pas. Le total du compte (classements) ne baisse pas.
+  function supprimer(etat, id) {
+    var l = lister(etat), i = -1;
+    for (var k = 0; k < l.length; k++) if (l[k].id === id) i = k;
+    if (i < 0) return false;
+    l.splice(i, 1);
+    etat.supprimes = etat.supprimes || [];
+    if (etat.supprimes.indexOf(id) < 0) etat.supprimes.push(id);
+    return true;
+  }
+
+  // ---------- Statistiques par matière (v10.32) ----------
+  // j.st[matière] = [parties jouées, parties réussies, réussies d'affilée en ce moment, record de réussies d'affilée].
+  // « Réussie » = le joueur a récolté sa part de l'objectif (même règle que le point de niveau, ligne 446 du backlog).
+  function statDe(j, matiereId) {
+    var v = j && j.st && j.st[matiereId];
+    function n(x) { x = Math.floor(Number(x)); return isFinite(x) && x > 0 ? x : 0; }
+    return { jouees: n(v && v[0]), reussies: n(v && v[1]), serie: n(v && v[2]), record: n(v && v[3]) };
+  }
+  function enregistrerPartie(etat, id, matiereId, reussie, maintenant) {
+    var j = trouver(etat, id);
+    if (!j || !matiere(matiereId)) return false;
+    var s = statDe(j, matiereId);
+    s.jouees += 1;
+    if (reussie) { s.reussies += 1; s.serie += 1; if (s.serie > s.record) s.record = s.serie; } else s.serie = 0;
+    j.st = j.st || {};
+    j.st[matiereId] = [s.jouees, s.reussies, s.serie, s.record];
+    j.maj = maintenantISO(maintenant);
+    return true;
+  }
+  function statTotal(j) {
+    var t = { jouees: 0, reussies: 0, record: 0 };
+    MATIERES.forEach(function (m) { var s = statDe(j, m.id); t.jouees += s.jouees; t.reussies += s.reussies; t.record = Math.max(t.record, s.record); });
+    return t;
+  }
+
   function libEtoiles() {
     if (racine && racine.Etoiles) return racine.Etoiles;
     if (typeof require === 'function') { try { return require('./etoiles.js'); } catch (e) { return null; } }
@@ -123,17 +163,27 @@
   // Même joueur (même id) : nom et personnage les plus récents, niveaux = le plus haut des deux (on ne perd jamais un
   // niveau gagné). Joueurs présents d'un seul côté : gardés. Les noms identiques de deux joueurs différents (créés chacun
   // sur un appareil) sont départagés par « (2) ».
-  function fusionner(a, b) {
-    var res = [], parId = {};
+  function fusionner(a, b, supprimes) {
+    var res = [], parId = {}, enterres = Array.isArray(supprimes) ? supprimes : [];
     function copie(j) { return JSON.parse(JSON.stringify(j)); }
     (Array.isArray(a) ? a : []).concat(Array.isArray(b) ? b : []).forEach(function (j) {
-      if (!j || typeof j.id !== 'string') return;
+      if (!j || typeof j.id !== 'string' || enterres.indexOf(j.id) >= 0) return; // joueur supprimé : il ne revient pas
       var x = parId[j.id];
       if (!x) { x = parId[j.id] = copie(j); x.niv = x.niv && typeof x.niv === 'object' ? x.niv : {}; res.push(x); return; }
-      if (String(j.maj || '') > String(x.maj || '')) { x.nom = j.nom; x.perso = j.perso; }
+      var plusRecent = String(j.maj || '') > String(x.maj || ''); // j est le côté le plus récent ?
+      if (plusRecent) { x.nom = j.nom; x.perso = j.perso; }
       x.maj = String(j.maj || '') > String(x.maj || '') ? j.maj : x.maj;
       x.cree = String(j.cree || '') && String(j.cree) < String(x.cree || '9') ? j.cree : x.cree;
       Object.keys(j.niv || {}).forEach(function (k) { x.niv[k] = Math.max(borne(x.niv[k]), borne(j.niv[k])); });
+      // Statistiques (v10.32) : le plus grand de chaque compteur ; la série en cours vient du côté le plus récent.
+      MATIERES.forEach(function (m) {
+        var sx = statDe(x, m.id), sj = statDe(j, m.id);
+        if (!sx.jouees && !sj.jouees) return;
+        var serie = plusRecent ? sj.serie : sx.serie;
+        var rec = Math.max(sx.record, sj.record, serie);
+        x.st = x.st || {};
+        x.st[m.id] = [Math.max(sx.jouees, sj.jouees), Math.max(sx.reussies, sj.reussies), serie, rec];
+      });
       // Trésor du joueur (v10.30 : étoiles, pierres, coffres) : le meilleur des deux (js/etoiles.js → fusionnerRec).
       if (x.rec || j.rec) { var E = libEtoiles(); if (E) x.rec = E.fusionnerRec(x.rec, j.rec); else x.rec = x.rec || j.rec; }
     });
@@ -167,6 +217,7 @@
     score: score, scoreMatiere: scoreMatiere, niveauDe: niveauDe, niveauMatiere: niveauMatiere, scoreGlobal: scoreGlobal, niveauGlobal: niveauGlobal,
     lister: lister, trouver: trouver, verifierNom: verifierNom, creer: creer, assurerPremier: assurerPremier,
     renommer: renommer, changerPerso: changerPerso, ajouterPoints: ajouterPoints, fusionner: fusionner,
+    supprimer: supprimer, statDe: statDe, enregistrerPartie: enregistrerPartie, statTotal: statTotal,
     duCompte: duCompte, enregistrer: enregistrer, compteDeLaPage: compteDeLaPage
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

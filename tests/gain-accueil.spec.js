@@ -124,6 +124,7 @@ test('coffres ouverts depuis la carte du joueur : pas d\'envol en revenant à l\
   }, [ETAT(175)]);
   await page.goto('./');
   await page.locator('#btn-compte').click();
+  await page.locator('#onglet-profil').click();
   await page.locator('.joueur-carte [data-act="coffres"]').first().click();
   for (let k = 0; k < 12; k++) {
     await page.locator('#btn-coffre-ouvrir').click();
@@ -135,6 +136,7 @@ test('coffres ouverts depuis la carte du joueur : pas d\'envol en revenant à l\
   await expect(page.locator('#coffre')).toBeHidden();
   const apres = await page.evaluate(() => window.Recompenses.compte.etat.total);
   expect(apres).toBeGreaterThan(175);
+  await page.locator('.joueur-carte').first().locator('.stats-btn').click(); // v10.32 : étoiles dans « Statistiques »
   await expect(page.locator('.joueur-carte').first().locator('.jt-etoiles strong')).toHaveText(String(apres));
   await expect(page.locator('.joueur-carte [data-act="coffres"]')).toHaveCount(0);
   expect(await page.evaluate(() => sessionStorage.getItem('ludoaventura-gain-accueil'))).toBeNull();
