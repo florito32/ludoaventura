@@ -1,13 +1,19 @@
-// Mentions légales (obligatoires, LCEN) : un lien visible en bas de page, vers la page du site ludo-aventura.fr.
+// Mentions légales (LCEN) : depuis la v10.32 (demande du 23/11/2026), le lien et les crédits ne sont plus dans le pied de page de
+// l'accueil : ils sont dans « Mon compte » › « Aide et mentions légales » (voir aussi tests/mon-compte-onglets.spec.js).
 const { test, expect } = require('@playwright/test');
 
-test('lien Mentions légales dans le pied de page @smoke', async ({ page }) => {
+async function ouvrirAide(page) {
+  await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); } catch (e) { /* */ } });
   await page.goto('./');
-  const lien = page.locator('footer.pied a', { hasText: 'Mentions légales' });
-  await lien.scrollIntoViewIfNeeded();
+  await page.locator('#btn-compte').click();
+  await page.locator('#onglet-aide').click();
+}
+
+test('lien Mentions légales dans « Aide et mentions légales » @smoke', async ({ page }) => {
+  await ouvrirAide(page);
+  const lien = page.locator('#panneau-aide a', { hasText: 'Mentions légales' });
   await expect(lien).toBeVisible();
   await expect(lien).toHaveAttribute('href', 'https://www.ludo-aventura.fr/pages/mentions-legales');
-  // Le pied de page ne fait pas défiler la page de côté.
   const deborde = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth);
   expect(deborde).toBe(false);
 });
@@ -23,8 +29,7 @@ test('le pied de page reste sur une ligne sur petit téléphone (320 et 360 px)'
 
 // v10.6 (backlog ligne 252) : les illustrations du jeu sont créditées à Stuki San dans « Crédits ».
 test('Crédits : illustrations du jeu de Stuki San, fenêtre sans débordement', async ({ page }) => {
-  await page.goto('./');
-  await page.locator('#btn-credits').scrollIntoViewIfNeeded();
+  await ouvrirAide(page);
   await page.locator('#btn-credits').click();
   const f = page.locator('#credits');
   await expect(f).toBeVisible();

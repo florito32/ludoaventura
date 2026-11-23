@@ -111,6 +111,12 @@ async function ouvrirCompte(page) {
   await page.goto('./');
   await page.locator('#btn-compte').click();
   await expect(page.locator('#ecran-compte')).toBeVisible();
+  await page.locator('#onglet-profil').click(); // v10.32 : « Profil et joueurs » (pas connecté, on arrive sur « Connexion »)
+}
+// v10.32 : les jauges et les chiffres sont dans « Statistiques », qui se déroule sous le nom du joueur.
+async function ouvrirStats(c) {
+  await c.getByRole('button', { name: 'Statistiques' }).click();
+  await expect(c.locator('.joueur-stats')).toBeVisible();
 }
 const sansDebordement = (page) => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1);
 const joueursStockes = (page) => page.evaluate(() => (JSON.parse(localStorage.getItem('ludoaventura-etoiles') || '{}').joueurs) || []);
@@ -122,6 +128,8 @@ test('sans compte : « Joueur 1 » existe déjà, avec 4 jauges à 0 (niveau 1) 
   const c = carte(page, 'Joueur 1');
   await expect(c).toBeVisible();
   await expect(page.locator('#joueurs-compte')).toHaveText('1 joueur');
+  await expect(c.locator('.joueur-stats')).toBeHidden(); // fermées au départ
+  await ouvrirStats(c);
   const jauges = c.locator('.joueur-jauges [role="meter"]');
   await expect(jauges).toHaveCount(4);
   for (const nom of ['Français', 'Maths', 'Histoire', 'Géographie']) {
@@ -136,6 +144,7 @@ test('les jauges montrent la moyenne des sous-matières ; les sous-matières res
     niv: { 'maths.calcul': 60, 'maths.probleme': 25, 'francais.orthographe': 100, 'francais.conjugaison': 100, 'francais.grammaire': 100, 'francais.phonemes': 100 } }] } });
   await ouvrirCompte(page);
   const c = carte(page, 'Léa');
+  await ouvrirStats(c);
   await expect(c.getByRole('meter', { name: 'Maths' })).toHaveAttribute('aria-valuenow', '42.5');
   await expect(c.getByRole('meter', { name: 'Maths' })).toHaveAttribute('aria-valuetext', 'niveau 5, 42.5 sur 100');
   await expect(c.getByRole('meter', { name: 'Français' })).toHaveAttribute('aria-valuetext', 'niveau 10, 100 sur 100');
@@ -174,6 +183,7 @@ test('créer un joueur : nom et personnage, sans limite, gardés après recharge
   await page.reload();
   // Le jeu rouvre l'écran où l'on était : on ne clique sur l'icône du compte que si elle est là.
   if (!(await page.locator('#ecran-compte').isVisible())) await page.locator('#btn-compte').click();
+  await page.locator('#onglet-profil').click();
   await expect(carte(page, 'Tom')).toBeVisible();
   await expect(carte(page, 'Tom').locator('.joueur-avatar')).toHaveAttribute('src', /aventuriers\/tom\.webp/);
   expect(await sansDebordement(page)).toBe(true);
@@ -193,24 +203,39 @@ test('créer : nom vide ou déjà pris = message clair, rien n’est créé', as
   await expect(page.getByRole('button', { name: 'Créer un joueur' })).toBeVisible();
 });
 
-test('changer de nom et de personnage, quand on veut, et le garder @smoke', async ({ page }) => {
+test('crayon : page de modification (nom et personnage), enregistrés et gardés @smoke', async ({ page }) => {
   await preparer(page);
   await ouvrirCompte(page);
   let c = carte(page, 'Joueur 1');
-  await c.getByRole('button', { name: 'Changer de nom' }).click();
-  await expect(c.getByLabel(/Nom du joueur/)).toBeFocused();
-  await c.getByLabel(/Nom du joueur/).fill('Capitaine Léa');
-  await c.getByRole('button', { name: 'Enregistrer' }).click();
+  await c.getByRole('button', { name: 'Modifier le joueur Joueur 1' }).click(); // v10.32 : icône à côté du nom
+  await expect(page.getByRole('heading', { name: 'Modifier le joueur' })).toBeVisible();
+  await expect(page.getByLabel(/Nom du joueur/)).toBeFocused();
+  await page.getByLabel(/Nom du joueur/).fill('Capitaine Léa');
+  await page.getByRole('button', { name: /^Awa,/ }).click();
+  await expect(page.getByRole('button', { name: /^Awa,/ })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByLabel(/Nom du joueur/)).toHaveValue('Capitaine Léa'); // le nom tapé est gardé en choisissant un personnage
+  await page.getByRole('button', { name: 'Enregistrer' }).click();
   c = carte(page, 'Capitaine Léa');
   await expect(c).toBeVisible();
-  await c.getByRole('button', { name: 'Changer de personnage' }).click();
-  await c.getByRole('button', { name: /^Awa,/ }).click();
-  await expect(c.getByRole('button', { name: /^Awa,/ })).toHaveAttribute('aria-pressed', 'true');
   await expect(c.locator('.joueur-avatar')).toHaveAttribute('src', /aventuriers\/awa\.webp/);
-  await c.getByRole('button', { name: 'Fermer' }).click();
+  await expect(c.getByRole('button', { name: 'Modifier le joueur Capitaine Léa' })).toBeFocused();
   const [j] = await joueursStockes(page);
   expect(j).toMatchObject({ id: 'j-1', nom: 'Capitaine Léa', perso: 'awa' });
   expect(await sansDebordement(page)).toBe(true);
+});
+
+test('crayon : nom déjà pris = message, Annuler ne change rien', async ({ page }) => {
+  await preparer(page, { etat: { v: 1, total: 0, joueurs: [
+    { id: 'j-1', nom: 'Léa', perso: 'lea', cree: '2026-11-01T00:00:00Z', maj: '2026-11-01T00:00:00Z', niv: {} },
+    { id: 'j2', nom: 'Tom', perso: 'tom', cree: '2026-11-01T00:00:00Z', maj: '2026-11-01T00:00:00Z', niv: {} }] } });
+  await ouvrirCompte(page);
+  await carte(page, 'Léa').getByRole('button', { name: 'Modifier le joueur Léa' }).click();
+  await page.getByLabel(/Nom du joueur/).fill('tom');
+  await page.getByRole('button', { name: 'Enregistrer' }).click();
+  await expect(page.getByRole('alert').filter({ hasText: 'porte déjà ce nom' })).toBeVisible();
+  await page.getByRole('button', { name: 'Annuler' }).click();
+  await expect(carte(page, 'Léa')).toBeVisible();
+  expect((await joueursStockes(page)).map((j) => j.nom)).toEqual(['Léa', 'Tom']);
 });
 
 test('connecté : les joueurs du compte arrivent à la connexion et partent vers le compte', async ({ page }) => {
@@ -229,12 +254,13 @@ test('connecté : les joueurs du compte arrivent à la connexion et partent vers
   await ouvrirCompte(page);
   await expect(carte(page, 'Nour')).toBeVisible();
   await expect(carte(page, 'Joueur 1')).toBeVisible();
+  await ouvrirStats(carte(page, 'Nour'));
   await expect(carte(page, 'Nour').getByRole('meter', { name: 'Géographie' })).toHaveAttribute('aria-valuenow', '20');
   await expect.poll(() => envois.length).toBeGreaterThan(0);
   const dernier = envois[envois.length - 1];
   expect(dernier.donnees.joueurs.map((j) => j.id).sort()).toEqual(['j-1', 'jD']);
   // Un changement de nom part au compte.
-  await carte(page, 'Nour').getByRole('button', { name: 'Changer de nom' }).click();
+  await carte(page, 'Nour').getByRole('button', { name: 'Modifier le joueur Nour' }).click();
   await page.getByLabel(/Nom du joueur/).fill('Nour K');
   await page.getByRole('button', { name: 'Enregistrer' }).click();
   await expect.poll(() => envois[envois.length - 1].donnees.joueurs.find((j) => j.id === 'jD').nom).toBe('Nour K');

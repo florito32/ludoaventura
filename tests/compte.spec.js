@@ -285,11 +285,15 @@ test('connecté : chaque gain est envoyé au compte, et la déconnexion remet l�
   await page.evaluate(() => window.Recompenses.compte.gagner(5, 'partie', 'test'));
   await expect.poll(() => envois.progression.at(-1).donnees.total).toBe(35);
   await page.locator('#btn-compte').click();
+  await page.locator('#onglet-id').click(); // v10.32 : « Se déconnecter » est dans « Identifiant et connexion »
   await page.getByRole('button', { name: 'Se déconnecter' }).click();
   await expect(page.locator('#compte-message')).toContainText('Tu es déconnecté');
   expect(envois.deconnexion).toBe(1);
   await expect(page.locator('#compte-invite')).toBeVisible();
   expect(await page.evaluate(() => localStorage.getItem('ludoaventura-session'))).toBeNull();
+  await page.locator('#onglet-profil').click();
+  await page.locator('.joueur-carte .stats-btn').first().click(); // v10.32 : les étoiles se lisent dans « Statistiques »
   await expect(page.locator('.joueur-carte .jt-etoiles strong').first()).toHaveText('0'); // v10.30 : carte du joueur
+  await page.locator('#onglet-id').click();
   await page.getByRole('button', { name: 'Jouer en invité' }).click();
 });

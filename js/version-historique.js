@@ -2,6 +2,13 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.32', date: '2026-11-23', changes: [
+    "« Mon compte » a maintenant 4 onglets : Profil et joueurs, Identifiant et connexion, Confidentialité et RGPD, Aide et mentions légales.",
+    "Profil et joueurs : chaque joueur a un crayon à côté de son nom (page pour changer le nom et le personnage) et une poubelle (avec confirmation, car elle détruit toute sa progression et ses gains). Un bouton « Statistiques » déroule étoiles, pierres, niveaux et, par matière, les parties jouées, réussies et réussies d’affilée.",
+    "Identifiant et connexion : l’e-mail, le pseudo et la connexion, avec en plus le changement d’adresse e-mail et du mot de passe.",
+    "Confidentialité et RGPD : ce que le jeu garde de toi, export de tes données et suppression définitive du compte (avec confirmation).",
+    "Aide et mentions légales : politique de confidentialité, mentions légales, crédits et version. Ils ne sont plus dans le bas de l’accueil."
+  ] },
   { v: '10.31', date: '2026-11-23', changes: [
     "Chaque joueur du compte a maintenant ses propres étoiles, son niveau, ses pierres précieuses, son coffre du jour, ses coffres de niveau, son méga coffre et ses défis du jour. Ce que le compte avait déjà gagné revient au Joueur 1.",
     "L’accueil n’affiche plus aucun nombre : il ne reste que « Défi du jour » et le compte. Les étoiles, pierres et coffres se voient dans la carte de chaque joueur (Mon compte), qui ouvre ses coffres et son écran « Mes étoiles ».",

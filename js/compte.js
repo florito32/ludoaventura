@@ -42,9 +42,9 @@
   function liste(x) { return Array.isArray(x) ? x : []; }
   function nombre(x) { return typeof x === 'number' && isFinite(x) ? x : 0; }
   function unir(a, b) { var r = liste(b).slice(); liste(a).forEach(function (x) { if (r.indexOf(x) < 0) r.push(x); }); return r; }
-  function joueursFusion(a, b) {
+  function joueursFusion(a, b, supprimes) {
     var J = (typeof module !== 'undefined' && module.exports) ? require('./joueurs.js') : racine.Joueurs;
-    return J ? J.fusionner(a, b) : liste(b).concat(liste(a));
+    return J ? J.fusionner(a, b, supprimes) : liste(b).concat(liste(a));
   }
   function fusionner(local, distant, base) {
     var a = objet(local), d = objet(distant), b = objet(base);
@@ -79,7 +79,9 @@
     r.defisQuittes = objet(d.defisQuittes);
     Object.keys(objet(a.defisQuittes)).forEach(function (j) { r.defisQuittes[j] = Object.assign(objet(r.defisQuittes[j]), objet(a.defisQuittes[j])); });
     // Joueurs du compte (v10.26) : même id = même joueur (nom le plus récent, niveaux les plus hauts), les autres sont gardés.
-    r.joueurs = joueursFusion(a.joueurs, d.joueurs);
+    // Joueurs supprimés (v10.32) : leur identifiant reste « enterré » des deux côtés, ils ne reviennent pas.
+    r.supprimes = unir(a.supprimes, d.supprimes);
+    r.joueurs = joueursFusion(a.joueurs, d.joueurs, r.supprimes);
     // Trésor de chaque joueur (v10.30) : comme pour le compte, les étoiles et pierres gagnées sur l'appareil depuis le
     // dernier envoi (base.joueurs) s'ajoutent à celles du compte. Sans base pour ce joueur : le plus grand des deux.
     // 1re synchronisation avec ce compte (base vide) : tout ce que l'appareil a gagné s'ajoute, comme pour le compte.
@@ -166,7 +168,8 @@
     if (s && s.access_token) {
       session = { access_token: s.access_token, refresh_token: s.refresh_token,
         expires_at: s.expires_at || Math.floor(Date.now() / 1000) + (Number(s.expires_in) || 3600),
-        user: s.user ? { id: s.user.id, email: s.user.email, anonyme: !!s.user.is_anonymous } : (session && session.user) || null };
+        user: s.user ? { id: s.user.id, email: s.user.email, anonyme: !!s.user.is_anonymous,
+          fournisseur: (s.user.app_metadata && s.user.app_metadata.provider) || (session && session.user && session.user.fournisseur) || '' } : (session && session.user) || null };
     } else session = null;
     ecrireJSON(CLE_SESSION, session);
     if (window.SiteVersion) window.SiteVersion.rafraichir(); // version visible seulement pour le compte de l'auteur (v9.5)
@@ -440,6 +443,18 @@
       $('compte-pseudo-form').hidden = !editionPseudo;
       $('compte-pseudo-changer').hidden = editionPseudo;
     }
+    // v10.32 : un compte Google n'a ni mot de passe ni adresse à changer ici (c'est Google qui les gère).
+    var google = co && session.user && session.user.fournisseur === 'google';
+    $('compte-email-bloc').hidden = !co || google;
+    $('compte-mdp-bloc').hidden = !co || google;
+    // Un parcours de connexion en cours (création, e-mail à valider, nouveau mot de passe…) se voit dans l'onglet « Connexion ».
+    if (mode !== 'connexion') choisirOnglet('id');
+    $('aide-version').textContent = window.SITE_VERSION ? 'v' + window.SITE_VERSION : '';
+    $('rgpd-suppr-titre').textContent = session ? 'Supprimer mon compte' : 'Effacer les données de cet appareil';
+    $('rgpd-suppr-texte').textContent = session
+      ? 'Efface définitivement ton compte et tout ce qui lui est lié : joueurs, niveaux, étoiles, pierres, coffres et statistiques. Il n’y a pas de retour en arrière.'
+      : 'Efface de cet appareil ta progression et tes joueurs (niveaux, étoiles, pierres, coffres, statistiques). Il n’y a pas de retour en arrière.';
+    $('rgpd-suppr').textContent = session ? 'Supprimer définitivement mon compte et mes données' : 'Effacer les données de cet appareil';
     if (co) {
       $('compte-qui').textContent = qui;
       $('compte-etat').textContent = attente ? 'Sauvegarde en cours…'
@@ -504,9 +519,124 @@
   $('compte-voir').addEventListener('change', function () { $('compte-mdp').type = this.checked ? 'text' : 'password'; });
   // En quittant « Mon compte », l'écran revient à la connexion (sauf « nouveau mot de passe », pas encore choisi).
   document.addEventListener('aventura-ecran', function (e) {
-    if (e.detail === 'ecran-compte') majPage();
-    else if (mode !== 'nouveau') { mode = 'connexion'; editionPseudo = false; dire(''); }
+    // Pas connecté : on arrive sur « Identifiant et connexion » ; connecté : sur « Profil et joueurs ».
+    if (e.detail === 'ecran-compte') { majPage(); if (mode === 'connexion') choisirOnglet(ongletCourant || (reel() ? 'profil' : 'id')); }
+    else {
+      if (e.detail !== 'ecran-etoiles' && e.detail !== 'ecran-progression') ongletCourant = null;
+      if (mode !== 'nouveau') { mode = 'connexion'; editionPseudo = false; fermerFormulaires(); dire(''); }
+    }
   });
+
+  // ---------- Onglets de « Mon compte » (v10.32) ----------
+  // Profil et joueurs | Identifiant et connexion | Confidentialité et RGPD | Aide et mentions légales. Flèches, Début et Fin au clavier.
+  var NOMS_ONGLETS = ['profil', 'id', 'rgpd', 'aide'];
+  var ongletCourant = null; // gardé en allant voir « Mes étoiles » ou « Ma progression » : on revient sur le même onglet
+  function choisirOnglet(nom, avecFocus) {
+    ongletCourant = nom;
+    NOMS_ONGLETS.forEach(function (n) {
+      var b = $('onglet-' + n), actif = n === nom;
+      b.setAttribute('aria-selected', String(actif)); b.tabIndex = actif ? 0 : -1;
+      $('panneau-' + n).hidden = !actif;
+      if (actif && avecFocus) b.focus();
+    });
+    if (nom === 'profil' && window.JoueursEcran) window.JoueursEcran.rendre();
+  }
+  var liste_onglets = document.querySelector('.compte-onglets');
+  if (liste_onglets) {
+    liste_onglets.addEventListener('click', function (e) { var b = e.target.closest('[data-onglet]'); if (b) choisirOnglet(b.getAttribute('data-onglet')); });
+    liste_onglets.addEventListener('keydown', function (e) {
+      var i = NOMS_ONGLETS.indexOf(document.activeElement && document.activeElement.getAttribute('data-onglet'));
+      if (i < 0) return;
+      var n = e.key === 'ArrowRight' ? (i + 1) % 4 : e.key === 'ArrowLeft' ? (i + 3) % 4 : e.key === 'Home' ? 0 : e.key === 'End' ? 3 : -1;
+      if (n < 0) return;
+      e.preventDefault(); choisirOnglet(NOMS_ONGLETS[n], true);
+    });
+  }
+
+  // ---------- Changer l'adresse e-mail et le mot de passe (v10.32) ----------
+  function messageForm(id, texte) { var m = $(id); if (m) { m.textContent = texte || ''; m.hidden = !texte; } }
+  function formulaire(idBouton, idForm, idChamp, idMessage, idAnnuler) {
+    $(idBouton).addEventListener('click', function () { $(idForm).hidden = false; $(idBouton).hidden = true; messageForm(idMessage, ''); $(idChamp).value = ''; $(idChamp).focus(); });
+    $(idAnnuler).addEventListener('click', function () { $(idForm).hidden = true; $(idBouton).hidden = false; $(idBouton).focus(); });
+  }
+  function fermerFormulaires() {
+    [['compte-email-changer', 'compte-email-form'], ['compte-mdp-changer', 'compte-mdp-form']].forEach(function (p) { if ($(p[0])) { $(p[0]).hidden = false; $(p[1]).hidden = true; } });
+  }
+  formulaire('compte-email-changer', 'compte-email-form', 'compte-email-champ', 'compte-email-message', 'compte-email-annuler');
+  formulaire('compte-mdp-changer', 'compte-mdp-form', 'compte-mdp-champ', 'compte-mdp-message', 'compte-mdp-annuler');
+  $('compte-email-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var adresse = $('compte-email-champ').value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adresse)) { messageForm('compte-email-message', 'Cette adresse e-mail ne semble pas correcte.'); $('compte-email-champ').focus(); return; }
+    if (session && session.user && String(session.user.email).toLowerCase() === adresse.toLowerCase()) { messageForm('compte-email-message', 'C’est déjà l’adresse de ton compte.'); return; }
+    action(jeton().then(function (j) { return appel('/auth/v1/user?redirect_to=' + encodeURIComponent(adresseRetour()), { methode: 'PUT', jeton: j, corps: { email: adresse } }); }).then(function () {
+      fermerFormulaires();
+      dire('Un e-mail de confirmation vient de partir à ' + adresse + '. Ouvre le lien qu’il contient (regarde aussi dans l’ancienne adresse) pour valider le changement.', 'ok');
+    }));
+  });
+  $('compte-mdp-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var mdp = $('compte-mdp-champ').value;
+    if (mdp.length < 6) { messageForm('compte-mdp-message', 'Au moins 6 caractères.'); $('compte-mdp-champ').focus(); return; }
+    action(jeton().then(function (j) { return appel('/auth/v1/user', { methode: 'PUT', jeton: j, corps: { password: mdp } }); }).then(function () {
+      fermerFormulaires(); $('compte-mdp-champ').value = ''; dire('Nouveau mot de passe enregistré.', 'ok');
+    }));
+  });
+
+  // ---------- Confidentialité et RGPD : export et suppression (v10.32) ----------
+  // Export : un fichier JSON avec ce qui est gardé sur l'appareil et sur le compte (sans les jetons de connexion).
+  function exporterDonnees() {
+    var c = compteEtoiles(), reglages = {};
+    try {
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (/^ludoaventura-/.test(k) && k !== CLE_SESSION && k !== CLE_ETOILES) reglages[k] = lireJSON(k);
+      }
+    } catch (e) { /* stockage interdit : on exporte le reste */ }
+    var donnees = {
+      export: { jeu: 'Ludoaventura', genere_le: new Date().toISOString(), version: window.SITE_VERSION || '' },
+      compte: { connecte: reel(), invite: invite(), email: (session && session.user && session.user.email) || null, pseudo: (profil && profil.pseudo) || null },
+      progression: c ? c.etat : lireJSON(CLE_ETOILES),
+      reglages_de_l_appareil: reglages
+    };
+    var blob = new Blob([JSON.stringify(donnees, null, 2)], { type: 'application/json' });
+    var a = document.createElement('a'), url = URL.createObjectURL(blob);
+    a.href = url; a.download = 'ludoaventura-mes-donnees-' + new Date().toISOString().slice(0, 10) + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    dire('Le fichier de tes données est téléchargé.', 'ok');
+  }
+  // Efface tout ce que le jeu garde sur l'appareil, puis recharge la page (le jeu repart de zéro).
+  function effacerAppareil() {
+    clearTimeout(minuterie);
+    garderSession(null);
+    try {
+      Object.keys(localStorage).forEach(function (k) { if (/^(ludoaventura|ludo)-/.test(k)) localStorage.removeItem(k); });
+      sessionStorage.clear();
+    } catch (e) { /* stockage interdit */ }
+    location.reload();
+  }
+  function supprimerCompte() {
+    var avecCompte = !!session;
+    window.Confirmer({
+      titre: avecCompte ? 'Supprimer définitivement ton compte ?' : 'Effacer les données de cet appareil ?',
+      texte: avecCompte ? 'Ton compte et toutes les données liées (joueurs, niveaux, étoiles, pierres, coffres, statistiques, pseudo) seront détruits. Cette action est définitive.'
+        : 'Ta progression et tes joueurs seront effacés de cet appareil. Cette action est définitive.',
+      oui: avecCompte ? 'Oui, tout supprimer' : 'Oui, tout effacer'
+    }).then(function (oui) {
+      if (!oui) return;
+      if (!avecCompte) { effacerAppareil(); return; }
+      action(jeton().then(function (j) {
+        if (!j) throw new Error('Ta connexion a expiré : reconnecte-toi, puis recommence.');
+        return appel('/rest/v1/rpc/supprimer_mon_compte', { methode: 'POST', jeton: j, corps: {} });
+      }).then(function (ok) {
+        if (ok !== true) throw new Error('La suppression n’a pas pu être faite. Réessaie dans un instant.');
+        effacerAppareil();
+      }));
+    });
+  }
+  $('rgpd-export').addEventListener('click', exporterDonnees);
+  $('rgpd-suppr').addEventListener('click', supprimerCompte);
 
   // ---------- Retour d'un lien reçu par e-mail ou de Google ----------
   // v9.9 : l'e-mail de validation (modèle dans outils/emails/) mène à ?valider=<jeton> ; le jeu vérifie le jeton

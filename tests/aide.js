@@ -213,12 +213,15 @@ function carteJoueur(page, nom) {
 }
 async function mesEtoiles(page, nom) {
   await page.locator('#btn-compte').click();
+  await page.locator('#onglet-profil').click(); // v10.32 : « Profil et joueurs » ; « Mes étoiles » est dans « Statistiques »
+  await carteJoueur(page, nom).getByRole('button', { name: 'Statistiques' }).click();
   await carteJoueur(page, nom).getByRole('button', { name: 'Mes étoiles' }).click();
   await page.getByRole('heading', { name: 'Mes étoiles' }).waitFor();
 }
 // Depuis l'accueil : « Mon compte » puis le bouton des coffres à ouvrir de la carte du joueur.
 async function coffresJoueur(page, nom) {
   await page.locator('#btn-compte').click();
+  await page.locator('#onglet-profil').click();
   await carteJoueur(page, nom).locator('[data-act="coffres"]').click();
 }
 module.exports = { carteJoueur, mesEtoiles, coffresJoueur, quiJoue, lancerRapideQui, creerJoueurs, ouvrirChoix, cocher, choisir, grammaire, repondre, valider, cocherJoueur, orthographe, maths, conjugaison, matiere, versReglages, lancer, lancerLeDe, lancerPartie, rapide, attendreJoueur, cocherTout, ouvrirNeuf };

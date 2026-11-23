@@ -204,6 +204,25 @@
     </header>
     <div class="page-corps" id="compte-corps">
       <p class="compte-message" id="compte-message" role="status" aria-live="polite" hidden></p>
+      <!-- v10.32 (demande du 23/11/2026, backlog lignes 459 à 466) : « Mon compte » en 4 onglets (proposition A de la page de test :
+           icône + texte). js/compte.js gère l'onglet affiché (flèches, Début, Fin au clavier). -->
+      <div class="compte-onglets" role="tablist" aria-label="Sections de Mon compte">
+        <button type="button" role="tab" id="onglet-profil" aria-controls="panneau-profil" aria-selected="true" data-onglet="profil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>Joueurs</span></button>
+        <button type="button" role="tab" id="onglet-id" aria-controls="panneau-id" aria-selected="false" tabindex="-1" data-onglet="id"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3"/></svg><span>Connexion</span></button>
+        <button type="button" role="tab" id="onglet-rgpd" aria-controls="panneau-rgpd" aria-selected="false" tabindex="-1" data-onglet="rgpd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9V6z"/></svg><span>RGPD</span></button>
+        <button type="button" role="tab" id="onglet-aide" aria-controls="panneau-aide" aria-selected="false" tabindex="-1" data-onglet="aide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 115 0c0 2-2.5 2-2.5 4M12 17v.5"/></svg><span>Aide</span></button>
+      </div>
+      <div class="compte-panneau" role="tabpanel" id="panneau-profil" aria-labelledby="onglet-profil">
+      <!-- v10.26 (demande du 23/11/2026, backlog lignes 438 à 449) : un compte fait jouer plusieurs joueurs (js/joueurs.js,
+           js/joueurs-ecran.js). Visible connecté ou en invité ; les joueurs sont sauvegardés avec la progression du compte. -->
+      <section class="joueurs-section" id="compte-joueurs" aria-labelledby="joueurs-titre">
+        <div class="joueurs-entete"><h3 id="joueurs-titre" tabindex="-1">Profil et joueurs</h3><span class="petit" id="joueurs-compte"></span></div>
+        <p class="joueurs-annonce visually-hidden" id="joueurs-annonce" role="status" aria-live="polite"></p>
+        <div class="joueurs-liste" id="joueurs-liste"></div>
+      </section>
+      </div>
+      <div class="compte-panneau" role="tabpanel" id="panneau-id" aria-labelledby="onglet-id" hidden>
+        <h3 class="panneau-titre">Identifiant et connexion</h3>
       <!-- v9.9 (17/11/2026) : « Se connecter » et « Créer un compte » sont deux parcours séparés.
            Le bouton « Créer un compte » est seul dans sa carte et ouvre un formulaire à part (#compte-creation). -->
       <div id="compte-invite">
@@ -276,10 +295,23 @@
       </section>
       <section class="carte-page compte-carte" id="compte-connecte" hidden>
         <h3>Tu es connecté</h3>
-        <p class="compte-qui">Compte : <strong id="compte-qui"></strong></p>
+        <p class="compte-qui">Adresse e-mail : <strong id="compte-qui"></strong></p>
+        <!-- v10.32 : changer l'adresse e-mail du compte (un e-mail de confirmation part ; pas pour un compte Google). -->
+        <div class="compte-pseudo" id="compte-email-bloc">
+          <button type="button" class="lien-bouton" id="compte-email-changer">Changer mon adresse e-mail</button>
+          <form id="compte-email-form" class="compte-form" novalidate hidden>
+            <label for="compte-email-champ">Nouvelle adresse e-mail</label>
+            <input type="email" id="compte-email-champ" autocomplete="email" inputmode="email" spellcheck="false" autocapitalize="off">
+            <p class="compte-message erreur" id="compte-email-message" role="alert" hidden></p>
+            <div class="compte-boutons">
+              <button type="submit" class="btn btn-principal">Enregistrer l’adresse</button>
+              <button type="button" class="btn btn-secondaire" id="compte-email-annuler">Annuler</button>
+            </div>
+          </form>
+        </div>
         <!-- Pseudo (v10.9) : affiché dès que le jeu l'a lu sur le compte ; modifiable ici à tout moment. -->
         <div class="compte-pseudo" id="compte-pseudo-bloc" hidden>
-          <p class="compte-qui">Pseudo : <strong id="compte-pseudo"></strong></p>
+          <p class="compte-qui">Pseudo du compte : <strong id="compte-pseudo"></strong></p>
           <p class="petit" id="compte-pseudo-note" hidden>Ce pseudo a été choisi par le jeu : tu peux le changer.</p>
           <button type="button" class="lien-bouton" id="compte-pseudo-changer">Changer mon pseudo</button>
           <form id="compte-pseudo-form" class="compte-form" novalidate hidden>
@@ -293,17 +325,24 @@
             </div>
           </form>
         </div>
+        <!-- v10.32 : changer le mot de passe quand on est connecté (pas pour un compte Google). -->
+        <div class="compte-pseudo" id="compte-mdp-bloc">
+          <button type="button" class="lien-bouton" id="compte-mdp-changer">Changer le mot de passe</button>
+          <form id="compte-mdp-form" class="compte-form" novalidate hidden>
+            <label for="compte-mdp-champ">Nouveau mot de passe <span class="petit-inline">(au moins 6 caractères)</span></label>
+            <input type="password" id="compte-mdp-champ" autocomplete="new-password" minlength="6">
+            <p class="compte-message erreur" id="compte-mdp-message" role="alert" hidden></p>
+            <div class="compte-boutons">
+              <button type="submit" class="btn btn-principal">Enregistrer le mot de passe</button>
+              <button type="button" class="btn btn-secondaire" id="compte-mdp-annuler">Annuler</button>
+            </div>
+          </form>
+        </div>
         <p class="petit" id="compte-etat"></p>
         <div class="compte-boutons">
           <button type="button" class="btn btn-secondaire" id="compte-synchro">Sauvegarder maintenant</button>
           <button type="button" class="btn btn-secondaire" id="compte-sortir">Se déconnecter</button>
         </div>
-      </section>
-      <!-- v10.26 (demande du 23/11/2026, backlog lignes 438 à 449) : un compte fait jouer plusieurs joueurs (js/joueurs.js,
-           js/joueurs-ecran.js). Visible connecté ou en invité ; les joueurs sont sauvegardés avec la progression du compte. -->
-      <section class="joueurs-section" id="compte-joueurs" aria-labelledby="joueurs-titre">
-        <div class="joueurs-entete"><h3 id="joueurs-titre">Mes joueurs</h3><span class="petit" id="joueurs-compte"></span></div>
-        <div class="joueurs-liste" id="joueurs-liste"></div>
       </section>
       <section class="carte-page compte-carte" id="compte-nouveau-bloc" hidden>
         <h3>Nouveau mot de passe</h3>
@@ -313,6 +352,42 @@
           <button type="submit" class="btn btn-principal">Enregistrer</button>
         </form>
       </section>
+      </div>
+      <!-- Confidentialité et RGPD (v10.32) : ce qui est gardé, export des données, suppression définitive. js/compte.js. -->
+      <div class="compte-panneau" role="tabpanel" id="panneau-rgpd" aria-labelledby="onglet-rgpd" hidden>
+        <h3 class="panneau-titre">Confidentialité et RGPD</h3>
+        <section class="carte-page compte-carte">
+          <h3>Ce que le jeu garde de toi</h3>
+          <ul class="rgpd-liste">
+            <li><strong>Sur cet appareil</strong> : ta progression, tes joueurs (noms, personnages, niveaux, statistiques) et tes choix de jeu.</li>
+            <li><strong>Sur ton compte</strong> (connecté, ou invité sous un pseudo « invité0001 ») : ton adresse e-mail s’il y en a une, ton pseudo, ta progression et tes joueurs, hébergés par Supabase.</li>
+            <li><strong>Pas de suivi</strong> : le jeu n’affiche aucune publicité et n’utilise ni mesure d’audience ni cookie de suivi, donc il n’y a aucun consentement à donner ici.</li>
+          </ul>
+        </section>
+        <section class="carte-page compte-carte">
+          <h3>Mes données</h3>
+          <p class="petit">Télécharge un fichier avec tout ce que le jeu garde de toi sur cet appareil et sur ton compte.</p>
+          <button type="button" class="btn btn-secondaire compte-large" id="rgpd-export">Exporter mes données</button>
+        </section>
+        <section class="carte-page compte-carte rgpd-danger">
+          <h3 id="rgpd-suppr-titre">Supprimer mon compte</h3>
+          <p class="petit" id="rgpd-suppr-texte">Efface définitivement ton compte et tout ce qui lui est lié : joueurs, niveaux, étoiles, pierres, coffres et statistiques. Il n’y a pas de retour en arrière.</p>
+          <button type="button" class="btn btn-danger compte-large" id="rgpd-suppr">Supprimer définitivement mon compte et mes données</button>
+        </section>
+      </div>
+      <!-- Aide et mentions légales (v10.32) : liens, crédits, version. Les mentions légales et les crédits ne sont plus dans le pied de l'accueil. -->
+      <div class="compte-panneau" role="tabpanel" id="panneau-aide" aria-labelledby="onglet-aide" hidden>
+        <h3 class="panneau-titre">Aide et mentions légales</h3>
+        <section class="carte-page compte-carte">
+          <h3>Informations</h3>
+          <div class="aide-liens">
+            <a class="btn btn-secondaire aide-lien" href="https://www.ludo-aventura.fr/policies/privacy-policy" target="_blank" rel="noopener">Politique de confidentialité <span class="visually-hidden">(s’ouvre dans un nouvel onglet)</span></a>
+            <a class="btn btn-secondaire aide-lien" href="https://www.ludo-aventura.fr/pages/mentions-legales" target="_blank" rel="noopener">Mentions légales <span class="visually-hidden">(s’ouvre dans un nouvel onglet)</span></a>
+            <button type="button" class="btn btn-secondaire aide-lien" id="btn-credits" aria-haspopup="dialog">Crédits</button>
+          </div>
+          <p class="petit">Version du jeu : <strong id="aide-version"></strong></p>
+        </section>
+      </div>
     </div>
   </section>
 
@@ -885,8 +960,18 @@
 </dialog>
 
 <footer class="pied">
-  <p><span class="pied-marque">Ludoaventura · Aventura</span> <span data-version></span> <span class="pied-sep" aria-hidden="true">·</span> <a class="pied-lien" href="https://www.ludo-aventura.fr/pages/mentions-legales">Mentions légales</a> <span class="pied-sep" aria-hidden="true">·</span> <button type="button" class="pied-lien pied-bouton" id="btn-credits" aria-haspopup="dialog">Crédits</button></p>
+  <p><span class="pied-marque">Ludoaventura · Aventura</span> <span data-version></span></p>
 </footer>
+
+<!-- Confirmation d'une action sans retour (v10.32) : supprimer un joueur, supprimer le compte. window.Confirmer(...) dans js/joueurs-ecran.js. -->
+<dialog class="fin confirmer" id="dlg-confirmer" aria-labelledby="confirmer-titre" aria-describedby="confirmer-texte">
+  <h2 id="confirmer-titre"></h2>
+  <p id="confirmer-texte"></p>
+  <div class="fin-actions">
+    <button type="button" class="btn btn-secondaire" id="confirmer-non">Annuler</button>
+    <button type="button" class="btn btn-danger" id="confirmer-oui">Oui, supprimer</button>
+  </div>
+</dialog>
 
 <!-- Crédits (v7.0) : sources libres utilisées par la Géographie, comme leurs licences le demandent.
      v10.6 (backlog ligne 252) : illustrations du jeu de Stuki San (réponse de l'utilisateur du 17/11/2026). -->

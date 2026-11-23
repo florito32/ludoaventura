@@ -42,6 +42,8 @@ test('aucune violation WCAG A/AA : accueil, Mes étoiles, Ma progression, Défi 
   // v10.30 : l'accueil n'a plus que le défi du jour et le compte ; les étoiles sont dans la carte du joueur.
   expect(await audit(page)).toEqual([]);
   await page.locator('#btn-compte').click();
+  await page.locator('#onglet-profil').click();
+  await page.locator('.joueur-carte').first().getByRole('button', { name: 'Statistiques' }).click();
   await page.locator('.joueur-carte').first().getByRole('button', { name: 'Mes étoiles' }).click();
   await expect(page.getByRole('heading', { name: 'Mes étoiles' })).toBeVisible();
   expect(await audit(page)).toEqual([]);
@@ -58,6 +60,7 @@ test('aucune violation WCAG A/AA : accueil, Mes étoiles, Ma progression, Défi 
   expect(await audit(page)).toEqual([]);
   await page.getByRole('button', { name: 'Accueil' }).click();
   await page.locator('#btn-compte').click();
+  await page.locator('#onglet-profil').click();
   await page.locator('.joueur-carte [data-act="coffres"]').first().click();
   await page.getByRole('button', { name: 'Ouvrir le coffre' }).click();
   await expect(page.getByRole('button', { name: 'Super !' })).toBeVisible();
@@ -74,6 +77,8 @@ test('aucune violation WCAG A/AA : Comment gagner des étoiles, Partie rapide', 
   await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); window.AVENTURA_AUTO_DE = 600000; } catch (e) { /* */ } });
   await page.goto('./');
   await page.locator('#btn-compte').click();
+  await page.locator('#onglet-profil').click();
+  await page.locator('.joueur-carte').first().getByRole('button', { name: 'Statistiques' }).click();
   await page.locator('.joueur-carte').first().getByRole('button', { name: 'Mes étoiles' }).click();
   await page.getByRole('button', { name: 'Comment gagner des étoiles ?' }).click();
   await expect(page.getByRole('dialog', { name: 'Comment gagner des étoiles ?' })).toBeVisible();

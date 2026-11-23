@@ -265,7 +265,11 @@
     var c = window.Recompenses.compte, pts = pointsParJoueur(r), part = partIndividuelle(r);
     partie.joueurs.forEach(function (j, i) {
       var sm = j.profil && j.sousMat;
-      if (sm && pts[i] >= part) window.Joueurs.ajouterPoints(c.etat, j.profil, sm.m, sm.s, 1);
+      if (!sm) return;
+      var reussi = pts[i] >= part;
+      if (reussi) window.Joueurs.ajouterPoints(c.etat, j.profil, sm.m, sm.s, 1);
+      // v10.32 : statistiques du joueur (parties jouées / réussies / d'affilée par matière), pour « Statistiques » dans Mon compte.
+      window.Joueurs.enregistrerPartie(c.etat, j.profil, sm.m, reussi);
     });
     c.ecrire();
   }

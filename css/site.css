@@ -2389,3 +2389,54 @@ body:has(#ecran-baby:not([hidden])) .pied { padding-block: 4px calc(4px + env(sa
 .pastille-compte.recoit { animation: compte-recoit .3s ease-out; }
 @keyframes compte-recoit { 50% { transform: scale(1.12); } }
 @media (prefers-reduced-motion: reduce) { .pastille-compte.recoit { animation: none; } }
+
+/* ---------- Mon compte en 4 onglets (v10.32, demande du 23/11/2026, backlog lignes 459 à 466) ---------- */
+/* Onglets « icône + texte » (proposition A de la page de test). */
+.btn-danger { background: var(--rouge-texte); color: #fff; box-shadow: 0 4px 0 var(--encre); }
+.btn-danger:hover { filter: brightness(1.08); }
+.compte-onglets { display: flex; gap: 4px; max-width: 560px; width: 100%; margin-inline: auto; }
+.compte-onglets button {
+  flex: 1 1 0; min-width: 0; min-height: 56px; padding: 4px 2px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  font: inherit; font-weight: 800; font-size: .8rem; line-height: 1.1; cursor: pointer; color: #fff;
+  background: rgb(0 0 0 / .22); border: 3px solid transparent; border-radius: 12px; overflow-wrap: anywhere; /* assombri : texte blanc lisible (contraste AA) */
+}
+.compte-onglets button svg { width: 22px; height: 22px; flex: none; }
+.compte-onglets button[aria-selected="true"] { background: var(--parchemin); color: var(--encre); border-color: var(--encre); }
+.compte-panneau { display: grid; gap: 12px; min-width: 0; }
+.compte-panneau[hidden] { display: none; }
+.panneau-titre { color: #fff; font-size: 1.15rem; max-width: 560px; width: 100%; margin-inline: auto; }
+.rgpd-liste { margin: 0; padding-left: 1.2em; display: grid; gap: 8px; }
+.rgpd-danger { border-color: var(--rouge-texte); }
+.rgpd-danger h3 { color: var(--rouge-texte); }
+.aide-liens { display: grid; gap: 10px; }
+.aide-lien { display: flex; align-items: center; justify-content: center; text-align: center; text-decoration: none; min-height: 48px; padding: 8px 14px; }
+.confirmer h2 { color: var(--rouge-texte); font-size: 1.4rem; overflow-wrap: anywhere; }
+.confirmer p { margin: 0; line-height: 1.4; }
+
+/* Carte d'un joueur, fermée : visage, nom + crayon, niveau ; en bas « Statistiques » à gauche et la poubelle à droite. */
+.joueur-nomligne { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.icone-btn {
+  position: relative; flex: none; width: 32px; height: 32px; padding: 0; display: inline-flex; align-items: center; justify-content: center;
+  background: #fff; color: var(--encre); border: 2px solid var(--parchemin-bord); border-radius: 50%; cursor: pointer;
+}
+.icone-btn svg { width: 60%; height: 60%; }
+.icone-btn::after { content: ""; position: absolute; inset: -6px; } /* zone de toucher de 44 px, icône de 32 px */
+.icone-btn:hover { background: var(--parchemin); }
+.icone-btn.suppr { color: var(--rouge-texte); }
+.joueur-pied { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.stats-btn {
+  font: inherit; font-weight: 800; font-size: .9rem; color: var(--encre); display: inline-flex; align-items: center; gap: 6px;
+  min-height: 44px; padding: 0 14px; background: #fff; border: 2px solid var(--encre); border-radius: 999px; cursor: pointer;
+}
+.stats-btn svg { width: 18px; height: 18px; transition: transform .2s; }
+.stats-btn[aria-expanded="true"] svg { transform: rotate(180deg); }
+.joueur-stats { border-top: 2px dashed var(--parchemin-bord); padding-top: 10px; display: grid; gap: 10px; }
+.joueur-stats[hidden] { display: none; }
+.jm-bloc { display: grid; gap: 2px; }
+.jm-detail { margin: 0; font-size: .85rem; color: var(--encre-douce); }
+.js-resume { display: flex; flex-wrap: wrap; gap: 6px 14px; font-weight: 700; align-items: center; }
+.js-resume .btn { min-height: 44px; padding: 6px 14px; }
+.joueur-coffres { margin: 0; }
+.joueur-coffres .btn { width: 100%; min-height: 48px; padding: 8px 14px; }
+.joueurs-annonce { margin: 0; color: #fff; font-weight: 700; }
+.joueur-retour { justify-self: start; background: none; border: 0; color: var(--encre); font: inherit; font-weight: 800; min-height: 44px; padding: 0; cursor: pointer; text-decoration: underline; }
