@@ -2275,3 +2275,44 @@ body:has(#ecran-baby:not([hidden])) .pied { padding-block: 4px calc(4px + env(sa
 @media (max-width: 899px) {
   .table .drapeau.grand { height: clamp(36px, 9cqh, 72px); width: auto; aspect-ratio: 4 / 3; }
 }
+
+/* ---------- Mon compte › Mes joueurs (v10.26, demande du 23/11/2026, backlog lignes 438 à 449) ----------
+   Proposition A : une colonne de cartes, jauges en barre coupée en 10 (un trait tous les 10 points). */
+.joueurs-section { max-width: 560px; width: 100%; margin: 0 auto; display: grid; gap: 10px; }
+.joueurs-entete { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.joueurs-entete h3 { margin: 0; font-size: 1.15rem; color: #fff; }
+.joueurs-entete .petit { margin: 0; color: #e9f3e6; font-size: .92rem; }
+.joueurs-liste { display: grid; gap: 10px; }
+.joueur-carte { display: grid; gap: 10px; min-width: 0; }
+.joueur-tete { display: flex; align-items: center; gap: 10px; }
+.joueur-avatar { width: 56px; height: 56px; border-radius: 50%; border: 3px solid var(--encre); background: #fff; object-fit: cover; object-position: top; flex: none; }
+.joueur-qui { flex: 1; min-width: 0; }
+.joueur-nom { margin: 0; font-size: 1.1rem; font-weight: 800; overflow-wrap: anywhere; }
+.joueur-qui .petit { margin: 0; }
+.joueur-niv { background: var(--encre); color: #fff; border-radius: 10px; padding: 2px 10px; font-weight: 800; font-size: .88rem; white-space: nowrap; }
+.joueur-jauges { display: grid; gap: 6px; }
+.jm { --col: var(--encre); display: grid; grid-template-columns: 5.6rem minmax(0, 1fr) 6.2rem; align-items: center; gap: 6px 10px; font-size: .92rem; }
+.jm-nom { font-weight: 700; }
+.jm-val { font-variant-numeric: tabular-nums; font-weight: 800; white-space: nowrap; text-align: right; }
+.jm-barre { position: relative; height: 14px; background: #e5dcc3; border: 1px solid var(--parchemin-bord); border-radius: 8px; overflow: hidden; }
+.jm-barre i { display: block; height: 100%; background: var(--col); }
+.jm-barre::after { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), rgba(59, 42, 30, .3) calc(10% - 1px) 10%); }
+.m-francais { --col: #c4452b; }
+.m-maths { --col: #2e55c9; }
+.m-histoire { --col: #9a6a14; }
+.m-geographie { --col: #1f7a3a; }
+.joueur-details summary { cursor: pointer; font-weight: 700; font-size: .9rem; color: var(--encre-douce); min-height: 32px; display: flex; align-items: center; }
+.sousmat { border-top: 2px dashed var(--parchemin-bord); padding-top: 6px; display: grid; gap: 4px; }
+.sousmat .jm { grid-template-columns: 7.4rem minmax(0, 1fr) 5.6rem; font-size: .84rem; }
+.sousmat .jm-nom { font-weight: 500; }
+.jm-groupe { margin: 6px 0 0; font-weight: 800; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; color: var(--encre-douce); }
+.joueur-form { display: grid; gap: 8px; }
+.joueur-form input[type="text"] { font: inherit; padding: 8px 10px; border: 3px solid var(--parchemin-bord); border-radius: 10px; background: #fff; color: var(--encre); min-height: 44px; }
+.joueur-form input[aria-invalid="true"] { border-color: var(--rouge-texte); }
+.perso-choix { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 6px; }
+.perso-bouton { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px; min-height: 44px; border: 3px solid var(--parchemin-bord); border-radius: 12px; background: #fff; color: var(--encre); font: inherit; font-size: .78rem; font-weight: 700; cursor: pointer; }
+.perso-bouton img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; object-position: top; }
+.perso-bouton[aria-pressed="true"] { border-color: var(--encre); background: var(--encre); color: #fff; }
+.joueur-ajout { border: 3px dashed var(--parchemin-bord); border-radius: 16px; background: rgba(246, 238, 219, .9); color: var(--encre-douce); font: inherit; font-weight: 800; min-height: 64px; padding: 12px; cursor: pointer; }
+.joueur-ajout:hover { background: var(--parchemin); }
+@media (max-width: 380px) { .jm { grid-template-columns: 4.6rem minmax(0, 1fr) 5.6rem; } .sousmat .jm { grid-template-columns: 6rem minmax(0, 1fr) 5.2rem; } }

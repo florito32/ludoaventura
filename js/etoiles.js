@@ -68,7 +68,9 @@
     // commencent au niveau suivant, pour ne pas en offrir des dizaines d'un coup aux joueurs déjà avancés).
     return { v: 1, total: 0, journal: [], parJour: {}, coffresJour: {}, coffresNiveau: {}, coffresMega: {}, visites: [], defis: {}, parties: [], gemmes: 0, simplesDepuis: null,
       // defisEnCours : { solo: { jour, id } } défi commencé et pas encore fini ; defisQuittes : { jour: { solo: true } } (v6.47).
-      defisEnCours: {}, defisQuittes: {} };
+      defisEnCours: {}, defisQuittes: {},
+      // joueurs : les joueurs du compte (nom, personnage, niveaux), voir js/joueurs.js (v10.26).
+      joueurs: [] };
   }
   // stockage : objet avec getItem / setItem (localStorage dans la page, une imitation dans les tests).
   function Compte(stockage, maintenant) {
