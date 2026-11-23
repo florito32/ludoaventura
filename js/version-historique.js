@@ -2,6 +2,9 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.33', date: '2026-11-23', changes: [
+    "Maths : chaque calcul a maintenant un niveau de difficulté « progression » de 1 à 100 (addition plus facile que soustraction, plus facile que multiplication, plus facile que division ; petits nombres avant grands ; un signe avant plusieurs). Rien ne change à l’écran pour l’instant."
+  ] },
   { v: '10.32', date: '2026-11-23', changes: [
     "« Mon compte » a maintenant 4 onglets : Profil et joueurs, Identifiant et connexion, Confidentialité et RGPD, Aide et mentions légales.",
     "Profil et joueurs : chaque joueur a un crayon à côté de son nom (page pour changer le nom et le personnage) et une poubelle (avec confirmation, car elle détruit toute sa progression et ses gains). Un bouton « Statistiques » déroule étoiles, pierres, niveaux et, par matière, les parties jouées, réussies et réussies d’affilée.",
