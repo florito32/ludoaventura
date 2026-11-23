@@ -244,7 +244,8 @@
         </section>
         <section class="carte-page compte-carte">
           <h3>Jouer en invité</h3>
-          <p class="petit">Sans compte, ta progression reste seulement sur cet appareil. Tu pourras te connecter plus tard : rien ne sera perdu.</p>
+          <p class="petit">Sans compte, tu joues sous un pseudo d’invité (invité0001…). Quand tu crées ton compte ou que tu te connectes, tu gardes ce que tu as gagné : rien n’est perdu.</p>
+          <p class="petit" id="compte-invite-nom" hidden>Ton pseudo d’invité : <strong id="compte-invite-pseudo"></strong></p>
           <p class="petit">Moins de 15 ans ? Demande à un parent de se connecter avec toi.</p>
           <button type="button" class="btn btn-bleu" id="compte-invite-ok">Jouer en invité</button>
         </section>
@@ -930,7 +931,7 @@
     <button type="button" class="btn btn-secondaire" id="fenetre-creer">Créer un compte</button>
     <button type="button" class="btn btn-secondaire" id="fenetre-invite">Jouer en invité</button>
   </div>
-  <p class="petit fenetre-compte-note">En invité, ta progression reste seulement sur cet appareil.</p>
+  <p class="petit fenetre-compte-note">En invité, tu gardes ta progression en créant un compte plus tard.</p>
 </dialog>
 
 <!-- Fenêtre « Choisis ton pseudo » (v10.9, demande du 17/11/2026) : à la prochaine ouverture du jeu après la création
