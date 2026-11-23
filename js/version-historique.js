@@ -2,6 +2,9 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.28', date: '2026-11-23', changes: [
+    "À plusieurs, l’écran de fin dit ce que chacun devait récolter (l’objectif de l’équipe partagé entre les joueurs : 30 à 2, c’est 15 chacun) et qui a réussi sa part. La réussite de l’aventure reste celle de l’équipe."
+  ] },
   { v: '10.27', date: '2026-11-23', changes: [
     "Préparation de la partie, étape 2 : si ton compte a au moins 2 joueurs, tu choisis qui joue (un joueur déjà pris est grisé pour les suivants) ; son personnage est proposé d’office.",
     "À la fin de chaque partie, réussie ou non, chaque joueur du compte gagne +1 point sur 100 dans la sous-matière qu’il a jouée (orthographe, calcul mental, une période d’histoire…)."
