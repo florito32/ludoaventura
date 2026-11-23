@@ -2,6 +2,9 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.34', date: '2026-11-23', changes: [
+    "Orthographe, Grammaire, Conjugaison et Phonèmes : chaque carte possible a maintenant un niveau de difficulté « progression » de 1 à 100 (mot, verbe et temps, jeu, son). Rien ne change à l’écran pour l’instant."
+  ] },
   { v: '10.33', date: '2026-11-23', changes: [
     "Maths : chaque calcul a maintenant un niveau de difficulté « progression » de 1 à 100 (addition plus facile que soustraction, plus facile que multiplication, plus facile que division ; petits nombres avant grands ; un signe avant plusieurs). Rien ne change à l’écran pour l’instant."
   ] },
