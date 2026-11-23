@@ -25,16 +25,6 @@
       '" aria-valuetext="niveau ' + n + ', ' + arrondi + ' sur 100"><i style="width:' + s + '%"></i></div>' +
       '<span class="jm-val">Niv. ' + n + ' · ' + Math.floor(s) + '</span></div>';
   }
-  function sousMatieres(j) {
-    return '<details class="joueur-details"><summary>Voir les sous-matières</summary><div class="sousmat">' +
-      J.MATIERES.map(function (m) {
-        return '<p class="jm-groupe">' + m.nom + '</p>' + m.subs.map(function (sm) {
-          var s = J.score(j, m.id, sm.id);
-          return '<div class="jm m-' + m.id + '"><span class="jm-nom">' + sm.nom + '</span><div class="jm-barre" aria-hidden="true"><i style="width:' + s + '%"></i></div>' +
-            '<span class="jm-val">Niv. ' + J.niveauDe(s) + ' · ' + s + '</span></div>';
-        }).join('');
-      }).join('') + '</div></details>';
-  }
   function choixPerso(idBase, choisi) {
     return '<div class="perso-choix" role="group" aria-label="Personnage">' + A.LISTE.map(function (p) {
       return '<button type="button" class="perso-bouton" data-perso="' + p.id + '" aria-pressed="' + (p.id === choisi) + '" aria-label="' + esc(p.nom + ', ' + p.titre) + '">' +
@@ -53,7 +43,7 @@
       '<div class="joueur-tete"><img class="joueur-avatar" src="' + p.image + '" alt="" width="56" height="56">' +
       '<div class="joueur-qui"><h4 class="joueur-nom">' + esc(j.nom) + '</h4><p class="petit">Personnage : ' + esc(p.nom + ', ' + p.titre) + '</p></div>' +
       '<span class="joueur-niv" title="Niveau moyen">Niv. ' + J.niveauGlobal(j) + '</span></div>' +
-      '<div class="joueur-jauges">' + J.MATIERES.map(function (m) { return jauge(j, m); }).join('') + '</div>' + sousMatieres(j);
+      '<div class="joueur-jauges">' + J.MATIERES.map(function (m) { return jauge(j, m); }).join('') + '</div>';
     if (mode === 'nom') {
       h += formNom('nom-' + j.id, edition.nom !== undefined ? edition.nom : j.nom, edition.erreur) +
         '<div class="compte-boutons"><button type="submit" class="btn btn-principal">Enregistrer</button><button type="button" class="btn btn-secondaire" data-act="annuler">Annuler</button></div></form>';
@@ -79,10 +69,7 @@
   function rendre() {
     var zone = $('joueurs-liste'), c = compte();
     if (!zone || !c || !J) return;
-    // « Joueur 1 » est créé sur place : on l'écrit sans lancer d'envoi au compte (son identifiant est fixe, deux appareils
-    // le créent donc de la même façon), pour ne pas déclencher une synchronisation à chaque ouverture de l'écran.
-    if (J.assurerPremier(c.etat)) { try { window.localStorage.setItem(window.Etoiles.CLE, JSON.stringify(c.etat)); } catch (e) { /* stockage plein ou interdit : le joueur reste en mémoire */ } }
-    var liste = J.lister(c.etat);
+    var liste = J.duCompte();
     $('joueurs-compte').textContent = liste.length + ' joueur' + (liste.length > 1 ? 's' : '');
     zone.innerHTML = liste.map(carte).join('') + carteCreer();
     if (focus) {

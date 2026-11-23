@@ -59,15 +59,10 @@ test('didacticiel : préparation et premier tour, flèche et bulle à chaque ét
   await flecheSur(page, '#btn-commencer');
   await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
 
-  // Étape 1 : la flèche montre les nombres, puis « Valider » une fois le nombre touché.
-  await expect(texte(page)).toContainText('Combien êtes-vous');
-  await flecheSur(page, '.nb-joueurs');
-  await page.locator('.nb-joueurs label').first().click();
-  await flecheSur(page, '#btn-valider-nb');
+  // Étape 1 : la flèche montre la liste des joueurs, puis « Valider ».
+  await expect(texte(page)).toContainText('Qui joue ?');
+  await flecheSur(page, '#btn-valider-joueurs');
   await bulleSansBouton(page);
-  await A.valider(page);
-
-  await expect(texte(page)).toContainText('choisis ton aventurier');
   await A.valider(page);
 
   await expect(texte(page)).toContainText('choisis ta matière');
@@ -146,9 +141,9 @@ test('didacticiel : continue après un rechargement de la page', async ({ page }
   await page.goto('./');
   await page.getByRole('button', { name: 'Oui, guide-moi' }).click();
   await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
-  await expect(texte(page)).toContainText('Combien êtes-vous');
+  await expect(texte(page)).toContainText('Qui joue');
   await page.reload();
-  await expect(texte(page)).toContainText('Combien êtes-vous');
+  await expect(texte(page)).toContainText('Qui joue');
   await page.getByRole('button', { name: 'Arrêter le guide' }).click();
   await expect(bulle(page)).toBeHidden();
 });

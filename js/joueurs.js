@@ -139,12 +139,28 @@
     return res;
   }
 
+  // ---------- Accès au compte de la page (navigateur seulement) ----------
+  // Les joueurs sont rangés dans la progression du compte (window.Recompenses.compte). « Joueur 1 » est créé sur place s'il
+  // manque, et écrit sans lancer d'envoi au compte (identifiant fixe : deux appareils le créent de la même façon).
+  function compteDeLaPage() { return racine.Recompenses && racine.Recompenses.compte; }
+  function duCompte() {
+    var c = compteDeLaPage();
+    if (!c) return [];
+    if (assurerPremier(c.etat)) {
+      try { racine.localStorage.setItem(racine.Etoiles.CLE, JSON.stringify(c.etat)); } catch (e) { /* stockage plein ou interdit : le joueur reste en mémoire */ }
+    }
+    return lister(c.etat);
+  }
+  // Enregistre un changement fait sur les joueurs (écriture + envoi au compte).
+  function enregistrer() { var c = compteDeLaPage(); if (c) c.ecrire(); }
+
   var api = {
     MATIERES: MATIERES, NOM_MAX: NOM_MAX, PERSO_DEFAUT: PERSO_DEFAUT, ID_PREMIER: ID_PREMIER, MESSAGES: MESSAGES,
     cle: cle, toutesLesCles: toutesLesCles, matiere: matiere,
     score: score, scoreMatiere: scoreMatiere, niveauDe: niveauDe, niveauMatiere: niveauMatiere, scoreGlobal: scoreGlobal, niveauGlobal: niveauGlobal,
     lister: lister, trouver: trouver, verifierNom: verifierNom, creer: creer, assurerPremier: assurerPremier,
-    renommer: renommer, changerPerso: changerPerso, ajouterPoints: ajouterPoints, fusionner: fusionner
+    renommer: renommer, changerPerso: changerPerso, ajouterPoints: ajouterPoints, fusionner: fusionner,
+    duCompte: duCompte, enregistrer: enregistrer, compteDeLaPage: compteDeLaPage
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else racine.Joueurs = api;

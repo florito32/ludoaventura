@@ -1,7 +1,7 @@
 // Baby jeux › Les chiffres › Les doigts (v10.7, demande du 17/11/2026) : mains noir sur blanc (Openclipart « Count on fingers », CC0)
 // à la place des mains dessinées en code (jugées moches). 1 à 5 : une main ; 6 à 10 : deux mains (5 + le reste).
 const { test, expect } = require('@playwright/test');
-const { rapide } = require('./aide');
+const { rapide, lancerRapideQui } = require('./aide');
 
 async function ouvrir(page, n) {
   await rapide(page);
@@ -12,7 +12,7 @@ async function ouvrir(page, n) {
   await page.goto('./');
   await page.getByRole('button', { name: 'Baby jeux' }).click();
   await page.getByRole('button', { name: 'Choisir les jeux' }).click();
-  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await lancerRapideQui(page);
   await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await expect(page.locator('#carte-gram .baby-mains')).toBeVisible();
 }

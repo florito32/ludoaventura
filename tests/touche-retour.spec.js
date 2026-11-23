@@ -8,12 +8,12 @@ const titrePrepa = (page) => page.getByRole('heading', { name: 'Préparer la par
 test('préparation : la touche précédent revient à l\'étape précédente, puis à l\'accueil', async ({ page }) => {
   await page.goto('./');
   await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
-  await valider(page); // 1 joueur → choix de l'aventurier
-  await expect(page.locator('#prepa-progres')).toHaveText('Étape 2 sur 4');
+  await valider(page); // Joueur 1 → réglages
+  await expect(page.locator('#prepa-progres')).toHaveText('Étape 2 sur 3');
   await page.goBack();
   await expect(titrePrepa(page)).toBeVisible();
-  await expect(page.locator('#prepa-progres')).toHaveText('Étape 1 sur 4');
-  await page.locator('.nb-joueurs label').nth(2).click(); // un toucher entre deux appuis, comme en vrai
+  await expect(page.locator('#prepa-progres')).toHaveText('Étape 1 sur 3');
+  await page.locator('[data-ouvrir="0"]').click(); // un toucher entre deux appuis, comme en vrai
   await page.goBack();
   await expect(page.getByRole('button', { name: 'Commencer l\'aventure' })).toBeVisible();
 });

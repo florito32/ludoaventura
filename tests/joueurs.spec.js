@@ -131,7 +131,7 @@ test('sans compte : « Joueur 1 » existe déjà, avec 4 jauges à 0 (niveau 1) 
   expect(await sansDebordement(page)).toBe(true);
 });
 
-test('les jauges montrent la moyenne des sous-matières ; les 17 sous-matières se déplient', async ({ page }) => {
+test('les jauges montrent la moyenne des sous-matières ; les sous-matières restent invisibles', async ({ page }) => {
   await preparer(page, { etat: { v: 1, total: 0, joueurs: [{ id: 'j-1', nom: 'Léa', perso: 'lea', cree: '2026-11-01T00:00:00Z', maj: '2026-11-01T00:00:00Z',
     niv: { 'maths.calcul': 60, 'maths.probleme': 25, 'francais.orthographe': 100, 'francais.conjugaison': 100, 'francais.grammaire': 100, 'francais.phonemes': 100 } }] } });
   await ouvrirCompte(page);
@@ -142,12 +142,10 @@ test('les jauges montrent la moyenne des sous-matières ; les 17 sous-matières 
   await expect(c.locator('.jm').filter({ hasText: 'Maths' }).first().locator('.jm-val')).toHaveText('Niv. 5 · 42');
   // Niveau moyen : (100 + 42,5 + 0 + 0) / 4 = 35,6 → niveau 4.
   await expect(c.locator('.joueur-niv')).toHaveText('Niv. 4');
-  const details = c.locator('.joueur-details');
-  await expect(details.locator('.jm')).toHaveCount(17);
-  await details.locator('summary').click();
-  await expect(details.getByText('Calcul mental')).toBeVisible();
-  await expect(details.getByText('Préhistoire')).toBeVisible();
-  await expect(details.getByText('Nature')).toBeVisible();
+  // v10.27 : les sous-matières restent enregistrées mais ne se voient pas (demande du 23/11/2026, 10 h 19).
+  await expect(c.locator('.joueur-details, details, summary')).toHaveCount(0);
+  await expect(c.locator('.jm')).toHaveCount(4);
+  await expect(c.getByText(/Calcul mental|Préhistoire|Nature|Orthographe/)).toHaveCount(0);
   expect(await sansDebordement(page)).toBe(true);
 });
 
@@ -247,7 +245,6 @@ test('accessibilité et aucun débordement avec 5 joueurs @smoke', async ({ page
   await preparer(page, { etat: { v: 1, total: 0, joueurs } });
   await ouvrirCompte(page);
   await expect(page.locator('.joueur-carte')).toHaveCount(5);
-  await page.locator('.joueur-details summary').first().click();
   expect(await sansDebordement(page)).toBe(true);
   const r = await new AxeBuilder({ page }).include('#compte-joueurs').analyze();
   expect(r.violations.map((v) => v.id + ' : ' + v.help)).toEqual([]);

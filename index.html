@@ -377,7 +377,7 @@
   </section>
 
   <!-- ÉCRAN 2 : préparation de la partie, en écrans successifs (un seul visible, sans défiler) :
-       1 nombre de joueurs → 2 aventurier de chaque joueur → 3 packs et questions de chaque joueur → 4 aventure.
+       1 joueurs de la partie (v10.27) → 2 packs et questions de chaque joueur → 3 aventure.
        Navigation : js/plateau.js (montrerEtape). -->
   <section class="ecran preparation" id="ecran-preparation" aria-labelledby="titre-preparation" hidden>
     <header class="barre">
@@ -387,34 +387,20 @@
     </header>
 
     <form id="form-preparation" class="prepa" novalidate>
+      <!-- v10.27 (demande du 23/11/2026) : une seule étape pour les joueurs. Plus de « Combien de joueurs ? » ni de choix de
+           l'aventurier : on choisit parmi les joueurs créés dans le compte, 4 au plus (js/choix-joueurs.js, proposition A). -->
       <fieldset class="bloc etape" data-etape="1" tabindex="-1">
-        <legend><span class="etape-num">1</span> Combien de joueurs ?</legend>
+        <legend><span class="etape-num">1</span> Qui joue ?</legend>
         <div class="etape-corps">
-          <div class="nb-joueurs">
-            <label><input type="radio" name="nb" value="1" checked><span>1<span class="visually-hidden"> joueur</span></span></label>
-            <label><input type="radio" name="nb" value="2"><span>2<span class="visually-hidden"> joueurs</span></span></label>
-            <label><input type="radio" name="nb" value="3"><span>3<span class="visually-hidden"> joueurs</span></span></label>
-            <label><input type="radio" name="nb" value="4"><span>4<span class="visually-hidden"> joueurs</span></span></label>
-          </div>
+          <div class="choix-joueurs" id="choix-joueurs"></div>
         </div>
         <div class="etape-actions">
-          <button type="button" class="btn btn-principal" id="btn-valider-nb">Valider</button>
+          <button type="button" class="btn btn-principal" id="btn-valider-joueurs">Valider</button>
         </div>
       </fieldset>
 
       <fieldset class="bloc etape" data-etape="2" tabindex="-1" hidden>
-        <legend><span class="etape-num">2</span> <span id="aventurier-legende">Joueur 1, choisis ton aventurier</span></legend>
-        <!-- Grille des 10 aventuriers (js/plateau.js) ; un aventurier pris par un autre joueur est grisé. -->
-        <div class="etape-corps">
-          <div class="aventuriers" id="grille-aventuriers"></div>
-        </div>
-        <div class="etape-actions">
-          <button type="button" class="btn btn-principal" id="btn-valider-aventurier">Valider</button>
-        </div>
-      </fieldset>
-
-      <fieldset class="bloc etape" data-etape="3" tabindex="-1" hidden>
-        <legend><span class="etape-num">3</span> <span id="reglages-titre"></span></legend>
+        <legend><span class="etape-num">2</span> <span id="reglages-titre"></span></legend>
         <!-- Cartes du joueur (v5.7) : d'abord la matière (Mathématiques ou Français), puis ses réglages.
              Mathématiques : signes, nombres de 1 à 10, dizaines, centaines, niveau (js/calcul.js).
              Français → Orthographe : packs où il pioche, questions posées (js/cartes.js, js/questions.js).
@@ -625,8 +611,8 @@
         </div>
       </fieldset>
 
-      <fieldset class="bloc etape" data-etape="4" tabindex="-1" hidden>
-        <legend><span class="etape-num">4</span> <span id="titre-choix-aventure">Choisis ton aventure</span></legend>
+      <fieldset class="bloc etape" data-etape="3" tabindex="-1" hidden>
+        <legend><span class="etape-num">3</span> <span id="titre-choix-aventure">Choisis ton aventure</span></legend>
         <div class="etape-corps etape-aventure">
           <div class="aventures" id="liste-aventures"><!-- cartes générées par js/plateau.js --></div>
           <div class="aventure-detail" id="aventure-detail" aria-live="polite"></div>
@@ -963,6 +949,16 @@
   </form>
 </dialog>
 
+<!-- v10.27 : « Qui joue ? » demandé à chaque lancement d'un défi du jour, d'une partie rapide ou de Baby jeux (js/plateau.js). -->
+<dialog class="fin fenetre-compte fenetre-joueurs" id="fenetre-joueurs" aria-labelledby="fenetre-joueurs-titre">
+  <h2 id="fenetre-joueurs-titre">Qui joue ?</h2>
+  <div class="choix-joueurs" id="fenetre-joueurs-choix"></div>
+  <div class="menu-actions">
+    <button type="button" class="btn btn-principal" id="fenetre-joueurs-ok" disabled>C’est parti</button>
+    <button type="button" class="btn btn-secondaire" id="fenetre-joueurs-annuler">Annuler</button>
+  </div>
+</dialog>
+
 <script src="js/des.js"></script>
 <script src="js/aventures.js"></script>
 <script src="js/aventuriers.js"></script>
@@ -1002,6 +998,7 @@
 <script src="js/recompenses.js"></script>
 <script src="js/figurines.js"></script>
 <script src="js/selecteur.js"></script>
+<script src="js/choix-joueurs.js"></script>
 <script src="js/plateau.js"></script>
 <script src="js/plein-ecran.js"></script>
 <script src="js/rapide.js"></script>

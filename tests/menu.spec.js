@@ -1,7 +1,7 @@
 // Menu de la partie (v6.22, demande du 04/11/2026) : une icône près du plateau ouvre, au milieu de l'écran,
 // « Redémarrer partie », « Modifier les choix » et « Retour à l'accueil ».
 const { test, expect } = require('@playwright/test');
-const { repondre, lancerPartie, lancerLeDe, attendreJoueur, valider, cocherJoueur } = require('./aide');
+const { repondre, lancerPartie, lancerLeDe, attendreJoueur, valider, cocherJoueur, creerJoueurs } = require('./aide');
 
 async function jouerUnTour(page) {
   await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
@@ -59,8 +59,8 @@ test('« Modifier les choix » : on change l\'aventure, puis la partie reprend l
   await page.getByRole('button', { name: 'Menu' }).click();
   await page.getByRole('button', { name: 'Modifier les choix' }).click();
   await expect(page.getByRole('heading', { name: 'Préparer la partie' })).toBeVisible();
-  await expect(page.locator('#prepa-progres')).toHaveText('Étape 1 sur 4');
-  await expect(page.locator('input[name="nb"]:checked')).toHaveValue('2'); // les choix sont gardés
+  await expect(page.locator('#prepa-progres')).toHaveText('Étape 1 sur 3');
+  await expect(page.locator('.cj-ligne')).toHaveCount(2); // les choix sont gardés
   await page.reload(); // un rechargement garde la modification en cours
   await expect(page.locator('#prepa-retour-texte')).toHaveText('Partie');
   // On avance jusqu'au choix de l'aventure : le dernier bouton reprend la partie.
@@ -88,11 +88,13 @@ test('« Modifier les choix » : un joueur ajouté joue la manche en cours à so
   const pts = await page.locator('#points').textContent();
   await page.getByRole('button', { name: 'Menu' }).click();
   await page.getByRole('button', { name: 'Modifier les choix' }).click();
-  await page.getByRole('radio', { name: /^3 joueurs$/ }).check();
+  await creerJoueurs(page, 3);
+  await page.locator('[data-ajouter]').click();
+  await page.locator('.cj-profil[data-choisir]:not([disabled])').first().click();
   await valider(page);
-  // Aventuriers (le 3e est proposé par défaut) puis réglages des joueurs 1 et 2, déjà faits.
+  // Réglages des joueurs 1 et 2, déjà faits, puis celui du nouveau joueur.
   const progres = page.locator('#prepa-progres');
-  while ((await progres.textContent()) !== 'Étape 3 sur 4 · Joueur 3 sur 3') await valider(page);
+  while ((await progres.textContent()) !== 'Étape 2 sur 3 · Joueur 3 sur 3') await valider(page);
   await cocherJoueur(page); await valider(page); // le nouveau joueur choisit ses cartes
   await page.getByRole('button', { name: 'Reprendre la partie' }).click();
   await expect(page.locator('.pion')).toHaveCount(3);
@@ -123,7 +125,7 @@ test('« Retour à l\'accueil » : la partie est arrêtée et tout repart de zé
   await page.reload();
   await expect(page.getByRole('button', { name: 'Commencer l\'aventure' })).toBeVisible();
   await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
-  await expect(page.locator('input[name="nb"]:checked')).toHaveValue('1');
+  await expect(page.locator('.cj-ligne')).toHaveCount(1);
 });
 
 test('v6.25 : refermer le menu pendant la confirmation, puis le rouvrir, montre de nouveau les 3 choix', async ({ page }) => {

@@ -7,7 +7,7 @@ const A = require('../js/aventures.js');
 const D = require('../js/defis.js');
 const G = require('../js/grammaire.js');
 const PH = require('../js/phonemes.js');
-const { rapide } = require('./aide');
+const { rapide, lancerRapideQui } = require('./aide');
 
 test.describe('tirage de la partie rapide', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
@@ -107,7 +107,7 @@ test('accueil → Partie rapide solo : matières (« Tout » / « Aucune » à c
   // Tout tient sans défiler.
   const tient = await page.evaluate(() => { const b = document.getElementById('btn-lancer-rapide').getBoundingClientRect(); return b.bottom <= window.innerHeight; });
   expect(tient).toBe(true);
-  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await lancerRapideQui(page);
   // Directement sur le plateau : 1 aventurier, aventure difficile.
   await expect(page.getByRole('heading', { name: 'Partie rapide' })).toBeVisible();
   const p = await page.evaluate(() => ({ nb: window.Aventura.partie.joueurs.length, rapide: window.Aventura.partie.rapide, diff: window.Aventura.partie.aventure.difficulte, mots: window.Aventura.partie.mots[0], types: window.Aventura.partie.types[0] }));
@@ -146,7 +146,7 @@ test('fin de partie rapide : « Recommencer la partie » et « Retour à l’acc
   await page.goto('./');
   await page.getByRole('button', { name: 'Partie rapide solo' }).click();
   await expect(page.getByRole('radio', { name: 'Moyen' })).toBeChecked();
-  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await lancerRapideQui(page);
   await expect(page.getByRole('heading', { name: 'Partie rapide' })).toBeVisible();
   const av = await page.evaluate(() => window.Aventura.partie.aventure.id);
   async function jouer() {
@@ -187,7 +187,7 @@ test('partie rapide : « Modifier les choix » revient aux réglages de la parti
   await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); localStorage.setItem('ludoaventura-rapide-choix', JSON.stringify({ matieres: ['maths'], niveau: 'moyen' })); } catch (e) { /* */ } });
   await page.goto('./');
   await page.getByRole('button', { name: 'Partie rapide solo' }).click();
-  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await lancerRapideQui(page);
   // Sur ordinateur, une carte est piochée avant de modifier (elle sera repiochée) ; sur téléphone la question
   // prend tout l'écran (v9.0), on passe par le menu avant de piocher.
   if (test.info().project.name === 'ordinateur') {
@@ -231,7 +231,7 @@ test('partie rapide : problèmes de maths et phonèmes s’affichent sur le plat
   await page.getByRole('button', { name: 'Partie rapide solo' }).click();
   // Toutes les matières sont cochées au départ.
   await expect(page.getByRole('button', { name: 'Aucune' })).toBeVisible();
-  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await lancerRapideQui(page);
   await expect(page.getByRole('heading', { name: 'Partie rapide' })).toBeVisible();
   const vus = await page.evaluate(() => {
     const j = window.Aventura.partie.joueurs[0], v = { probleme: 0, calcul: 0, phonemes: 0, baby: 0 };
@@ -257,4 +257,24 @@ test('partie rapide : problèmes de maths et phonèmes s’affichent sur le plat
   await expect(page.locator('#carte-piochee')).toContainText('Phonèmes');
   const largeur = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
   expect(largeur).toBe(true);
+});
+
+test('v10.27 : « Qui joue ? » est demandé au lancement ; « Annuler » ne lance rien ; « C’est parti » lance avec le joueur du compte', async ({ page }) => {
+  await rapide(page);
+  await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); } catch (e) { /* */ } });
+  await page.goto('./');
+  await page.getByRole('button', { name: 'Partie rapide solo' }).click();
+  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  const fenetre = page.getByRole('dialog', { name: 'Qui joue ?' });
+  await expect(fenetre).toBeVisible();
+  await expect(fenetre.locator('.cj-ligne')).toHaveCount(1); // solo : une seule place, pas de « Ajouter un joueur »
+  await expect(fenetre.locator('[data-ajouter]')).toHaveCount(0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await fenetre.getByRole('button', { name: 'Annuler' }).click();
+  await expect(fenetre).toBeHidden();
+  await expect(page.getByRole('heading', { name: 'Partie rapide' })).toBeVisible();
+  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await fenetre.getByRole('button', { name: 'C’est parti' }).click();
+  await expect(page.getByRole('heading', { name: 'Partie rapide', level: 1 }).or(page.locator('#titre-plateau'))).toBeVisible();
+  expect(await page.evaluate(() => window.Aventura.partie.profils)).toEqual(['j-1']);
 });

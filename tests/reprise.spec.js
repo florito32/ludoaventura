@@ -89,7 +89,7 @@ test('rafraîchir la préparation garde l\'écran et les choix (joueurs, joueur 
   await valider(page); // joueur 2
   await page.reload();
   await expect(page.getByRole('heading', { name: /Préparer/ })).toBeVisible();
-  await expect(page.locator('#prepa-progres')).toHaveText('Étape 3 sur 4 · Joueur 2 sur 3');
+  await expect(page.locator('#prepa-progres')).toHaveText('Étape 2 sur 3 · Joueur 2 sur 3');
   await page.getByRole('button', { name: /Retour/ }).click();
   await expect(page.getByRole('checkbox', { name: 'Nombre de syllabes', exact: true })).toBeChecked();
   await page.getByRole('button', { name: /Retour/ }).click();
@@ -102,7 +102,7 @@ test('rafraîchir la préparation garde l\'écran et les choix (joueurs, joueur 
   await page.getByRole('radio', { name: /^Savane/ }).check();
   await page.reload();
   await expect(page.getByRole('radio', { name: /^Savane/ })).toBeChecked();
-  await expect(page.locator('#prepa-progres')).toHaveText('Étape 4 sur 4');
+  await expect(page.locator('#prepa-progres')).toHaveText('Étape 3 sur 3');
   await expect(page.locator('#aventure-detail')).toContainText('3 joueurs');
 });
 
