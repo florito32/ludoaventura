@@ -377,7 +377,7 @@
   </section>
 
   <!-- ÉCRAN 2 : préparation de la partie, en écrans successifs (un seul visible, sans défiler) :
-       1 joueurs de la partie (v10.27) → 2 packs et questions de chaque joueur → 3 aventure.
+       1 joueurs de la partie (v10.29) → 2 packs et questions de chaque joueur → 3 aventure.
        Navigation : js/plateau.js (montrerEtape). -->
   <section class="ecran preparation" id="ecran-preparation" aria-labelledby="titre-preparation" hidden>
     <header class="barre">
@@ -387,7 +387,7 @@
     </header>
 
     <form id="form-preparation" class="prepa" novalidate>
-      <!-- v10.27 (demande du 23/11/2026) : une seule étape pour les joueurs. Plus de « Combien de joueurs ? » ni de choix de
+      <!-- v10.29 (demande du 23/11/2026) : une seule étape pour les joueurs. Plus de « Combien de joueurs ? » ni de choix de
            l'aventurier : on choisit parmi les joueurs créés dans le compte, 4 au plus (js/choix-joueurs.js, proposition A). -->
       <fieldset class="bloc etape" data-etape="1" tabindex="-1">
         <legend><span class="etape-num">1</span> Qui joue ?</legend>
@@ -772,6 +772,8 @@
   <p class="fin-icone" id="fin-icone" aria-hidden="true"></p>
   <h2 id="fin-titre"></h2>
   <p id="fin-texte"></p>
+  <!-- v10.28 (backlog ligne 446) : réussite de chaque joueur, à plusieurs — objectif de l'équipe ÷ nombre de joueurs. -->
+  <div class="fin-joueurs" id="fin-joueurs" hidden></div>
   <!-- Étoiles gagnées avec la partie (v6.36) : remplies par js/recompenses.js. -->
   <div class="fin-etoiles" id="fin-etoiles" hidden></div>
   <div class="fin-actions">
@@ -949,7 +951,7 @@
   </form>
 </dialog>
 
-<!-- v10.27 : « Qui joue ? » demandé à chaque lancement d'un défi du jour, d'une partie rapide ou de Baby jeux (js/plateau.js). -->
+<!-- v10.29 : « Qui joue ? » demandé à chaque lancement d'un défi du jour, d'une partie rapide ou de Baby jeux (js/plateau.js). -->
 <dialog class="fin fenetre-compte fenetre-joueurs" id="fenetre-joueurs" aria-labelledby="fenetre-joueurs-titre">
   <h2 id="fenetre-joueurs-titre">Qui joue ?</h2>
   <div class="choix-joueurs" id="fenetre-joueurs-choix"></div>

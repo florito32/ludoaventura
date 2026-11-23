@@ -2312,7 +2312,7 @@ body:has(#ecran-baby:not([hidden])) .pied { padding-block: 4px calc(4px + env(sa
 .joueur-ajout:hover { background: var(--parchemin); }
 @media (max-width: 380px) { .jm { grid-template-columns: 4.6rem minmax(0, 1fr) 5.6rem; } }
 
-/* ---------- Préparation › Qui joue ? (v10.27, js/choix-joueurs.js) ---------- */
+/* ---------- Préparation › Qui joue ? (v10.29, js/choix-joueurs.js) ---------- */
 .choix-joueurs { width: min(100%, 520px); margin: 0 auto; text-align: left; }
 .cj-places { display: flex; flex-direction: column; gap: 10px; }
 .cj-ligne {
@@ -2351,3 +2351,13 @@ body:has(#ecran-baby:not([hidden])) .pied { padding-block: 4px calc(4px + env(sa
   .cj-btn { min-height: 36px; padding: 2px 10px; }
   .cj-ajouter { min-height: 40px; margin-top: 4px; }
 }
+
+/* v10.28 : réussite de chaque joueur sur l'écran de fin (backlog ligne 446) */
+.fin-joueurs { margin: .5rem 0 0; }
+.fin-joueurs-titre { margin: 0 0 .35rem; font-weight: 700; }
+.fin-joueurs-liste { list-style: none; margin: 0; padding: 0; display: grid; gap: .3rem; }
+.fin-joueurs-liste li { display: flex; align-items: center; gap: .5rem; padding: .3rem .6rem; border-radius: .6rem; background: #f3ece2; }
+.fin-joueurs-liste .fj-nom { font-weight: 700; flex: 1 1 auto; text-align: left; }
+.fin-joueurs-liste .fj-pts { font-variant-numeric: tabular-nums; }
+.fin-joueurs-liste li.reussi { background: #e3f3e0; }
+.fin-joueurs-liste li.manque { background: #f7ece3; }

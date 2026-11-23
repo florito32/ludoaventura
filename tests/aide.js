@@ -99,7 +99,7 @@ async function cocherTout(page, joueurs) {
   await page.getByRole('button', { name: 'Lancer la partie' }).waitFor();
 }
 
-// De l'accueil jusqu'aux réglages des cartes du joueur 1 (v10.27) : l'étape « Qui joue ? » choisit parmi les joueurs du compte.
+// De l'accueil jusqu'aux réglages des cartes du joueur 1 (v10.29) : l'étape « Qui joue ? » choisit parmi les joueurs du compte.
 // Les tests créent d'abord les joueurs manquants dans le compte (Joueur 1 existe toujours), puis les ajoutent un à un.
 async function creerJoueurs(page, joueurs) {
   // Les joueurs de test portent le nom et le personnage des aventuriers dans l'ordre (Léa, Tom, Nour, Malo) : les anciens
@@ -112,7 +112,7 @@ async function creerJoueurs(page, joueurs) {
     localStorage.setItem(window.Etoiles.CLE, JSON.stringify(c.etat));
   }, joueurs);
 }
-// Fenêtre « Qui joue ? » (v10.27), demandée au lancement d'un défi, d'une partie rapide ou de Baby jeux : remplit les places
+// Fenêtre « Qui joue ? » (v10.29), demandée au lancement d'un défi, d'une partie rapide ou de Baby jeux : remplit les places
 // vides avec les premiers joueurs libres du compte, puis « C'est parti ». Les joueurs doivent exister (creerJoueurs) avant.
 async function quiJoue(page) {
   const fenetre = page.getByRole('dialog', { name: 'Qui joue ?' });
