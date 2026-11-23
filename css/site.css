@@ -2361,3 +2361,31 @@ body:has(#ecran-baby:not([hidden])) .pied { padding-block: 4px calc(4px + env(sa
 .fin-joueurs-liste .fj-pts { font-variant-numeric: tabular-nums; }
 .fin-joueurs-liste li.reussi { background: #e3f3e0; }
 .fin-joueurs-liste li.manque { background: #f7ece3; }
+
+/* v10.30 (backlog lignes 447, 453, 454) : trésor de chaque joueur dans sa carte (Mon compte), en-tête des écrans
+   « Mes étoiles » / « Ma progression », gains de chacun en fin de partie, note du coffre à ouvrir. */
+.joueur-tresor { display: grid; gap: 8px; padding: 8px 10px; border-radius: 12px; background: #fff7e0; border: 2px solid var(--parchemin-bord); }
+.jt-ligne { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 14px; font-weight: 700; }
+.jt-ligne > span { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.jt-ligne .ico { width: 22px; height: 22px; }
+.jt-ligne strong { font: 800 1.15rem/1 "Rockwell", "Roboto Slab", Georgia, serif; }
+.jt-gemmes { color: #12687b; }
+.jt-niveau { background: #f2b705; color: var(--encre); border-radius: 99px; padding: 1px 10px; font-size: .88rem; }
+.joueur-tresor .compte-boutons { margin: 0; }
+.jt-coffres .ico { width: 26px; height: 26px; }
+.tresor-de { margin: 0 auto; max-width: 560px; width: 100%; display: flex; align-items: center; gap: 8px; color: #fff; font-size: 1.05rem; }
+.tresor-de img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #fff; background: #fff; object-fit: cover; object-position: top; }
+.vers-progression { margin: 0 auto; max-width: 560px; width: 100%; text-align: center; }
+.vers-progression .btn { display: inline-flex; align-items: center; gap: 6px; }
+.vers-progression .ico { width: 26px; height: 26px; }
+.fin-gains-joueurs { list-style: none; margin: .4rem 0 0; padding: 0; display: grid; gap: .3rem; }
+.fin-gains-joueurs li { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem .7rem; padding: .3rem .6rem; border-radius: .6rem; background: #f3ece2; }
+.fin-gains-joueurs .fg-nom { font-weight: 700; flex: 1 1 auto; text-align: left; min-width: 0; overflow-wrap: anywhere; }
+.fin-gains-joueurs span { display: inline-flex; align-items: center; gap: 3px; font-weight: 800; }
+.fin-gains-joueurs .ico { width: 18px; height: 18px; }
+.fin-gains-joueurs .fg-gemmes { color: #12687b; }
+.fin-coffre-note { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 6px 0 0; font-weight: 700; }
+.fin-coffre-note .ico { width: 28px; height: 28px; flex: none; }
+.pastille-compte.recoit { animation: compte-recoit .3s ease-out; }
+@keyframes compte-recoit { 50% { transform: scale(1.12); } }
+@media (prefers-reduced-motion: reduce) { .pastille-compte.recoit { animation: none; } }

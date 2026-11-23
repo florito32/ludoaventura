@@ -114,6 +114,11 @@
     return j.niv[cle(matiereId, sousId)];
   }
 
+  function libEtoiles() {
+    if (racine && racine.Etoiles) return racine.Etoiles;
+    if (typeof require === 'function') { try { return require('./etoiles.js'); } catch (e) { return null; } }
+    return null;
+  }
   // ---------- Fusion (compte ↔ appareil) ----------
   // Même joueur (même id) : nom et personnage les plus récents, niveaux = le plus haut des deux (on ne perd jamais un
   // niveau gagné). Joueurs présents d'un seul côté : gardés. Les noms identiques de deux joueurs différents (créés chacun
@@ -129,6 +134,8 @@
       x.maj = String(j.maj || '') > String(x.maj || '') ? j.maj : x.maj;
       x.cree = String(j.cree || '') && String(j.cree) < String(x.cree || '9') ? j.cree : x.cree;
       Object.keys(j.niv || {}).forEach(function (k) { x.niv[k] = Math.max(borne(x.niv[k]), borne(j.niv[k])); });
+      // Trésor du joueur (v10.30 : étoiles, pierres, coffres) : le meilleur des deux (js/etoiles.js → fusionnerRec).
+      if (x.rec || j.rec) { var E = libEtoiles(); if (E) x.rec = E.fusionnerRec(x.rec, j.rec); else x.rec = x.rec || j.rec; }
     });
     var vus = {};
     res.forEach(function (j) {

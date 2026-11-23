@@ -70,7 +70,76 @@
       // defisEnCours : { solo: { jour, id } } défi commencé et pas encore fini ; defisQuittes : { jour: { solo: true } } (v6.47).
       defisEnCours: {}, defisQuittes: {},
       // joueurs : les joueurs du compte (nom, personnage, niveaux), voir js/joueurs.js (v10.26).
-      joueurs: [] };
+      joueurs: [],
+      // parJoueur (v10.30) : 1 quand les étoiles, pierres et coffres du compte ont été donnés à « Joueur 1 » (voir migrer).
+      parJoueur: 0 };
+  }
+  // Trésor propre à un joueur (v10.30, backlog lignes 447, 453, 454) : mêmes champs que le compte, rangés dans joueur.rec.
+  // Un nouveau joueur a ses coffres simples dès le niveau 2 (simplesDepuis 1).
+  var CHAMPS_REC = ['total', 'gemmes', 'journal', 'parJour', 'coffresJour', 'coffresNiveau', 'coffresMega', 'visites', 'defis', 'parties', 'simplesDepuis'];
+  function recVide() {
+    return { total: 0, gemmes: 0, journal: [], parJour: {}, coffresJour: {}, coffresNiveau: {}, coffresMega: {}, visites: [], defis: {}, parties: [], simplesDepuis: 1, defisEnCours: {}, defisQuittes: {} };
+  }
+  function recNormal(r) {
+    var e = recVide();
+    if (r && typeof r === 'object') CHAMPS_REC.forEach(function (k) { if (r[k] !== undefined && r[k] !== null) e[k] = r[k]; });
+    return e;
+  }
+  function obj(x) { return x && typeof x === 'object' && !Array.isArray(x) ? x : {}; }
+  function num(x) { return typeof x === 'number' && isFinite(x) ? x : 0; }
+  function lst(x) { return Array.isArray(x) ? x : []; }
+  function union(a, b) { var r = lst(a).slice(); lst(b).forEach(function (x) { if (r.indexOf(x) < 0) r.push(x); }); return r; }
+  // Fusion de deux trésors d'un même joueur (deux appareils, ou migration) : on garde le meilleur des deux, sans rien
+  // compter deux fois (le plus grand total, les coffres ouverts d'un côté ou de l'autre…). js/compte.js corrige ensuite
+  // le total et les pierres avec ce qui a déjà été envoyé au compte, quand il le connaît.
+  function fusionnerRec(a, b) {
+    var x = recNormal(a), y = recNormal(b), r = recNormal(x);
+    r.total = Math.max(num(x.total), num(y.total));
+    r.gemmes = Math.max(num(x.gemmes), num(y.gemmes));
+    r.parJour = Object.assign({}, obj(x.parJour));
+    Object.keys(obj(y.parJour)).forEach(function (j) { r.parJour[j] = Math.max(num(r.parJour[j]), num(y.parJour[j])); });
+    ['coffresJour', 'coffresNiveau'].forEach(function (k) {
+      r[k] = Object.assign({}, obj(x[k]));
+      Object.keys(obj(y[k])).forEach(function (c) { if (r[k][c] === undefined) r[k][c] = y[k][c]; });
+    });
+    r.coffresMega = Object.assign({}, obj(x.coffresMega));
+    Object.keys(obj(y.coffresMega)).forEach(function (c) { if (r.coffresMega[c] === undefined || r.coffresMega[c] === null) r.coffresMega[c] = y.coffresMega[c]; });
+    r.defis = {};
+    [x.defis, y.defis].forEach(function (d) {
+      Object.keys(obj(d)).forEach(function (j) {
+        r.defis[j] = r.defis[j] || {};
+        Object.keys(obj(d[j])).forEach(function (t) { r.defis[j][t] = Math.max(num(r.defis[j][t]), num(d[j][t])); });
+      });
+    });
+    r.visites = union(x.visites, y.visites).sort();
+    r.parties = union(x.parties, y.parties).slice(0, 50);
+    // Le plus petit des deux, parmi les côtés qui existent (un joueur sans trésor prend celui de l'autre côté).
+    var sd = [a, b].filter(function (z) { return z && typeof z === 'object' && typeof z.simplesDepuis === 'number'; }).map(function (z) { return z.simplesDepuis; });
+    r.simplesDepuis = sd.length ? Math.min.apply(null, sd) : 1;
+    var vu = {}, journal = [];
+    lst(x.journal).concat(lst(y.journal)).forEach(function (g) {
+      var k = g && (g.quand + '|' + g.type + '|' + g.n);
+      if (g && !vu[k]) { vu[k] = true; journal.push(g); }
+    });
+    journal.sort(function (p, q) { return String(q.quand).localeCompare(String(p.quand)); });
+    r.journal = journal.slice(0, JOURNAL_MAX);
+    return r;
+  }
+  function libJoueurs() {
+    if (racine && racine.Joueurs) return racine.Joueurs;
+    if (typeof require === 'function') { try { return require('./joueurs.js'); } catch (e) { return null; } }
+    return null;
+  }
+  // Migration (v10.30) : ce que le compte avait gagné avant les trésors par joueur revient à « Joueur 1 » (choix de
+  // l'utilisateur, ligne 445). Une seule fois (parJoueur) ; refaite sans risque (fusion = le meilleur des deux).
+  function migrer(e) {
+    if (e.parJoueur) return;
+    var J = libJoueurs();
+    if (!J) return;
+    J.assurerPremier(e);
+    var p = J.trouver(e, J.ID_PREMIER) || e.joueurs[0];
+    if (p) p.rec = fusionnerRec(p.rec, e);
+    e.parJoueur = 1;
   }
   // stockage : objet avec getItem / setItem (localStorage dans la page, une imitation dans les tests).
   function Compte(stockage, maintenant) {
@@ -84,6 +153,7 @@
     var e = vide();
     if (d && d.v === 1) for (var k in e) if (d[k] !== undefined) e[k] = d[k];
     if (e.simplesDepuis === null) e.simplesDepuis = niveau(e.total).niveau;
+    migrer(e);
     return e;
   };
   Compte.prototype.ecrire = function () {
@@ -95,6 +165,7 @@
   // Ajoute n pierres précieuses (v6.46).
   Compte.prototype.gagnerGemmes = function (n) {
     this.etat.gemmes = (this.etat.gemmes || 0) + Math.max(0, Math.round(n));
+    if (this.parent) this.parent.etat.gemmes = (this.parent.etat.gemmes || 0) + Math.max(0, Math.round(n)); // total du compte (classements)
     this.ecrire();
     return n;
   };
@@ -113,6 +184,13 @@
     // Ménage : on ne garde que les derniers jours dans les totaux par jour.
     var limite = jour(joursAvant(this.maintenant(), JOURS_GARDES));
     Object.keys(e.parJour).forEach(function (k) { if (k < limite) delete e.parJour[k]; });
+    // Trésor d'un joueur (v10.30) : le compte garde aussi le total de tous ses joueurs (table stats_joueur, classements).
+    if (this.parent) {
+      var pe = this.parent.etat;
+      pe.total += n;
+      pe.parJour[j] = (pe.parJour[j] || 0) + n;
+      Object.keys(pe.parJour).forEach(function (k) { if (k < limite) delete pe.parJour[k]; });
+    }
     var coffres = [];
     for (var L = avant + 1; L <= apres; L++) {
       var t = coffreDuNiveau(L);
@@ -218,10 +296,12 @@
   // ---------- Défi quitté (v6.47) ----------
   // Un défi commence (id : identifiant de la partie). Si un autre défi du même type était encore en cours
   // aujourd'hui, il a été quitté avant la fin.
-  Compte.prototype.commencerDefi = function (defi, id) {
+  // joueurs (v10.30) : identifiants des joueurs de la partie ; seuls eux perdent la récompense s'ils quittent.
+  Compte.prototype.commencerDefi = function (defi, id, joueurs) {
     var e = this.etat, j = this.aujourdhui(), c = e.defisEnCours[defi];
     if (c && c.jour === j && c.id !== id) this.marquerQuitte(defi);
     e.defisEnCours[defi] = { jour: j, id: id };
+    if (joueurs && joueurs.length) e.defisEnCours[defi].joueurs = joueurs.slice();
     this.ecrire();
   };
   // Le défi en cours (s'il y en a un) a été quitté : plus de récompense pour ce défi aujourd'hui.
@@ -230,7 +310,9 @@
     delete e.defisEnCours[defi];
     if (c && c.jour !== j) { this.ecrire(); return; } // défi d'un autre jour : rien à bloquer aujourd'hui
     e.defisQuittes[j] = e.defisQuittes[j] || {};
-    e.defisQuittes[j][defi] = true;
+    // v10.30 : « solo@j-1 » = quitté par ce joueur seulement ; « solo » (sans joueurs connus) = pour tout le compte.
+    if (c && c.joueurs && c.joueurs.length) c.joueurs.forEach(function (pid) { e.defisQuittes[j][defi + '@' + pid] = true; });
+    else e.defisQuittes[j][defi] = true;
     // Ménage : seulement aujourd'hui.
     Object.keys(e.defisQuittes).forEach(function (k) { if (k !== j) delete e.defisQuittes[k]; });
     this.ecrire();
@@ -244,7 +326,8 @@
     });
   };
   // Vrai si ce défi a été quitté aujourd'hui.
-  Compte.prototype.defiQuitte = function (defi) { var q = this.etat.defisQuittes[this.aujourdhui()]; return !!(q && q[defi]); };
+  // pid (v10.30) : pour un joueur précis (sinon : quitté par le compte entier).
+  Compte.prototype.defiQuitte = function (defi, pid) { var q = this.etat.defisQuittes[this.aujourdhui()]; return !!(q && (q[defi] || (pid && q[defi + '@' + pid]))); };
   // Défi encore à faire aujourd'hui : ni réussi, ni quitté.
   Compte.prototype.defiAFaire = function (defi) { return this.defiDuJour(defi) === undefined && !this.defiQuitte(defi); };
 
@@ -258,8 +341,49 @@
     return t;
   };
 
+  // ---------- Trésor de chaque joueur (v10.30, backlog lignes 447, 453, 454) ----------
+  // Chaque joueur du compte a ses étoiles, son niveau, ses pierres, ses coffres (du jour, de niveau, méga) et ses défis
+  // réussis. pourJoueur renvoie un « compte » qui travaille sur le trésor du joueur (mêmes méthodes : gagner, ouvrir,
+  // coffresAOuvrir…) et écrit avec le compte. À redemander après chaque relecture du compte (l'objet change).
+  Compte.prototype.pourJoueur = function (pid) {
+    var parent = this, l = lst(this.etat.joueurs), j = null;
+    for (var i = 0; i < l.length; i++) if (l[i] && l[i].id === pid) j = l[i];
+    if (!j) return null;
+    j.rec = recNormal(j.rec);
+    var s = Object.create(Compte.prototype);
+    s.parent = parent; s.joueurId = pid; s.stockage = null; s.etat = j.rec;
+    s.maintenant = parent.maintenant;
+    s.ecrire = function () { parent.ecrire(); };
+    s.defiQuitte = function (defi) { return parent.defiQuitte(defi, pid); };
+    s.visite = function () { // la venue d'un joueur : il a joué une partie ou ouvert un coffre ce jour-là
+      return Compte.prototype.visite.call(s);
+    };
+    return s;
+  };
+  // Fin de partie (v10.30) : chacun reçoit les étoiles qu'il a lui-même récoltées (gains : [{ joueur, unites }]), doublées
+  // pour un défi du jour qu'il n'a pas encore réussi aujourd'hui ; partie perdue : rien. Une partie ne rapporte qu'une fois.
+  // Renvoie null si elle a déjà été récompensée, sinon un résultat par joueur (voir recompenserPartie) avec son identifiant.
+  Compte.prototype.recompenserJoueurs = function (id, gains, gagnee, defi, texte, hasard) {
+    var e = this.etat, self = this;
+    if (e.parties.indexOf(id) >= 0) return null;
+    e.parties.unshift(id);
+    if (e.parties.length > 50) e.parties.length = 50;
+    if (defi && e.defisEnCours[defi] && e.defisEnCours[defi].id === id) delete e.defisEnCours[defi];
+    var res = [];
+    (gains || []).forEach(function (g) {
+      var s = self.pourJoueur(g.joueur);
+      if (!s) return;
+      s.visite();
+      var r = s.recompenserPartie(id, Math.max(0, Math.round(g.unites || 0)), gagnee, defi, texte, hasard) || { base: 0, bonus: 0, gain: null, gemmes: 0 };
+      r.joueur = g.joueur;
+      res.push(r);
+    });
+    this.ecrire();
+    return res;
+  };
+
   var api = {
-    CLE: CLE, COFFRES: COFFRES, SERIE_MEGA: SERIE_MEGA, GEMMES: GEMMES, CHANCE_GEMME: CHANCE_GEMME, Compte: Compte,
+    CLE: CLE, recVide: recVide, recNormal: recNormal, fusionnerRec: fusionnerRec, COFFRES: COFFRES, SERIE_MEGA: SERIE_MEGA, GEMMES: GEMMES, CHANCE_GEMME: CHANCE_GEMME, Compte: Compte,
     seuil: seuil, pas: pas, niveau: niveau, coffreDuNiveau: coffreDuNiveau, prochainCoffre: prochainCoffre, prochainGrosCoffre: prochainGrosCoffre, jour: jour
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

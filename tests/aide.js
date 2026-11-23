@@ -206,4 +206,19 @@ async function grammaire(page, { jeux = null, niveau = 'facile' } = {}) {
   }
 }
 
-module.exports = { quiJoue, lancerRapideQui, creerJoueurs, ouvrirChoix, cocher, choisir, grammaire, repondre, valider, cocherJoueur, orthographe, maths, conjugaison, matiere, versReglages, lancer, lancerLeDe, lancerPartie, rapide, attendreJoueur, cocherTout, ouvrirNeuf };
+// v10.30 (backlog lignes 447, 453) : les étoiles, pierres et coffres sont dans la carte de chaque joueur (Mon compte).
+// Depuis l'accueil : « Mon compte » puis, sur la carte du joueur (le 1er, ou celui qui porte ce nom), « Mes étoiles ».
+function carteJoueur(page, nom) {
+  return nom ? page.locator('.joueur-carte', { has: page.locator('.joueur-nom', { hasText: nom }) }) : page.locator('.joueur-carte').first();
+}
+async function mesEtoiles(page, nom) {
+  await page.locator('#btn-compte').click();
+  await carteJoueur(page, nom).getByRole('button', { name: 'Mes étoiles' }).click();
+  await page.getByRole('heading', { name: 'Mes étoiles' }).waitFor();
+}
+// Depuis l'accueil : « Mon compte » puis le bouton des coffres à ouvrir de la carte du joueur.
+async function coffresJoueur(page, nom) {
+  await page.locator('#btn-compte').click();
+  await carteJoueur(page, nom).locator('[data-act="coffres"]').click();
+}
+module.exports = { carteJoueur, mesEtoiles, coffresJoueur, quiJoue, lancerRapideQui, creerJoueurs, ouvrirChoix, cocher, choisir, grammaire, repondre, valider, cocherJoueur, orthographe, maths, conjugaison, matiere, versReglages, lancer, lancerLeDe, lancerPartie, rapide, attendreJoueur, cocherTout, ouvrirNeuf };

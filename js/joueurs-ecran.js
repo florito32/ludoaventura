@@ -37,12 +37,28 @@
       '<p class="compte-message erreur" id="err-' + idBase + '" role="alert"' + (erreur ? '' : ' hidden') + '>' + (erreur ? esc(J.MESSAGES[erreur] || 'Ce nom ne convient pas.') : '') + '</p>';
   }
 
+  function ico(id, classe) { return '<svg class="ico ' + (classe || '') + '" aria-hidden="true"><use href="#' + id + '"/></svg>'; }
+  // Trésor du joueur (v10.30, backlog lignes 447 et 453) : étoiles, niveau des étoiles, pierres précieuses, et ses coffres
+  // à ouvrir (ils s'ouvrent ici, hors partie). « Mes étoiles » ouvre son écran (coffres de niveau, coffre du jour, méga coffre).
+  function tresor(j) {
+    var R = window.Recompenses, t = R && R.resume && R.resume(j.id);
+    if (!t) return '';
+    return '<div class="joueur-tresor">' +
+      '<p class="jt-ligne"><span class="jt-etoiles">' + ico('i-etoile') + '<strong>' + t.total + '</strong> ' + (t.total > 1 ? 'étoiles' : 'étoile') + '</span>' +
+      '<span class="jt-niveau">niveau ' + t.niveau + '</span>' +
+      '<span class="jt-gemmes">' + ico('i-gemme') + '<strong>' + t.gemmes + '</strong> ' + (t.gemmes > 1 ? 'pierres' : 'pierre') + '</span></p>' +
+      '<div class="compte-boutons">' +
+      (t.coffres ? '<button type="button" class="btn btn-principal jt-coffres" data-act="coffres">' + ico('i-coffre', 'coffre-jour') + ' Ouvrir ' + (t.coffres > 1 ? 'mes ' + t.coffres + ' coffres' : 'mon coffre') + '</button>' : '') +
+      '<button type="button" class="btn btn-secondaire" data-act="etoiles">Mes étoiles</button></div></div>';
+  }
+
   function carte(j) {
     var p = perso(j.perso), mode = edition && edition.id === j.id ? edition.mode : null;
     var h = '<article class="carte-page joueur-carte" data-id="' + j.id + '" aria-label="Joueur ' + esc(j.nom) + '">' +
       '<div class="joueur-tete"><img class="joueur-avatar" src="' + p.image + '" alt="" width="56" height="56">' +
       '<div class="joueur-qui"><h4 class="joueur-nom">' + esc(j.nom) + '</h4><p class="petit">Personnage : ' + esc(p.nom + ', ' + p.titre) + '</p></div>' +
       '<span class="joueur-niv" title="Niveau moyen">Niv. ' + J.niveauGlobal(j) + '</span></div>' +
+      tresor(j) +
       '<div class="joueur-jauges">' + J.MATIERES.map(function (m) { return jauge(j, m); }).join('') + '</div>';
     if (mode === 'nom') {
       h += formNom('nom-' + j.id, edition.nom !== undefined ? edition.nom : j.nom, edition.erreur) +
@@ -86,6 +102,8 @@
     var b = e.target.closest('button'); if (!b) return;
     var c = compte(), carte_ = b.closest('.joueur-carte'), id = carte_ && carte_.getAttribute('data-id');
     var act = b.getAttribute('data-act');
+    if (act === 'etoiles' && window.Recompenses) { window.Recompenses.voir(id, 'ecran-etoiles'); return; }
+    if (act === 'coffres' && window.Recompenses) { window.Recompenses.ouvrirCoffresDe(id); return; }
     if (act === 'nom') { edition = { mode: 'nom', id: id }; focus = { selecteur: '.joueur-carte[data-id="' + id + '"] input[type=text]' }; rendre(); }
     else if (act === 'perso') { edition = { mode: 'perso', id: id }; focus = { selecteur: '.joueur-carte[data-id="' + id + '"] [aria-pressed="true"]' }; rendre(); }
     else if (act === 'creer') { edition = { mode: 'creer', perso: J.PERSO_DEFAUT, nom: '' }; focus = { selecteur: '#champ-nouveau' }; rendre(); }

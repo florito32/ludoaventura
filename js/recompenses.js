@@ -1,4 +1,7 @@
 // Étoiles, coffres et progression à l'écran (v6.36, demande du 10/11/2026, backlog lignes 164 à 173).
+// v10.30 (demande du 23/11/2026, backlog lignes 447, 453, 454) : étoiles, pierres, niveaux et coffres sont propres à chaque
+// joueur du compte (js/etoiles.js → pourJoueur). L'accueil ne montre plus aucun nombre : tout se voit dans la carte du
+// joueur (Mon compte), qui ouvre « Mes étoiles », « Ma progression » et ses coffres. « Joueur affiché » = celui de la carte.
 // La logique (niveaux, coffres, sauvegarde sur l'appareil) est dans js/etoiles.js ; ici :
 //  - la barre du haut de l'accueil : étoiles + niveau (→ « Mes étoiles »), défi du jour, coffre (→ ouvrir, sinon
 //    « Ma progression ») ; les raccourcis « Mes étoiles » et « Progrès » faisaient doublon (retirés en v6.38) ;
@@ -15,6 +18,21 @@
   var E = window.Etoiles;
   function stockage() { try { return window.localStorage; } catch (e) { return null; } }
   var compte = new E.Compte(stockage());
+  var J = window.Joueurs;
+  // ---------- Joueur affiché (v10.30) ----------
+  // Le joueur dont on montre les étoiles et les coffres : choisi sur sa carte (Mon compte), gardé dans l'onglet ; sinon le 1er.
+  var CLE_VU = 'ludoaventura-joueur-vu';
+  function joueurs() { return J ? J.lister(compte.etat) : []; }
+  function idVu() {
+    var l = joueurs(), id = null;
+    try { id = sessionStorage.getItem(CLE_VU); } catch (e) { id = null; }
+    if (!l.some(function (j) { return j.id === id; })) id = l[0] ? l[0].id : null;
+    return id;
+  }
+  function choisirVu(id) { try { sessionStorage.setItem(CLE_VU, id); } catch (e) { /* onglet sans stockage : le 1er joueur */ } }
+  // Compte du joueur affiché (à redemander à chaque fois : la progression est relue après une synchronisation).
+  function vue() { var id = idVu(); return (id && compte.pourJoueur(id)) || compte; }
+  function nomDe(id) { var j = J && J.trouver(compte.etat, id); return j ? j.nom : ''; }
   // Durée du tremblement avant que le coffre s'ouvre (ms). Les tests la mettent à 0 (window.AVENTURA_DUREE_COFFRE).
   var reduit = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var DUREE_COFFRE = typeof window.AVENTURA_DUREE_COFFRE === 'number' ? window.AVENTURA_DUREE_COFFRE : (reduit ? 0 : 700);
@@ -45,46 +63,17 @@
   }
 
   // ---------- Accueil ----------
+  // v10.30 (ligne 453) : rien de chiffré sur l'accueil (ni étoiles, ni pierres, ni coffres, ni défis restants).
+  // Il ne reste que le bouton « Défi du jour » ; son texte pour les lecteurs d'écran ne donne plus de nombre.
   function majAccueil() {
-    // Pendant l'envol des étoiles (v9.8), le compteur montre le total atteint par les étoiles déjà arrivées.
-    // Les étoiles gagnées mais pas encore envolées (retenu : coffres ouverts, v10.3) ne sont pas encore comptées non plus.
-    var total = vol ? vol.vu : Math.max(0, compte.etat.total - retenu), nv = E.niveau(total);
-    if (window.Defis) {
-      // Défis encore à faire : ni réussis ni quittés (v6.47).
-      var reste = ['solo', 'equipe'].filter(function (t) { return compte.defiAFaire(t); }).length;
-      $('defi-badge').textContent = reste;
-      $('defi-badge').hidden = !reste;
-      $('defi-aide').textContent = reste ? ' à faire' : ' : plus rien à gagner aujourd’hui';
-    }
-    $('accueil-total').textContent = total;
-    $('accueil-gemmes').textContent = compte.etat.gemmes || 0; // pierres précieuses (v6.46)
-    $('accueil-niveau').textContent = 'Niveau ' + nv.niveau;
-    $('accueil-jauge').style.width = Math.round(100 * nv.dans / nv.besoin) + '%';
-    // Texte lu par les lecteurs d'écran : ajouté au texte visible (pas d'aria-label, qui doit reprendre le texte visible, WCAG 2.5.3).
-    $('accueil-etoiles-aide').textContent = ', encore ' + etoiles(nv.reste) + ' pour le niveau ' + (nv.niveau + 1) + ' : voir mes étoiles';
-    var aOuvrir = compte.coffresAOuvrir(), b = $('btn-coffre-haut');
-    var icone = $('accueil-coffre-ico');
-    if (aOuvrir.length) {
-      var jour = aOuvrir.filter(function (c) { return c.type === 'jour'; }).length;
-      $('accueil-coffre-texte').textContent = aOuvrir.length > 1 ? 'Coffres à ouvrir' : jour ? 'Coffre du jour' : NOMS_COFFRES[aOuvrir[0].type];
-      icone.setAttribute('class', 'ico coffre-' + aOuvrir[0].type);
-      $('accueil-badge').textContent = aOuvrir.length;
-      $('accueil-badge').hidden = false;
-      b.classList.add('a-ouvrir');
-      $('accueil-coffre-aide').textContent = (aOuvrir.length > 1 ? ' à ouvrir' : ' : à ouvrir') + ', toucher pour l’ouvrir';
-    } else {
-      var prochain = E.prochainCoffre(nv.niveau);
-      $('accueil-coffre-texte').textContent = 'Niveau ' + prochain;
-      icone.setAttribute('class', 'ico coffre-' + E.coffreDuNiveau(prochain));
-      $('accueil-badge').hidden = true;
-      b.classList.remove('a-ouvrir');
-      $('accueil-coffre-aide').textContent = ' : prochain coffre (' + NOMS_COFFRES[E.coffreDuNiveau(prochain)].toLowerCase() + '), coffre du jour déjà ouvert. Voir ma progression';
-    }
+    var badge = $('defi-badge');
+    if (badge) badge.hidden = true;
   }
 
   // ---------- Fenêtre d'ouverture d'un coffre ----------
-  var file = [], actuel = null, ouvertDepuis = null;
+  var file = [], actuel = null, ouvertDepuis = null, ouvertPour = null;
   function ouvrirCoffres(liste) {
+    ouvertPour = idVu();
     if (vol) finirGain(); // un envol en cours est terminé d'un coup avant d'ouvrir
     file = liste.slice();
     ouvertDepuis = document.activeElement;
@@ -98,9 +87,10 @@
     $('coffre-scene').className = 'coffre-scene';
     $('coffre-scene').classList.remove('fini');
     $('coffre-volees').innerHTML = '';
-    $('coffre-gain').textContent = c.type === 'jour' ? 'Touche le coffre pour l’ouvrir !'
+    var pour = joueurs().length > 1 && ouvertPour ? 'Coffre de ' + nomDe(ouvertPour) + '. ' : ''; // v10.30 : le coffre d'un joueur
+    $('coffre-gain').textContent = pour + (c.type === 'jour' ? 'Touche le coffre pour l’ouvrir !'
       : c.type === 'mega' ? 'Bravo, tu es venu ' + E.SERIE_MEGA + ' jours d’affilée ! Touche le coffre pour l’ouvrir.'
-      : 'Bravo pour ce niveau ! Touche le coffre pour l’ouvrir.';
+      : 'Bravo pour ce niveau ! Touche le coffre pour l’ouvrir.');
     $('btn-coffre-ouvrir').hidden = false;
     $('btn-coffre-suivant').hidden = true;
     $('btn-coffre-fermer').hidden = true;
@@ -108,8 +98,11 @@
   function ouvrirActuel() {
     if (!actuel || actuel.ouvert) return;
     actuel.ouvert = true;
-    var g = compte.ouvrir(actuel.coffre);
-    if (g && g.n > 0) retenir(retenu + g.n); // v10.3 : le cumul des coffres s'envole à la fermeture de la fenêtre
+    var v = vue();
+    var g = v.ouvrir(actuel.coffre);
+    // v10.30 : plus d'envol vers l'accueil après un coffre (l'accueil ne montre plus de compteur) ; les étoiles
+    // sortent du coffre dans la fenêtre. Ouvrir un coffre compte comme une venue du joueur (série de jours).
+    if (g) v.visite();
     $('btn-coffre-ouvrir').hidden = true;
     $('coffre-scene').classList.add('tremble');
     setTimeout(function () {
@@ -147,11 +140,23 @@
     majTout();
     demarrerGain(); // v10.3 : sur l'accueil, les étoiles de tous les coffres ouverts s'envolent vers le compteur
     if (ouvertDepuis && document.contains(ouvertDepuis) && !ouvertDepuis.closest('[hidden]')) ouvertDepuis.focus();
+    else if (ouvertPour) { // la carte du joueur a été redessinée : on revient sur son bouton des étoiles
+      var b = document.querySelector('.joueur-carte[data-id="' + ouvertPour + '"] [data-act="etoiles"]');
+      if (b) b.focus();
+    }
   });
+
+  // En-tête des écrans « Mes étoiles » et « Ma progression » (v10.30) : le joueur dont on parle.
+  function enTeteJoueur() {
+    var id = idVu(), j = J && J.trouver(compte.etat, id), p = j && window.Aventuriers && window.Aventuriers.trouver(j.perso);
+    if (!j) return '';
+    return '<p class="tresor-de">' + (p ? '<img src="' + p.image + '" alt="" width="40" height="40">' : '') + '<span>Joueur : <strong id="tresor-nom">' + esc(j.nom) + '</strong></span></p>';
+  }
 
   // ---------- Écran « Mes étoiles » ----------
   function pageEtoiles() {
-    var nv = compte.niveau(), e = compte.etat, h = '';
+    var v = vue(), nv = v.niveau(), e = v.etat, h = '';
+    h += enTeteJoueur();
     h += '<section class="carte-page resume-etoiles">' + ico('i-etoile', 'ico-geant') +
       '<p class="gros-total"><strong id="etoiles-total">' + e.total + '</strong> ' + (e.total > 1 ? 'étoiles' : 'étoile') + '</p>' +
       '<p class="total-gemmes">' + ico('i-gemme') + ' <strong id="etoiles-gemmes">' + (e.gemmes || 0) + '</strong> ' + ((e.gemmes || 0) > 1 ? 'pierres précieuses' : 'pierre précieuse') + '</p>' +
@@ -163,7 +168,7 @@
     // Coffres de niveau : 4 paliers (v6.46 : un coffre simple à chaque niveau, un gros tous les 5).
     // Départ : le premier coffre atteint mais pas ouvert, sinon le dernier coffre ouvert, sinon le niveau suivant.
     function aCoffre(n) { var t = E.coffreDuNiveau(n); return !!t && !(t === 'simple' && n <= e.simplesDepuis); }
-    var enAttente = compte.coffresAOuvrir().filter(function (c) { return c.niveau; });
+    var enAttente = v.coffresAOuvrir().filter(function (c) { return c.niveau; });
     var L = nv.niveau + 1;
     if (enAttente.length) L = enAttente[0].niveau;
     else for (var a = nv.niveau; a >= 2; a--) if (aCoffre(a) && e.coffresNiveau[a] !== undefined) { L = a; break; }
@@ -184,14 +189,16 @@
         NOMS_COFFRES[E.coffreDuNiveau(gros)].toLowerCase() + '</strong> au niveau ' + gros + ', encore ' + etoiles(E.seuil(gros) - e.total) + '.</span></p><ol hidden>';
     }
     h += '</ol></section>';
+    // v10.30 : « Ma progression » (coffre du jour, défis, méga coffre) du même joueur.
+    h += '<p class="vers-progression"><button type="button" class="btn btn-secondaire" data-vers-progression="1">' + ico('i-coffre', 'coffre-jour') + ' Coffre du jour, défis et méga coffre</button></p>';
 
     $('etoiles-corps').innerHTML = h;
   }
 
   // ---------- Écran « Ma progression » (la journée) ----------
   function pageProgression() {
-    var e = compte.etat, auj = compte.aujourdhui(), aujN = e.parJour[auj] || 0, h = '';
-    var coffreJour = compte.coffreDuJourOuvert();
+    var v = vue(), e = v.etat, auj = v.aujourdhui(), aujN = e.parJour[auj] || 0, h = enTeteJoueur();
+    var coffreJour = v.coffreDuJourOuvert();
     var defisActifs = !!window.Defis;
     var taches = [{
       ico: ico('i-coffre', 'coffre-jour'), nom: 'Coffre du jour',
@@ -200,9 +207,9 @@
     }];
     if (defisActifs) {
       ['solo', 'equipe'].forEach(function (t) {
-        var g = compte.defiDuJour(t);
+        var g = v.defiDuJour(t);
         taches.push({ ico: ico('i-defi'), nom: t === 'solo' ? 'Défi solo' : 'Défi en équipe', fait: g !== undefined, gain: g,
-          quitte: g === undefined && compte.defiQuitte(t),
+          quitte: g === undefined && v.defiQuitte(t),
           action: '<button type="button" class="btn-petit" data-defi="' + t + '">Jouer</button>' });
       });
     }
@@ -217,8 +224,8 @@
     h += '</ul></section>';
 
     // Série de jours d'affilée vers le méga coffre (v6.38 ; remplace les 7 derniers jours, retirés à la demande de l'utilisateur).
-    var vm = compte.versMega(), megas = compte.coffresAOuvrir().filter(function (c) { return c.type === 'mega'; });
-    var cycle = vm.dans === 0 && vm.serie > 0 && compte.etat.coffresMega[auj] !== undefined ? vm.besoin : vm.dans;
+    var vm = v.versMega(), megas = v.coffresAOuvrir().filter(function (c) { return c.type === 'mega'; });
+    var cycle = vm.dans === 0 && vm.serie > 0 && e.coffresMega[auj] !== undefined ? vm.besoin : vm.dans;
     h += '<section class="carte-page"><h3>Méga coffre</h3><p class="serie-mega">' + ico('i-coffre', 'coffre-mega') + '<span>' +
       (vm.serie ? 'Tu es venu <strong id="serie-jours">' + jours(vm.serie) + '</strong> d’affilée.' : 'Viens jouer plusieurs jours de suite !') + ' ' +
       (cycle === vm.besoin ? 'Méga coffre gagné aujourd’hui !' : 'Encore <strong>' + jours(vm.besoin - cycle) + '</strong> pour le méga coffre (100 à 200 étoiles).') +
@@ -236,7 +243,7 @@
       });
       h += '</ul>';
     }
-    h += '<p class="petit">Un jour sans venir et la série repart de zéro.</p></section>';
+    h += '<p class="petit">Un jour sans jouer et la série repart de zéro.</p></section>';
 
     // v6.44 : l'encadré « Coffres de niveau » est retiré (il est déjà dans « Mes étoiles », bouton de l'étoile).
     $('progression-corps').innerHTML = h;
@@ -247,10 +254,11 @@
     var b = ev.target.closest('[data-ouvrir]');
     if (b) {
       var x = b.dataset.ouvrir.split(':');
-      var c = compte.coffresAOuvrir().filter(function (k) { return k.type === x[0] && k.cle === x[1]; })[0];
+      var c = vue().coffresAOuvrir().filter(function (k) { return k.type === x[0] && k.cle === x[1]; })[0];
       if (c) ouvrirCoffres([c]);
       return;
     }
+    if (ev.target.closest('[data-vers-progression]')) { aller('ecran-progression'); return; }
     var d = ev.target.closest('[data-defi]');
     if (d && window.Defis) window.Defis.ouvrir(d.dataset.defi);
   }
@@ -282,22 +290,27 @@
   // v6.40 (demande du 10/11/2026) : plus d'aperçu de l'aventure. Le joueur choisit la matière et le niveau
   // (et le nombre de joueurs en équipe), touche « Valider » et découvre l'aventure sur le plateau.
   function pageDefi() {
+    // v10.30 : défis réussis ou quittés propres à chaque joueur. Avec un seul joueur dans le compte, on montre les siens ;
+    // à plusieurs, on ne sait pas encore qui jouera (« Qui joue ? » après « Valider ») : pas d'état.
+    var seul = joueurs().length <= 1, v = seul ? vue() : null;
+    var statut = function (t) { return seul ? v.defiDuJour(t) : undefined; };
+    var quitte = function (t) { return seul && v.defiQuitte(t); };
     var h = '<section class="carte-page"><fieldset class="defi-types"><legend class="visually-hidden">Quel défi ?</legend>';
     ['solo', 'equipe'].forEach(function (t) {
-      var g = compte.defiDuJour(t);
+      var g = statut(t);
       h += '<label class="defi-type"><input type="radio" name="defi-type" value="' + t + '"' + (choixDefi.type === t ? ' checked' : '') + '>' +
         '<span>' + ico('i-defi') + '<strong>' + (t === 'solo' ? 'Défi solo' : 'Défi en équipe') + '</strong>' +
-        '<small class="' + (g !== undefined ? 'fait' : compte.defiQuitte(t) ? 'quitte' : '') + '">' + (g !== undefined ? '✔ Réussi · +' + g + ' ⭐' : compte.defiQuitte(t) ? 'Quitté aujourd’hui' : 'À faire') + '</small></span></label>';
+        '<small class="' + (g !== undefined ? 'fait' : quitte(t) ? 'quitte' : '') + '">' + (g !== undefined ? '✔ Réussi · +' + g + ' ⭐' : quitte(t) ? 'Quitté aujourd’hui' : seul ? 'À faire' : 'Une fois par jour et par joueur') + '</small></span></label>';
     });
     h += '</fieldset>';
     h += radios('defi-matiere', 'Matière', [['maths', 'Maths'], ['francais', 'Français']], choixDefi.matiere);
     h += radios('defi-niveau', 'Niveau', D.NIVEAUX.map(function (n) { return [n.id, n.nom]; }), choixDefi.niveau);
     if (choixDefi.type === 'equipe') h += radios('defi-joueurs', 'Joueurs', [[2, '2'], [3, '3'], [4, '4']], choixDefi.joueurs);
-    var g = compte.defiDuJour(choixDefi.type);
+    var g = statut(choixDefi.type);
     h += '<div class="defi-valider" aria-live="polite">' +
-      (g === undefined && compte.defiQuitte(choixDefi.type) ? '<p class="defi-recompense quitte">Tu as quitté ce défi avant la fin aujourd’hui : tu peux y rejouer, mais il ne rapporte plus rien jusqu’à demain.</p>'
+      (g === undefined && quitte(choixDefi.type) ? '<p class="defi-recompense quitte">Tu as quitté ce défi avant la fin aujourd’hui : tu peux y rejouer, mais il ne rapporte plus rien jusqu’à demain.</p>'
         : g !== undefined ? '<p class="defi-recompense fait">✔ Défi déjà réussi aujourd’hui (+' + g + ' ⭐). Tu peux rejouer : étoiles normales.</p>'
-        : '<p class="defi-recompense">' + ico('i-etoile') + '<span>L’aventure reste une surprise. Gagne-la : tes étoiles sont <strong>doublées</strong> !</span></p>') +
+        : '<p class="defi-recompense">' + ico('i-etoile') + '<span>L’aventure reste une surprise. Gagne-la : tes étoiles sont <strong>doublées</strong> !' + (seul ? '' : ' (une fois par jour pour chaque joueur)') + '</span></p>') +
       (choixDefi.matiere ? '' : '<p class="petit" id="defi-manque">Choisis la matière pour valider.</p>') +
       '<button type="button" class="btn btn-principal" id="btn-lancer-defi"' + (choixDefi.matiere ? '' : ' disabled aria-describedby="defi-manque"') + '>Valider</button>' +
       '</div></section>';
@@ -326,13 +339,13 @@
 
   // ---------- Navigation ----------
   function aller(id) { window.Aventura.afficher(id); }
-  $('btn-etoiles-haut').addEventListener('click', function () { aller('ecran-etoiles'); });
-  $('btn-coffre-haut').addEventListener('click', function () {
-    var l = compte.coffresAOuvrir();
-    if (l.length) ouvrirCoffres(l); else aller('ecran-progression');
-  });
+  // v10.30 : plus de boutons des étoiles ni du coffre sur l'accueil (ligne 453) ; on y va depuis la carte du joueur.
   document.querySelectorAll('[data-retour-accueil]').forEach(function (b) {
     b.addEventListener('click', function () { aller('ecran-accueil'); });
+  });
+  // « Mes étoiles » et « Ma progression » reviennent à « Mon compte », d'où on les ouvre (v10.30).
+  document.querySelectorAll('[data-retour-compte]').forEach(function (b) {
+    b.addEventListener('click', function () { aller('ecran-compte'); });
   });
   // Le bouton « Défi du jour » n'apparaît que lorsque les défis existent (js/defis.js).
   $('btn-defi').hidden = !window.Defis;
@@ -345,6 +358,7 @@
     if (ecran === 'ecran-etoiles') pageEtoiles();
     if (ecran === 'ecran-progression') pageProgression();
     if (ecran === 'ecran-defi' && window.Defis) pageDefi();
+    if (ecran === 'ecran-compte' && window.JoueursEcran && !$('coffre').open) window.JoueursEcran.rendre(); // trésor des cartes
   }
   document.addEventListener('aventura-ecran', majTout);
   // Retour sur l'application (autre jour, autre onglet) : coffre du jour et compteurs à jour.
@@ -353,39 +367,71 @@
   window.addEventListener('storage', function (ev) { if (ev.key === E.CLE) { compte.etat = compte.lire(); majTout(); } });
 
   // ---------- Fin de partie ----------
-  // Appelé par js/plateau.js à l'affichage du résultat. info = { regles, aventure, gagnee, defi }.
+  // Appelé par js/plateau.js à l'affichage du résultat. info = { regles, aventure, gagnee, defi, joueurs }.
+  // joueurs (v10.30) : [{ profil, nom, unites }] : chacun reçoit les étoiles qu'il a récoltées (ligne 454), doublées pour un
+  // défi du jour pas encore réussi par lui aujourd'hui. Sans profil connu (partie d'avant la v10.29) : le 1er joueur du compte.
   // La partie ne rapporte qu'une fois (identifiant regles.id) ; après un rechargement, on réaffiche le même résultat.
+  // Total des étoiles d'une récompense (pour l'envol de l'accueil, js/plateau.js → accueilApresFin).
+  function gainTotal(rc) {
+    if (!rc) return 0;
+    if (!rc.joueurs) return rc.quitte ? 0 : (rc.base || 0) + (rc.bonus || 0); // récompense d'avant la v10.30
+    return rc.joueurs.reduce(function (t, x) { return t + (x.quitte ? 0 : (x.base || 0) + (x.bonus || 0)); }, 0);
+  }
   function finDePartie(info) {
     var r = info.regles, av = info.aventure, box = $('fin-etoiles');
     if (!r.id) r.id = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
     var texte = (info.defi ? (info.defi === 'solo' ? 'Défi solo' : 'Défi en équipe') + ' réussi · ' : 'Aventure réussie · ') + av.nom;
-    var res = compte.recompenserPartie(r.id, r.points, info.gagnee, info.defi, texte);
-    if (res) r.recompense = { base: res.base, bonus: res.bonus, deja: !!res.defiDejaFait, avant: res.gain ? res.gain.avant : 0, apres: res.gain ? res.gain.apres : 0, gemmes: res.gemmes || 0, quitte: !!res.quitte };
-    var rc = r.recompense || { base: 0, bonus: 0 };
-    var h = '';
-    if (rc.quitte) {
-      // Défi quitté plus tôt aujourd'hui (v6.47) : pas de récompense, même gagné.
-      h += '<p class="fin-quitte">Tu as quitté ce défi avant la fin aujourd’hui : pas d’étoiles ni de pierres pour lui avant demain.</p>';
-    } else if (info.gagnee) {
-      h += '<p class="fin-gain">' + ico('i-etoile', 'ico-gain') + '<strong>+' + etoiles(rc.base + rc.bonus) + '</strong></p>';
-      if (rc.bonus) h += '<p class="fin-bonus">' + ico('i-defi') + ' Défi du jour réussi : étoiles doublées !</p>';
-      else if (rc.deja) h += '<p class="petit">Défi déjà réussi aujourd’hui : étoiles normales.</p>';
-      else h += '<p class="petit">Une étoile pour chaque ' + av.objet.un + ' (' + av.objet.titre.toLowerCase() + ' : ' + r.points + ').</p>';
-      if (rc.gemmes) h += '<p class="fin-gemmes">' + ico('i-gemme') + ' <strong>+' + gemmes(rc.gemmes) + ' !</strong></p>';
-      if (rc.apres > rc.avant) h += '<p class="fin-niveau">Niveau ' + rc.apres + ' atteint !</p>';
-    } else {
-      h += '<p class="petit">' + (info.defi ? 'Défi manqué : tu peux réessayer autant de fois que tu veux !' : 'Gagne l’aventure pour gagner des étoiles.') + '</p>';
+    var premier = joueurs()[0], gains = (info.joueurs && info.joueurs.length ? info.joueurs : [{ profil: null, unites: r.points }]).map(function (g) {
+      return { joueur: g.profil && J && J.trouver(compte.etat, g.profil) ? g.profil : premier && premier.id, unites: g.unites };
+    }).filter(function (g) { return g.joueur; });
+    var res = compte.recompenserJoueurs(r.id, gains, info.gagnee, info.defi, texte);
+    if (res) {
+      r.recompense = { joueurs: res.map(function (x) {
+        return { id: x.joueur, nom: nomDe(x.joueur), base: x.base, bonus: x.bonus, deja: !!x.defiDejaFait, avant: x.gain ? x.gain.avant : 0, apres: x.gain ? x.gain.apres : 0, gemmes: x.gemmes || 0, quitte: !!x.quitte };
+      }) };
     }
-    var aOuvrir = compte.coffresAOuvrir().filter(function (c) { return c.type !== 'jour'; });
-    if (aOuvrir.length) h += '<button type="button" class="btn btn-secondaire btn-fin-coffre" id="btn-fin-coffre">' + ico('i-coffre', 'coffre-' + aOuvrir[0].type) + ' Ouvrir ' + (aOuvrir.length > 1 ? 'les coffres' : 'le ' + NOMS_COFFRES[aOuvrir[0].type].toLowerCase()) + '</button>';
+    var rc = r.recompense || { joueurs: [] };
+    if (!rc.joueurs) rc = { joueurs: [{ id: premier && premier.id, nom: '', base: rc.base || 0, bonus: rc.bonus || 0, deja: !!rc.deja, avant: rc.avant || 0, apres: rc.apres || 0, gemmes: rc.gemmes || 0, quitte: !!rc.quitte }] };
+    var L = rc.joueurs, seul = L.length < 2, h = '';
+    var tousQuitte = L.length > 0 && L.every(function (x) { return x.quitte; });
+    if (tousQuitte) {
+      // Défi quitté plus tôt aujourd'hui (v6.47) : pas de récompense, même gagné.
+      h += '<p class="fin-quitte">' + (seul ? 'Tu as quitté ce défi avant la fin aujourd’hui : pas d’étoiles ni de pierres pour lui avant demain.' : 'Vous avez quitté ce défi avant la fin aujourd’hui : pas d’étoiles ni de pierres pour lui avant demain.') + '</p>';
+    } else if (info.gagnee && seul) {
+      var x = L[0] || { base: 0, bonus: 0 };
+      h += '<p class="fin-gain">' + ico('i-etoile', 'ico-gain') + '<strong>+' + etoiles(x.base + x.bonus) + '</strong></p>';
+      if (x.bonus) h += '<p class="fin-bonus">' + ico('i-defi') + ' Défi du jour réussi : étoiles doublées !</p>';
+      else if (x.deja) h += '<p class="petit">Défi déjà réussi aujourd’hui : étoiles normales.</p>';
+      else h += '<p class="petit">Une étoile pour chaque ' + av.objet.un + ' (' + av.objet.titre.toLowerCase() + ' : ' + r.points + ').</p>';
+      if (x.gemmes) h += '<p class="fin-gemmes">' + ico('i-gemme') + ' <strong>+' + gemmes(x.gemmes) + ' !</strong></p>';
+      if (x.apres > x.avant) h += '<p class="fin-niveau">Niveau ' + x.apres + ' atteint !</p>';
+    } else if (info.gagnee) {
+      // À plusieurs (v10.30) : une ligne par joueur, avec ce qu'il a lui-même récolté.
+      h += '<p class="fin-gain">' + ico('i-etoile', 'ico-gain') + '<strong>+' + etoiles(gainTotal(rc)) + '</strong></p>' +
+        '<p class="petit">Chacun reçoit les étoiles de ce qu’il a lui-même récolté.</p>';
+      if (L.some(function (y) { return y.bonus; })) h += '<p class="fin-bonus">' + ico('i-defi') + ' Défi du jour réussi : étoiles doublées !</p>';
+      h += '<ul class="fin-gains-joueurs">' + L.map(function (y) {
+        return '<li><span class="fg-nom">' + esc(y.nom) + '</span>' +
+          (y.quitte ? '<span class="petit">défi quitté : rien</span>' : '<span class="fg-etoiles">' + ico('i-etoile') + ' +' + (y.base + y.bonus) + '</span>' +
+            (y.gemmes ? '<span class="fg-gemmes">' + ico('i-gemme') + ' +' + y.gemmes + '</span>' : '') +
+            (y.apres > y.avant ? '<span class="fg-niveau">Niveau ' + y.apres + ' !</span>' : '') +
+            (y.deja && !y.bonus ? '<span class="petit">défi déjà réussi</span>' : '')) + '</li>';
+      }).join('') + '</ul>';
+    } else {
+      h += '<p class="petit">' + (info.defi ? 'Défi manqué : ' + (seul ? 'tu peux' : 'vous pouvez') + ' réessayer autant de fois que ' + (seul ? 'tu veux' : 'vous voulez') + ' !' : 'Gagne' + (seul ? '' : 'z') + ' l’aventure pour gagner des étoiles.') + '</p>';
+    }
+    // Coffres de niveau ou méga coffres à ouvrir : ils s'ouvrent hors de la partie, dans la carte du joueur (v10.30).
+    var avecCoffre = L.filter(function (y) { var v = y.id && compte.pourJoueur(y.id); return v && v.coffresAOuvrir().some(function (c) { return c.type !== 'jour'; }); });
+    if (avecCoffre.length) {
+      h += '<p class="fin-coffre-note">' + ico('i-coffre', 'coffre-simple') + '<span>' + (seul ? 'Un coffre t’attend' : 'Un coffre attend ' + avecCoffre.map(function (y) { return esc(y.nom); }).join(', ')) + ' dans <strong>Mon compte</strong>.</span></p>';
+    }
     box.innerHTML = h;
     box.hidden = false;
-    var bc = $('btn-fin-coffre');
-    if (bc) bc.addEventListener('click', function () { ouvrirCoffres(compte.coffresAOuvrir().filter(function (c) { return c.type !== 'jour'; })); });
     majAccueil();
   }
 
   // ---------- Envol des étoiles gagnées vers le compteur de l'accueil (v9.8, demande du 17/11/2026) ----------
+  // v10.30 : l'accueil n'a plus de compteur ; les étoiles volent vers le bouton « Mon compte » (hypothèse à valider).
   // Après « Retour à l'accueil » sur l'écran de fin (js/plateau.js → accueilApresFin), « ⭐ +19 étoiles » reste au
   // centre de l'écran (sans encadré) ; de là, une étoile par étoile gagnée vole jusqu'au compteur du haut, qui
   // grandit à chaque arrivée. Durée : 1 seconde pour 10 étoiles, 3 secondes au plus (choix de l'utilisateur).
@@ -407,7 +453,7 @@
     var n = Math.floor(retenu);
     if (n < 1 || n > compte.etat.total) { retenir(0); majAccueil(); return; }
     retenir(0);
-    vol = { n: n, vu: compte.etat.total - n, arrivees: 0, minuteurs: [], etiquette: null };
+    vol = { n: n, arrivees: 0, minuteurs: [], etiquette: null };
     majAccueil();
     // Petite pause : l'accueil (ou la fenêtre qui se ferme) doit être affiché et mis en page.
     vol.minuteurs.push(setTimeout(animerGain, 250));
@@ -422,12 +468,6 @@
     if (document.readyState === 'complete') demarrerGain(); else window.addEventListener('load', demarrerGain, { once: true });
   })();
 
-  function majCompteur() {
-    var nv = E.niveau(vol.vu);
-    $('accueil-total').textContent = vol.vu;
-    $('accueil-niveau').textContent = 'Niveau ' + nv.niveau;
-    $('accueil-jauge').style.width = Math.round(100 * nv.dans / nv.besoin) + '%';
-  }
   function finirGain() {
     if (!vol) return;
     vol.minuteurs.forEach(clearTimeout);
@@ -439,7 +479,9 @@
   }
   function animerGain() {
     if (!vol) return;
-    var accueil = $('ecran-accueil'), cible = document.querySelector('#btn-etoiles-haut .pe-total .ico');
+    // v10.30 : plus de compteur sur l'accueil (ligne 453) : les étoiles filent vers le bouton du compte, où on les retrouve
+    // dans la carte de chaque joueur.
+    var accueil = $('ecran-accueil'), cible = document.querySelector('#btn-compte .ico');
     if (!accueil || accueil.hidden || !cible) { finirGain(); return; }
     var n = vol.n;
     // « ⭐ +19 étoiles » au centre de l'écran, comme sur l'écran de fin, sans l'encadré.
@@ -457,13 +499,11 @@
     var ecart = nv > 1 ? (D - vole) / (nv - 1) : 0; // la dernière étoile arrive au bout de D
     var a = et.querySelector('.ico').getBoundingClientRect(), b = cible.getBoundingClientRect();
     var dx = (b.left + b.width / 2) - (a.left + a.width / 2), dy = (b.top + b.height / 2) - (a.top + a.height / 2);
-    var total = $('btn-etoiles-haut').querySelector('.pe-total');
+    var total = $('btn-compte');
     // Étoile volante k : elle apporte sa part des n étoiles (1 en général, plusieurs pour un gros gain).
     function arrivee() {
       if (!vol) return;
-      var k = vol.arrivees++;
-      vol.vu += Math.floor((k + 1) * n / nv) - Math.floor(k * n / nv);
-      majCompteur();
+      vol.arrivees++;
       total.classList.remove('recoit'); void total.offsetWidth; total.classList.add('recoit');
       if (vol.arrivees >= nv) finirGain();
     }
@@ -497,5 +537,20 @@
 
   compte.visite(); // venue du jour (série de jours d'affilée, méga coffre)
   majAccueil();
-  window.Recompenses = { compte: compte, finDePartie: finDePartie, majTout: majTout, ouvrirCoffres: ouvrirCoffres };
+  // ---------- Depuis la carte d'un joueur (Mon compte, js/joueurs-ecran.js) ----------
+  // Résumé du trésor d'un joueur : { total, gemmes, niveau, coffres (à ouvrir) }.
+  function resume(pid) {
+    var v = compte.pourJoueur(pid);
+    if (!v) return null;
+    return { total: v.etat.total, gemmes: v.etat.gemmes || 0, niveau: v.niveau().niveau, coffres: v.coffresAOuvrir().length };
+  }
+  function voir(pid, ecran) { choisirVu(pid); aller(ecran || 'ecran-etoiles'); }
+  function ouvrirCoffresDe(pid) {
+    choisirVu(pid);
+    var l = vue().coffresAOuvrir();
+    if (l.length) ouvrirCoffres(l);
+  }
+
+  window.Recompenses = { compte: compte, finDePartie: finDePartie, majTout: majTout, ouvrirCoffres: ouvrirCoffres, gainTotal: gainTotal,
+    resume: resume, voir: voir, ouvrirCoffresDe: ouvrirCoffresDe, vue: vue, idVu: idVu };
 })();

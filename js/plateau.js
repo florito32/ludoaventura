@@ -1216,7 +1216,8 @@
     // (plus de récompense pour lui aujourd'hui). Puis on note le défi qui commence.
     if (window.Recompenses) {
       window.Recompenses.compte.verifierDefis(null);
-      if (partie.defi) window.Recompenses.compte.commencerDefi(partie.defi.type, partie.regles.id);
+      // v10.30 : seuls les joueurs de cette partie perdent la récompense du défi s'ils le quittent.
+      if (partie.defi) window.Recompenses.compte.commencerDefi(partie.defi.type, partie.regles.id, partie.joueurs.map(function (j) { return j.profil; }).filter(Boolean));
     }
     partie.carte = null;
     partie.etapesVues = 0;
@@ -2641,7 +2642,10 @@
     $('btn-fin-accueil').hidden = !!partie.rapide; // v7.1 : 3e bouton, sauf partie rapide (déjà « Retour à l'accueil »)
     // Étoiles gagnées (v6.36) : toute aventure gagnée rapporte ce que l'équipe a récolté (doublé pour un défi du jour).
     if (window.Recompenses) {
-      window.Recompenses.finDePartie({ regles: r, aventure: av, gagnee: ok, defi: partie.defi ? partie.defi.type : null });
+      // v10.30 (backlog ligne 454) : chacun reçoit les étoiles qu'il a lui-même récoltées (en solo : tout ce qui est récolté).
+      var ptsJ = pointsParJoueur(r);
+      window.Recompenses.finDePartie({ regles: r, aventure: av, gagnee: ok, defi: partie.defi ? partie.defi.type : null,
+        joueurs: partie.joueurs.map(function (j, i) { return { profil: j.profil || null, nom: j.nom, unites: r.nbJoueurs < 2 ? r.points : Math.max(0, ptsJ[i] || 0) }; }) });
       sauver();
     }
     $('fin').showModal();
@@ -2655,12 +2659,12 @@
   // v7.1 : la partie est finie, on revient à l'accueil sans confirmation (rien n'est perdu : étoiles déjà comptées).
   $('btn-fin-accueil').addEventListener('click', function () { $('fin').close(); accueilApresFin(); });
   // v9.8 (17/11/2026) : en revenant à l'accueil après une partie gagnée, les étoiles gagnées s'envolent du centre
-  // de l'écran vers le compteur (js/recompenses.js → animerGain). La page se recharge : on note le gain dans
+  // de l'écran vers le compteur (v10.30 : vers le bouton du compte, l'accueil ne montre plus de nombres) (js/recompenses.js → animerGain). La page se recharge : on note le gain dans
   // l'onglet (sessionStorage) pour que l'accueil le retrouve. « Rejouer » ou « Nouvelle partie » : pas d'animation,
   // les étoiles sont déjà dans le compte depuis l'affichage du résultat.
   function accueilApresFin() {
     var r = partie.regles, rc = r && r.recompense;
-    var n = rc && !rc.quitte && R.reussie(r) ? (rc.base || 0) + (rc.bonus || 0) : 0;
+    var n = rc && R.reussie(r) && window.Recompenses ? window.Recompenses.gainTotal(rc) : 0;
     // v10.3 : s'ajoute aux étoiles déjà en attente (coffre ouvert sur l'écran de fin) : un seul envol pour le tout.
     if (n > 0) {
       try {

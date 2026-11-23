@@ -40,3 +40,31 @@ test('à 1 joueur : pas de part individuelle (l\'objectif est déjà le sien)', 
   await expect(page.locator('#fin')).toBeVisible();
   await expect(page.locator('#fin-joueurs')).toBeHidden();
 });
+
+// v10.30 (backlog lignes 447 et 454) : partie gagnée à plusieurs, chacun reçoit les étoiles qu'il a lui-même récoltées.
+test('à 2 joueurs, partie gagnée : chacun reçoit ses propres étoiles, visibles dans sa carte', async ({ page }) => {
+  await rapide(page);
+  await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); } catch (e) { /* */ } });
+  await lancerPartie(page, { joueurs: 2 });
+  await jouerJusquALaFin(page);
+  await expect(page.locator('#fin-titre')).toHaveText('Aventure réussie !');
+  const pts = await page.evaluate(() => {
+    const r = window.Aventura.partie.regles, t = [0, 0];
+    (r.historique || []).forEach((h) => { if (h.joueur >= 0 && h.joueur < 2) t[h.joueur] += Number(h.points) || 0; });
+    return t;
+  });
+  const lignes = page.locator('#fin-etoiles .fin-gains-joueurs li');
+  await expect(lignes).toHaveCount(2);
+  await expect(page.locator('#fin-etoiles .fin-gain')).toContainText('+' + (pts[0] + pts[1]));
+  for (let i = 0; i < 2; i++) await expect(lignes.nth(i).locator('.fg-etoiles')).toHaveText('+' + pts[i]);
+  // Pas de débordement de l'écran de fin.
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
+  // Chacun dans sa carte (Mon compte).
+  const noms = await page.evaluate(() => window.Aventura.partie.joueurs.map((j) => j.nom));
+  await page.locator('#fin').evaluate((d) => d.close());
+  await page.evaluate(() => window.Aventura.afficher('ecran-compte'));
+  for (let i = 0; i < 2; i++) {
+    const carte = page.locator('.joueur-carte', { has: page.locator('.joueur-nom', { hasText: noms[i] }) });
+    await expect(carte.locator('.jt-etoiles strong')).toHaveText(String(pts[i]));
+  }
+});
