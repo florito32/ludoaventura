@@ -313,6 +313,12 @@
           <button type="button" class="btn btn-secondaire" id="compte-sortir">Se déconnecter</button>
         </div>
       </section>
+      <!-- v10.26 (demande du 23/11/2026, backlog lignes 438 à 449) : un compte fait jouer plusieurs joueurs (js/joueurs.js,
+           js/joueurs-ecran.js). Visible connecté ou en invité ; les joueurs sont sauvegardés avec la progression du compte. -->
+      <section class="joueurs-section" id="compte-joueurs" aria-labelledby="joueurs-titre">
+        <div class="joueurs-entete"><h3 id="joueurs-titre">Mes joueurs</h3><span class="petit" id="joueurs-compte"></span></div>
+        <div class="joueurs-liste" id="joueurs-liste"></div>
+      </section>
       <section class="carte-page compte-carte" id="compte-nouveau-bloc" hidden>
         <h3>Nouveau mot de passe</h3>
         <form id="compte-nouveau-form" class="compte-form" novalidate>
@@ -960,6 +966,7 @@
 <script src="js/des.js"></script>
 <script src="js/aventures.js"></script>
 <script src="js/aventuriers.js"></script>
+<script src="js/joueurs.js"></script>
 <script src="js/cartes.js"></script>
 <script src="js/questions.js"></script>
 <script src="js/calcul.js"></script>
@@ -1000,6 +1007,7 @@
 <script src="js/rapide.js"></script>
 <script src="js/baby-ecran.js"></script>
 <script src="js/ludo.js"></script>
+<script src="js/joueurs-ecran.js"></script>
 <script src="js/compte.js"></script>
 <script src="js/version.js"></script>
 <script src="js/navigateur.js"></script>

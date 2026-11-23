@@ -2,6 +2,11 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.26', date: '2026-11-23', changes: [
+    "Mon compte : nouvelle section « Mes joueurs ». Un compte fait jouer plusieurs joueurs, sans limite : chacun a son nom, son personnage (un des 10 aventuriers) et ses niveaux. Tu peux créer un joueur, changer son nom et son personnage quand tu veux.",
+    "Niveaux : chaque sous-matière est notée de 0 à 100 (Français : orthographe, conjugaison, grammaire, phonèmes ; Maths : calcul mental, problèmes ; Histoire : une période ; Géographie : un jeu). La matière est la moyenne de ses sous-matières, affichée en jauge coupée en 10 niveaux.",
+    "Les joueurs sont sauvegardés avec ta progression (sur ton compte, ou sur l’appareil en invité) et retrouvés sur tous tes appareils. Les niveaux augmenteront avec les parties : étape suivante."
+  ] },
   { v: '10.25', date: '2026-11-18', changes: [
     "Histoire, Antiquité (fin) : nouvelles questions pour « Monuments et merveilles » (dont les 7 merveilles), « Chiffres romains » (règles et culture), « Olympie » et « Écritures », et compléments pour Rome, la Gaule et la vie antique. Toute l’Antiquité est maintenant ajoutée.",
     "Mêmes formats : 4 choix en mode Quiz ; en mode Normal, question ouverte dès Difficile quand la réponse est courte, vrai ou faux avant, dates en frise (avant J.-C. comprises)."

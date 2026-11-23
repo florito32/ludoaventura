@@ -36,6 +36,10 @@
   function liste(x) { return Array.isArray(x) ? x : []; }
   function nombre(x) { return typeof x === 'number' && isFinite(x) ? x : 0; }
   function unir(a, b) { var r = liste(b).slice(); liste(a).forEach(function (x) { if (r.indexOf(x) < 0) r.push(x); }); return r; }
+  function joueursFusion(a, b) {
+    var J = (typeof module !== 'undefined' && module.exports) ? require('./joueurs.js') : racine.Joueurs;
+    return J ? J.fusionner(a, b) : liste(b).concat(liste(a));
+  }
   function fusionner(local, distant, base) {
     var a = objet(local), d = objet(distant), b = objet(base);
     if (!distant || d.v !== 1) return JSON.parse(JSON.stringify(a)); // compte encore vide
@@ -68,6 +72,8 @@
     });
     r.defisQuittes = objet(d.defisQuittes);
     Object.keys(objet(a.defisQuittes)).forEach(function (j) { r.defisQuittes[j] = Object.assign(objet(r.defisQuittes[j]), objet(a.defisQuittes[j])); });
+    // Joueurs du compte (v10.26) : même id = même joueur (nom le plus récent, niveaux les plus hauts), les autres sont gardés.
+    r.joueurs = joueursFusion(a.joueurs, d.joueurs);
     r.visites = unir(a.visites, d.visites).sort();
     r.parties = unir(a.parties, d.parties).slice(0, 50);
     r.defisEnCours = objet(a.defisEnCours); // défi commencé sur CET appareil
@@ -352,6 +358,7 @@
   }
   function majPage() {
     majPastille();
+    if (window.JoueursEcran) window.JoueursEcran.rendre();
     var corps = $('compte-corps'); if (!corps) return;
     var co = !!session, attente = etat.synchro === 'en-cours';
     $('compte-invite').hidden = !(mode === 'connexion' && !co);
