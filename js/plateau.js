@@ -110,6 +110,8 @@
   // Packs et types de questions sont décochés au départ : c'est au joueur de les cocher (demande du 02/11/2026).
   var partie = {
     nbJoueurs: 1, aventure: A.LISTE[0], joueurs: [], choix: ['lea', 'tom', 'nour', 'malo'], actif: 0, regles: null,
+    // Profil du compte (js/joueurs.js, v10.27) joué par chaque siège : id du joueur du compte, ou null (joueur sans profil).
+    profil: [null, null, null, null],
     etapePrepa: 1, // écran de la préparation affiché (1 à 4), voir montrerEtape
     // Étape 3 en deux écrans par joueur (v5.8, choix de l'utilisateur) : 'matiere' puis 'reglages'.
     // Conjugaison (v6.0) : 'matiere' (avec le niveau) → 'modes' (modes, groupes et temps, un seul écran depuis la v6.49).
@@ -198,6 +200,62 @@
     });
     construireReglages();
     majAventuriers();
+  }
+
+  // ---------- Profils du compte (v10.27, backlog lignes 446 et 448) ----------
+  // Étape 2 : en plus de l'aventurier, chaque siège joue un profil du compte (nom, personnage, niveaux) ; un profil déjà
+  // pris par un siège précédent est indisponible. Sans profil libre, le siège joue sans profil (rien n'est noté).
+  function profilsCompte() {
+    var c = window.Recompenses && window.Recompenses.compte, J = window.Joueurs;
+    if (!c || !J) return [];
+    if (J.assurerPremier(c.etat)) c.ecrire();
+    return J.lister(c.etat);
+  }
+  function majProfils() {
+    var boite = $('profils-joueur'); if (!boite) return;
+    var liste = profilsCompte(), a = partie.actif, avant = partie.profil.slice(0, a);
+    var ids = liste.map(function (j) { return j.id; });
+    // Un profil disparu ou déjà pris par un siège précédent est remplacé par le premier profil libre (ou aucun).
+    if (partie.profil[a] && (ids.indexOf(partie.profil[a]) < 0 || avant.indexOf(partie.profil[a]) >= 0)) partie.profil[a] = null;
+    if (!partie.profil[a]) { var libre = ids.filter(function (id) { return avant.indexOf(id) < 0; })[0]; partie.profil[a] = libre || null; }
+    if (liste.length < 2) { boite.hidden = true; boite.innerHTML = ''; return; }
+    boite.hidden = false;
+    boite.innerHTML = '<p class="profils-titre" id="profils-titre">Qui joue ?</p><div class="profils-liste" role="group" aria-labelledby="profils-titre">' +
+      liste.map(function (j) {
+        var pris = avant.indexOf(j.id) >= 0, perso = P.trouver(j.perso) || P.LISTE[0];
+        return '<button type="button" class="profil-bouton" data-profil="' + j.id + '" aria-pressed="' + (partie.profil[a] === j.id) + '"' + (pris ? ' disabled' : '') + '>' +
+          '<img src="' + perso.image + '" alt="" width="36" height="36"><span></span></button>';
+      }).join('') + '</div>';
+    Array.prototype.forEach.call(boite.querySelectorAll('.profil-bouton'), function (b, i) { b.lastChild.textContent = liste[i].nom; });
+  }
+  if ($('profils-joueur')) $('profils-joueur').addEventListener('click', function (e) {
+    var b = e.target.closest('.profil-bouton'); if (!b || b.disabled) return;
+    var j = window.Joueurs.trouver(window.Recompenses.compte.etat, b.dataset.profil);
+    partie.profil[partie.actif] = b.dataset.profil;
+    if (j && partie.choix.slice(0, partie.actif).indexOf(j.perso) < 0 && P.trouver(j.perso)) partie.choix[partie.actif] = j.perso; // son personnage, s'il est libre
+    majAventuriers();
+  });
+  // Sous-matière jouée par un siège : celle de son choix à l'étape 3 (js/joueurs.js), ou null si elle n'est pas connue.
+  function sousMatiereDe(i) {
+    var m = partie.matiere[i];
+    if (m === 'maths') return { m: 'maths', s: (partie.maths[i] && partie.maths[i].type) === 'probleme' ? 'probleme' : 'calcul' };
+    if (m === 'orthographe' || m === 'conjugaison' || m === 'grammaire' || m === 'phonemes') return { m: 'francais', s: m };
+    if (estSavoir(m)) {
+      var r = partie.savoirs[i] && partie.savoirs[i][m], jeu = r && r.jeux && SV.trouver(r.jeux[0]);
+      return jeu ? { m: m, s: jeu.famille } : null;
+    }
+    return null;
+  }
+  // Fin de partie (réussie ou non) : +1 point sur 100 à la sous-matière jouée de chaque profil, une seule fois par partie.
+  function noterNiveauxProfils(r) {
+    if (r.niveauxNotes || !window.Recompenses || !window.Joueurs) return;
+    r.niveauxNotes = true;
+    var c = window.Recompenses.compte;
+    partie.joueurs.forEach(function (j) {
+      var sm = j.profil && j.sousMat;
+      if (sm) window.Joueurs.ajouterPoints(c.etat, j.profil, sm.m, sm.s, 1);
+    });
+    c.ecrire();
   }
 
   // Ajoute un choix « entouré » (case à cocher ou bouton radio invisibles, v5.6) dans une boîte.
@@ -803,6 +861,7 @@
       // Nom accessible = texte visible + précision pour les lecteurs d'écran (WCAG 2.5.3).
       b.querySelector('.aventurier-proprio').textContent = proprio >= 0 ? ' — choisi par Joueur ' + (proprio + 1) : '';
     });
+    majProfils();
     // Réglages des cartes du joueur actif.
     var actif = P.trouver(partie.choix[partie.actif]);
     $('reglages-joueur').className = 'etape-corps reglages-joueur joueur-' + couleur;
@@ -1152,7 +1211,7 @@
     partie.joueurs = [];
     for (var i = 0; i < partie.nbJoueurs; i++) {
       var perso = P.trouver(partie.choix[i]);
-      partie.joueurs.push({ nom: perso.nom, aventurier: perso, couleur: COULEURS[i], index: i, tas: melanger(cartesDuJoueur(i)) });
+      partie.joueurs.push({ nom: perso.nom, aventurier: perso, couleur: COULEURS[i], index: i, tas: melanger(cartesDuJoueur(i)), profil: partie.profil[i] || null, sousMat: sousMatiereDe(i) });
     }
     partie.objectif = A.objectif(av, partie.nbJoueurs);
     partie.regles = R.nouvellePartie(partie.nbJoueurs, partie.objectif);
@@ -2548,6 +2607,7 @@
   function montrerFin() {
     var r = partie.regles, av = partie.aventure;
     var ok = R.reussie(r);
+    noterNiveauxProfils(r);
     $('fin-icone').textContent = ok ? '🏆' : '🌋';
     $('fin-titre').textContent = ok ? 'Aventure réussie !' : 'Aventure manquée…';
     $('fin-texte').textContent = 'L’équipe a ' + av.objet.participe + ' ' + A.quantite(av, r.points) + ', il en fallait ' + r.objectif + '. ' +
@@ -2617,7 +2677,7 @@
       ecran: partie.ecran || 'ecran-accueil',
       nb: nb ? Number(nb.value) : partie.nbJoueurs,
       aventure: avRadio ? avRadio.value : partie.aventure.id,
-      choix: partie.choix, packs: partie.packs, types: partie.types, actif: partie.actif,
+      choix: partie.choix, profil: partie.profil, packs: partie.packs, types: partie.types, actif: partie.actif,
       matiere: partie.matiere, francais: partie.francais, maths: partie.maths, conj: partie.conj,
       etapePrepa: partie.etapePrepa, sousEtape: partie.sousEtape, modif: !!partie.modif,
       mots: partie.mots, orthoNiveau: partie.orthoNiveau, gram: partie.gram, phon: partie.phon, defi: partie.defi, avantDefi: partie.avantDefi || null, rapide: partie.rapide,
@@ -2626,7 +2686,7 @@
     if (partie.regles && partie.joueurs.length) {
       d.jeu = {
         aventure: partie.aventure.id, objectif: partie.objectif, regles: partie.regles,
-        joueurs: partie.joueurs.map(function (j) { return { id: j.aventurier.id, tas: j.tas.map(carteVersDonnees) }; }),
+        joueurs: partie.joueurs.map(function (j) { return { id: j.aventurier.id, profil: j.profil || null, sousMat: j.sousMat || null, tas: j.tas.map(carteVersDonnees) }; }),
         carte: carteVersDonnees(partie.carte), vue: partie.vue || 'cache', etapesVues: partie.etapesVues || 0
       };
     }
@@ -2647,7 +2707,7 @@
       if (nb) nb.checked = true;
       var av = document.querySelector('input[name="aventure"][value="' + d.aventure + '"]');
       if (av) av.checked = true;
-      partie.choix = d.choix; partie.packs = d.packs.map(function (l) { return l.filter(function (id) { return TOUS_PACKS.indexOf(id) >= 0; }); }); partie.types = d.types.map(function (l) { return l.filter(function (id) { return TOUS_TYPES.indexOf(id) >= 0; }); }); partie.actif = d.actif || 0;
+      partie.choix = d.choix; partie.profil = Array.isArray(d.profil) ? d.profil : [null, null, null, null]; partie.packs = d.packs.map(function (l) { return l.filter(function (id) { return TOUS_PACKS.indexOf(id) >= 0; }); }); partie.types = d.types.map(function (l) { return l.filter(function (id) { return TOUS_TYPES.indexOf(id) >= 0; }); }); partie.actif = d.actif || 0;
       partie.etapePrepa = d.etapePrepa || 1;
       partie.sousEtape = d.sousEtape || 'matiere';
       partie.modif = !!(d.modif && d.jeu); // « Modifier les choix » en cours : la partie attend d'être reprise
@@ -2694,7 +2754,7 @@
         partie.regles = g.regles;
         partie.joueurs = g.joueurs.map(function (s, i) {
           var perso = P.trouver(s.id);
-          return { nom: perso.nom, aventurier: perso, couleur: COULEURS[i], index: i, tas: s.tas.map(donneesVersCarte) };
+          return { nom: perso.nom, aventurier: perso, couleur: COULEURS[i], index: i, profil: s.profil || null, sousMat: s.sousMat || null, tas: s.tas.map(donneesVersCarte) };
         });
         partie.carte = donneesVersCarte(g.carte);
         partie.etapesVues = g.etapesVues;

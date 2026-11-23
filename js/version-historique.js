@@ -2,6 +2,10 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.27', date: '2026-11-23', changes: [
+    "Préparation de la partie, étape 2 : si ton compte a au moins 2 joueurs, tu choisis qui joue (un joueur déjà pris est grisé pour les suivants) ; son personnage est proposé d’office.",
+    "À la fin de chaque partie, réussie ou non, chaque joueur du compte gagne +1 point sur 100 dans la sous-matière qu’il a jouée (orthographe, calcul mental, une période d’histoire…)."
+  ] },
   { v: '10.26', date: '2026-11-23', changes: [
     "Mon compte : nouvelle section « Mes joueurs ». Un compte fait jouer plusieurs joueurs, sans limite : chacun a son nom, son personnage (un des 10 aventuriers) et ses niveaux. Tu peux créer un joueur, changer son nom et son personnage quand tu veux.",
     "Niveaux : chaque sous-matière est notée de 0 à 100 (Français : orthographe, conjugaison, grammaire, phonèmes ; Maths : calcul mental, problèmes ; Histoire : une période ; Géographie : un jeu). La matière est la moyenne de ses sous-matières, affichée en jauge coupée en 10 niveaux.",

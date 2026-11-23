@@ -406,6 +406,8 @@
         <legend><span class="etape-num">2</span> <span id="aventurier-legende">Joueur 1, choisis ton aventurier</span></legend>
         <!-- Grille des 10 aventuriers (js/plateau.js) ; un aventurier pris par un autre joueur est grisé. -->
         <div class="etape-corps">
+          <!-- v10.27 : profil du compte joué par ce siège (visible si le compte a au moins 2 joueurs ; js/plateau.js). -->
+          <div class="profils-joueur" id="profils-joueur" hidden></div>
           <div class="aventuriers" id="grille-aventuriers"></div>
         </div>
         <div class="etape-actions">

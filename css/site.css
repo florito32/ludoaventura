@@ -2316,3 +2316,12 @@ body:has(#ecran-baby:not([hidden])) .pied { padding-block: 4px calc(4px + env(sa
 .joueur-ajout { border: 3px dashed var(--parchemin-bord); border-radius: 16px; background: rgba(246, 238, 219, .9); color: var(--encre-douce); font: inherit; font-weight: 800; min-height: 64px; padding: 12px; cursor: pointer; }
 .joueur-ajout:hover { background: var(--parchemin); }
 @media (max-width: 380px) { .jm { grid-template-columns: 4.6rem minmax(0, 1fr) 5.6rem; } .sousmat .jm { grid-template-columns: 6rem minmax(0, 1fr) 5.2rem; } }
+
+/* v10.27 : choix du profil du compte à l'étape 2 de la préparation (backlog ligne 448) */
+.profils-joueur { margin: 0 0 .75rem; }
+.profils-titre { margin: 0 0 .35rem; font-weight: 700; }
+.profils-liste { display: flex; flex-wrap: wrap; gap: .5rem; }
+.profil-bouton { display: inline-flex; align-items: center; gap: .4rem; padding: .3rem .7rem .3rem .3rem; border: 2px solid #5b4630; border-radius: 999px; background: #fff; font: inherit; cursor: pointer; min-height: 44px; }
+.profil-bouton img { border-radius: 50%; object-fit: cover; }
+.profil-bouton[aria-pressed="true"] { background: #2b2118; color: #fff; }
+.profil-bouton:disabled { opacity: .45; cursor: not-allowed; }
