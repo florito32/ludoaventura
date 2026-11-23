@@ -1,6 +1,6 @@
 // Accessibilité : audit axe-core (WCAG 2.1 A et AA) sur l'accueil et le plateau.
 const { test, expect } = require('@playwright/test');
-const { lancerPartie, valider, cocherTout } = require('./aide');
+const { lancerPartie, valider, cocherTout, creerJoueurs } = require('./aide');
 const AxeBuilder = require('@axe-core/playwright').default;
 
 async function audit(page) {
@@ -14,14 +14,15 @@ test('aucune violation WCAG A/AA : accueil, préparation et plateau', async ({ p
   expect(await audit(page)).toEqual([]);
   await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
   await expect(page.getByRole('heading', { name: 'Préparer la partie' })).toBeVisible();
-  expect(await audit(page)).toEqual([]); // écran 1 : nombre de joueurs
-  await page.getByRole('radio', { name: '2 joueurs' }).check(); // 1 joueur par défaut depuis la v6.20
+  expect(await audit(page)).toEqual([]); // étape 1 : qui joue ?
+  await creerJoueurs(page, 2);
+  await page.locator('[data-ajouter]').click();
+  expect(await audit(page)).toEqual([]); // liste des joueurs du compte ouverte
+  await page.locator('.cj-profil[data-choisir]:not([disabled])').first().click();
   await valider(page);
-  expect(await audit(page)).toEqual([]); // écran 2 : aventuriers
-  await valider(page); await valider(page);
-  expect(await audit(page)).toEqual([]); // écran 3 : cartes du joueur
+  expect(await audit(page)).toEqual([]); // étape 2 : cartes du joueur
   await cocherTout(page, 2);
-  expect(await audit(page)).toEqual([]); // écran 4 : aventure
+  expect(await audit(page)).toEqual([]); // étape 3 : aventure
   await lancerPartie(page, { joueurs: 3, aventure: 'Mayas' });
   expect(await audit(page)).toEqual([]);
 });
@@ -77,6 +78,9 @@ test('aucune violation WCAG A/AA : Comment gagner des étoiles, Partie rapide', 
   await expect(page.getByRole('heading', { name: 'Partie rapide' })).toBeVisible();
   expect(await audit(page)).toEqual([]);
   await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await expect(page.getByRole('dialog', { name: 'Qui joue ?' })).toBeVisible(); // v10.27 : demandé à chaque lancement
+  expect(await audit(page)).toEqual([]);
+  await page.getByRole('button', { name: 'C’est parti' }).click();
   await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await expect(page.locator('#carte-piochee')).toBeVisible();
   expect(await audit(page)).toEqual([]);

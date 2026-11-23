@@ -58,6 +58,8 @@
     return e ? e.id : null;
   }
   function nomJoueur(p) {
+    var j = p.profils && p.profils[p.actif] && window.Joueurs && window.Joueurs.duCompte().filter(function (x) { return x.id === p.profils[p.actif]; })[0];
+    if (j) return j.nom;
     var a = window.Aventuriers.trouver(p.choix[p.actif]);
     return a ? a.nom : 'Joueur ' + (p.actif + 1);
   }
@@ -81,18 +83,15 @@
     var n = p.etapePrepa, nom = nomJoueur(p), valider;
     var cle = 'prepa-' + n + '-' + p.actif + '-' + p.sousEtape;
     if (n === 1) {
-      return { cle: cle, choix: document.querySelector('.nb-joueurs'), cible: $('btn-valider-nb'),
-        texte: 'Combien êtes-vous à jouer ? Touche le bon nombre, puis « Valider ».' };
+      return { cle: cle, cible: $('btn-valider-joueurs'), // Joueur 1 est déjà choisi : la flèche va droit sur « Valider »
+       
+        texte: 'Qui joue ? Touche « Choisir » pour prendre un joueur de ton compte, « Ajouter un joueur » pour être plus nombreux (4 au plus), puis « Valider ».' };
     }
-    if (n === 2) {
-      return { cle: cle, choix: $('grille-aventuriers'), cible: $('btn-valider-aventurier'),
-        texte: nom + ', choisis ton aventurier : touche son portrait, puis « Valider ». Il marchera sur le plateau pour toi.' };
-    }
-    if (n === 4) {
+    if (n === 3) {
       return { cle: cle, choix: $('liste-aventures'), cible: $('btn-lancer'),
         texte: 'Choisis ton aventure. Chacune a son objectif à atteindre ensemble avant d’arriver au volcan (pierres à tailler, épées à forger…). Puis « Lancer la partie ».' };
     }
-    // Étape 3 : la matière, puis ses réglages (un écran ou deux selon la matière).
+    // Étape 2 : la matière, puis ses réglages (un écran ou deux selon la matière).
     // v10.13 : « Valider » du dernier bandeau déroulant s'il est ouvert, sinon celui du bas ; les niveaux se choisissent via leur onglet.
     valider = (window.Selecteur && window.Selecteur.boutonValider()) || $('btn-valider-reglages');
     var ongletNiveau = window.Selecteur && window.Selecteur.onglet('niveau');

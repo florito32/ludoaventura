@@ -1,6 +1,7 @@
-// v10.27 (backlog lignes 446 et 448) : les joueurs du compte jouent la partie ; +1 point à la sous-matière jouée de chaque profil.
+// v10.29 (backlog lignes 446 et 448) : les joueurs du compte jouent la partie ; +1 point à la sous-matière jouée de chaque profil
+// qui a réussi sa part (objectif ÷ nombre de joueurs), que l'équipe réussisse ou non.
 const { test, expect } = require('@playwright/test');
-const { rapide, lancerPartie, ouvrirNeuf, repondre, lancerLeDe } = require('./aide');
+const { rapide, lancerPartie, repondre, lancerLeDe } = require('./aide');
 
 const ETAT = {
   v: 1, total: 0,
@@ -16,32 +17,7 @@ async function preparer(page, etat) {
 }
 const stockes = (page) => page.evaluate(() => JSON.parse(localStorage.getItem('ludoaventura-etoiles') || '{}').joueurs || []);
 
-test('étape 2 : choix du profil (2 joueurs au compte) ; un profil pris par le joueur 1 est grisé pour le joueur 2 @smoke', async ({ page }) => {
-  await rapide(page); await preparer(page, ETAT);
-  await ouvrirNeuf(page);
-  await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
-  await page.getByRole('radio', { name: /^2 joueurs?$/ }).check();
-  await page.getByRole('button', { name: 'Valider', exact: true }).click();
-  const chips = page.locator('#profils-joueur .profil-bouton');
-  await expect(chips).toHaveCount(2);
-  await expect(chips.nth(0)).toHaveAttribute('aria-pressed', 'true'); // Léa d'office
-  await chips.nth(1).click(); // Hugo : prend son personnage (Tom)
-  await expect(chips.nth(1)).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('.aventurier[data-id="tom"]')).toHaveAttribute('aria-pressed', 'true');
-  await page.getByRole('button', { name: 'Valider', exact: true }).click(); // joueur 2
-  await expect(page.locator('#profils-joueur .profil-bouton').nth(1)).toBeDisabled();
-  await expect(page.locator('#profils-joueur .profil-bouton').nth(0)).toHaveAttribute('aria-pressed', 'true');
-});
-
-test('un seul joueur au compte : pas de choix de profil, la partie compte pour lui', async ({ page }) => {
-  await rapide(page); await preparer(page, { v: 1, total: 0, joueurs: [] });
-  await ouvrirNeuf(page);
-  await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
-  await page.getByRole('button', { name: 'Valider', exact: true }).click();
-  await expect(page.locator('#profils-joueur')).toBeHidden();
-});
-
-test('fin de partie : +1 point à l\'orthographe pour chaque profil joué, réussie ou non, une seule fois', async ({ page }) => {
+test('fin de partie : +1 point à l\'orthographe pour chaque profil qui a réussi sa part, une seule fois', async ({ page }) => {
   await rapide(page); await preparer(page, ETAT);
   await lancerPartie(page, { joueurs: 2 });
   const suite = page.getByRole('button', { name: /^(Première question|Question suivante)$/ });
@@ -53,10 +29,32 @@ test('fin de partie : +1 point à l\'orthographe pour chaque profil joué, réus
     await lancerLeDe(page);
   }
   await expect(page.locator('#fin')).toBeVisible();
+  // Qui a réussi sa part ? (points de chaque joueur d'après l'historique, comparés à objectif ÷ 2)
+  const reussi = await page.evaluate(() => {
+    const r = window.Aventura.partie.regles, pts = [0, 0];
+    (r.historique || []).forEach((h) => { if (h.joueur >= 0 && h.joueur < 2) pts[h.joueur] += Number(h.points) || 0; });
+    return pts.map((p) => p >= r.objectif / 2);
+  });
   const j = await stockes(page);
-  expect(j.find((x) => x.id === 'j-1').niv['francais.orthographe']).toBe(11);
-  expect(j.find((x) => x.id === 'j-2').niv['francais.orthographe']).toBe(1);
+  expect(j.find((x) => x.id === 'j-1').niv['francais.orthographe']).toBe(reussi[0] ? 11 : 10);
+  expect((j.find((x) => x.id === 'j-2').niv || {})['francais.orthographe'] || 0).toBe(reussi[1] ? 1 : 0);
   await page.reload();
   const apres = await stockes(page);
-  expect(apres.find((x) => x.id === 'j-1').niv['francais.orthographe']).toBe(11);
+  expect(apres.find((x) => x.id === 'j-1').niv['francais.orthographe']).toBe(reussi[0] ? 11 : 10);
+});
+
+test('v10.29 : un joueur qui ne rapporte rien à l\'équipe ne gagne aucun point de niveau', async ({ page }) => {
+  await rapide(page); await preparer(page, ETAT);
+  await lancerPartie(page, { joueurs: 2 });
+  // Partie fabriquée : le joueur 1 a tout rapporté, le joueur 2 rien ; la partie est finie.
+  await page.evaluate(() => {
+    const p = window.Aventura.partie, r = p.regles;
+    r.historique = [{ manche: 1, joueur: 0, de: 'fort', points: r.objectif }];
+    r.points = r.objectif; r.etape = 'fin';
+  });
+  await page.reload(); // la partie finie est restaurée : l'écran de fin note les niveaux
+  await expect(page.locator('#fin')).toBeVisible();
+  const j = await stockes(page);
+  expect(j.find((x) => x.id === 'j-1').niv['francais.orthographe']).toBe(11); // il a réussi sa part
+  expect((j.find((x) => x.id === 'j-2').niv || {})['francais.orthographe'] || 0).toBe(0); // lui n'a rien rapporté
 });

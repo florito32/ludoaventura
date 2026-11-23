@@ -53,16 +53,15 @@ test.describe('données des aventures', () => {
   });
 });
 
-test('v6.20 : à l\'étape 1, 1 joueur est sélectionné par défaut', async ({ page }) => {
+test('v10.27 : à l\'étape 1, Joueur 1 est choisi par défaut', async ({ page }) => {
   await page.goto('./');
   await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
-  await expect(page.locator('input[name="nb"]:checked')).toHaveValue('1');
-  await expect(page.locator('input[name="nb"]:checked')).toHaveCount(1);
+  await expect(page.locator('.cj-ligne')).toHaveCount(1);
+  await expect(page.locator('#btn-valider-joueurs')).toBeEnabled();
 });
 
 test('préparation : 4 choix de joueurs, 10 aventures avec image, objectif mis à jour', async ({ page }) => {
   await page.goto('./');
-  await expect(page.locator('input[name="nb"]')).toHaveCount(4);
   await versReglages(page, 4);
   await cocherTout(page, 4);
   await expect(page.locator('.aventure')).toHaveCount(10);

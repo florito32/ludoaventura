@@ -2,6 +2,12 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.29', date: '2026-11-23', changes: [
+    "Préparation de la partie : plus de « Combien de joueurs ? » ni de choix de l’aventurier. Une seule étape « Qui joue ? » : le Joueur 1 est déjà là, « Ajouter un joueur » en ajoute jusqu’à 4, chacun choisi parmi les joueurs de ton compte (visage, nom et niveaux affichés, pion de couleur). Un joueur déjà dans la partie est grisé ; deux joueurs peuvent avoir le même personnage.",
+    "Défi du jour, partie rapide et Baby jeux : la fenêtre « Qui joue ? » s’ouvre à chaque lancement, avec les derniers joueurs déjà proposés.",
+    "Mon compte : la progression des sous-matières n’est plus visible (elle reste enregistrée), il ne reste que les 4 jauges Français, Maths, Histoire et Géographie.",
+    "Un joueur gagne +1 point de niveau seulement s’il réussit sa part de l’objectif (objectif ÷ nombre de joueurs), que l’équipe gagne ou non."
+  ] },
   { v: '10.28', date: '2026-11-23', changes: [
     "À plusieurs, l’écran de fin dit ce que chacun devait récolter (l’objectif de l’équipe partagé entre les joueurs : 30 à 2, c’est 15 chacun) et qui a réussi sa part. La réussite de l’aventure reste celle de l’équipe."
   ] },

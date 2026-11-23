@@ -2,7 +2,7 @@
 const { test, expect } = require('@playwright/test');
 const D = require('../js/defis.js');
 const A = require('../js/aventures.js');
-const { rapide, lancerLeDe } = require('./aide');
+const { rapide, lancerLeDe, quiJoue, creerJoueurs } = require('./aide');
 
 test.describe('tirage des défis', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
@@ -83,6 +83,7 @@ test('défi solo du jour : le joueur choisit seulement matière et niveau ; gagn
   await expect(page.locator('.defi-recompense')).toContainText('doublées');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.getByRole('button', { name: 'Valider' }).click();
+  await quiJoue(page);
   await expect(page.getByRole('heading', { name: 'Défi solo du jour' })).toBeVisible();
   const p = await page.evaluate(() => ({ nb: window.Aventura.partie.nbJoueurs, m: window.Aventura.partie.matiere[0], defi: window.Aventura.partie.defi.type, niv: window.Aventura.partie.maths[0].niveau }));
   expect(p).toEqual({ nb: 1, m: 'maths', defi: 'solo', niv: 'facile' });
@@ -103,10 +104,11 @@ test('défi solo du jour : le joueur choisit seulement matière et niveau ; gagn
   expect(await page.evaluate(() => [window.Aventura.partie.defi, window.Aventura.partie.matiere[0]])).toEqual([null, null]);
 });
 
-test('défi en équipe : nombre de joueurs choisi, aventuriers tirés, plateau « Défi en équipe du jour »', async ({ page }) => {
+test('défi en équipe : nombre de joueurs choisi, joueurs demandés (v10.27), plateau « Défi en équipe du jour »', async ({ page }) => {
   await rapide(page);
   await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); } catch (e) { /* */ } });
   await page.goto('./');
+  await creerJoueurs(page, 3);
   await page.locator('#btn-defi').click();
   await page.locator('label:has(input[name="defi-type"][value="equipe"])').click();
   await page.locator('label:has(input[name="defi-matiere"][value="francais"])').click();
@@ -118,6 +120,7 @@ test('défi en équipe : nombre de joueurs choisi, aventuriers tirés, plateau �
   await page.locator('#btn-defi').click();
   await expect(page.locator('input[name="defi-joueurs"][value="3"]')).toBeChecked();
   await page.getByRole('button', { name: 'Valider' }).click();
+  await quiJoue(page);
   await expect(page.getByRole('heading', { name: 'Défi en équipe du jour' })).toBeVisible();
   const p = await page.evaluate(() => ({ nb: window.Aventura.partie.nbJoueurs, defi: window.Aventura.partie.defi.type, m: window.Aventura.partie.matiere.slice(0, 3) }));
   expect(p.nb).toBe(3); expect(p.defi).toBe('equipe');
@@ -181,6 +184,7 @@ test('défi quitté avant la fin (retour à l’accueil) : on peut le rejouer ma
   await page.locator('label:has(input[name="defi-matiere"][value="maths"])').click();
   await page.locator('label:has(input[name="defi-niveau"][value="facile"])').click();
   await page.getByRole('button', { name: 'Valider' }).click();
+  await quiJoue(page);
   await expect(page.getByRole('heading', { name: 'Défi solo du jour' })).toBeVisible();
   // Menu → Retour à l'accueil : l'avertissement le dit.
   await page.getByRole('button', { name: 'Menu' }).click();
@@ -195,6 +199,7 @@ test('défi quitté avant la fin (retour à l’accueil) : on peut le rejouer ma
   await expect(page.locator('.defi-recompense')).toContainText('ne rapporte plus rien');
   // On peut toujours y jouer ; gagné, il ne rapporte ni étoiles ni pierres.
   await page.getByRole('button', { name: 'Valider' }).click();
+  await quiJoue(page);
   await gagner(page);
   await expect(page.locator('#fin-titre')).toHaveText('Aventure réussie !');
   await expect(page.locator('#fin-etoiles')).toContainText('Tu as quitté ce défi avant la fin');

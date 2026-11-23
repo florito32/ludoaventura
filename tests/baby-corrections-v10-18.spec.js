@@ -7,7 +7,7 @@
 //  - Plateau : plus de bandeau en haut, le plateau est en haut de l'écran, le menu est sur le plateau à droite ;
 //    bouton plein écran quand le navigateur sait le faire.
 const { test, expect } = require('@playwright/test');
-const { rapide } = require('./aide');
+const { rapide, lancerRapideQui } = require('./aide');
 
 async function ouvrir(page, jeu, chiffres, { calme = true } = {}) {
   await rapide(page);
@@ -18,7 +18,7 @@ async function ouvrir(page, jeu, chiffres, { calme = true } = {}) {
   await page.goto('./');
   await page.getByRole('button', { name: 'Baby jeux' }).click();
   await page.getByRole('button', { name: 'Choisir les jeux' }).click();
-  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await lancerRapideQui(page);
 }
 async function premiereQuestion(page) {
   await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();

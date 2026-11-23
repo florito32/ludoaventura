@@ -2,7 +2,7 @@
 // 20 petits jeux de lettres et de chiffres joués sur le plateau comme une partie rapide.
 const { test, expect } = require('@playwright/test');
 const B = require('../js/baby.js');
-const { rapide } = require('./aide');
+const { rapide, lancerRapideQui } = require('./aide');
 
 test.describe('contenu des baby jeux', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
@@ -217,7 +217,7 @@ test('Baby jeux, page 1 : Lettres OU Chiffres, écriture, lettres ou chiffres ; 
   await page.getByRole('button', { name: 'Chiffres', exact: false }).filter({ hasText: '←' }).click();
   await expect(page.locator('input[name="baby-chiffre"]')).toHaveCount(10);
   await page.getByRole('button', { name: 'Choisir les jeux' }).click();
-  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await lancerRapideQui(page);
   await expect(page.getByRole('heading', { name: 'Baby jeux' })).toBeVisible();
   const p = await page.evaluate(() => ({ nb: window.Aventura.partie.joueurs.length, baby: window.Aventura.partie.rapide.baby, diff: window.Aventura.partie.aventure.difficulte }));
   expect(p.nb).toBe(1);
@@ -238,7 +238,7 @@ test('Baby jeux : « Modifier les choix » revient aux réglages Baby jeux, puis
   test.skip(test.info().project.name !== 'ordinateur' && test.info().project.name !== 'telephone', 'deux formats suffisent');
   await ouvrirBaby(page, { categories: ['lettres'], lettres: ['A', 'B'], ecriture: 'maj' });
   await page.getByRole('button', { name: 'Choisir les jeux' }).click();
-  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await lancerRapideQui(page);
   await expect(page.getByRole('button', { name: /^(Première question|Question suivante)$/ })).toBeVisible();
   const avant = await page.evaluate(() => { const p = window.Aventura.partie; p.regles.points = 7; return { av: p.aventure.id, perso: p.choix[0] }; });
   await page.getByRole('button', { name: 'Menu' }).click();
@@ -274,7 +274,7 @@ test('les 20 baby jeux se jouent au toucher, sans déborder, et la bonne répons
   test.setTimeout(240000);
   await ouvrirBaby(page);
   await page.getByRole('button', { name: 'Choisir les jeux' }).click();
-  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await lancerRapideQui(page);
   await expect(page.getByRole('heading', { name: 'Baby jeux' })).toBeVisible();
   for (const id of B.IDS) {
     const suivante = page.getByRole('button', { name: /^(Première question|Question suivante)$/ });
@@ -309,7 +309,7 @@ test('attrape la lettre : une mauvaise lettre se grise ; 2 erreurs → dé FAIBL
   test.skip(test.info().project.name !== 'ordinateur' && test.info().project.name !== 'telephone', 'deux formats suffisent');
   await ouvrirBaby(page, { categories: ['lettres'], lettres: ['L'], ecriture: 'maj', jeux: ['attrape-lettre'] });
   await page.getByRole('button', { name: 'Choisir les jeux' }).click();
-  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await lancerRapideQui(page);
   await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   const c = await page.evaluate(() => window.Aventura.partie.carte);
   expect(c.modele).toBe('L');
@@ -329,7 +329,7 @@ test('les jetons se baladent (animation) quand l’appareil n’a pas demandé m
   await page.goto('./');
   await page.getByRole('button', { name: 'Baby jeux' }).click();
   await page.getByRole('button', { name: 'Choisir les jeux' }).click();
-  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await lancerRapideQui(page);
   await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await expect(page.locator('.baby-modele .baby-de').first()).toBeVisible(); // le dé classique
   const anim = await page.locator('.baby-jeton').first().evaluate((e) => getComputedStyle(e).animationName);
@@ -343,7 +343,7 @@ for (const id of ['lettre-manque', 'chiffre-manque']) {
   test('« ' + id + ' » : la suite et les boutons de réponse se distinguent nettement, sans déborder', async ({ page }) => {
     await ouvrirBaby(page);
     await page.getByRole('button', { name: 'Choisir les jeux' }).click();
-    await page.getByRole('button', { name: 'Lancer la partie' }).click();
+    await lancerRapideQui(page);
     await page.evaluate(([x, k]) => { const b = window.Aventura.partie.rapide.baby; b.jeux = [x]; b.categories = [k]; }, [id, B.jeu(id).cat]);
     await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
     const boite = page.locator('#carte-gram');
@@ -379,7 +379,7 @@ for (const id of ['lettre-manque', 'chiffre-manque']) {
 test('J’en ajoute : la carte dit « Tu as 10 … Tu en reçois N de plus », montre les objets, tient sur tous les écrans', async ({ page }) => {
   await ouvrirBaby(page, { categories: ['chiffres'], chiffres: [10], jeux: ['encore-un'] });
   await page.getByRole('button', { name: 'Choisir les jeux' }).click();
-  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await lancerRapideQui(page);
   await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   const carte = page.locator('#carte-piochee');
   await expect(carte).toBeVisible();

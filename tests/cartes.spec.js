@@ -110,7 +110,7 @@ test('préparation : chaque joueur choisit ses packs, sur son propre écran, san
   await valider(page);
   // Joueur 2 : il commence par l'écran de la matière (v5.8), rien de choisi.
   await expect(page.locator('#reglages-titre')).toHaveText('Tom (Joueur 2) : quelle matière ?');
-  await expect(page.locator('#prepa-progres')).toHaveText('Étape 3 sur 4 · Joueur 2 sur 2');
+  await expect(page.locator('#prepa-progres')).toHaveText('Étape 2 sur 3 · Joueur 2 sur 2');
   await expect(page.locator('#ortho-packs')).toBeHidden();
   for (const c of await page.locator('#matieres input').all()) await expect(c).not.toBeChecked();
   await orthographe(page);
