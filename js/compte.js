@@ -4,7 +4,8 @@
 //    une fenêtre propose de se connecter à chaque ouverture du jeu tant qu'on n'est pas connecté ;
 //  - connexion avec Google, ou avec une adresse e-mail + un mot de passe (confirmation par e-mail à l'inscription,
 //    « Mot de passe oublié ») ; les e-mails partent par Brevo (réglé dans le tableau de bord Supabase) ;
-//  - une seule progression par compte (pas de profils par enfant) ;
+//  - une seule progression par compte ; depuis la v10.26 elle range plusieurs joueurs, et depuis la v10.30 chaque joueur
+//    y a son propre trésor (étoiles, pierres, coffres : js/etoiles.js → pourJoueur) ;
 //  - en se connectant, la progression de l'appareil est FUSIONNÉE avec celle du compte (on garde le meilleur des deux).
 // Ce qui est sauvegardé : les étoiles, niveaux, coffres, pierres et défis (js/etoiles.js, clé « ludoaventura-etoiles »).
 // Les réglages des parties (packs, niveaux…) restent propres à chaque appareil.
@@ -79,6 +80,30 @@
     Object.keys(objet(a.defisQuittes)).forEach(function (j) { r.defisQuittes[j] = Object.assign(objet(r.defisQuittes[j]), objet(a.defisQuittes[j])); });
     // Joueurs du compte (v10.26) : même id = même joueur (nom le plus récent, niveaux les plus hauts), les autres sont gardés.
     r.joueurs = joueursFusion(a.joueurs, d.joueurs);
+    // Trésor de chaque joueur (v10.30) : comme pour le compte, les étoiles et pierres gagnées sur l'appareil depuis le
+    // dernier envoi (base.joueurs) s'ajoutent à celles du compte. Sans base pour ce joueur : le plus grand des deux.
+    // 1re synchronisation avec ce compte (base vide) : tout ce que l'appareil a gagné s'ajoute, comme pour le compte.
+    var bj = objet(b.joueurs), premiere = !b.joueurs && !nombre(b.total) && !nombre(b.gemmes);
+    function recDe(l, id) { var x = liste(l).filter(function (j) { return j && j.id === id; })[0]; return x && x.rec ? x.rec : null; }
+    r.joueurs.forEach(function (p) {
+      var la = recDe(a.joueurs, p.id), ld = recDe(d.joueurs, p.id), base = bj[p.id] || (premiere ? { total: 0, gemmes: 0 } : null);
+      if (!la || !ld || !base || !p.rec) return;
+      p.rec.total = nombre(ld.total) + Math.max(0, nombre(la.total) - nombre(base.total));
+      p.rec.gemmes = nombre(ld.gemmes) + Math.max(0, nombre(la.gemmes) - nombre(base.gemmes));
+    });
+    // Compte écrit par un appareil d'avant la v10.30 (pas encore de trésor par joueur) : ce qu'il a gagné depuis le dernier
+    // envoi de cet appareil revient à « Joueur 1 », comme la migration de js/etoiles.js.
+    var E = (typeof module !== 'undefined' && module.exports) ? require('./etoiles.js') : racine.Etoiles;
+    if (a.parJoueur && !d.parJoueur && E) {
+      var p1 = r.joueurs.filter(function (p) { return p.id === 'j-1'; })[0];
+      if (p1) {
+        var t = nombre(p1.rec && p1.rec.total), g = nombre(p1.rec && p1.rec.gemmes);
+        p1.rec = E.fusionnerRec(p1.rec, d);
+        p1.rec.total = t + Math.max(0, nombre(d.total) - nombre(b.total));
+        p1.rec.gemmes = g + Math.max(0, nombre(d.gemmes) - nombre(b.gemmes));
+      }
+    }
+    r.parJoueur = a.parJoueur || d.parJoueur || 0;
     r.visites = unir(a.visites, d.visites).sort();
     r.parties = unir(a.parties, d.parties).slice(0, 50);
     r.defisEnCours = objet(a.defisEnCours); // défi commencé sur CET appareil
@@ -187,7 +212,9 @@
         if (c) r = c.etat; // progression remise en forme par js/etoiles.js (champs manquants complétés)
         return appel('/rest/v1/progression', { methode: 'POST', jeton: j, entetes: { Prefer: 'resolution=merge-duplicates,return=minimal' },
           corps: { user_id: uid, donnees: r, mis_a_jour: new Date().toISOString() } }).then(function () {
-          ecrireJSON(CLE_BASE, { uid: uid, total: nombre(r.total), gemmes: nombre(r.gemmes), quand: new Date().toISOString() });
+          var parJ = {}; // v10.30 : ce qui a été envoyé pour chaque joueur
+          liste(r.joueurs).forEach(function (p) { if (p && p.rec) parJ[p.id] = { total: nombre(p.rec.total), gemmes: nombre(p.rec.gemmes) }; });
+          ecrireJSON(CLE_BASE, { uid: uid, total: nombre(r.total), gemmes: nombre(r.gemmes), joueurs: parJ, quand: new Date().toISOString() });
           etat.synchro = 'ok'; etat.quand = new Date(); etat.erreur = null;
         });
       });

@@ -2,6 +2,12 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.31', date: '2026-11-23', changes: [
+    "Chaque joueur du compte a maintenant ses propres étoiles, son niveau, ses pierres précieuses, son coffre du jour, ses coffres de niveau, son méga coffre et ses défis du jour. Ce que le compte avait déjà gagné revient au Joueur 1.",
+    "L’accueil n’affiche plus aucun nombre : il ne reste que « Défi du jour » et le compte. Les étoiles, pierres et coffres se voient dans la carte de chaque joueur (Mon compte), qui ouvre ses coffres et son écran « Mes étoiles ».",
+    "Fin de partie gagnée : chacun reçoit les étoiles de ce qu’il a lui-même récolté (doublées au défi du jour s’il ne l’a pas encore réussi aujourd’hui). Un coffre gagné s’ouvre ensuite dans Mon compte.",
+    "En revenant à l’accueil après une partie gagnée, les étoiles s’envolent vers le bouton du compte."
+  ] },
   { v: '10.30', date: '2026-11-23', changes: [
     "Jouer en invité : sans adresse e-mail, le jeu te donne un pseudo « invité0001 » (puis invité0002…) et sauvegarde ta progression. Tu le vois dans « Mon compte ».",
     "Quand tu crées ton compte ou que tu te connectes, tu retrouves ce que tu as gagné en invité ; ton pseudo d’invité disparaît."

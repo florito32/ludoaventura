@@ -1,7 +1,7 @@
 // Étoiles, niveaux et coffres (v6.36, demande du 10/11/2026, backlog lignes 164 à 173).
 const { test, expect } = require('@playwright/test');
 const E = require('../js/etoiles.js');
-const { repondre, lancerPartie, lancerLeDe, rapide, ouvrirNeuf } = require('./aide');
+const { repondre, lancerPartie, lancerLeDe, rapide, ouvrirNeuf, mesEtoiles, coffresJoueur, carteJoueur, creerJoueurs } = require('./aide');
 
 // Stockage imité pour les tests de logique.
 function memoire() { const m = {}; return { getItem: (k) => (k in m ? m[k] : null), setItem: (k, v) => { m[k] = String(v); } }; }
@@ -152,23 +152,19 @@ async function accueil(page, etoiles) {
   await page.goto('./');
 }
 
-test('accueil : étoiles, niveau et coffre du jour ; le coffre s\'ouvre une fois et les étoiles restent après fermeture @smoke', async ({ page, context }) => {
+// v10.30 (backlog lignes 447 et 453) : l'accueil ne montre plus de nombre ; les étoiles, le niveau, les pierres et les coffres
+// sont dans la carte de chaque joueur (Mon compte). Ce qui était gagné avant revient à « Joueur 1 ».
+test('carte du joueur : étoiles, niveau, pierres et coffre du jour ; le coffre s\'ouvre une fois et les étoiles restent @smoke', async ({ page, context }) => {
   await accueil(page);
-  const total = page.locator('#accueil-total');
-  await expect(total).toHaveText('0');
-  await expect(page.locator('#accueil-niveau')).toHaveText('Niveau 1');
-  for (const id of ['#btn-etoiles-haut', '#btn-defi', '#btn-coffre-haut', '#btn-commencer']) {
-    await expect(page.locator(id)).toBeInViewport({ ratio: 1 });
-  }
-  // v6.38 : plus de raccourcis « Mes étoiles » ni « Progrès » (doublons des boutons du haut).
-  await expect(page.locator('#btn-etoiles, #btn-progression, .raccourcis')).toHaveCount(0);
-  // Les 3 boutons du haut sur une seule ligne, sans se chevaucher ni déborder.
-  const boites = await page.evaluate(() => ['btn-etoiles-haut', 'btn-defi', 'btn-coffre-haut'].map((id) => document.getElementById(id).getBoundingClientRect().toJSON()));
-  expect(boites[0].right).toBeLessThanOrEqual(boites[1].left + 1);
-  expect(boites[1].right).toBeLessThanOrEqual(boites[2].left + 1);
-  expect(Math.abs(boites[0].top - boites[1].top)).toBeLessThan(30);
-  await expect(page.locator('#accueil-badge')).toHaveText('1');
-  await page.locator('#btn-coffre-haut').click();
+  await expect(page.locator('#btn-commencer')).toBeInViewport({ ratio: 1 });
+  await expect(page.locator('#btn-etoiles-haut, #btn-coffre-haut, #accueil-total')).toHaveCount(0);
+  await page.locator('#btn-compte').click();
+  const carte = carteJoueur(page);
+  await expect(carte.locator('.jt-etoiles strong')).toHaveText('0');
+  await expect(carte.locator('.jt-niveau')).toHaveText('niveau 1');
+  await expect(carte.locator('.jt-gemmes strong')).toHaveText('0');
+  await expect(carte.locator('[data-act="coffres"]')).toHaveText(/Ouvrir mon coffre/);
+  await carte.locator('[data-act="coffres"]').click();
   const coffre = page.getByRole('dialog', { name: 'Coffre du jour' });
   await expect(coffre).toBeVisible();
   await coffre.getByRole('button', { name: 'Ouvrir le coffre' }).click();
@@ -181,38 +177,41 @@ test('accueil : étoiles, niveau et coffre du jour ; le coffre s\'ouvre une fois
   await expect.poll(() => page.evaluate(() => getComputedStyle(document.querySelector('.couvercle-ouvert')).transform)).toBe('matrix(1, 0, 0, 1, 0, 0)');
   await coffre.getByRole('button', { name: 'Super !' }).click();
   await expect(coffre).toBeHidden();
-  await expect(total).toHaveText(String(n));
-  await expect(page.locator('#accueil-badge')).toBeHidden();
+  await expect(carte.locator('.jt-etoiles strong')).toHaveText(String(n));
+  await expect(carte.locator('[data-act="coffres"]')).toHaveCount(0);
+  // La carte reste dans l'écran (pas de débordement).
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
   // Fermer et rouvrir le jeu (nouvel onglet) : les étoiles sont gardées sur l'appareil.
   await page.close();
   const p2 = await context.newPage();
   await p2.goto('./');
-  await expect(p2.locator('#accueil-total')).toHaveText(String(n));
-  await expect(p2.locator('#accueil-badge')).toBeHidden();
+  await p2.locator('#btn-compte').click();
+  await expect(carteJoueur(p2).locator('.jt-etoiles strong')).toHaveText(String(n));
+  await expect(carteJoueur(p2).locator('[data-act="coffres"]')).toHaveCount(0);
 });
 
-test('écrans « Mes étoiles » et « Ma progression » : niveau, coffres de niveau, série vers le méga coffre ; retour à l\'accueil', async ({ page }) => {
+test('écrans « Mes étoiles » et « Ma progression » : niveau, coffres de niveau, série vers le méga coffre ; retour à Mon compte', async ({ page }) => {
   const auj = await page.evaluate(() => 0).then(() => { const d = new Date(); const z = (x) => (x < 10 ? '0' : '') + x; return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate()); });
   // simplesDepuis : 99 → pas de coffre simple (v6.46) si le coffre du jour fait passer le niveau 7 (test déterministe).
   await accueil(page, { v: 1, total: 265, journal: [{ quand: new Date().toISOString(), jour: auj, type: 'partie', n: 18, texte: 'Aventure réussie · Viking' }], parJour: { [auj]: 18 }, coffresJour: {}, coffresNiveau: {}, defis: {}, parties: [], simplesDepuis: 99 });
-  await expect(page.locator('#accueil-niveau')).toHaveText('Niveau 6');
-  await expect(page.locator('#accueil-badge')).toHaveText('2'); // coffre du jour + coffre d'argent du niveau 5
-  await page.locator('#btn-etoiles-haut').click();
+  await page.locator('#btn-compte').click();
+  await expect(carteJoueur(page).locator('.jt-niveau')).toHaveText('niveau 6');
+  await expect(carteJoueur(page).locator('[data-act="coffres"]')).toHaveText(/mes 2 coffres/); // coffre du jour + coffre d'argent du niveau 5
+  await carteJoueur(page).getByRole('button', { name: 'Mes étoiles' }).click();
   await expect(page.getByRole('heading', { name: 'Mes étoiles' })).toBeVisible();
+  await expect(page.locator('#tresor-nom')).toHaveText('Joueur 1');
   await expect(page.locator('#etoiles-total')).toHaveText('265');
   await expect(page.locator('.chemin-coffres li').first()).toContainText('Niveau 5');
   // v6.42 : plus de liste « Dernières étoiles gagnées » ; l'explication s'ouvre avec un petit bouton.
   await expect(page.locator('.journal')).toHaveCount(0);
   await expect(page.locator('#etoiles-corps')).not.toContainText('Dernières étoiles');
-  await expect(page.locator('#etoiles-corps .regles-etoiles')).toHaveCount(0);
   await page.getByRole('button', { name: 'Comment gagner des étoiles ?' }).click();
   const aide = page.getByRole('dialog', { name: 'Comment gagner des étoiles ?' });
   await expect(aide).toBeVisible();
   await expect(aide).toContainText('Coffre du jour');
   await aide.getByRole('button', { name: 'J’ai compris' }).click();
   await expect(aide).toBeHidden();
-  const largeur = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
-  expect(largeur).toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
   // Ouvrir le coffre d'argent depuis l'écran.
   await page.locator('.chemin-coffres [data-ouvrir]').click();
   await page.getByRole('dialog', { name: /Coffre d’argent/ }).getByRole('button', { name: 'Ouvrir le coffre' }).click();
@@ -221,27 +220,24 @@ test('écrans « Mes étoiles » et « Ma progression » : niveau, coffres de ni
   await page.getByRole('button', { name: 'Super !' }).click();
   await expect(page.locator('#etoiles-total')).toHaveText(String(265 + n));
   await expect(page.locator('.chemin-coffres li').first()).toContainText('Ouvert');
-  await page.getByRole('button', { name: 'Accueil' }).click();
-  // Le bouton du coffre ouvre le coffre du jour ; une fois ouvert, il mène à « Ma progression ».
-  await page.locator('#btn-coffre-haut').click();
+  // « Coffre du jour, défis et méga coffre » : Ma progression du même joueur.
+  await page.locator('[data-vers-progression]').click();
+  await expect(page.getByRole('heading', { name: 'Ma progression' })).toBeVisible();
+  await page.locator('#progression-corps [data-ouvrir^="jour:"]').click();
   await page.getByRole('dialog', { name: 'Coffre du jour' }).getByRole('button', { name: 'Ouvrir le coffre' }).click();
   const nj = Number((await page.locator('#coffre-gain strong').textContent()).match(/\d+/)[0]);
   await page.getByRole('button', { name: 'Super !' }).click();
-  await page.locator('#btn-coffre-haut').click();
-  await expect(page.getByRole('heading', { name: 'Ma progression' })).toBeVisible();
   await expect(page.locator('#progression-jour')).toHaveText('+' + (18 + n + nj));
-  // v6.38 : plus les 7 derniers jours ; la série de jours d'affilée vers le méga coffre à la place.
-  await expect(page.locator('.histo')).toHaveCount(0);
   await expect(page.locator('#serie-jours')).toHaveText('1 jour');
   await expect(page.locator('.serie-cases li')).toHaveCount(5);
   await expect(page.locator('.serie-cases li.fait')).toHaveCount(1);
   await expect(page.locator('.taches-jour').first()).toContainText('Coffre du jour');
-  // v6.44 : plus d'encadré « Coffres de niveau » dans Ma progression (il est dans Mes étoiles).
   await expect(page.locator('#progression-corps')).not.toContainText('Coffres de niveau');
-  await expect(page.locator('#progression-corps .prochain')).toHaveCount(0);
-  // La touche « précédent » du téléphone revient à l'accueil.
-  await page.goBack();
-  await expect(page.locator('#btn-commencer')).toBeVisible();
+  // « ← Mon compte » revient à la carte du joueur, à jour.
+  await page.getByRole('button', { name: 'Mon compte' }).click();
+  await expect(page.getByRole('heading', { name: 'Mon compte' })).toBeVisible();
+  await expect(carteJoueur(page).locator('.jt-etoiles strong')).toHaveText(String(265 + n + nj));
+  await expect(carteJoueur(page).locator('[data-act="coffres"]')).toHaveCount(0);
 });
 
 test('une aventure gagnée rapporte ses unités en étoiles, une seule fois même si on recharge la page', async ({ page }) => {
@@ -265,7 +261,7 @@ test('une aventure gagnée rapporte ses unités en étoiles, une seule fois mêm
   expect(await page.evaluate(() => window.Recompenses.compte.etat.total)).toBe(pts);
 });
 
-test('fin de partie : passer le niveau 5 propose d\'ouvrir le coffre d\'argent', async ({ page }) => {
+test('fin de partie : passer le niveau 5 annonce le coffre d\'argent, qui s\'ouvre dans Mon compte (hors partie)', async ({ page }) => {
   await rapide(page);
   await page.addInitScript(() => {
     window.AVENTURA_DUREE_COFFRE = 0;
@@ -278,24 +274,28 @@ test('fin de partie : passer le niveau 5 propose d\'ouvrir le coffre d\'argent',
     await lancerLeDe(page);
   }
   await expect(page.locator('#fin-etoiles')).toContainText('Niveau 5 atteint !');
-  await page.getByRole('button', { name: 'Ouvrir le coffre d’argent' }).click();
+  await expect(page.locator('#fin-etoiles .fin-coffre-note')).toContainText('Mon compte');
+  await expect(page.locator('#btn-fin-coffre')).toHaveCount(0);
+  await page.locator('#fin').evaluate((d) => d.close());
+  await page.evaluate(() => window.Aventura.afficher('ecran-compte'));
+  await expect(carteJoueur(page).locator('[data-act="coffres"]')).toBeVisible();
+  await carteJoueur(page).getByRole('button', { name: 'Mes étoiles' }).click();
+  await page.locator('.chemin-coffres [data-ouvrir^="argent:"]').click();
   await page.getByRole('dialog', { name: /Coffre d’argent/ }).getByRole('button', { name: 'Ouvrir le coffre' }).click();
   await expect(page.locator('#coffre-gain')).toContainText(/\+\d+ étoiles/);
 });
 
 // v6.46 (demande du 10/11/2026, backlog lignes 216 à 218) : coffre simple à chaque niveau et pierres précieuses.
-test('coffre simple au passage de niveau et pierres précieuses : accueil, ouverture, Mes étoiles', async ({ page }) => {
+test('coffre simple au passage de niveau et pierres précieuses : carte du joueur, ouverture, Mes étoiles', async ({ page }) => {
   const auj = (() => { const d = new Date(); const z = (x) => (x < 10 ? '0' : '') + x; return d.getFullYear() + '-' + z(d.getMonth() + 1) + '-' + z(d.getDate()); })();
   // Niveau 3 atteint après la v6.46 (coffres simples depuis le niveau 1), coffre du jour déjà ouvert, 4 pierres.
   await accueil(page, { v: 1, total: E.seuil(3), gemmes: 4, simplesDepuis: 1, coffresJour: { [auj]: 10 }, coffresNiveau: {}, parJour: {}, journal: [], defis: {}, parties: [] });
-  await expect(page.locator('#accueil-gemmes')).toHaveText('4');
-  await expect(page.locator('#btn-etoiles-haut')).toContainText('pierres précieuses');
-  // La pastille des étoiles tient dans la barre (pas de débordement horizontal).
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-  const barre = await page.evaluate(() => { const b = document.querySelector('.accueil-haut').getBoundingClientRect(); return [...document.querySelectorAll('.accueil-haut .pastille')].every((p) => { const r = p.getBoundingClientRect(); return r.left >= b.left - 1 && r.right <= b.right + 1 && r.height < 80; }); });
-  expect(barre).toBe(true);
-  await expect(page.locator('#accueil-badge')).toHaveText('2'); // coffres simples des niveaux 2 et 3
-  await page.locator('#btn-coffre-haut').click();
+  await page.locator('#btn-compte').click();
+  const carte = carteJoueur(page);
+  await expect(carte.locator('.jt-gemmes strong')).toHaveText('4');
+  await expect(carte.locator('.jt-gemmes')).toContainText('pierres');
+  await expect(carte.locator('[data-act="coffres"]')).toHaveText(/mes 2 coffres/); // coffres simples des niveaux 2 et 3
+  await carte.locator('[data-act="coffres"]').click();
   const d = page.getByRole('dialog', { name: /Coffre simple/ });
   await expect(d).toBeVisible();
   await d.getByRole('button', { name: 'Ouvrir le coffre' }).click();
@@ -306,9 +306,9 @@ test('coffre simple au passage de niveau et pierres précieuses : accueil, ouver
   await d.getByRole('button', { name: 'Ouvrir le coffre' }).click();
   await expect(page.locator('#coffre-gain')).toContainText('+1 pierre précieuse');
   await page.getByRole('button', { name: 'Super !' }).click();
-  await expect(page.locator('#accueil-gemmes')).toHaveText('6');
+  await expect(carte.locator('.jt-gemmes strong')).toHaveText('6');
   // Mes étoiles : nombre de pierres et chemin des coffres (simple à chaque niveau, gros coffre au niveau 5).
-  await page.locator('#btn-etoiles-haut').click();
+  await carte.getByRole('button', { name: 'Mes étoiles' }).click();
   await expect(page.locator('#etoiles-gemmes')).toHaveText('6');
   await expect(page.locator('.chemin-coffres li')).toHaveCount(4);
   await expect(page.locator('.chemin-coffres li').first()).toContainText('Ouvert');
@@ -317,4 +317,30 @@ test('coffre simple au passage de niveau et pierres précieuses : accueil, ouver
   await page.getByRole('button', { name: 'Comment gagner des étoiles ?' }).click();
   await expect(page.getByRole('dialog', { name: 'Comment gagner des étoiles ?' })).toContainText('Pierres précieuses');
   await expect(page.getByRole('dialog', { name: 'Comment gagner des étoiles ?' })).toContainText('coffre simple');
+});
+
+// v10.30 (backlog lignes 447, 453) : chaque joueur a ses propres étoiles et ses propres coffres.
+test('deux joueurs : chacun son coffre du jour et ses étoiles, sans se mélanger', async ({ page }) => {
+  await accueil(page);
+  await creerJoueurs(page, 2); // Léa (Joueur 1 renommé) et Tom
+  await page.locator('#btn-compte').click();
+  const lea = carteJoueur(page, 'Léa'), tom = carteJoueur(page, 'Tom');
+  await expect(lea.locator('[data-act="coffres"]')).toBeVisible();
+  await expect(tom.locator('[data-act="coffres"]')).toBeVisible();
+  await tom.locator('[data-act="coffres"]').click();
+  await expect(page.locator('#coffre-gain')).toContainText('Coffre de Tom');
+  await page.getByRole('button', { name: 'Ouvrir le coffre' }).click();
+  const n = Number((await page.locator('#coffre-gain strong').textContent()).match(/\d+/)[0]);
+  await page.getByRole('button', { name: 'Super !' }).click();
+  await expect(tom.locator('.jt-etoiles strong')).toHaveText(String(n));
+  await expect(tom.locator('[data-act="coffres"]')).toHaveCount(0);
+  // Léa n'a rien reçu et garde son propre coffre du jour.
+  await expect(lea.locator('.jt-etoiles strong')).toHaveText('0');
+  await expect(lea.locator('[data-act="coffres"]')).toBeVisible();
+  // « Mes étoiles » de Tom montre ses étoiles à lui.
+  await tom.getByRole('button', { name: 'Mes étoiles' }).click();
+  await expect(page.locator('#tresor-nom')).toHaveText('Tom');
+  await expect(page.locator('#etoiles-total')).toHaveText(String(n));
+  // Le compte garde le total de tous ses joueurs (classements, Supabase).
+  expect(await page.evaluate(() => window.Recompenses.compte.etat.total)).toBe(n);
 });

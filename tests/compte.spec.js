@@ -92,7 +92,7 @@ test('accueil : bouton « Se connecter », écran Mon compte, retour en invité,
   await expect(bouton).toHaveAccessibleName(/Se connecter/);
   // La barre du haut tient dans l'écran.
   const larg = page.viewportSize().width;
-  for (const id of ['btn-etoiles-haut', 'btn-coffre-haut', 'btn-compte']) {
+  for (const id of ['btn-defi', 'btn-compte']) { // v10.30 : plus d'étoiles ni de coffre sur l'accueil
     const b = await page.locator('#' + id).boundingBox();
     expect(b.x).toBeGreaterThanOrEqual(0);
     expect(b.x + b.width).toBeLessThanOrEqual(larg + 1);
@@ -122,8 +122,10 @@ test('connexion par e-mail : la progression de l’appareil est ajoutée à cell
   expect(envois.progression.at(-1).user_id).toBe(UTILISATEUR.id);
   expect(envois.progression.at(-1).donnees.total).toBe(70);
   expect(envois.progression.at(-1).donnees.gemmes).toBe(3);
+  // v10.30 : les étoiles sont dans la carte du joueur (Joueur 1 reçoit celles du compte d'avant les trésors par joueur).
+  await expect(page.locator('.joueur-carte .jt-etoiles strong').first()).toHaveText('70');
+  await expect(page.locator('.joueur-carte .jt-gemmes strong').first()).toHaveText('3');
   await page.locator('#ecran-compte [data-retour-accueil]').click();
-  await expect(page.locator('#accueil-total')).toHaveText('70');
   await expect(page.locator('#btn-compte')).toHaveClass(/connecte/);
   // Le mot de passe n'est gardé nulle part sur l'appareil.
   expect(await page.evaluate(() => JSON.stringify(localStorage))).not.toContain('secret123');
@@ -288,6 +290,6 @@ test('connecté : chaque gain est envoyé au compte, et la déconnexion remet l�
   expect(envois.deconnexion).toBe(1);
   await expect(page.locator('#compte-invite')).toBeVisible();
   expect(await page.evaluate(() => localStorage.getItem('ludoaventura-session'))).toBeNull();
+  await expect(page.locator('.joueur-carte .jt-etoiles strong').first()).toHaveText('0'); // v10.30 : carte du joueur
   await page.getByRole('button', { name: 'Jouer en invité' }).click();
-  await expect(page.locator('#accueil-total')).toHaveText('0');
 });
