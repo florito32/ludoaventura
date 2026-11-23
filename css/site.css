@@ -2398,7 +2398,7 @@ body:has(#ecran-baby:not([hidden])) .pied { padding-block: 4px calc(4px + env(sa
 .compte-onglets button {
   flex: 1 1 0; min-width: 0; min-height: 56px; padding: 4px 2px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
   font: inherit; font-weight: 800; font-size: .8rem; line-height: 1.1; cursor: pointer; color: #fff;
-  background: rgb(255 255 255 / .12); border: 3px solid transparent; border-radius: 12px; overflow-wrap: anywhere;
+  background: rgb(0 0 0 / .22); border: 3px solid transparent; border-radius: 12px; overflow-wrap: anywhere; /* assombri : texte blanc lisible (contraste AA) */
 }
 .compte-onglets button svg { width: 22px; height: 22px; flex: none; }
 .compte-onglets button[aria-selected="true"] { background: var(--parchemin); color: var(--encre); border-color: var(--encre); }
