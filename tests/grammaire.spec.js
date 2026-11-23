@@ -4,7 +4,7 @@ const { test, expect } = require('@playwright/test');
 const G = require('../js/grammaire.js');
 const Q = require('../js/questions.js');
 const D = require('../js/defis.js');
-const { rapide, versReglages, valider, lancer, grammaire, cocher } = require('./aide');
+const { rapide, versReglages, valider, lancer, grammaire, cocher, lancerRapideQui } = require('./aide');
 
 const NIVEAUX = ['facile', 'moyen', 'difficile', 'expert'];
 const JEUX_CARTE = ['phrase', 'contraires', 'erreur', 'relier', 'nature', 'homophones'];
@@ -292,7 +292,7 @@ test('partie rapide « Français » : une carte de grammaire au niveau choisi', 
   await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); localStorage.setItem('ludoaventura-rapide-choix', JSON.stringify({ matieres: ['francais'], niveau: 'difficile' })); } catch (e) { /* */ } });
   await page.goto('./');
   await page.getByRole('button', { name: 'Partie rapide' }).click();
-  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await lancerRapideQui(page);
   // On force la matière de la prochaine carte (v10.4 : 4 matières du français, 0.6 tombe sur la grammaire).
   await page.evaluate(() => { const R = window.Rapide, c = R.carte; R.carte = (m, n) => { const t = c(m, n, () => 0.6); return t; }; });
   await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();

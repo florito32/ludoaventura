@@ -4,7 +4,7 @@
 //  - la toute première question de la partie s'appelle « Première question ».
 const { test, expect } = require('@playwright/test');
 const R = require('../js/rapide.js');
-const { rapide, versReglages, cocherJoueur, lancer, repondre, lancerLeDe, cocher } = require('./aide');
+const { rapide, versReglages, cocherJoueur, lancer, repondre, lancerLeDe, cocher, lancerRapideQui } = require('./aide');
 
 test.describe('tirage de la partie rapide avec Géographie et Histoire', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
@@ -47,7 +47,7 @@ test('partie rapide : Géographie et Histoire, choix Quiz / Normal, sans comment
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   const b = await page.locator('#btn-lancer-rapide').boundingBox();
   expect(b.y + b.height).toBeLessThanOrEqual(page.viewportSize().height);
-  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await lancerRapideQui(page);
   await expect(page.getByRole('heading', { name: 'Partie rapide' })).toBeVisible();
   expect(await page.evaluate(() => window.Aventura.partie.rapide)).toEqual({ matieres: ['histoire'], niveau: 'facile', mode: 'normal' });
   // Toutes les cartes sont des cartes d'Histoire en mode Normal (jamais de QCM).
