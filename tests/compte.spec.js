@@ -57,9 +57,12 @@ test.describe('fusion des progressions', () => {
   test('1re connexion : les étoiles et pierres de l’appareil s’ajoutent à celles du compte', () => {
     const local = { ...progression(20, 1), journal: [{ quand: '2026-11-16T10:00:00Z', type: 'partie', n: 20 }], coffresJour: { '2026-11-16': 10 }, visites: ['2026-11-16'], parties: ['a'] };
     const distant = { ...progression(50, 2), journal: [{ quand: '2026-11-15T10:00:00Z', type: 'partie', n: 50 }], coffresNiveau: { 2: 12 }, visites: ['2026-11-15'], parties: ['b'] };
-    const r = C.fusionner(local, distant, { total: 0, gemmes: 0 });
+    const m = C.fusionner(local, distant, { total: 0, gemmes: 0 });
+    expect(m.total).toBe(70);
+    expect(m.gemmes).toBe(3);
+    // v10.31 : le détail (journal, coffres…) est rangé dans la progression du joueur 1.
+    const r = m.joueurs[0].prog;
     expect(r.total).toBe(70);
-    expect(r.gemmes).toBe(3);
     expect(r.journal.map((g) => g.n)).toEqual([20, 50]); // du plus récent au plus ancien
     expect(r.coffresJour).toEqual({ '2026-11-16': 10 });
     expect(r.coffresNiveau).toEqual({ 2: 12 });
@@ -74,7 +77,7 @@ test.describe('fusion des progressions', () => {
     expect(r.total).toBe(85);
     expect(r.gemmes).toBe(3);
     const journal = [{ quand: '2026-11-16T10:00:00Z', type: 'partie', n: 5 }];
-    expect(C.fusionner({ ...progression(5), journal }, { ...progression(5), journal }, { total: 5 }).journal).toHaveLength(1);
+    expect(C.fusionner({ ...progression(5), journal }, { ...progression(5), journal }, { total: 5 }).joueurs[0].prog.journal).toHaveLength(1);
   });
 
   test('compte vide ou appareil vide : on garde l’autre', () => {
@@ -92,7 +95,7 @@ test('accueil : bouton « Se connecter », écran Mon compte, retour en invité,
   await expect(bouton).toHaveAccessibleName(/Se connecter/);
   // La barre du haut tient dans l'écran.
   const larg = page.viewportSize().width;
-  for (const id of ['btn-etoiles-haut', 'btn-coffre-haut', 'btn-compte']) {
+  for (const id of ['btn-defi', 'btn-compte']) {
     const b = await page.locator('#' + id).boundingBox();
     expect(b.x).toBeGreaterThanOrEqual(0);
     expect(b.x + b.width).toBeLessThanOrEqual(larg + 1);
@@ -122,8 +125,9 @@ test('connexion par e-mail : la progression de l’appareil est ajoutée à cell
   expect(envois.progression.at(-1).user_id).toBe(UTILISATEUR.id);
   expect(envois.progression.at(-1).donnees.total).toBe(70);
   expect(envois.progression.at(-1).donnees.gemmes).toBe(3);
+  // v10.31 : le total est dans la carte du joueur 1 (la progression de l'appareil lui revient).
+  await expect(page.locator('.joueur-carte').first().locator('.je-ligne')).toContainText('70 étoiles');
   await page.locator('#ecran-compte [data-retour-accueil]').click();
-  await expect(page.locator('#accueil-total')).toHaveText('70');
   await expect(page.locator('#btn-compte')).toHaveClass(/connecte/);
   // Le mot de passe n'est gardé nulle part sur l'appareil.
   expect(await page.evaluate(() => JSON.stringify(localStorage))).not.toContain('secret123');
@@ -280,7 +284,7 @@ test('connecté : chaque gain est envoyé au compte, et la déconnexion remet l�
   await expect(page.locator('#btn-compte')).toHaveClass(/connecte/);
   await expect.poll(() => envois.progression.length).toBeGreaterThan(0); // synchro à l'ouverture
   expect(envois.progression[0].donnees.total).toBe(30);
-  await page.evaluate(() => window.Recompenses.compte.gagner(5, 'partie', 'test'));
+  await page.evaluate(() => window.Recompenses.compte.pour('j-1').gagner(5, 'partie', 'test'));
   await expect.poll(() => envois.progression.at(-1).donnees.total).toBe(35);
   await page.locator('#btn-compte').click();
   await page.getByRole('button', { name: 'Se déconnecter' }).click();
@@ -289,5 +293,6 @@ test('connecté : chaque gain est envoyé au compte, et la déconnexion remet l�
   await expect(page.locator('#compte-invite')).toBeVisible();
   expect(await page.evaluate(() => localStorage.getItem('ludoaventura-session'))).toBeNull();
   await page.getByRole('button', { name: 'Jouer en invité' }).click();
-  await expect(page.locator('#accueil-total')).toHaveText('0');
+  await page.locator('#btn-compte').click();
+  await expect(page.locator('.joueur-carte').first().locator('.je-ligne')).toContainText('0 étoile');
 });

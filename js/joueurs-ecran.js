@@ -37,13 +37,24 @@
       '<p class="compte-message erreur" id="err-' + idBase + '" role="alert"' + (erreur ? '' : ' hidden') + '>' + (erreur ? esc(J.MESSAGES[erreur] || 'Ce nom ne convient pas.') : '') + '</p>';
   }
 
+  function ico(id) { return '<svg class="ico" aria-hidden="true"><use href="#' + id + '"/></svg>'; }
+  // v10.31 : étoiles, niveau, pierres et coffres de CE joueur (rien de chiffré sur l'accueil). Les boutons ouvrent ses écrans.
+  function progres(j) {
+    var R = window.Recompenses, rs = R && R.resume && R.resume(j.id);
+    if (!rs) return '';
+    return '<div class="joueur-etoiles"><p class="je-ligne">' + ico('i-etoile') + ' <strong>' + rs.total + '</strong> étoile' + (rs.total > 1 ? 's' : '') +
+      ' · Niveau ' + rs.niveau + ' · ' + ico('i-gemme') + ' <strong>' + rs.gemmes + '</strong> pierre' + (rs.gemmes > 1 ? 's' : '') + ' précieuse' + (rs.gemmes > 1 ? 's' : '') + '</p>' +
+      '<div class="compte-boutons"><button type="button" class="btn btn-secondaire" data-act="etoiles">Mes étoiles</button>' +
+      '<button type="button" class="btn btn-secondaire" data-act="progression">Ma progression</button>' +
+      '<button type="button" class="btn btn-secondaire' + (rs.coffres ? ' a-ouvrir' : '') + '" data-act="coffres"' + (rs.coffres ? '' : ' disabled') + '>' + ico('i-coffre') + ' Mes coffres' + (rs.coffres ? ' (' + rs.coffres + ' à ouvrir)' : '') + '</button></div></div>';
+  }
   function carte(j) {
     var p = perso(j.perso), mode = edition && edition.id === j.id ? edition.mode : null;
     var h = '<article class="carte-page joueur-carte" data-id="' + j.id + '" aria-label="Joueur ' + esc(j.nom) + '">' +
       '<div class="joueur-tete"><img class="joueur-avatar" src="' + p.image + '" alt="" width="56" height="56">' +
       '<div class="joueur-qui"><h4 class="joueur-nom">' + esc(j.nom) + '</h4><p class="petit">Personnage : ' + esc(p.nom + ', ' + p.titre) + '</p></div>' +
       '<span class="joueur-niv" title="Niveau moyen">Niv. ' + J.niveauGlobal(j) + '</span></div>' +
-      '<div class="joueur-jauges">' + J.MATIERES.map(function (m) { return jauge(j, m); }).join('') + '</div>';
+      '<div class="joueur-jauges">' + J.MATIERES.map(function (m) { return jauge(j, m); }).join('') + '</div>' + progres(j);
     if (mode === 'nom') {
       h += formNom('nom-' + j.id, edition.nom !== undefined ? edition.nom : j.nom, edition.erreur) +
         '<div class="compte-boutons"><button type="submit" class="btn btn-principal">Enregistrer</button><button type="button" class="btn btn-secondaire" data-act="annuler">Annuler</button></div></form>';
@@ -86,6 +97,8 @@
     var b = e.target.closest('button'); if (!b) return;
     var c = compte(), carte_ = b.closest('.joueur-carte'), id = carte_ && carte_.getAttribute('data-id');
     var act = b.getAttribute('data-act');
+    if (act === 'etoiles' || act === 'progression') { window.Recompenses.ouvrirJoueur(id, act === 'etoiles' ? 'ecran-etoiles' : 'ecran-progression'); return; }
+    if (act === 'coffres') { window.Recompenses.ouvrirCoffresDe(id); return; }
     if (act === 'nom') { edition = { mode: 'nom', id: id }; focus = { selecteur: '.joueur-carte[data-id="' + id + '"] input[type=text]' }; rendre(); }
     else if (act === 'perso') { edition = { mode: 'perso', id: id }; focus = { selecteur: '.joueur-carte[data-id="' + id + '"] [aria-pressed="true"]' }; rendre(); }
     else if (act === 'creer') { edition = { mode: 'creer', perso: J.PERSO_DEFAUT, nom: '' }; focus = { selecteur: '#champ-nouveau' }; rendre(); }

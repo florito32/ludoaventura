@@ -41,10 +41,14 @@ test('aucune violation WCAG A/AA : accueil, Mes étoiles, Défi du jour, coffre,
   await page.goto('./');
   // v6.38 : l'accueil n'a plus que la barre du haut (étoiles, défi du jour, coffre).
   expect(await audit(page)).toEqual([]);
-  await page.locator('#btn-etoiles-haut').click();
+  await page.locator('#btn-compte').click();
+  await page.locator('.joueur-carte').first().waitFor();
+  expect(await audit(page)).toEqual([]); // Mon compte avec la carte du joueur (étoiles, coffres)
+  await page.locator('.joueur-carte').first().getByRole('button', { name: 'Mes étoiles' }).click();
   await expect(page.getByRole('heading', { name: 'Mes étoiles' })).toBeVisible();
   expect(await audit(page)).toEqual([]);
-  await page.getByRole('button', { name: 'Accueil' }).click();
+  await page.getByRole('button', { name: 'Mon compte' }).click();
+  await page.getByRole('button', { name: 'Accueil' }).first().click();
   await page.locator('#btn-defi').click();
   await expect(page.getByRole('button', { name: 'Valider' })).toBeDisabled();
   expect(await audit(page)).toEqual([]);
@@ -52,13 +56,14 @@ test('aucune violation WCAG A/AA : accueil, Mes étoiles, Défi du jour, coffre,
   await expect(page.getByRole('button', { name: 'Valider' })).toBeEnabled();
   expect(await audit(page)).toEqual([]);
   await page.getByRole('button', { name: 'Accueil' }).click();
-  await page.locator('#btn-coffre-haut').click();
+  await page.locator('#btn-compte').click();
+  await page.locator('.joueur-carte').first().getByRole('button', { name: /Mes coffres/ }).click();
   await page.getByRole('button', { name: 'Ouvrir le coffre' }).click();
   await expect(page.getByRole('button', { name: 'Super !' })).toBeVisible();
   expect(await audit(page)).toEqual([]);
   await page.getByRole('button', { name: 'Super !' }).click();
-  // Coffre du jour ouvert : le bouton du coffre mène à « Ma progression ».
-  await page.locator('#btn-coffre-haut').click();
+  // Coffre du jour ouvert : « Ma progression » est dans la carte du joueur.
+  await page.locator('.joueur-carte').first().getByRole('button', { name: 'Ma progression' }).click();
   await expect(page.getByRole('heading', { name: 'Ma progression' })).toBeVisible();
   expect(await audit(page)).toEqual([]);
 });
@@ -68,12 +73,14 @@ test('aucune violation WCAG A/AA : Comment gagner des étoiles, Partie rapide', 
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); window.AVENTURA_AUTO_DE = 600000; } catch (e) { /* */ } });
   await page.goto('./');
-  await page.locator('#btn-etoiles-haut').click();
+  await page.locator('#btn-compte').click();
+  await page.locator('.joueur-carte').first().getByRole('button', { name: 'Mes étoiles' }).click();
   await page.getByRole('button', { name: 'Comment gagner des étoiles ?' }).click();
   await expect(page.getByRole('dialog', { name: 'Comment gagner des étoiles ?' })).toBeVisible();
   expect(await audit(page)).toEqual([]);
   await page.getByRole('button', { name: 'J’ai compris' }).click();
-  await page.getByRole('button', { name: 'Accueil' }).click();
+  await page.getByRole('button', { name: 'Mon compte' }).click();
+  await page.getByRole('button', { name: 'Accueil' }).first().click();
   await page.getByRole('button', { name: 'Partie rapide' }).click();
   await expect(page.getByRole('heading', { name: 'Partie rapide' })).toBeVisible();
   expect(await audit(page)).toEqual([]);

@@ -139,6 +139,48 @@
     return res;
   }
 
+  // ---------- Progression propre à chaque joueur (v10.31, demande du 23/11/2026) ----------
+  // Étoiles, pierres précieuses, coffres, défis et série de jours sont ceux de CHAQUE joueur (joueur.prog, même forme que
+  // la progression du compte d'avant). Les champs total, gemmes et parJour de la racine du compte restent la SOMME des
+  // joueurs : la base de données s'en sert pour les classements, et les anciennes versions du jeu les lisent encore.
+  var CHAMPS_PROG = ['total', 'journal', 'parJour', 'coffresJour', 'coffresNiveau', 'coffresMega', 'visites', 'defis', 'parties', 'gemmes', 'simplesDepuis', 'defisEnCours', 'defisQuittes'];
+  function progVide() {
+    return { v: 1, total: 0, journal: [], parJour: {}, coffresJour: {}, coffresNiveau: {}, coffresMega: {}, visites: [], defis: {}, parties: [], gemmes: 0, simplesDepuis: 1, defisEnCours: {}, defisQuittes: {} };
+  }
+  // Complète une progression de joueur (champs manquants) ; la crée si besoin.
+  function progDe(joueur) {
+    var p = joueur.prog && typeof joueur.prog === 'object' ? joueur.prog : (joueur.prog = progVide()), v = progVide();
+    for (var k in v) if (p[k] === undefined || p[k] === null) p[k] = v[k];
+    return p;
+  }
+  // Première fois : la progression déjà acquise sur le compte (étoiles, coffres, pierres…) revient au premier joueur
+  // (« Joueur 1 », j-1) ; la racine ne garde ensuite que les totaux. Renvoie true si quelque chose a changé.
+  function migrer(etat) {
+    var l = lister(etat);
+    if (!l.length) return false;
+    var cible = trouver(etat, ID_PREMIER) || l[0];
+    if (cible.prog) return false;
+    var p = progVide();
+    CHAMPS_PROG.forEach(function (k) { if (etat[k] !== undefined && etat[k] !== null) p[k] = JSON.parse(JSON.stringify(etat[k])); });
+    cible.prog = p;
+    etat.journal = []; etat.coffresJour = {}; etat.coffresNiveau = {}; etat.coffresMega = {}; etat.visites = []; etat.defis = {};
+    etat.parties = []; etat.defisEnCours = {}; etat.defisQuittes = {};
+    agreger(etat);
+    return true;
+  }
+  // Racine = somme des joueurs (total, pierres, étoiles par jour).
+  function agreger(etat) {
+    var l = lister(etat).filter(function (j) { return j.prog; });
+    if (!l.length) return etat;
+    var total = 0, gemmes = 0, parJour = {};
+    l.forEach(function (j) {
+      total += Number(j.prog.total) || 0; gemmes += Number(j.prog.gemmes) || 0;
+      Object.keys(j.prog.parJour || {}).forEach(function (d) { parJour[d] = (parJour[d] || 0) + (Number(j.prog.parJour[d]) || 0); });
+    });
+    etat.total = total; etat.gemmes = gemmes; etat.parJour = parJour;
+    return etat;
+  }
+
   // ---------- Accès au compte de la page (navigateur seulement) ----------
   // Les joueurs sont rangés dans la progression du compte (window.Recompenses.compte). « Joueur 1 » est créé sur place s'il
   // manque, et écrit sans lancer d'envoi au compte (identifiant fixe : deux appareils le créent de la même façon).
@@ -146,7 +188,9 @@
   function duCompte() {
     var c = compteDeLaPage();
     if (!c) return [];
-    if (assurerPremier(c.etat)) {
+    var change = assurerPremier(c.etat);
+    if (migrer(c.etat)) change = true;
+    if (change) {
       try { racine.localStorage.setItem(racine.Etoiles.CLE, JSON.stringify(c.etat)); } catch (e) { /* stockage plein ou interdit : le joueur reste en mémoire */ }
     }
     return lister(c.etat);
@@ -160,6 +204,7 @@
     score: score, scoreMatiere: scoreMatiere, niveauDe: niveauDe, niveauMatiere: niveauMatiere, scoreGlobal: scoreGlobal, niveauGlobal: niveauGlobal,
     lister: lister, trouver: trouver, verifierNom: verifierNom, creer: creer, assurerPremier: assurerPremier,
     renommer: renommer, changerPerso: changerPerso, ajouterPoints: ajouterPoints, fusionner: fusionner,
+    CHAMPS_PROG: CHAMPS_PROG, progVide: progVide, progDe: progDe, migrer: migrer, agreger: agreger,
     duCompte: duCompte, enregistrer: enregistrer, compteDeLaPage: compteDeLaPage
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

@@ -127,6 +127,16 @@ async function lancerRapideQui(page) {
   await page.getByRole('button', { name: 'Lancer la partie' }).click();
   await quiJoue(page);
 }
+// Mon compte (v10.31) : étoiles, pierres, niveau et coffres de chaque joueur sont dans sa carte. Renvoie la carte du joueur
+// (la première par défaut). Le texte des étoiles se lit dans « .je-ligne ».
+async function ouvrirCompte(page) {
+  if (!(await page.locator('#ecran-compte').isVisible())) await page.locator('#btn-compte').click();
+  await page.locator('#ecran-compte').waitFor();
+}
+function carteJoueur(page, nom) {
+  return nom ? page.locator('.joueur-carte[aria-label="Joueur ' + nom + '"]') : page.locator('.joueur-carte').first();
+}
+async function versCarte(page, nom) { await ouvrirCompte(page); const c = carteJoueur(page, nom); await c.waitFor(); return c; }
 async function versReglages(page, joueurs) {
   await creerJoueurs(page, joueurs);
   await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
@@ -206,4 +216,4 @@ async function grammaire(page, { jeux = null, niveau = 'facile' } = {}) {
   }
 }
 
-module.exports = { quiJoue, lancerRapideQui, creerJoueurs, ouvrirChoix, cocher, choisir, grammaire, repondre, valider, cocherJoueur, orthographe, maths, conjugaison, matiere, versReglages, lancer, lancerLeDe, lancerPartie, rapide, attendreJoueur, cocherTout, ouvrirNeuf };
+module.exports = { ouvrirCompte, carteJoueur, versCarte, quiJoue, lancerRapideQui, creerJoueurs, ouvrirChoix, cocher, choisir, grammaire, repondre, valider, cocherJoueur, orthographe, maths, conjugaison, matiere, versReglages, lancer, lancerLeDe, lancerPartie, rapide, attendreJoueur, cocherTout, ouvrirNeuf };

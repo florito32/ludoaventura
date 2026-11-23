@@ -68,7 +68,7 @@ test('défi solo du jour : le joueur choisit seulement matière et niveau ; gagn
   await rapide(page);
   await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); } catch (e) { /* */ } });
   await page.goto('./');
-  await expect(page.locator('#defi-badge')).toHaveText('2');
+  await expect(page.locator('#defi-aide')).toHaveText(' à faire');
   // v6.38 : le défi du jour est en haut de l'écran.
   const haut = await page.evaluate(() => document.getElementById('btn-defi').getBoundingClientRect().top);
   expect(haut).toBeLessThan(80);
@@ -193,7 +193,7 @@ test('défi quitté avant la fin (retour à l’accueil) : on peut le rejouer ma
   await page.getByRole('button', { name: 'Oui, arrêter la partie' }).click();
   await expect(page.locator('#btn-commencer')).toBeVisible();
   // Le défi solo ne compte plus dans les défis à faire.
-  await expect(page.locator('#defi-badge')).toHaveText('1');
+  await expect(page.locator('#defi-aide')).toHaveText(' à faire'); // le défi d'équipe reste à faire
   await page.locator('#btn-defi').click();
   await expect(page.locator('.defi-type').first()).toContainText('Quitté aujourd’hui');
   await expect(page.locator('.defi-recompense')).toContainText('ne rapporte plus rien');

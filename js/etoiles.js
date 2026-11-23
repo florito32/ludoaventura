@@ -89,6 +89,18 @@
   Compte.prototype.ecrire = function () {
     try { if (this.stockage) this.stockage.setItem(CLE, JSON.stringify(this.etat)); } catch (e) { /* stockage plein ou interdit : les étoiles restent en mémoire */ }
   };
+  // Progression d'un joueur du compte (v10.31) : un Compte « vue » dont l'état est joueur.prog ; toutes les méthodes
+  // (gagner, ouvrir, recompenserPartie…) agissent sur CE joueur, puis la racine est remise à la somme des joueurs.
+  // Renvoie null si le joueur n'existe pas.
+  Compte.prototype.pour = function (id) {
+    var J = (typeof module !== 'undefined' && module.exports) ? require('./joueurs.js') : racine.Joueurs;
+    var parent = this, j = J && J.trouver(this.etat, id);
+    if (!j) return null;
+    var v = Object.create(Compte.prototype);
+    v.stockage = this.stockage; v.maintenant = this.maintenant; v.etat = J.progDe(j); v.joueurId = id; v.parent = parent;
+    v.ecrire = function () { J.agreger(parent.etat); parent.ecrire(); };
+    return v;
+  };
   Compte.prototype.aujourdhui = function () { return jour(this.maintenant()); };
   Compte.prototype.niveau = function () { return niveau(this.etat.total); };
 

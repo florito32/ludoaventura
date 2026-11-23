@@ -168,26 +168,10 @@
   <!-- ÉCRAN 1 : accueil, composé comme la boîte du jeu (décor, arche, aventurier, herbes) -->
   <section class="ecran accueil" id="ecran-accueil" aria-labelledby="titre-accueil">
     <h1 id="titre-accueil" class="visually-hidden">Aventura</h1>
-    <!-- Barre du haut (v6.36, js/recompenses.js) : étoiles + niveau (→ Mes étoiles), défi du jour, coffre (→ ouvrir, ou Ma progression). -->
+    <!-- Barre du haut : défi du jour et compte. v10.30 : plus d'étoiles ni de coffre sur l'accueil (ils sont dans la carte de chaque joueur, Mon compte). -->
     <div class="accueil-haut">
-      <button type="button" class="pastille pastille-etoiles" id="btn-etoiles-haut">
-        <!-- v9.5 (17/11/2026) : trois lignes empilées pour gagner de la largeur sur téléphone :
-             niveau (et sa jauge), puis étoiles (une seule petite étoile devant le total), puis pierres précieuses. -->
-        <span class="pe-pile">
-          <span class="pe-niveau"><span id="accueil-niveau">Niveau 1</span><span class="mini-jauge" aria-hidden="true"><span id="accueil-jauge"></span></span></span>
-          <span class="pe-total"><svg class="ico" aria-hidden="true"><use href="#i-etoile"/></svg><span id="accueil-total">0</span><span class="visually-hidden"> étoiles,</span></span>
-          <span class="pe-gemmes"><svg class="ico" aria-hidden="true"><use href="#i-gemme"/></svg><span id="accueil-gemmes">0</span><span class="visually-hidden"> pierres précieuses,</span></span>
-        </span>
-        <span class="visually-hidden" id="accueil-etoiles-aide"></span>
-      </button>
       <!-- Défi du jour en haut de l'écran (v6.38, demande du 10/11/2026) ; pastille = défis restants. -->
-      <button type="button" class="pastille pastille-defi" id="btn-defi"><svg class="ico" aria-hidden="true"><use href="#i-defi"/></svg><span class="pd-texte">Défi <span>du jour</span></span><span class="badge" id="defi-badge" hidden></span><span class="visually-hidden" id="defi-aide"></span></button>
-      <button type="button" class="pastille pastille-coffre" id="btn-coffre-haut">
-        <svg class="ico coffre-jour" id="accueil-coffre-ico" aria-hidden="true"><use href="#i-coffre"/></svg>
-        <span id="accueil-coffre-texte">Coffre du jour</span>
-        <span class="badge" id="accueil-badge" hidden></span>
-        <span class="visually-hidden" id="accueil-coffre-aide"></span>
-      </button>
+      <button type="button" class="pastille pastille-defi" id="btn-defi"><svg class="ico" aria-hidden="true"><use href="#i-defi"/></svg><span class="pd-texte">Défi <span>du jour</span></span><span class="visually-hidden" id="defi-aide"></span></button>
       <!-- Compte (v9.4, js/compte.js) : se connecter pour garder sa progression sur tous ses appareils (facultatif). -->
       <button type="button" class="pastille pastille-compte" id="btn-compte">
         <svg class="ico" aria-hidden="true"><use href="#i-compte"/></svg>
@@ -354,7 +338,7 @@
   <!-- ÉCRANS des étoiles (v6.36, js/recompenses.js) : Mes étoiles, Progression du jour, Défi du jour. -->
   <section class="ecran page" id="ecran-etoiles" aria-labelledby="titre-etoiles" hidden>
     <header class="barre">
-      <button type="button" class="btn-retour" data-retour-accueil><span aria-hidden="true">←</span> Accueil</button>
+      <button type="button" class="btn-retour" data-retour-compte><span aria-hidden="true">←</span> Mon compte</button>
       <h2 id="titre-etoiles">Mes étoiles</h2>
       <span class="barre-vide" aria-hidden="true"></span>
     </header>
@@ -362,7 +346,7 @@
   </section>
   <section class="ecran page" id="ecran-progression" aria-labelledby="titre-progression" hidden>
     <header class="barre">
-      <button type="button" class="btn-retour" data-retour-accueil><span aria-hidden="true">←</span> Accueil</button>
+      <button type="button" class="btn-retour" data-retour-compte><span aria-hidden="true">←</span> Mon compte</button>
       <h2 id="titre-progression">Ma progression</h2>
       <span class="barre-vide" aria-hidden="true"></span>
     </header>

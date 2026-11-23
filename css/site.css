@@ -2361,3 +2361,14 @@ body:has(#ecran-baby:not([hidden])) .pied { padding-block: 4px calc(4px + env(sa
 .fin-joueurs-liste .fj-pts { font-variant-numeric: tabular-nums; }
 .fin-joueurs-liste li.reussi { background: #e3f3e0; }
 .fin-joueurs-liste li.manque { background: #f7ece3; }
+
+/* ---------- v10.31 : étoiles, niveau, pierres et coffres dans la carte de chaque joueur (Mon compte) ---------- */
+.joueur-etoiles { display: grid; gap: 8px; padding-top: 8px; border-top: 2px dashed var(--parchemin-bord); }
+.je-ligne { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-weight: 700; }
+.je-ligne .ico { width: 1.2em; height: 1.2em; }
+.joueur-etoiles .compte-boutons .btn { min-height: 44px; }
+.joueur-etoiles .btn.a-ouvrir { border-color: var(--rouge-texte); }
+.fin-etoiles-joueurs { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; text-align: left; }
+.fin-etoiles-joueurs li { padding: 6px 10px; border-radius: 10px; background: #f3ece2; border-left: 6px solid var(--c, var(--encre)); }
+.fin-etoiles-joueurs .fe-nom { display: block; }
+.fin-etoiles-joueurs p { margin: 2px 0; }

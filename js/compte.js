@@ -45,7 +45,7 @@
     var J = (typeof module !== 'undefined' && module.exports) ? require('./joueurs.js') : racine.Joueurs;
     return J ? J.fusionner(a, b) : liste(b).concat(liste(a));
   }
-  function fusionner(local, distant, base) {
+  function fusionBase(local, distant, base) {
     var a = objet(local), d = objet(distant), b = objet(base);
     if (!distant || d.v !== 1) return JSON.parse(JSON.stringify(a)); // compte encore vide
     if (!local || a.v !== 1) return JSON.parse(JSON.stringify(d));   // appareil vide
@@ -84,6 +84,29 @@
     r.defisEnCours = objet(a.defisEnCours); // défi commencé sur CET appareil
     var s = [a.simplesDepuis, d.simplesDepuis].filter(function (x) { return typeof x === 'number'; });
     r.simplesDepuis = s.length ? Math.min.apply(null, s) : null;
+    return r;
+  }
+
+  // v10.31 : la progression (étoiles, pierres, coffres, défis, série) est celle de chaque joueur (joueur.prog). Une
+  // progression d'avant (sans joueur.prog) revient à « Joueur 1 » ; chaque joueur est fusionné avec les règles de fusionBase,
+  // avec sa propre base ; la racine redevient la somme des joueurs (classements de la base de données).
+  function fusionner(local, distant, base) {
+    var J = (typeof module !== 'undefined' && module.exports) ? require('./joueurs.js') : racine.Joueurs;
+    var a = objet(local), d = objet(distant), b = objet(base);
+    if (!J || !distant || d.v !== 1 || !local || a.v !== 1) return fusionBase(local, distant, base);
+    a = JSON.parse(JSON.stringify(a)); d = JSON.parse(JSON.stringify(d));
+    J.assurerPremier(a); J.migrer(a); J.assurerPremier(d); J.migrer(d);
+    var r = fusionBase(a, d, b);
+    var enveloppe = function (p) { return Object.assign({ v: 1 }, p); };
+    r.joueurs.forEach(function (j) {
+      var pa = (liste(a.joueurs).filter(function (x) { return x.id === j.id; })[0] || {}).prog;
+      var pd = (liste(d.joueurs).filter(function (x) { return x.id === j.id; })[0] || {}).prog;
+      // Base d'avant la v10.31 : un seul total pour tout le compte, qui était celui de « Joueur 1 ».
+      var bj = b.joueurs ? objet(b.joueurs[j.id]) : (j.id === J.ID_PREMIER ? { total: b.total, gemmes: b.gemmes } : {});
+      if (pa && pd) { var m = fusionBase(enveloppe(pa), enveloppe(pd), bj); delete m.joueurs; j.prog = m; }
+      else j.prog = JSON.parse(JSON.stringify(pa || pd || J.progVide()));
+    });
+    J.agreger(r);
     return r;
   }
 
@@ -187,7 +210,9 @@
         if (c) r = c.etat; // progression remise en forme par js/etoiles.js (champs manquants complétés)
         return appel('/rest/v1/progression', { methode: 'POST', jeton: j, entetes: { Prefer: 'resolution=merge-duplicates,return=minimal' },
           corps: { user_id: uid, donnees: r, mis_a_jour: new Date().toISOString() } }).then(function () {
-          ecrireJSON(CLE_BASE, { uid: uid, total: nombre(r.total), gemmes: nombre(r.gemmes), quand: new Date().toISOString() });
+          var bj = {};
+          liste(r.joueurs).forEach(function (j) { if (j.prog) bj[j.id] = { total: nombre(j.prog.total), gemmes: nombre(j.prog.gemmes) }; });
+          ecrireJSON(CLE_BASE, { uid: uid, total: nombre(r.total), gemmes: nombre(r.gemmes), joueurs: bj, quand: new Date().toISOString() });
           etat.synchro = 'ok'; etat.quand = new Date(); etat.erreur = null;
         });
       });

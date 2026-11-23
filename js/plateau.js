@@ -1215,8 +1215,10 @@
     // Défi quitté (v6.47) : commencer une partie alors qu'un défi n'était pas fini, c'est quitter ce défi
     // (plus de récompense pour lui aujourd'hui). Puis on note le défi qui commence.
     if (window.Recompenses) {
-      window.Recompenses.compte.verifierDefis(null);
-      if (partie.defi) window.Recompenses.compte.commencerDefi(partie.defi.type, partie.regles.id);
+      var profilsPartie = partie.joueurs.map(function (j) { return j.profil; }).filter(Boolean);
+      window.Recompenses.verifierDefis(null);
+      if (partie.defi) window.Recompenses.commencerDefi(partie.defi.type, partie.regles.id, profilsPartie);
+      window.Recompenses.visite(profilsPartie); // v10.31 : chaque joueur de la partie est venu aujourd'hui
     }
     partie.carte = null;
     partie.etapesVues = 0;
@@ -2641,7 +2643,10 @@
     $('btn-fin-accueil').hidden = !!partie.rapide; // v7.1 : 3e bouton, sauf partie rapide (déjà « Retour à l'accueil »)
     // Étoiles gagnées (v6.36) : toute aventure gagnée rapporte ce que l'équipe a récolté (doublé pour un défi du jour).
     if (window.Recompenses) {
-      window.Recompenses.finDePartie({ regles: r, aventure: av, gagnee: ok, defi: partie.defi ? partie.defi.type : null });
+      // v10.31 : chaque joueur reçoit les étoiles qu'il a lui-même récoltées (ses points de dé, pas ceux de l'équipe).
+      var recolte = pointsParJoueur(r);
+      window.Recompenses.finDePartie({ regles: r, aventure: av, gagnee: ok, defi: partie.defi ? partie.defi.type : null,
+        joueurs: partie.joueurs.map(function (j, i) { return { profil: j.profil, nom: j.nom, couleur: j.couleur, points: recolte[i] }; }) });
       sauver();
     }
     $('fin').showModal();
@@ -2654,22 +2659,8 @@
   });
   // v7.1 : la partie est finie, on revient à l'accueil sans confirmation (rien n'est perdu : étoiles déjà comptées).
   $('btn-fin-accueil').addEventListener('click', function () { $('fin').close(); accueilApresFin(); });
-  // v9.8 (17/11/2026) : en revenant à l'accueil après une partie gagnée, les étoiles gagnées s'envolent du centre
-  // de l'écran vers le compteur (js/recompenses.js → animerGain). La page se recharge : on note le gain dans
-  // l'onglet (sessionStorage) pour que l'accueil le retrouve. « Rejouer » ou « Nouvelle partie » : pas d'animation,
-  // les étoiles sont déjà dans le compte depuis l'affichage du résultat.
-  function accueilApresFin() {
-    var r = partie.regles, rc = r && r.recompense;
-    var n = rc && !rc.quitte && R.reussie(r) ? (rc.base || 0) + (rc.bonus || 0) : 0;
-    // v10.3 : s'ajoute aux étoiles déjà en attente (coffre ouvert sur l'écran de fin) : un seul envol pour le tout.
-    if (n > 0) {
-      try {
-        var avant = JSON.parse(sessionStorage.getItem('ludoaventura-gain-accueil') || 'null');
-        sessionStorage.setItem('ludoaventura-gain-accueil', JSON.stringify({ n: n + (avant && Number(avant.n) > 0 ? Math.floor(Number(avant.n)) : 0) }));
-      } catch (e) { /* rien : pas d'animation */ }
-    }
-    retourAccueil();
-  }
+  // v10.31 : plus d'envol d'étoiles vers l'accueil (rien de chiffré sur l'accueil) ; les étoiles sont dans la carte de chaque joueur.
+  function accueilApresFin() { retourAccueil(); }
 
   // ---------- Sauvegarde de la partie (stockage de session) ----------
   // sessionStorage : « survit aux rechargements et restaurations de la page ; fermer l'onglet efface les données »
@@ -2908,7 +2899,7 @@
     annulerMinuteurs();
     partie.modif = true;
     // Changer les réglages d'un défi en fait une partie libre (v6.37, hypothèse à valider) : on garde ceux du défi.
-    if (partie.defi && window.Recompenses) window.Recompenses.compte.marquerQuitte(partie.defi.type); // défi quitté (v6.47)
+    if (partie.defi && window.Recompenses) window.Recompenses.marquerQuitte(partie.defi.type, partie.joueurs.map(function (j) { return j.profil; }).filter(Boolean)); // défi quitté (v6.47)
     if (partie.defi) { partie.defi = null; partie.avantDefi = null; partie.mots = [null, null, null, null]; }
     // Partie rapide ou Baby jeux (v9.2) : retour à leurs propres réglages, la partie garde son mode.
     if (partie.rapide) { modifierRapide(); return; }
@@ -2992,7 +2983,7 @@
   // Défi quitté (v6.47) : un défi noté « en cours » qui n'est pas la partie reprise a été arrêté
   // (retour à l'accueil, jeu fermé…) : plus de récompense pour ce défi aujourd'hui.
   if (window.Recompenses) {
-    window.Recompenses.compte.verifierDefis(partie.defi && partie.regles ? partie.defi.type : null, partie.regles ? partie.regles.id : null);
+    window.Recompenses.verifierDefis(partie.defi && partie.regles ? partie.defi.type : null, partie.regles ? partie.regles.id : null);
     window.Recompenses.majTout();
   }
 
