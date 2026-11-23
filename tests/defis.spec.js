@@ -270,5 +270,8 @@ test.describe('trésor par joueur', () => {
     const ancien = { v: 1, total: 130, gemmes: 2 };
     const r2 = C.fusionner(local, ancien, base);
     expect([r2.total, r2.joueurs[0].rec.total, r2.parJoueur]).toEqual([140, 140, 1]);
+    // 1re connexion à un compte (base vide, ex. un invité qui crée son compte) : les étoiles du joueur s'ajoutent.
+    const r3 = C.fusionner({ v: 1, total: 20, gemmes: 0, parJoueur: 1, joueurs: j(20, 0) }, { v: 1, total: 50, gemmes: 1, parJoueur: 1, joueurs: j(50, 1) }, { uid: 'v', total: 0, gemmes: 0 });
+    expect([r3.total, r3.joueurs[0].rec.total, r3.joueurs[0].rec.gemmes]).toEqual([70, 70, 1]);
   });
 });

@@ -82,10 +82,11 @@
     r.joueurs = joueursFusion(a.joueurs, d.joueurs);
     // Trésor de chaque joueur (v10.30) : comme pour le compte, les étoiles et pierres gagnées sur l'appareil depuis le
     // dernier envoi (base.joueurs) s'ajoutent à celles du compte. Sans base pour ce joueur : le plus grand des deux.
-    var bj = objet(b.joueurs);
+    // 1re synchronisation avec ce compte (base vide) : tout ce que l'appareil a gagné s'ajoute, comme pour le compte.
+    var bj = objet(b.joueurs), premiere = !b.joueurs && !nombre(b.total) && !nombre(b.gemmes);
     function recDe(l, id) { var x = liste(l).filter(function (j) { return j && j.id === id; })[0]; return x && x.rec ? x.rec : null; }
     r.joueurs.forEach(function (p) {
-      var la = recDe(a.joueurs, p.id), ld = recDe(d.joueurs, p.id), base = bj[p.id];
+      var la = recDe(a.joueurs, p.id), ld = recDe(d.joueurs, p.id), base = bj[p.id] || (premiere ? { total: 0, gemmes: 0 } : null);
       if (!la || !ld || !base || !p.rec) return;
       p.rec.total = nombre(ld.total) + Math.max(0, nombre(la.total) - nombre(base.total));
       p.rec.gemmes = nombre(ld.gemmes) + Math.max(0, nombre(la.gemmes) - nombre(base.gemmes));
