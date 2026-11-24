@@ -2,8 +2,16 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
-  { v: '10.45', date: '2026-11-24', changes: [
+  { v: '10.47', date: '2026-11-24', changes: [
     "« Personnaliser » en Histoire et en Géographie : le niveau 1 à 10 choisi donne des questions de sa dizaine de progression (niveau 2 = questions 11 à 20), parmi les jeux que tu as cochés."
+  ] },
+  { v: '10.46', date: '2026-11-24', changes: [
+    "Fenêtre « Défi du jour » : « Étoiles ×3 » est maintenant écrit en gros, de travers, en jaune, tout en haut (plus de bulle). Les niveaux sous les noms, « Niveau inchangé » et la phrase du bas disparaissent."
+  ] },
+  { v: '10.45', date: '2026-11-24', changes: [
+    "Préparation de la partie : à la place de ses niveaux, chaque joueur voit la matière qu’il a choisie.",
+    "Le bouton « Changer » a disparu. Un joueur seul n’a aucun bouton ; à plusieurs, chaque joueur a une poubelle tout à droite pour le retirer de la partie (son profil reste dans le compte).",
+    "Plus aucun niveau affiché sur les boutons de « Suivre ma progression », dans la liste des joueurs du compte ni dans le choix des joueurs du défi du jour."
   ] },
   { v: '10.44', date: '2026-11-24', changes: [
     "Les phonèmes deviennent un mini-jeu : « Les sons » (complète le mot, quel son, l’intrus, où est le son, relier, trier). Tu gagnes 10 étoiles par partie, sans changer ton niveau.",

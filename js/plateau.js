@@ -251,7 +251,9 @@
     var p = partie.parcours[i], pret = !!(p && partie.pret[i]), resume = '';
     if (pret && p === 'suivre') resume = (NOMS_MATIERES_COURTS[partie.suivi[i]] || '') + (estBaby(partie.suivi[i]) ? ' · sans niveau' : ' · suit sa progression');
     if (pret && p === 'perso') resume = (NOMS_MATIERES_COURTS[partie.matiere[i]] || '') + (estBaby(partie.matiere[i]) ? ' · sans niveau (personnalisé)' : ' · niveau ' + (partie.niveauProg[i] || '?') + ' (personnalisé)');
-    return { parcours: p, pret: pret, resume: resume };
+    // v10.45 : la ligne du joueur dit la matière qu'il a choisie (à la place de ses niveaux), une fois sa préparation faite.
+    var mat = pret ? (p === 'suivre' ? partie.suivi[i] : partie.matiere[i]) : null;
+    return { parcours: p, pret: pret, resume: resume, matiere: (mat && NOMS_MATIERES_COURTS[mat]) || '' };
   }
   // Un des deux boutons de l'étape 1 : on passe à l'étape 2 pour ce joueur (matière seule, ou étape complète).
   function choisirParcours(i, type) {
@@ -312,15 +314,14 @@
     partie.orthoNiveau[i] = id; partie.conj[i].niveau = id; partie.gram[i].niveau = id;
     MATIERES_SAVOIR.forEach(function (sv) { if (partie.savoirs[i] && partie.savoirs[i][sv]) partie.savoirs[i][sv].niveau = id; });
   }
-  // « Suivre ma progression » : la liste des 4 matières, avec le niveau déjà atteint par le joueur dans chacune.
+  // « Suivre ma progression » : la liste des matières (sans niveau affiché depuis la v10.45).
   function majSuivre(a, actif) {
     ['choix-matiere', 'conj-temps', 'ortho-packs', 'phon-sons', 'reglages-maths', 'reglages-ortho', 'reglages-gram', 'reglages-phon', 'savoir-jeux'].forEach(function (id) { $(id).hidden = true; });
     if (window.Selecteur) window.Selecteur.maj(); // le sélecteur est caché : il remet le bouton « Valider » du bas
-    var j = partie.profils[a] && profil(partie.profils[a]);
+    // v10.45 (demande du 24/11/2026) : aucun niveau sur les boutons, seulement le nom de la matière.
     $('suivre-matieres').innerHTML = MATIERES_SUIVIES.map(function (m) {
-      var niv = j && !estBaby(m.id) ? window.Joueurs.niveauMatiere(j, m.id) : 1;
       return '<label class="pack pack-suivre"><input type="radio" name="suivre" value="' + m.id + '"' + (partie.suivi[a] === m.id ? ' checked' : '') + '>' +
-        '<span><b>' + m.nom + '</b><small>' + (estBaby(m.id) ? 'sans niveau' : 'niveau ' + niv + ' sur 10') + '</small></span></label>';
+        '<span><b>' + m.nom + '</b></span></label>';
     }).join('');
     $('reglages-titre').innerHTML = '<img src="' + actif.image + '" alt="" width="200" height="220">' +
       esc(nomDe(a)) + ' (Joueur ' + (a + 1) + ') : quelle matière ?';
