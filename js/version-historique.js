@@ -2,6 +2,9 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.49', date: '2026-11-24', changes: [
+    "Sur un écran carré, une longue réponse au clavier à lettres laisse maintenant toujours voir le bouton « Valider »."
+  ] },
   { v: '10.48', date: '2026-11-24', changes: [
     "« Personnaliser » : le niveau que tu choisis (de 1 à 10) donne maintenant des questions de sa bande de 10 niveaux (niveau 2 : de 11 à 20), parmi ce que tu as coché, en Maths, Français, Histoire et Géographie."
   ] },
