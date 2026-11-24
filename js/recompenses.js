@@ -271,71 +271,11 @@
   $('comment-gagner').addEventListener('click', function (ev) { if (ev.target === $('comment-gagner')) $('comment-gagner').close(); }); // toucher le fond ferme
   $('progression-corps').addEventListener('click', surClicPage);
 
-  // ---------- Écran « Défi du jour » (v6.37) ----------
-  // Le joueur choisit : solo ou en équipe, la matière, le niveau (et le nombre de joueurs en équipe) ;
-  // js/defis.js tire tout le reste d'après la date. Les derniers choix sont gardés sur l'appareil.
+  // ---------- Défi du jour (v10.36) ----------
+  // Plus d'écran de choix : le bouton de l'accueil ouvre la fenêtre « Défi du jour » (js/defi-jour.js), où l'on ne choisit
+  // que son ou ses profils. js/defis.js tire le reste (aventure, matières et niveau de chaque carte).
   var D = window.Defis;
-  var CLE_CHOIX = 'ludoaventura-defi-choix';
-  var choixDefi = { type: 'solo', matiere: null, niveau: 'facile', joueurs: 2 };
-  try { var cd = JSON.parse(localStorage.getItem(CLE_CHOIX) || 'null'); if (cd) for (var kc in choixDefi) if (cd[kc] !== undefined) choixDefi[kc] = cd[kc]; } catch (e) { /* */ }
-  function garderChoix() { try { localStorage.setItem(CLE_CHOIX, JSON.stringify(choixDefi)); } catch (e) { /* */ } }
-  function typesDisponibles() {
-    return window.Questions.TYPES.map(function (t) { return t.id; });
-  }
-  function radios(nom, legende, liste, valeur) {
-    return '<fieldset class="defi-choix"><legend>' + legende + '</legend><div class="packs">' + liste.map(function (o) {
-      return '<label class="pack"><input type="radio" name="' + nom + '" value="' + o[0] + '"' + (String(valeur) === String(o[0]) ? ' checked' : '') + '><span>' + o[1] + '</span></label>';
-    }).join('') + '</div></fieldset>';
-  }
-  // v6.40 (demande du 10/11/2026) : plus d'aperçu de l'aventure. Le joueur choisit la matière et le niveau
-  // (et le nombre de joueurs en équipe), touche « Valider » et découvre l'aventure sur le plateau.
-  function pageDefi() {
-    // v10.30 : défis réussis ou quittés propres à chaque joueur. Avec un seul joueur dans le compte, on montre les siens ;
-    // à plusieurs, on ne sait pas encore qui jouera (« Qui joue ? » après « Valider ») : pas d'état.
-    var seul = joueurs().length <= 1, v = seul ? vue() : null;
-    var statut = function (t) { return seul ? v.defiDuJour(t) : undefined; };
-    var quitte = function (t) { return seul && v.defiQuitte(t); };
-    var h = '<section class="carte-page"><fieldset class="defi-types"><legend class="visually-hidden">Quel défi ?</legend>';
-    ['solo', 'equipe'].forEach(function (t) {
-      var g = statut(t);
-      h += '<label class="defi-type"><input type="radio" name="defi-type" value="' + t + '"' + (choixDefi.type === t ? ' checked' : '') + '>' +
-        '<span>' + ico('i-defi') + '<strong>' + (t === 'solo' ? 'Défi solo' : 'Défi en équipe') + '</strong>' +
-        '<small class="' + (g !== undefined ? 'fait' : quitte(t) ? 'quitte' : '') + '">' + (g !== undefined ? '✔ Réussi · +' + g + ' ⭐' : quitte(t) ? 'Quitté aujourd’hui' : seul ? 'À faire' : 'Une fois par jour et par joueur') + '</small></span></label>';
-    });
-    h += '</fieldset>';
-    h += radios('defi-matiere', 'Matière', [['maths', 'Maths'], ['francais', 'Français']], choixDefi.matiere);
-    h += radios('defi-niveau', 'Niveau', D.NIVEAUX.map(function (n) { return [n.id, n.nom]; }), choixDefi.niveau);
-    if (choixDefi.type === 'equipe') h += radios('defi-joueurs', 'Joueurs', [[2, '2'], [3, '3'], [4, '4']], choixDefi.joueurs);
-    var g = statut(choixDefi.type);
-    h += '<div class="defi-valider" aria-live="polite">' +
-      (g === undefined && quitte(choixDefi.type) ? '<p class="defi-recompense quitte">Tu as quitté ce défi avant la fin aujourd’hui : tu peux y rejouer, mais il ne rapporte plus rien jusqu’à demain.</p>'
-        : g !== undefined ? '<p class="defi-recompense fait">✔ Défi déjà réussi aujourd’hui (+' + g + ' ⭐). Tu peux rejouer : étoiles normales.</p>'
-        : '<p class="defi-recompense">' + ico('i-etoile') + '<span>L’aventure reste une surprise. Gagne-la : tes étoiles sont <strong>doublées</strong> !' + (seul ? '' : ' (une fois par jour pour chaque joueur)') + '</span></p>') +
-      (choixDefi.matiere ? '' : '<p class="petit" id="defi-manque">Choisis la matière pour valider.</p>') +
-      '<button type="button" class="btn btn-principal" id="btn-lancer-defi"' + (choixDefi.matiere ? '' : ' disabled aria-describedby="defi-manque"') + '>Valider</button>' +
-      '</div></section>';
-    $('defi-corps').innerHTML = h;
-  }
-  if (D) {
-    $('defi-corps').addEventListener('change', function (e) {
-      var n = e.target.name;
-      if (n === 'defi-type') choixDefi.type = e.target.value;
-      if (n === 'defi-matiere') choixDefi.matiere = e.target.value;
-      if (n === 'defi-niveau') choixDefi.niveau = e.target.value;
-      if (n === 'defi-joueurs') choixDefi.joueurs = Number(e.target.value);
-      garderChoix();
-      pageDefi();
-      var el = $('defi-corps').querySelector('input[name="' + n + '"][value="' + e.target.value + '"]');
-      if (el) el.focus({ preventScroll: true });
-    });
-    $('defi-corps').addEventListener('click', function (e) {
-      // Le défi n'est tiré qu'au moment de valider (même tirage pour tous le même jour, js/defis.js).
-      if (e.target.closest('#btn-lancer-defi') && choixDefi.matiere) {
-        window.Aventura.lancerDefi(D.generer(compte.aujourdhui(), choixDefi, { typesDisponibles: typesDisponibles() }));
-      }
-    });
-    D.ouvrir = function (type) { if (type) { choixDefi.type = type; garderChoix(); } aller('ecran-defi'); };
-  }
+  if (D) D.ouvrir = function () { if (window.DefiJour) window.DefiJour.ouvrir(); };
 
   // ---------- Navigation ----------
   function aller(id) { window.Aventura.afficher(id); }
@@ -349,7 +289,7 @@
   });
   // Le bouton « Défi du jour » n'apparaît que lorsque les défis existent (js/defis.js).
   $('btn-defi').hidden = !window.Defis;
-  $('btn-defi').addEventListener('click', function () { aller('ecran-defi'); });
+  $('btn-defi').addEventListener('click', function () { if (window.DefiJour) window.DefiJour.ouvrir(); });
 
   // Écran affiché (js/plateau.js → afficher) : on remplit l'écran des étoiles ou de la progression.
   function majTout() {
@@ -357,7 +297,6 @@
     var ecran = window.Aventura && window.Aventura.partie.ecran;
     if (ecran === 'ecran-etoiles') pageEtoiles();
     if (ecran === 'ecran-progression') pageProgression();
-    if (ecran === 'ecran-defi' && window.Defis) pageDefi();
     if (ecran === 'ecran-compte' && window.JoueursEcran && !$('coffre').open) window.JoueursEcran.rendre(); // trésor des cartes
   }
   document.addEventListener('aventura-ecran', majTout);
@@ -368,7 +307,7 @@
 
   // ---------- Fin de partie ----------
   // Appelé par js/plateau.js à l'affichage du résultat. info = { regles, aventure, gagnee, defi, joueurs }.
-  // joueurs (v10.30) : [{ profil, nom, unites }] : chacun reçoit les étoiles qu'il a récoltées (ligne 454), doublées pour un
+  // joueurs (v10.30) : [{ profil, nom, unites }] : chacun reçoit les étoiles qu'il a récoltées (ligne 454), triplées (×3) pour un
   // défi du jour pas encore réussi par lui aujourd'hui. Sans profil connu (partie d'avant la v10.29) : le 1er joueur du compte.
   // La partie ne rapporte qu'une fois (identifiant regles.id) ; après un rechargement, on réaffiche le même résultat.
   // Total des étoiles d'une récompense (pour l'envol de l'accueil, js/plateau.js → accueilApresFin).
@@ -400,7 +339,7 @@
     } else if (info.gagnee && seul) {
       var x = L[0] || { base: 0, bonus: 0 };
       h += '<p class="fin-gain">' + ico('i-etoile', 'ico-gain') + '<strong>+' + etoiles(x.base + x.bonus) + '</strong></p>';
-      if (x.bonus) h += '<p class="fin-bonus">' + ico('i-defi') + ' Défi du jour réussi : étoiles doublées !</p>';
+      if (x.bonus) h += '<p class="fin-bonus">' + ico('i-defi') + ' Défi du jour réussi : étoiles ×3 !</p>';
       else if (x.deja) h += '<p class="petit">Défi déjà réussi aujourd’hui : étoiles normales.</p>';
       else h += '<p class="petit">Une étoile pour chaque ' + av.objet.un + ' (' + av.objet.titre.toLowerCase() + ' : ' + r.points + ').</p>';
       if (x.gemmes) h += '<p class="fin-gemmes">' + ico('i-gemme') + ' <strong>+' + gemmes(x.gemmes) + ' !</strong></p>';
@@ -409,7 +348,7 @@
       // À plusieurs (v10.30) : une ligne par joueur, avec ce qu'il a lui-même récolté.
       h += '<p class="fin-gain">' + ico('i-etoile', 'ico-gain') + '<strong>+' + etoiles(gainTotal(rc)) + '</strong></p>' +
         '<p class="petit">Chacun reçoit les étoiles de ce qu’il a lui-même récolté.</p>';
-      if (L.some(function (y) { return y.bonus; })) h += '<p class="fin-bonus">' + ico('i-defi') + ' Défi du jour réussi : étoiles doublées !</p>';
+      if (L.some(function (y) { return y.bonus; })) h += '<p class="fin-bonus">' + ico('i-defi') + ' Défi du jour réussi : étoiles ×3 !</p>';
       h += '<ul class="fin-gains-joueurs">' + L.map(function (y) {
         return '<li><span class="fg-nom">' + esc(y.nom) + '</span>' +
           (y.quitte ? '<span class="petit">défi quitté : rien</span>' : '<span class="fg-etoiles">' + ico('i-etoile') + ' +' + (y.base + y.bonus) + '</span>' +

@@ -171,8 +171,6 @@
     <!-- Barre du haut (v6.36, js/recompenses.js). v10.30 (demande du 23/11/2026, backlog ligne 453) : rien de chiffré sur
          l'accueil ; étoiles, pierres, niveaux et coffres sont dans la carte de chaque joueur (Mon compte). -->
     <div class="accueil-haut">
-      <!-- Défi du jour en haut de l'écran (v6.38, demande du 10/11/2026) ; v10.30 : plus de nombre de défis restants. -->
-      <button type="button" class="pastille pastille-defi" id="btn-defi"><svg class="ico" aria-hidden="true"><use href="#i-defi"/></svg><span class="pd-texte">Défi <span>du jour</span></span><span class="badge" id="defi-badge" hidden></span><span class="visually-hidden" id="defi-aide"></span></button>
       <!-- Compte (v9.4, js/compte.js) : se connecter pour garder sa progression sur tous ses appareils (facultatif). -->
       <button type="button" class="pastille pastille-compte" id="btn-compte">
         <svg class="ico" aria-hidden="true"><use href="#i-compte"/></svg>
@@ -185,6 +183,8 @@
       <img class="calque herbe" src="img/herbe.webp" alt="" width="531" height="779">
       <div class="accueil-actions">
         <button type="button" class="btn btn-principal" id="btn-commencer">Commencer l'aventure</button>
+        <!-- Défi du jour (v10.36, demande du 24/11/2026) : sous « Commencer l'aventure », dans un rectangle ; on y choisit seulement ses profils (js/defi-jour.js). -->
+        <button type="button" class="btn btn-jaune btn-defi" id="btn-defi"><span class="bd-ligne"><svg class="ico" aria-hidden="true"><use href="#i-defi"/></svg>Défi du jour</span><small class="bd-sous"><svg class="ico" aria-hidden="true"><use href="#i-etoile"/></svg>étoiles ×3</small></button>
         <!-- Partie rapide solo (v6.43, js/rapide.js ; bouton bleu et « solo » en v6.44). -->
         <button type="button" class="btn btn-bleu" id="btn-rapide"><span aria-hidden="true">⚡</span> Partie rapide solo</button>
         <!-- Baby jeux (v9.1, js/baby-ecran.js) : petits jeux de lettres et de chiffres, joués sur le plateau comme une partie rapide. -->
@@ -427,14 +427,6 @@
       <span class="barre-vide" aria-hidden="true"></span>
     </header>
     <div class="page-corps" id="progression-corps"></div>
-  </section>
-  <section class="ecran page" id="ecran-defi" aria-labelledby="titre-defi" hidden>
-    <header class="barre">
-      <button type="button" class="btn-retour" data-retour-accueil><span aria-hidden="true">←</span> Accueil</button>
-      <h2 id="titre-defi">Défi du jour</h2>
-      <span class="barre-vide" aria-hidden="true"></span>
-    </header>
-    <div class="page-corps" id="defi-corps"></div>
   </section>
 
   <!-- ÉCRAN 2 : préparation de la partie, en écrans successifs (un seul visible, sans défiler) :
@@ -947,7 +939,7 @@
   <h2 id="comment-gagner-titre">Comment gagner des étoiles ?</h2>
   <ul class="regles-etoiles">
     <li><svg class="ico" aria-hidden="true"><use href="#i-etoile"/></svg><span><strong>Aventure gagnée</strong> : 1 étoile par tronc coupé, pierre taillée… récolté par l’équipe.</span></li>
-    <li><svg class="ico" aria-hidden="true"><use href="#i-defi"/></svg><span><strong>Défi du jour gagné</strong> : les étoiles de la partie sont doublées (une fois par jour).</span></li>
+    <li><svg class="ico" aria-hidden="true"><use href="#i-defi"/></svg><span><strong>Défi du jour gagné</strong> : les étoiles de la partie sont triplées (×3, une fois par jour).</span></li>
     <li><svg class="ico coffre-jour" aria-hidden="true"><use href="#i-coffre"/></svg><span><strong>Coffre du jour</strong> : 5 à 20 étoiles, chaque jour où tu viens jouer.</span></li>
     <li><svg class="ico coffre-mega" aria-hidden="true"><use href="#i-coffre"/></svg><span><strong>Méga coffre</strong> : 100 à 200 étoiles chaque fois que tu viens 5 jours d’affilée.</span></li>
     <li><svg class="ico coffre-simple" aria-hidden="true"><use href="#i-coffre"/></svg><span><strong>Chaque nouveau niveau</strong> : un coffre simple (10 à 25 étoiles).</span></li>
@@ -1032,6 +1024,19 @@
   </div>
 </dialog>
 
+<!-- v10.36 : fenêtre « Défi du jour » : on choisit seulement son ou ses profils (1 = solo, 2 à 4 = équipe), js/defi-jour.js. -->
+<dialog class="fin fenetre-compte fenetre-joueurs fenetre-defi" id="fenetre-defi" aria-labelledby="fenetre-defi-titre">
+  <h2 id="fenetre-defi-titre"><svg class="ico" aria-hidden="true"><use href="#i-defi"/></svg> Défi du jour</h2>
+  <p class="dj-etat" id="dj-etat" role="status" aria-live="polite"></p>
+  <div class="dj-liste" id="dj-liste" role="group" aria-label="Qui joue ?"></div>
+  <p class="dj-puces"><span class="dj-puce dj-or"><svg class="ico" aria-hidden="true"><use href="#i-etoile"/></svg>Étoiles ×3</span><span class="dj-puce">Niveau inchangé</span></p>
+  <p class="dj-note">1 joueur : défi solo. 2 à 4 : défi en équipe. Les questions suivent le niveau de chacun.</p>
+  <div class="menu-actions">
+    <button type="button" class="btn btn-principal" id="dj-ok" disabled>C’est parti !</button>
+    <button type="button" class="btn btn-secondaire" id="dj-annuler">Annuler</button>
+  </div>
+</dialog>
+
 <script src="js/des.js"></script>
 <script src="js/aventures.js"></script>
 <script src="js/aventuriers.js"></script>
@@ -1075,6 +1080,7 @@
 <script src="js/plateau.js"></script>
 <script src="js/plein-ecran.js"></script>
 <script src="js/rapide.js"></script>
+<script src="js/defi-jour.js"></script>
 <script src="js/baby-ecran.js"></script>
 <script src="js/ludo.js"></script>
 <script src="js/joueurs-ecran.js"></script>

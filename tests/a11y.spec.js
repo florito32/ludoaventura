@@ -52,13 +52,12 @@ test('aucune violation WCAG A/AA : accueil, Mes étoiles, Ma progression, Défi 
   expect(await audit(page)).toEqual([]);
   await page.getByRole('button', { name: 'Mon compte' }).click();
   await page.locator('#ecran-compte [data-retour-accueil]').click();
+  // v10.36 : le défi du jour est une fenêtre où l'on ne choisit que ses profils.
   await page.locator('#btn-defi').click();
-  await expect(page.getByRole('button', { name: 'Valider' })).toBeDisabled();
+  await expect(page.getByRole('dialog', { name: 'Défi du jour' })).toBeVisible();
   expect(await audit(page)).toEqual([]);
-  await page.locator('label:has(input[name="defi-matiere"][value="maths"])').click();
-  await expect(page.getByRole('button', { name: 'Valider' })).toBeEnabled();
-  expect(await audit(page)).toEqual([]);
-  await page.getByRole('button', { name: 'Accueil' }).click();
+  await page.getByRole('button', { name: 'Annuler' }).click();
+  await expect(page.getByRole('dialog', { name: 'Défi du jour' })).toBeHidden();
   await page.locator('#btn-compte').click();
   await page.locator('#onglet-profil').click();
   await page.locator('.joueur-carte [data-act="coffres"]').first().click();

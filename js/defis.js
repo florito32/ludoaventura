@@ -136,7 +136,27 @@
     return d;
   }
 
-  var api = { NIVEAUX: NIVEAUX, PACKS: PACKS, ORTHO: ORTHO, DIFFICULTE_AVENTURE: DIFFICULTE_AVENTURE, generer: generer, reglages: reglages, hasard: hasard };
+
+  // ---------- Défi du jour v2 (demande du 24/11/2026, backlog lignes 475 à 477) ----------
+  // Le joueur ne choisit que ses profils (1 = défi solo, 2 à 4 = défi en équipe). Le jeu tire l'aventure d'après le niveau
+  // moyen des joueurs, et chaque carte tire sa matière (Français, Maths, Histoire, Géographie) au niveau du joueur qui la joue.
+  // Hypothèse à valider : en attendant d'utiliser la difficulté 1 à 100 des questions (js/progression-*.js, pas encore chargés
+  // par le jeu), le score du joueur (0 à 100) est rangé en quatre tranches : Facile < 25, Moyen < 50, Difficile < 75, Expert.
+  var MATIERES_DEFI = ['francais', 'maths', 'histoire', 'geographie'];
+  function niveauPourScore(s) { s = Number(s) || 0; return s < 25 ? 'facile' : s < 50 ? 'moyen' : s < 75 ? 'difficile' : 'expert'; }
+  // Aventure : Facile < 34, Moyen < 67, sinon Difficile (score moyen des joueurs, de 0 à 100).
+  function difficultePourScore(s) { s = Number(s) || 0; return s < 34 ? 'facile' : s < 67 ? 'moyen' : 'difficile'; }
+  // jour = « 2026-11-24 » ; scores = score global de chaque joueur (0 à 100). Même jour et même difficulté : même aventure.
+  function genererJour(jour, scores) {
+    var nb = Math.min(4, Math.max(1, scores.length));
+    var moy = scores.length ? scores.reduce(function (a, b) { return a + (Number(b) || 0); }, 0) / scores.length : 0;
+    var difficulte = difficultePourScore(moy), type = nb === 1 ? 'solo' : 'equipe';
+    var aventures = A.LISTE.filter(function (a) { return a.difficulte === difficulte; });
+    var aventure = aventures[Math.floor(hasard(jour + '|' + type + '|aventure|' + difficulte)() * aventures.length)];
+    return { jour: jour, type: type, mixte: true, matiere: 'mixte', niveau: difficulte, aventure: aventure.id, joueurs: nb };
+  }
+
+  var api = { MATIERES_DEFI: MATIERES_DEFI, niveauPourScore: niveauPourScore, difficultePourScore: difficultePourScore, genererJour: genererJour, NIVEAUX: NIVEAUX, PACKS: PACKS, ORTHO: ORTHO, DIFFICULTE_AVENTURE: DIFFICULTE_AVENTURE, generer: generer, reglages: reglages, hasard: hasard };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else racine.Defis = api;
 })(this);
