@@ -2,6 +2,10 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.36', date: '2026-11-24', changes: [
+    "Défi du jour : le bouton est maintenant un rectangle jaune juste sous « Commencer l’aventure ». Tu choisis seulement ton ou tes profils (1 = défi solo, 2 à 4 = défi en équipe) puis tu lances : plus de matière, de niveau ni d’aventure à choisir.",
+    "Les cartes du défi mêlent Français, Maths, Histoire et Géographie, au niveau de chaque joueur dans la matière. Le défi du jour ne fait pas monter les niveaux, mais les étoiles gagnées sont multipliées par 3 (une fois par jour et par profil)."
+  ] },
   { v: '10.35', date: '2026-11-23', changes: [
     "Histoire et Géographie : chaque question a maintenant un niveau de difficulté « progression » de 1 à 100 (100 niveaux par période d’Histoire et par famille de Géographie). Rien ne change à l’écran pour l’instant."
   ] },
