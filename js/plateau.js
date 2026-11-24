@@ -1199,6 +1199,11 @@
   // Les générateurs lisent encore Facile…Expert : le niveau 1 à 10 du profil y est traduit (provisoire, backlog ligne 485).
   // Hypothèses à valider : sous-matière tirée au hasard à chaque carte ; Géographie et Histoire en mode Quiz.
   function estSuivi(i) { return partie.parcours[i] === 'suivre' && !!partie.suivi[i] && !partie.rapide && !partie.defi; }
+  // Niveau de progression (0 à 100) du profil du siège i dans une sous-matière.
+  function niveauProfil(i, m, s) {
+    var j = partie.profils[i] && profil(partie.profils[i]);
+    return j ? window.Joueurs.score(j, m, s) : 0;
+  }
   function niveauSousMatiere(i, m, s) {
     var j = partie.profils[i] && profil(partie.profils[i]);
     return niveauId(j ? window.Joueurs.niveauDe(window.Joueurs.score(j, m, s)) : 1);
@@ -1220,9 +1225,9 @@
     if (estSavoir(m)) subs = subs.filter(function (f) { return jeuxProposes(m, 'quiz').some(function (x) { return x.famille === f; }); });
     var s = subs[Math.floor(Math.random() * subs.length)], niv = niveauSousMatiere(i, m, s), sous = { m: m, s: s };
     if (m === 'maths') {
-      var mt = window.Defis.reglages('maths', niv, Math.random).maths;
-      mt.type = s === 'probleme' ? 'probleme' : 'calcul';
-      return { matiere: 'maths', maths: mt, sous: sous };
+      // v10.39 : un calcul dont le niveau de progression (1 à 100) est dans la fenêtre de 5 niveaux du profil (js/progression-calcul.js).
+      var fm = window.ProgressionFenetre.fenetre(niveauProfil(i, m, s)), calcul = window.ProgressionCalcul.genererDans(fm.bas, fm.haut, Math.random);
+      return { matiere: 'maths', calcul: calcul, probleme: s === 'probleme', sous: sous };
     }
     if (m === 'francais') {
       if (s === 'conjugaison') return { matiere: 'conjugaison', conj: window.Defis.reglages('conjugaison', niv, Math.random).conj, sous: sous };
@@ -1239,6 +1244,18 @@
     var meilleure = null, n = 0;
     Object.keys(j.sous || {}).forEach(function (k) { if (j.sous[k] > n) { n = j.sous[k]; meilleure = k; } });
     return meilleure ? { m: meilleure.split('.')[0], s: meilleure.split('.')[1] } : null;
+  }
+
+  // Carte de calcul (ou de problème) déjà tirée au bon niveau de progression (v10.39) : même forme qu'un calcul tiré par K.generer.
+  function carteCalculProgression(f, probleme) {
+    f.type = 'calcul';
+    if (probleme && window.Problemes) {
+      window.Problemes.habiller(f);
+      f.packNom = 'Problème · niveau ' + f.prog;
+      return f;
+    }
+    f.packNom = 'Calcul · niveau ' + f.prog;
+    return f;
   }
 
   // Pioche dans le tas du joueur (tas vide → on remélange toutes ses cartes) et tire au hasard
@@ -1269,6 +1286,7 @@
       j.sous = j.sous || {};
       j.sous[cs.sous.m + '.' + cs.sous.s] = (j.sous[cs.sous.m + '.' + cs.sous.s] || 0) + 1;
       if (cs.carte) return cs.carte;
+      if (cs.calcul) return carteCalculProgression(cs.calcul, cs.probleme);
       mat = cs.matiere; if (cs.maths) mr = cs.maths; if (cs.conj) cr = cs.conj; if (cs.gram) gr = cs.gram;
       if (cs.phon) return cartePhonemes(j, cs.phon);
     }
