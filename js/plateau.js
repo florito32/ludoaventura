@@ -860,7 +860,7 @@
     lettreBaby: ['choisir au moins une lettre.', 'reglages-baby'],
     chiffreBaby: ['choisir au moins un chiffre.', 'reglages-baby'],
     jeuBaby: ['choisir au moins un jeu.', 'reglages-baby'],
-    francais: ['choisir Orthographe, Conjugaison, Grammaire ou Phonèmes.', 'francais'],
+    francais: ['choisir Orthographe, Conjugaison ou Grammaire.', 'francais'],
     categorie: ['choisir au moins une catégorie de sons.', 'cats-phon'],
     son: ['choisir au moins un son.', 'sons-phon'],
     jeuPh: ['choisir au moins un jeu.', 'jeux-phon'],

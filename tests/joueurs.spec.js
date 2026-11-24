@@ -35,9 +35,9 @@ test('matière = moyenne de ses sous-matières ; un nouveau joueur est à 0 part
   expect(J.ajouterPoints(etat, joueur.id, 'maths', 'inconnue', 1)).toBe(-1);
 });
 
-test('les sous-matières : Français 4, Maths 2, Histoire = 7 périodes, Géographie = 4 jeux', () => {
-  expect(J.MATIERES.map((m) => m.subs.length)).toEqual([4, 2, 7, 4]);
-  expect(J.toutesLesCles()).toHaveLength(17);
+test('les sous-matières : Français 3 (v10.44 : plus de phonèmes), Maths 2, Histoire = 7 périodes, Géographie = 4 jeux', () => {
+  expect(J.MATIERES.map((m) => m.subs.length)).toEqual([3, 2, 7, 4]);
+  expect(J.toutesLesCles()).toHaveLength(16);
 });
 
 test('noms : vide, trop long, interdit, déjà pris (majuscules et accents ignorés)', () => {
@@ -141,7 +141,7 @@ test('sans compte : « Joueur 1 » existe déjà, avec 4 jauges à 0 (niveau 1) 
 
 test('les jauges montrent la moyenne des sous-matières ; les sous-matières restent invisibles', async ({ page }) => {
   await preparer(page, { etat: { v: 1, total: 0, joueurs: [{ id: 'j-1', nom: 'Léa', perso: 'lea', cree: '2026-11-01T00:00:00Z', maj: '2026-11-01T00:00:00Z',
-    niv: { 'maths.calcul': 60, 'maths.probleme': 25, 'francais.orthographe': 100, 'francais.conjugaison': 100, 'francais.grammaire': 100, 'francais.phonemes': 100 } }] } });
+    niv: { 'maths.calcul': 60, 'maths.probleme': 25, 'francais.orthographe': 100, 'francais.conjugaison': 100, 'francais.grammaire': 100 } }] } });
   await ouvrirCompte(page);
   const c = carte(page, 'Léa');
   await ouvrirStats(c);

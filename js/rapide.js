@@ -7,8 +7,7 @@
 //  - Français : orthographe, conjugaison ou grammaire (une chance sur trois, v6.55) ; orthographe : tous les thèmes,
 //    mots et questions du niveau ; conjugaison : temps et groupes du niveau ; grammaire : tous les jeux, au niveau.
 //  - v10.4 (demande du 17/11/2026, backlog ligne 290) : n'importe quelle question des matières, hors Baby jeux.
-//    Français = orthographe, conjugaison, grammaire ou phonèmes (une chance sur quatre ; phonèmes : tous les jeux,
-//    tous les sons, ils n'ont pas de niveau) ; Maths = calcul mental ou problème (une chance sur deux).
+//    Français = orthographe, conjugaison ou grammaire (une chance sur trois ; les phonèmes sont un mini-jeu depuis la v10.43) ; Maths = calcul mental ou problème (une chance sur deux).
 //  - Géographie et Histoire (v8.5, demande du 13/11/2026) : tous les jeux de la matière jouables dans le mode choisi
 //    (Quiz ou Normal, choix visible seulement quand l'une des deux est cochée), au niveau choisi.
 // Aventure : Facile → facile, Moyen → moyenne, Difficile et Expert → difficile (des aventures « Expert » viendront plus tard).
@@ -93,7 +92,7 @@
   function carte(matieres, niveau, r, mode) {
     r = r || Math.random;
     var m = tirer(matieres && matieres.length ? matieres : ['maths', 'francais'], r);
-    if (m === 'francais') { var f = r(); m = f < 1 / 4 ? 'orthographe' : f < 2 / 4 ? 'conjugaison' : f < 3 / 4 ? 'grammaire' : 'phonemes'; }
+    if (m === 'francais') { var f = r(); m = f < 1 / 3 ? 'orthographe' : f < 2 / 3 ? 'conjugaison' : 'grammaire'; }
     if (m === 'geographie' || m === 'histoire') return { matiere: m, savoir: { niveau: niveau ? niveauValide(niveau) : 'facile', mode: modeValide(mode) } };
     if (m === 'orthographe') return { matiere: 'orthographe' };
     if (m === 'phonemes') return { matiere: 'phonemes', phon: phonTout() };

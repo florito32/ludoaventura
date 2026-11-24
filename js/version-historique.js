@@ -2,6 +2,10 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.44', date: '2026-11-24', changes: [
+    "Les phonèmes deviennent un mini-jeu : « Les sons » (complète le mot, quel son, l’intrus, où est le son, relier, trier). Tu gagnes 10 étoiles par partie, sans changer ton niveau.",
+    "Les phonèmes ne sont plus une matière de l’aventure, de la partie rapide ni du profil."
+  ] },
   { v: '10.43', date: '2026-11-24', changes: [
     "Lettres et Chiffres sont maintenant des matières, comme Maths ou Histoire, à choisir quand tu commences l’aventure (en « Personnaliser » et en « Suivre ma progression »). Elles n’ont pas de niveau : tu gagnes des étoiles, mais ta progression ne change pas.",
     "Nouveau mode « Mini-jeux » sur l’accueil : tu choisis un mini-jeu et ton profil, sans plateau ni pion, et tu gagnes 10 étoiles à chaque partie terminée. Le premier mini-jeu est « La fabrique à mots ».",

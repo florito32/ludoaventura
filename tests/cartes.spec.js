@@ -141,7 +141,7 @@ test('packs et questions décochés au départ ; « Valider » demande au moins 
   await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir une matière.');
   await cocher(page, '#matieres', 'francais');
   await valider(page);
-  await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir Orthographe, Conjugaison, Grammaire ou Phonèmes.');
+  await expect(page.locator('#packs-alerte')).toHaveText('Léa (Joueur 1) doit choisir Orthographe, Conjugaison ou Grammaire.');
   await cocher(page, '#francais', 'orthographe');
   await valider(page); // écran des packs (v6.16)
   for (const c of await page.locator('#packs input, #types-questions input').all()) await expect(c).not.toBeChecked();

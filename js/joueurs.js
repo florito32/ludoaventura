@@ -15,7 +15,7 @@
   var MATIERES = [
     { id: 'francais', nom: 'Français', subs: [
       { id: 'orthographe', nom: 'Orthographe' }, { id: 'conjugaison', nom: 'Conjugaison' },
-      { id: 'grammaire', nom: 'Grammaire' }, { id: 'phonemes', nom: 'Phonèmes' }] },
+      { id: 'grammaire', nom: 'Grammaire' }] },
     { id: 'maths', nom: 'Maths', subs: [{ id: 'calcul', nom: 'Calcul mental' }, { id: 'probleme', nom: 'Problèmes' }] },
     { id: 'histoire', nom: 'Histoire', subs: [
       { id: 'pre', nom: 'Préhistoire' }, { id: 'ant', nom: 'Antiquité' }, { id: 'mag', nom: 'Moyen Âge' },
