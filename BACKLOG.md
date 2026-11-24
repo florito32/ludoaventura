@@ -126,9 +126,4 @@ Numéros : toujours relire la dernière ligne de `main` juste avant la fusion (d
 | 492 | Correctif : la table de progression de Conjugaison contenait des cartes impossibles (impératif de « pouvoir » et « valoir », sans forme) | fait à valider (v10.41) — table construite avec les personnes que le jeu sait conjuguer | ✅ local + CI |
 | 493 | Règle 1 pour Histoire et Géographie (v10.42) : questions dont le niveau 1–100 est dans la fenêtre du profil ; fenêtre élargie si la série est trop courte ; mode Quiz | fait à valider (v10.42) — hypothèses : élargissement 0, 2, 5, 10, 25, 50, 100 ; sous-matière tirée au hasard | ✅ local (4 formats) + CI |
 | 494 | Branches déjà fusionnées non supprimables depuis les sessions cloud (proxy : 403) : claude/v10-39-progression-fenetre, claude/v10-41-progression-francais | question en attente — à supprimer à la main sur GitHub | |
-| 495 | Demande du 24/11/2026 (10 h 13) : Lettres et Chiffres (ex-Baby jeux) deviennent des matières comme Maths/Histoire, sans niveau (étoiles oui, progression non) | fait à valider (v10.43) — proposées dans Aventure › Personnaliser et Suivre ma progression ; tests ✅ |
-| 496 | Idem : le bouton « Baby jeux » et son écran sont supprimés de l'accueil | fait à valider (v10.43) — tests ✅ |
-| 497 | Idem : nouveau mode « Mini-jeux » (après Partie rapide solo) : liste de mini-jeux, profil seul (Qui joue ?), sans plateau ni progression, 10 étoiles par partie terminée | fait à valider (v10.43) — tests ✅ |
-| 498 | Idem : « La fabrique à mots » quitte les Lettres et devient le 1er mini-jeu | fait à valider (v10.43) — tests ✅ |
-| 499 | Hypothèses à valider (v10.43) : Lettres/Chiffres absents de partie rapide et défi du jour ; suivi = réglages par défaut tout coché ; fabrique en majuscules ; étoiles dans le trésor du profil choisi | question en attente |
 | 500 | Tâche planifiée de reprise (2 h) de nouveau refusée par le classifieur le 24/11 | question en attente — voir ligne 466 |
