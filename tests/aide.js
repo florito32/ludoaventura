@@ -207,16 +207,16 @@ async function grammaire(page, { jeux = null, niveau = 'facile' } = {}) {
 }
 
 // v10.30 (backlog lignes 447, 453) : les étoiles, pierres et coffres sont dans la carte de chaque joueur (Mon compte).
-// Depuis l'accueil : « Mon compte » puis, sur la carte du joueur (le 1er, ou celui qui porte ce nom), « Mes étoiles ».
+// Depuis l'accueil : « Mon compte » puis, sur la carte du joueur (le 1er, ou celui qui porte ce nom), le bouton coffre « Mes coffres » (v10.36).
 function carteJoueur(page, nom) {
   return nom ? page.locator('.joueur-carte', { has: page.locator('.joueur-nom', { hasText: nom }) }) : page.locator('.joueur-carte').first();
 }
 async function mesEtoiles(page, nom) {
   await page.locator('#btn-compte').click();
-  await page.locator('#onglet-profil').click(); // v10.32 : « Profil et joueurs » ; « Mes étoiles » est dans « Statistiques »
+  await page.locator('#onglet-profil').click(); // v10.32 : « Profil et joueurs » ; « Mes coffres » est dans « Statistiques »
   await carteJoueur(page, nom).getByRole('button', { name: 'Statistiques' }).click();
-  await carteJoueur(page, nom).getByRole('button', { name: 'Mes étoiles' }).click();
-  await page.getByRole('heading', { name: 'Mes étoiles' }).waitFor();
+  await carteJoueur(page, nom).getByRole('button', { name: 'Mes coffres' }).click();
+  await page.getByRole('heading', { name: 'Mes coffres' }).waitFor();
 }
 // Depuis l'accueil : « Mon compte » puis le bouton des coffres à ouvrir de la carte du joueur.
 async function coffresJoueur(page, nom) {

@@ -2,6 +2,10 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.36', date: '2026-11-24', changes: [
+    "Mon compte : dans la carte du joueur, le bouton « Mes étoiles » est remplacé par un bouton coffre (sans texte). Il ouvre la page « Mes coffres » : coffres des prochains niveaux, coffre du jour, défis et méga coffre sur une seule page (l’écran « Ma progression » n’existe plus).",
+    "Un petit « ? » à côté du nombre d’étoiles du joueur ouvre la fenêtre « Comment gagner des étoiles ? »."
+  ] },
   { v: '10.35', date: '2026-11-23', changes: [
     "Histoire et Géographie : chaque question a maintenant un niveau de difficulté « progression » de 1 à 100 (100 niveaux par période d’Histoire et par famille de Géographie). Rien ne change à l’écran pour l’instant."
   ] },

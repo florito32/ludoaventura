@@ -411,22 +411,15 @@
     <div class="page-corps" id="baby-corps"></div>
   </section>
 
-  <!-- ÉCRANS des étoiles (v6.36, js/recompenses.js) : Mes étoiles, Progression du jour, Défi du jour. -->
-  <section class="ecran page" id="ecran-etoiles" aria-labelledby="titre-etoiles" hidden>
+  <!-- ÉCRANS des coffres (v6.36, js/recompenses.js) : Mes coffres (v10.36 : coffres des prochains niveaux, coffre du jour,
+       défis et méga coffre sur une seule page, ouverte par le bouton coffre de la carte du joueur), Défi du jour. -->
+  <section class="ecran page" id="ecran-coffres" aria-labelledby="titre-coffres" hidden>
     <header class="barre">
       <button type="button" class="btn-retour" data-retour-compte><span aria-hidden="true">←</span> Mon compte</button>
-      <h2 id="titre-etoiles">Mes étoiles</h2>
+      <h2 id="titre-coffres">Mes coffres</h2>
       <span class="barre-vide" aria-hidden="true"></span>
     </header>
-    <div class="page-corps" id="etoiles-corps"></div>
-  </section>
-  <section class="ecran page" id="ecran-progression" aria-labelledby="titre-progression" hidden>
-    <header class="barre">
-      <button type="button" class="btn-retour" data-retour-compte><span aria-hidden="true">←</span> Mon compte</button>
-      <h2 id="titre-progression">Ma progression</h2>
-      <span class="barre-vide" aria-hidden="true"></span>
-    </header>
-    <div class="page-corps" id="progression-corps"></div>
+    <div class="page-corps" id="coffres-corps"></div>
   </section>
   <section class="ecran page" id="ecran-defi" aria-labelledby="titre-defi" hidden>
     <header class="barre">
@@ -942,7 +935,7 @@
   </div>
 </dialog>
 
-<!-- « Comment gagner des étoiles ? » (v6.42) : ouvert depuis l'écran « Mes étoiles ». -->
+<!-- « Comment gagner des étoiles ? » (v6.42) : ouvert par le « ? » à côté du nombre d'étoiles (carte du joueur, v10.36) et depuis « Mes coffres ». -->
 <dialog class="fin comment-gagner" id="comment-gagner" aria-labelledby="comment-gagner-titre">
   <h2 id="comment-gagner-titre">Comment gagner des étoiles ?</h2>
   <ul class="regles-etoiles">

@@ -2683,7 +2683,7 @@
   // sessionStorage : « survit aux rechargements et restaurations de la page ; fermer l'onglet efface les données »
   // (MDN, Window.sessionStorage). Les objets (aventure, aventuriers, questions) sont enregistrés par leur identifiant.
   var CLE = 'ludoaventura-partie';
-  var PAGES_ACCUEIL = ['ecran-etoiles', 'ecran-progression', 'ecran-defi', 'ecran-rapide', 'ecran-baby']; // écrans ouverts depuis l'accueil (v6.36)
+  var PAGES_ACCUEIL = ['ecran-coffres', 'ecran-defi', 'ecran-rapide', 'ecran-baby']; // écrans ouverts depuis l'accueil (v6.36)
   var pretASauver = false; // pas de sauvegarde pendant la construction initiale de la page
 
   function carteVersDonnees(c) {
