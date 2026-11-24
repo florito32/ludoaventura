@@ -151,22 +151,36 @@ test('« Suivre ma progression » : un joueur à 26 en calcul reçoit des calcul
   expect(new Set(niveaux).size).toBeGreaterThan(1); // la fenêtre est bien utilisée, pas un seul niveau
 });
 
-test('« Suivre ma progression » en Français : orthographe, conjugaison, grammaire et phonèmes, chacun à son niveau', async ({ page }) => {
+test('« Suivre ma progression » en Français : chaque sous-matière tire dans une fenêtre de 5 niveaux autour de son niveau (v10.41)', async ({ page }) => {
   await ouvrir(page, { v: 1, total: 0, joueurs: [{ id: 'j-1', nom: 'Léa', perso: 'lea', cree: '2026-11-01T00:00:00Z', maj: '2026-11-01T00:00:00Z',
-    niv: { 'francais.orthographe': 5, 'francais.conjugaison': 95, 'francais.grammaire': 35, 'francais.phonemes': 0 } }] });
+    niv: { 'francais.orthographe': 5, 'francais.conjugaison': 26, 'francais.grammaire': 35, 'francais.phonemes': 0 } }] });
   await etape1(page, 1);
   await suivreMaProgression(page, 0, 'francais');
   await aventure(page).click();
   await page.getByRole('button', { name: 'Lancer la partie' }).click();
   await page.getByRole('heading', { name: 'Le plateau' }).waitFor();
   const r = await page.evaluate(() => {
-    const j = window.Aventura.partie.joueurs[0], vus = {};
-    for (let i = 0; i < 120; i++) { const c = window.Aventura.piocherCarte(j); const k = (c.packNom || '').split(' · ')[0] + ' · ' + (c.type || ''); vus[k] = c.packNom; }
-    return { sous: j.sous, conj: Object.values(vus).filter((n) => n.startsWith('Conjugaison')), gram: Object.values(vus).filter((n) => n.startsWith('Grammaire')) };
+    const j = window.Aventura.partie.joueurs[0], noms = {};
+    const ratees = [];
+    for (let i = 0; i < 300; i++) {
+      const c = window.Aventura.piocherCarte(j), m = /^(\S+) · niveau (\d+)/.exec(c.packNom || '');
+      if (m) (noms[m[1]] = noms[m[1]] || []).push(Number(m[2])); else ratees.push(c.packNom);
+      // La carte est jouable : orthographe = une réponse attendue ; conjugaison = une bonne forme ; grammaire et phonèmes = une consigne.
+      try {
+        if (c.question) { const a = c.question.attendu(c.mot, window.Cartes.INFOS[c.mot], c.params); if (a === undefined || a === '') ratees.push('attendu vide ' + c.mot); }
+        else if (c.type === 'conjugaison') { if (!c.bonne) ratees.push('conjugaison sans réponse'); }
+        else if (!c.consigne) ratees.push('sans consigne ' + c.packNom);
+      } catch (e) { ratees.push('erreur ' + e.message); }
+    }
+    return { sous: j.sous, noms, ratees };
   });
+  expect(r.ratees).toEqual([]); // toutes les cartes viennent de la progression et se jouent
   expect(Object.keys(r.sous).sort()).toEqual(['francais.conjugaison', 'francais.grammaire', 'francais.orthographe', 'francais.phonemes']);
-  for (const n of r.conj) expect(n).toContain('Expert'); // 95 → niveau 10 → Expert
-  for (const n of r.gram) expect(n).toContain('Moyen'); // 35 → niveau 4 → Moyen
+  const bornes = { Orthographe: [3, 7], Conjugaison: [24, 28], Grammaire: [33, 37], Phonèmes: [1, 5] };
+  for (const [nom, [bas, haut]] of Object.entries(bornes)) {
+    expect(r.noms[nom], nom).toBeDefined();
+    for (const n of r.noms[nom]) { expect(n, nom).toBeGreaterThanOrEqual(bas); expect(n, nom).toBeLessThanOrEqual(haut); }
+  }
 });
 
 test('fin de partie : le point de niveau va à la sous-matière la plus jouée par un joueur qui suit sa progression', async ({ page }) => {
@@ -233,3 +247,26 @@ test('étape 1 : rien ne déborde avec 4 joueurs (téléphone, carré, tablette,
     expect(t.height).toBeGreaterThanOrEqual(24); // cible tactile (WCAG 2.5.8)
   }
 });
+
+// v10.41 : chaque sous-matière du Français fabrique une carte qui s'affiche sur le plateau, sans erreur ni débordement.
+for (const [k, nom] of [[0, 'Orthographe'], [1, 'Conjugaison'], [2, 'Grammaire'], [3, 'Phonèmes']]) {
+  test('« Suivre ma progression » en Français : une carte de ' + nom + ' au niveau du profil s\'affiche sur le plateau', async ({ page }) => {
+    const erreurs = [];
+    page.on('pageerror', (e) => erreurs.push(e.message));
+    await ouvrir(page, { v: 1, total: 0, joueurs: [{ id: 'j-1', nom: 'Léa', perso: 'lea', cree: '2026-11-01T00:00:00Z', maj: '2026-11-01T00:00:00Z',
+      niv: { 'francais.orthographe': 40, 'francais.conjugaison': 40, 'francais.grammaire': 40, 'francais.phonemes': 40 } }] });
+    await etape1(page, 1);
+    await suivreMaProgression(page, 0, 'francais');
+    await aventure(page).click();
+    await page.getByRole('button', { name: 'Lancer la partie' }).click();
+    await page.getByRole('heading', { name: 'Le plateau' }).waitFor();
+    // La première décision aléatoire de la carte est le choix de la sous-matière : on la fixe pour ce test, puis on rend le hasard.
+    await page.evaluate((idx) => { const o = Math.random; Math.random = () => { Math.random = o; return (idx + 0.1) / 4; }; }, k);
+    await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
+    await expect(page.locator('#carte-piochee')).toBeVisible();
+    const c = await page.evaluate(() => window.Aventura.partie.carte.packNom);
+    expect(c).toMatch(new RegExp('^' + nom + ' · niveau (3[89]|4[0-2])'));
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
+    expect(erreurs).toEqual([]);
+  });
+}

@@ -1252,9 +1252,9 @@
       return { matiere: 'maths', calcul: calcul, probleme: s === 'probleme', sous: sous };
     }
     if (m === 'francais') {
-      if (s === 'conjugaison') return { matiere: 'conjugaison', conj: window.Defis.reglages('conjugaison', niv, Math.random).conj, sous: sous };
-      if (s === 'grammaire') return { matiere: 'grammaire', gram: window.Rapide.gramTout(niv), sous: sous };
-      if (s === 'phonemes') return { matiere: 'phonemes', phon: window.Rapide.phonTout(), sous: sous };
+      // v10.41 : une carte dont le niveau de progression (1 à 100) est dans la fenêtre de 5 niveaux du profil (js/progression-francais.js).
+      var ff = window.ProgressionFenetre.fenetre(niveauProfil(i, m, s)), tir = window.ProgressionFrancais.tirer(s, ff.bas, ff.haut, Math.random);
+      if (tir) return { matiere: s === 'phonemes' ? 'phonemes' : s, progression: tir, sous: sous };
       return { matiere: 'orthographe', sous: sous };
     }
     var jeux = jeuxProposes(m, 'quiz').filter(function (x) { return x.famille === s; }).map(function (x) { return x.id; });
@@ -1266,6 +1266,46 @@
     var meilleure = null, n = 0;
     Object.keys(j.sous || {}).forEach(function (k) { if (j.sous[k] > n) { n = j.sous[k]; meilleure = k; } });
     return meilleure ? { m: meilleure.split('.')[0], s: meilleure.split('.')[1] } : null;
+  }
+
+  // Carte de Français tirée à partir d'une clé de la progression (v10.41) : { cle, niveau }.
+  //  orthographe : « mot|type de question » ; conjugaison : « verbe|temps|personne » ; grammaire : « jeu|niveau du jeu|rang » ;
+  //  phonèmes : « jeu|son|mot ». Renvoie null si la clé ne donne rien (le tirage habituel prend alors le relais).
+  function carteFrancaisProgression(j, sousId, tir) {
+    var k = tir.cle.split('|'), nom = ' · niveau ' + tir.niveau;
+    if (sousId === 'orthographe') {
+      var q = Q.trouver(k[1]), info = C.INFOS[k[0]], pack = null, serie = 0;
+      C.PACKS.forEach(function (p) { // tous les thèmes, y compris « mots simples » et « mots compliqués » (hors des familles affichées)
+        Object.keys(p.niveaux).forEach(function (n) { if (!pack && p.niveaux[n].indexOf(k[0]) >= 0) { pack = p; serie = Number(n); } });
+      });
+      if (!q || !info || !pack) return null;
+      return { pack: pack.id, packNom: 'Orthographe' + nom, niveau: serie, mot: k[0], lettre: false, question: q, params: q.preparer ? q.preparer(k[0], info) : null };
+    }
+    if (sousId === 'conjugaison') {
+      var cj = V.carte(k[0], k[1], Number(k[2]));
+      cj.type = 'conjugaison';
+      cj.packNom = 'Conjugaison' + nom;
+      return cj;
+    }
+    if (sousId === 'grammaire') {
+      var g = G.generer(k[0], k[1], Math.random, [], Number(k[2]));
+      g.type = 'grammaire';
+      g.packNom = 'Grammaire' + nom + ' · ' + G.jeu(k[0]).nom;
+      return g;
+    }
+    if (sousId === 'phonemes') {
+      // Le mot de la clé : on cherche une carte de ce jeu et de ce son (avec ce mot quand la carte en a un seul).
+      var c = null;
+      for (var essai = 0; essai < 30; essai++) {
+        c = PH.generer(k[0], [k[1]], Math.random, []);
+        if (!c || !c.mot || c.mot === k[2]) break;
+      }
+      if (!c) return null;
+      c.type = 'grammaire';
+      c.packNom = 'Phonèmes' + nom + ' · ' + PH.jeu(c.jeu).nom;
+      return c;
+    }
+    return null;
   }
 
   // Carte de calcul (ou de problème) déjà tirée au bon niveau de progression (v10.39) : même forme qu'un calcul tiré par K.generer.
@@ -1313,6 +1353,7 @@
       j.sous[cs.sous.m + '.' + cs.sous.s] = (j.sous[cs.sous.m + '.' + cs.sous.s] || 0) + 1;
       if (cs.carte) return cs.carte;
       if (cs.calcul) return carteCalculProgression(cs.calcul, cs.probleme);
+      if (cs.progression) { var cp = carteFrancaisProgression(j, cs.sous.s, cs.progression); if (cp) return cp; }
       mat = cs.matiere; if (cs.maths) mr = cs.maths; if (cs.conj) cr = cs.conj; if (cs.gram) gr = cs.gram;
       if (cs.phon) return cartePhonemes(j, cs.phon);
     }

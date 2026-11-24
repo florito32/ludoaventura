@@ -48,4 +48,33 @@ test.describe('progression du Français (1 à 100)', () => {
     expect(P.grammaire.element('contraires', 'facile', 0)).toBeLessThan(P.grammaire.element('contraires', 'expert', 0));
     expect(P.grammaire.element('erreur', 'facile', 0)).toBeLessThan(P.grammaire.element('erreur', 'expert', 0));
   });
+
+  // v10.41 (règle 1 du 24/11/2026) : « Suivre ma progression » tire dans une fenêtre de 5 niveaux.
+  test('fenêtre : chaque tirage est dans les 5 niveaux demandés, pour les 4 sous-matières', () => {
+    let g = 11; const h = () => { g = (g * 1664525 + 1013904223) % 4294967296; return g / 4294967296; };
+    for (const sous of ['orthographe', 'conjugaison', 'grammaire', 'phonemes']) {
+      for (const bas of [1, 24, 50, 96]) {
+        for (let i = 0; i < 30; i++) {
+          const t = P.tirer(sous, bas, bas + 4, h);
+          expect(t.niveau, sous + ' ' + bas).toBeGreaterThanOrEqual(bas);
+          expect(t.niveau, sous + ' ' + bas).toBeLessThanOrEqual(bas + 4);
+        }
+      }
+    }
+  });
+
+  test('conjugaison : toutes les cartes de la table se conjuguent (pas de personne sans forme)', () => {
+    for (const cle of Object.keys(P.conjugaison.table())) {
+      const [inf, temps, p] = cle.split('|');
+      expect(Conj.carte(inf, temps, Number(p)).bonne, cle).toBeTruthy();
+    }
+  });
+
+  test('grammaire : une carte imposée par son rang est bien celle de la clé', () => {
+    const G = require('../js/grammaire.js');
+    for (const cle of Object.keys(P.grammaire.table()).filter((x) => !x.startsWith('nature'))) {
+      const [jeu, niv, rang] = cle.split('|');
+      expect(G.generer(jeu, niv, Math.random, [], Number(rang)).cle.split('|').slice(0, 3).join('|'), cle).toBe(cle.startsWith('relier') ? jeu + '|' + niv + '|' + rang : cle);
+    }
+  });
 });
