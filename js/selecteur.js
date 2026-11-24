@@ -15,7 +15,7 @@
   var ETAPES = [
     { cle: 'matiere', titre: 'Matière', icone: '📚', lignes: ['reglage-matiere'] },
     { cle: 'type', titre: 'Exercice', icone: '✏️', lignes: ['reglage-francais', 'reglage-type-maths', 'reglage-mode-savoir'] },
-    { cle: 'niveau', titre: 'Niveau', icone: '🎚️', lignes: ['reglage-niveau-maths', 'reglage-niveau-ortho', 'reglage-niveau-conj', 'reglage-niveau-gram', 'reglage-niveau-savoir'] },
+    { cle: 'niveau', titre: 'Niveau', icone: '🎚️', lignes: ['reglage-niveau-prog', 'reglage-niveau-maths', 'reglage-niveau-ortho', 'reglage-niveau-conj', 'reglage-niveau-gram', 'reglage-niveau-savoir'] }, // v10.36 : niveau 1 à 10 d'abord
     { cle: 'signes', titre: 'Signes par calcul', icone: '🔢', lignes: ['reglage-nb-signes'] }
   ];
 

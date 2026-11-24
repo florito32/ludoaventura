@@ -141,7 +141,7 @@ test('écran des réglages : Grammaire, niveau avec exemples, jeux tous cochés 
   await versReglages(page, 1);
   await cocher(page, '#matieres', 'francais');
   await cocher(page, '#francais', 'grammaire');
-  await expect(page.locator('#reglage-niveau-gram')).not.toHaveAttribute('hidden', '');
+  await expect(page.locator('#reglage-niveau-prog')).not.toHaveAttribute('hidden', ''); // v10.36 : niveau de 1 à 10
   await expect(page.locator('#niveau-gram-aide')).toHaveCount(0); // v8.5
   await cocher(page, '#niveau-gram', 'expert');
   await expect(page.locator('#niveau-gram input[value="expert"]')).toBeChecked();
@@ -154,6 +154,7 @@ test('écran des réglages : Grammaire, niveau avec exemples, jeux tous cochés 
   await expect(page.locator('#packs-alerte')).toContainText('choisir au moins un jeu');
   await page.locator('#jeux-gram input[value="contraires"]').check();
   await valider(page);
+  await page.getByRole('button', { name: 'Choisir l\'aventure' }).click(); // v10.36 : l'aventure se choisit après l'étape 1
   await expect(page.getByRole('button', { name: 'Lancer la partie' })).toBeVisible();
   await sansDebordement(page);
 });

@@ -18,20 +18,37 @@ async function valider(page) {
 
 // v10.13 : à l'écran « matière », les choix sont dans des bandeaux déroulants (un seul ouvert à la fois, js/selecteur.js).
 // ouvrirChoix ouvre celui du conteneur voulu (ex. '#niveau-maths') s'il n'est pas déjà ouvert ; cocher / choisir agissent ensuite.
-const ONGLET_DE = { matieres: 'matiere', francais: 'type', 'type-maths': 'type', 'mode-savoir': 'type', 'niveau-maths': 'niveau',
-  'niveau-ortho': 'niveau', 'niveau-conj': 'niveau', 'niveau-gram': 'niveau', 'niveau-savoir': 'niveau', 'nb-signes': 'signes' };
+const ONGLET_DE = { matieres: 'matiere', francais: 'type', 'type-maths': 'type', 'mode-savoir': 'type', 'niveau-prog': 'niveau', 'nb-signes': 'signes' };
+// v10.36 (demande du 24/11/2026) : Facile / Moyen / Difficile / Expert sont remplacés par un niveau de 1 à 10 (#niveau-prog). Les tests qui
+// parlent encore de « facile »… passent par cette table : facile = niveau 1, moyen = 4, difficile = 6, expert = 9 (js/plateau.js → NIVEAU_DE_PROG).
+const NIVEAU_ANCIEN = { '#niveau-maths': 1, '#niveau-ortho': 1, '#niveau-conj': 1, '#niveau-gram': 1, '#niveau-savoir': 1 };
+const PROG_DE = { facile: 1, moyen: 4, difficile: 6, expert: 9, Facile: 1, Moyen: 4, Difficile: 6, Expert: 9 };
 async function ouvrirChoix(page, conteneur) {
   if (await page.locator(conteneur).isVisible()) return;
   await page.locator('.onglet[data-etape="' + ONGLET_DE[conteneur.slice(1)] + '"]').click();
   await page.locator(conteneur).waitFor();
 }
 async function cocher(page, conteneur, valeur, etat = true) {
+  if (conteneur in NIVEAU_ANCIEN) { conteneur = '#niveau-prog'; valeur = PROG_DE[valeur] || valeur; }
   await ouvrirChoix(page, conteneur);
   await page.locator(conteneur + ' input[value="' + valeur + '"]').setChecked(etat);
 }
 async function choisir(page, conteneur, texte) {
+  if (conteneur in NIVEAU_ANCIEN) { await cocher(page, conteneur, texte); return; }
   await ouvrirChoix(page, conteneur);
   await page.locator(conteneur + ' label', { hasText: texte }).click();
+}
+// Étape 1 (v10.36) : les 2 boutons à côté du joueur k (0 = le premier). « Personnaliser » ouvre l'étape 2 de ce joueur ;
+// « Suivre ma progression » n'a que la matière à choisir.
+async function personnaliser(page, k = 0) {
+  await page.locator('.cj-parcours-btn[data-parcours="perso"][data-place="' + k + '"]').click();
+  await page.locator('#reglages-titre').waitFor();
+}
+async function suivreMaProgression(page, k = 0, matiere = 'maths') {
+  await page.locator('.cj-parcours-btn[data-parcours="suivre"][data-place="' + k + '"]').click();
+  await page.locator('#suivre-matieres').waitFor();
+  await page.locator('#suivre-matieres input[value="' + matiere + '"]').check();
+  await page.getByRole('button', { name: 'Valider', exact: true }).click();
 }
 
 // Écran 3 (v5.7, deux écrans depuis v5.8) : choisit la matière, valide, et arrive sur ses réglages.
@@ -95,7 +112,12 @@ async function maths(page, { signes = ['plus'], nombres = [2, 3], dizaines = [],
 // Écran 3 : packs et questions sont décochés au départ (v3.9) : coche tout pour chaque joueur et valide
 // (on arrive sur l'écran 4, le choix de l'aventure).
 async function cocherTout(page, joueurs) {
-  for (let k = 0; k < joueurs; k++) { await cocherJoueur(page); await valider(page); }
+  // v10.36 : chaque joueur choisit « Personnaliser » à l'étape 1, règle ses cartes, « Valider » le ramène à l'étape 1 ; puis « Choisir l'aventure ».
+  for (let k = 0; k < joueurs; k++) {
+    if (k > 0) await personnaliser(page, k);
+    await cocherJoueur(page); await valider(page);
+  }
+  await page.getByRole('button', { name: 'Choisir l\'aventure' }).click();
   await page.getByRole('button', { name: 'Lancer la partie' }).waitFor();
 }
 
@@ -147,14 +169,16 @@ async function versReglages(page, joueurs) {
     await page.locator('[data-ajouter]').click();
     await page.locator('.cj-profil[data-choisir]:not([disabled])').first().click();
   }
-  await valider(page);
-  await page.locator('#reglages-titre').waitFor();
+  await personnaliser(page, 0); // v10.36 : le premier joueur choisit « Personnaliser » (étape 1)
 }
 
-// Termine la préparation (valide les écrans restants) et lance la partie.
+// Termine la préparation (valide les écrans restants, puis « Choisir l'aventure ») et lance la partie.
 async function lancer(page) {
   const go = page.getByRole('button', { name: 'Lancer la partie' });
-  while (!(await go.isVisible())) await valider(page);
+  const aventure = page.getByRole('button', { name: 'Choisir l\'aventure' });
+  for (let i = 0; i < 12 && !(await go.isVisible()); i++) {
+    if (await aventure.isVisible()) await aventure.click(); else await valider(page);
+  }
   await go.click();
 }
 
@@ -237,4 +261,4 @@ async function coffresJoueur(page, nom) {
   await page.locator('#onglet-profil').click();
   await carteJoueur(page, nom).locator('[data-act="coffres"]').click();
 }
-module.exports = { lancerDefiJour, carteJoueur, mesEtoiles, coffresJoueur, quiJoue, lancerRapideQui, creerJoueurs, ouvrirChoix, cocher, choisir, grammaire, repondre, valider, cocherJoueur, orthographe, maths, conjugaison, matiere, versReglages, lancer, lancerLeDe, lancerPartie, rapide, attendreJoueur, cocherTout, ouvrirNeuf };
+module.exports = { lancerDefiJour, personnaliser, suivreMaProgression, carteJoueur, mesEtoiles, coffresJoueur, quiJoue, lancerRapideQui, creerJoueurs, ouvrirChoix, cocher, choisir, grammaire, repondre, valider, cocherJoueur, orthographe, maths, conjugaison, matiere, versReglages, lancer, lancerLeDe, lancerPartie, rapide, attendreJoueur, cocherTout, ouvrirNeuf };

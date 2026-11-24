@@ -1,7 +1,7 @@
 // La partie continue après un rafraîchissement, un changement de page ou une mise en veille ;
 // elle ne repart de l'accueil que si l'onglet est fermé (stockage de session, demande du 02/11/2026).
 const { test, expect } = require('@playwright/test');
-const { repondre, lancerPartie, attendreJoueur, rapide, lancerLeDe, versReglages, cocherJoueur, valider, orthographe } = require('./aide');
+const { repondre, lancerPartie, attendreJoueur, rapide, lancerLeDe, versReglages, cocherJoueur, valider, orthographe, personnaliser } = require('./aide');
 
 async function unTour(page) {
   await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
@@ -86,19 +86,21 @@ test('rafraîchir la préparation garde l\'écran et les choix (joueurs, joueur 
   await page.getByRole('checkbox', { name: 'Jours et mois', exact: true }).check();
   await valider(page); // écran des questions (v6.16)
   await page.getByRole('checkbox', { name: 'Nombre de syllabes', exact: true }).check();
-  await valider(page); // joueur 2
+  await valider(page); // Léa est prête : retour à l'étape 1 (v10.36)
+  await personnaliser(page, 1); // joueur 2
   await page.reload();
   await expect(page.getByRole('heading', { name: /Préparer/ })).toBeVisible();
   await expect(page.locator('#prepa-progres')).toHaveText('Étape 2 sur 3 · Joueur 2 sur 3');
-  await page.getByRole('button', { name: /Retour/ }).click();
-  await expect(page.getByRole('checkbox', { name: 'Nombre de syllabes', exact: true })).toBeChecked();
-  await page.getByRole('button', { name: /Retour/ }).click();
+  await page.getByRole('button', { name: /Retour/ }).click(); // étape 1
+  await personnaliser(page, 0);
+  await valider(page); // matière gardée → les packs de Léa
   await expect(page.getByRole('checkbox', { name: 'Jours et mois', exact: true })).toBeChecked();
   await expect(page.getByRole('checkbox', { name: 'Nombres', exact: true })).not.toBeChecked();
-  // On est revenu sur les packs du joueur 1 : il valide deux fois (packs, questions), puis les joueurs 2 et 3.
   await valider(page);
-  await valider(page);
-  for (let k = 1; k < 3; k++) { await cocherJoueur(page); await valider(page); }
+  await expect(page.getByRole('checkbox', { name: 'Nombre de syllabes', exact: true })).toBeChecked();
+  await valider(page); // retour à l'étape 1 ; puis les joueurs 2 et 3
+  for (let k = 1; k < 3; k++) { await personnaliser(page, k); await cocherJoueur(page); await valider(page); }
+  await page.getByRole('button', { name: 'Choisir l\'aventure' }).click();
   await page.getByRole('radio', { name: /^Savane/ }).check();
   await page.reload();
   await expect(page.getByRole('radio', { name: /^Savane/ })).toBeChecked();

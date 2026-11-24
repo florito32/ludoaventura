@@ -151,6 +151,7 @@ test('conjugaison en 2 écrans : matière et niveau → modes, groupes et temps 
   await page.locator('#groupes label', { hasText: '2e' }).click();
   await tient(page);
   await valider(page);
+  await page.getByRole('button', { name: 'Choisir l\'aventure' }).click(); // v10.36 : l'aventure se choisit après l'étape 1
   await expect(page.getByRole('button', { name: 'Lancer la partie' })).toBeVisible();
   expect(await page.evaluate(() => window.Aventura.partie.conj[0])).toMatchObject({ groupes: [2], niveau: 'expert', temps: ['indicatif.futur'] });
 });
@@ -169,6 +170,7 @@ test('chaque mode choisi doit avoir au moins un temps', async ({ page }) => {
   await expect(page.getByRole('checkbox', { name: 'Conditionnel présent' })).toBeFocused();
   await page.getByRole('checkbox', { name: 'Conditionnel passé' }).check();
   await valider(page);
+  await page.getByRole('button', { name: 'Choisir l\'aventure' }).click(); // v10.36 : l'aventure se choisit après l'étape 1
   await expect(page.getByRole('button', { name: 'Lancer la partie' })).toBeVisible();
 });
 

@@ -1,7 +1,7 @@
 // Menu de la partie (v6.22, demande du 04/11/2026) : une icône près du plateau ouvre, au milieu de l'écran,
 // « Redémarrer partie », « Modifier les choix » et « Retour à l'accueil ».
 const { test, expect } = require('@playwright/test');
-const { repondre, lancerPartie, lancerLeDe, attendreJoueur, valider, cocherJoueur, creerJoueurs } = require('./aide');
+const { repondre, lancerPartie, lancerLeDe, attendreJoueur, valider, cocherJoueur, creerJoueurs, personnaliser } = require('./aide');
 
 async function jouerUnTour(page) {
   await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
@@ -65,7 +65,9 @@ test('« Modifier les choix » : on change l\'aventure, puis la partie reprend l
   await expect(page.locator('#prepa-retour-texte')).toHaveText('Partie');
   // On avance jusqu'au choix de l'aventure : le dernier bouton reprend la partie.
   const go = page.getByRole('button', { name: 'Reprendre la partie' });
-  while (!(await go.isVisible())) await valider(page);
+  // v10.36 : les joueurs de la partie en cours sont déjà prêts → « Choisir l'aventure » est là tout de suite.
+  await page.getByRole('button', { name: 'Choisir l\'aventure' }).click();
+  await expect(go).toBeVisible();
   await page.getByRole('radio', { name: /^Savane/ }).check();
   await go.click();
   await expect(page.getByRole('heading', { name: 'Le plateau' })).toBeVisible();
@@ -91,11 +93,12 @@ test('« Modifier les choix » : un joueur ajouté joue la manche en cours à so
   await creerJoueurs(page, 3);
   await page.locator('[data-ajouter]').click();
   await page.locator('.cj-profil[data-choisir]:not([disabled])').first().click();
-  await valider(page);
-  // Réglages des joueurs 1 et 2, déjà faits, puis celui du nouveau joueur.
-  const progres = page.locator('#prepa-progres');
-  while ((await progres.textContent()) !== 'Étape 2 sur 3 · Joueur 3 sur 3') await valider(page);
-  await cocherJoueur(page); await valider(page); // le nouveau joueur choisit ses cartes
+  // v10.36 : les joueurs 1 et 2 sont déjà prêts ; le nouveau joueur touche « Personnaliser » et choisit ses cartes.
+  await expect(page.getByRole('button', { name: 'Choisir l\'aventure' })).toBeHidden();
+  await personnaliser(page, 2);
+  await expect(page.locator('#prepa-progres')).toHaveText('Étape 2 sur 3 · Joueur 3 sur 3');
+  await cocherJoueur(page); await valider(page);
+  await page.getByRole('button', { name: 'Choisir l\'aventure' }).click();
   await page.getByRole('button', { name: 'Reprendre la partie' }).click();
   await expect(page.locator('.pion')).toHaveCount(3);
   await expect(page.locator('#points')).toHaveText(pts);

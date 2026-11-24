@@ -113,6 +113,11 @@
     nbJoueurs: 1, aventure: A.LISTE[0], joueurs: [], choix: ['lea', 'tom', 'nour', 'malo'], actif: 0, regles: null,
     // profils[i] = joueur du compte (js/joueurs.js) qui joue à la place i ; choix[i] = son personnage (v10.29, 23/11/2026).
     profils: [],
+    // v10.36 (demande du 24/11/2026) : préparation de chaque joueur depuis l'étape 1, par l'un des deux boutons.
+    //  parcours[i] = 'suivre' (« Suivre ma progression » : seulement la matière) ou 'perso' (« Personnaliser » : l'étape 2 actuelle,
+    //  avec un niveau de 1 à 10) ; pret[i] = vrai quand le joueur a fini ; suivi[i] = matière suivie ('maths', 'francais',
+    //  'geographie' ou 'histoire') ; niveauProg[i] = niveau 1 à 10 de « Personnaliser » (dizaine de la progression 1-100).
+    parcours: [null, null, null, null], pret: [false, false, false, false], suivi: [null, null, null, null], niveauProg: [null, null, null, null],
     etapePrepa: 1, // écran de la préparation affiché (1 à 3), voir montrerEtape
     // Étape 3 en deux écrans par joueur (v5.8, choix de l'utilisateur) : 'matiere' puis 'reglages'.
     // Conjugaison (v6.0) : 'matiere' (avec le niveau) → 'modes' (modes, groupes et temps, un seul écran depuis la v6.49).
@@ -197,14 +202,57 @@
   }
   // Appelé à chaque changement de la liste : profils, personnages (choix) et bouton « Valider ».
   function surChoixJoueurs(slots) {
+    var avant = partie.profils.slice();
     partie.profils = slots.slice();
     for (var i = 0; i < slots.length; i++) {
       var j = slots[i] && profil(slots[i]);
       if (j && P.trouver(j.perso)) partie.choix[i] = j.perso;
+      // Une place qui change de joueur (changé, retiré, ajouté) repart de zéro : c'est à ce joueur de se préparer (v10.36).
+      if (avant[i] !== slots[i]) reinitialiserPlace(i);
     }
-    var bouton = $('btn-valider-joueurs');
-    if (bouton) bouton.disabled = !(slots.length && slots.every(Boolean));
+    majBasEtape1();
     sauver();
+  }
+  // Remet à zéro la préparation de la place i (matière, réglages, parcours choisi).
+  function reinitialiserPlace(i) {
+    partie.parcours[i] = null; partie.pret[i] = false; partie.suivi[i] = null; partie.niveauProg[i] = null;
+    partie.matiere[i] = null; partie.francais[i] = false;
+    partie.maths[i] = mathsVides(); partie.conj[i] = conjVide(); partie.gram[i] = gramVide(); partie.phon[i] = phonVide();
+    partie.savoirs[i] = savoirVide(); partie.orthoNiveau[i] = 'facile';
+    partie.packs[i] = []; partie.types[i] = [];
+  }
+  // Étape 1 : le bouton « Choisir l'aventure » n'apparaît que lorsque tous les joueurs ont fini de se préparer (v10.36).
+  function tousPrets() {
+    var n = partie.profils.length;
+    return n > 0 && partie.profils.every(Boolean) && partie.profils.every(function (id, i) { return partie.pret[i]; });
+  }
+  function majBasEtape1() {
+    var bouton = $('btn-valider-joueurs'), aide = $('prepa-aide'), ok = tousPrets();
+    if (bouton) bouton.hidden = !ok;
+    if (aide) {
+      var attend = partie.profils.map(function (id, i) { return id && !partie.pret[i] ? nomDe(i) : null; }).filter(Boolean);
+      aide.hidden = ok;
+      aide.textContent = !partie.profils.every(Boolean) ? 'Choisis un joueur pour chaque place.'
+        : attend.length === 1 ? attend[0] + ' doit choisir « Suivre ma progression » ou « Personnaliser ».'
+        : 'Chaque joueur choisit « Suivre ma progression » ou « Personnaliser » (encore à faire : ' + attend.join(', ') + ').';
+    }
+  }
+  // Ce que la ligne d'un joueur affiche à l'étape 1 : son parcours et ce qui est prêt.
+  var NOMS_MATIERES_COURTS = { maths: 'Maths', francais: 'Français', geographie: 'Géographie', histoire: 'Histoire', orthographe: 'Orthographe', conjugaison: 'Conjugaison', grammaire: 'Grammaire', phonemes: 'Phonèmes' };
+  function etatParcours(i) {
+    var p = partie.parcours[i], pret = !!(p && partie.pret[i]), resume = '';
+    if (pret && p === 'suivre') resume = (NOMS_MATIERES_COURTS[partie.suivi[i]] || '') + ' · suit sa progression';
+    if (pret && p === 'perso') resume = (NOMS_MATIERES_COURTS[partie.matiere[i]] || '') + ' · niveau ' + (partie.niveauProg[i] || '?') + ' (personnalisé)';
+    return { parcours: p, pret: pret, resume: resume };
+  }
+  // Un des deux boutons de l'étape 1 : on passe à l'étape 2 pour ce joueur (matière seule, ou étape complète).
+  function choisirParcours(i, type) {
+    partie.actif = i;
+    partie.parcours[i] = type;
+    partie.pret[i] = false;
+    partie.sousEtape = 'matiere';
+    if (type === 'perso') niveauParDefaut(i);
+    montrerEtape(2);
   }
   // Remplit la liste : les places sauvegardées si elles existent encore, sinon « Joueur 1 » du compte.
   function construireJoueurs() {
@@ -213,13 +261,64 @@
     if (!slots.length) slots = l.length ? [l[0].id] : [null];
     choixJ = window.ChoixJoueurs.creer($('choix-joueurs'), {
       idBase: 'prepa', slots: slots, surChangement: surChoixJoueurs,
-      surCreer: function () { afficher('ecran-compte'); }
+      surCreer: function () { afficher('ecran-compte'); },
+      parcours: { etat: etatParcours, choisir: choisirParcours }
     });
     surChoixJoueurs(choixJ.places());
     construireReglages();
   }
   // « Modifier les choix » ou retour à l'écran : la liste reprend les places de la partie.
   function majChoixJoueurs() { if (choixJ) { choixJ.definir(partie.profils.length ? partie.profils : [null]); surChoixJoueurs(choixJ.places()); } }
+
+  // ---------- Niveau 1 à 10 de « Personnaliser » et matière de « Suivre ma progression » (v10.36, demande du 24/11/2026) ----------
+  // Chaque sous-matière d'un joueur est notée de 0 à 100 (js/joueurs.js) ; le niveau 1 à 10 en est la dizaine :
+  // niveau 2 = progression 11 à 20. Les questions sont encore tirées avec les 4 niveaux Facile…Expert des générateurs :
+  // chaque niveau 1 à 10 est traduit en l'un d'eux (provisoire : le tirage direct par niveau de progression suit, backlog ligne 485).
+  var NIVEAU_DE_PROG = ['facile', 'facile', 'facile', 'moyen', 'moyen', 'difficile', 'difficile', 'difficile', 'expert', 'expert'];
+  function niveauId(n) { return NIVEAU_DE_PROG[Math.max(1, Math.min(10, Number(n) || 1)) - 1]; }
+  var MATIERES_SUIVIES = [{ id: 'maths', nom: 'Maths' }, { id: 'francais', nom: 'Français' }, { id: 'geographie', nom: 'Géographie' }, { id: 'histoire', nom: 'Histoire' }];
+  // Matière avec jauge (js/joueurs.js) d'une matière jouable de la préparation.
+  function matiereJauge(m) { return m === 'maths' || estSavoir(m) ? m : 'francais'; }
+  // Niveau 1 à 10 enregistré dans le profil du joueur de la place i pour la matière m (celle de sa jauge, ou sa sous-matière).
+  function niveauEnregistre(i, m) {
+    var j = partie.profils[i] && profil(partie.profils[i]), W = window.Joueurs;
+    if (!j || !m) return 1;
+    if (m === 'orthographe' || m === 'conjugaison' || m === 'grammaire' || m === 'phonemes') return W.niveauDe(W.score(j, 'francais', m));
+    return W.niveauMatiere(j, matiereJauge(m));
+  }
+  // « Personnaliser » : le niveau proposé d'abord est celui du profil (le joueur peut le changer).
+  function niveauParDefaut(i) {
+    if (partie.matiere[i] && !partie.niveauProg[i] && partie.matiere[i] !== 'phonemes') { partie.niveauProg[i] = niveauEnregistre(i, partie.matiere[i]); appliquerNiveau(i); }
+  }
+  // Pose le niveau choisi (1 à 10) dans les réglages de chaque matière du joueur i (ceux que les générateurs lisent).
+  function appliquerNiveau(i) {
+    var n = partie.niveauProg[i];
+    if (!n) return;
+    var id = niveauId(n), m = partie.maths[i], avant = m.niveau;
+    m.niveau = id;
+    // Seuls les nombres de signes permis au niveau restent ; Facile = toujours 1 signe (comme le choix du niveau de maths d'avant).
+    var max = K.niveau(id).signes;
+    m.nbSignes = (m.nbSignes || []).filter(function (x) { return x <= max; });
+    if (id === 'facile' || (avant !== id && !m.nbSignes.length)) m.nbSignes = [1];
+    partie.orthoNiveau[i] = id; partie.conj[i].niveau = id; partie.gram[i].niveau = id;
+    MATIERES_SAVOIR.forEach(function (sv) { if (partie.savoirs[i] && partie.savoirs[i][sv]) partie.savoirs[i][sv].niveau = id; });
+  }
+  // « Suivre ma progression » : la liste des 4 matières, avec le niveau déjà atteint par le joueur dans chacune.
+  function majSuivre(a, actif) {
+    ['choix-matiere', 'conj-temps', 'ortho-packs', 'phon-sons', 'reglages-maths', 'reglages-ortho', 'reglages-gram', 'reglages-phon', 'savoir-jeux'].forEach(function (id) { $(id).hidden = true; });
+    if (window.Selecteur) window.Selecteur.maj(); // le sélecteur est caché : il remet le bouton « Valider » du bas
+    var j = partie.profils[a] && profil(partie.profils[a]);
+    $('suivre-matieres').innerHTML = MATIERES_SUIVIES.map(function (m) {
+      var niv = j ? window.Joueurs.niveauMatiere(j, m.id) : 1;
+      return '<label class="pack pack-suivre"><input type="radio" name="suivre" value="' + m.id + '"' + (partie.suivi[a] === m.id ? ' checked' : '') + '>' +
+        '<span><b>' + m.nom + '</b><small>niveau ' + niv + ' sur 10</small></span></label>';
+    }).join('');
+    $('reglages-titre').innerHTML = '<img src="' + actif.image + '" alt="" width="200" height="220">' +
+      esc(nomDe(a)) + ' (Joueur ' + (a + 1) + ') : quelle matière ?';
+    $('btn-memes-reglages').hidden = true;
+    $('btn-valider-reglages').disabled = false;
+    sauver();
+  }
 
   // ---------- Réussite individuelle (v10.28, backlog ligne 446) ----------
   // À plusieurs, chaque joueur a sa part de l'objectif de l'équipe : objectif ÷ nombre de joueurs (ex. 30 à 2 = 15 chacun).
@@ -265,7 +364,7 @@
     if (partie.defi) return; // v10.36 : le défi du jour ne fait pas progresser les niveaux (étoiles ×3 seulement)
     var c = window.Recompenses.compte, pts = pointsParJoueur(r), part = partIndividuelle(r);
     partie.joueurs.forEach(function (j, i) {
-      var sm = j.profil && j.sousMat;
+      var sm = j.profil && (sousSuivie(j) || j.sousMat); // v10.36 : « Suivre ma progression » = la sous-matière la plus jouée
       if (!sm) return;
       var reussi = pts[i] >= part;
       if (reussi) window.Joueurs.ajouterPoints(c.etat, j.profil, sm.m, sm.s, 1);
@@ -363,15 +462,33 @@
   function construireReglages() {
     // Matière : Mathématiques ou Français ; Français → Orthographe.
     $('matieres').addEventListener('change', function () {
-      var j = partie.actif, v = valeursCochees($('matieres'))[0];
+      var j = partie.actif, v = valeursCochees($('matieres'))[0], avant = partie.matiere[j];
       $('packs-alerte').textContent = '';
       if (v === 'maths' || estSavoir(v)) { partie.matiere[j] = v; partie.francais[j] = false; }
       else { partie.francais[j] = true; partie.matiere[j] = valeursCochees($('francais'))[0] || null; }
+      if (partie.matiere[j] !== avant) partie.niveauProg[j] = null; // v10.36 : le niveau 1 à 10 repart de celui du profil dans cette matière
       majAventuriers();
     });
     $('francais').addEventListener('change', function () {
       $('packs-alerte').textContent = '';
+      var avant = partie.matiere[partie.actif];
       partie.matiere[partie.actif] = valeursCochees($('francais'))[0] || null;
+      if (partie.matiere[partie.actif] !== avant) partie.niveauProg[partie.actif] = null;
+      majAventuriers();
+    });
+    // v10.36 : « Suivre ma progression » : une seule matière à choisir.
+    $('suivre-matieres').addEventListener('change', function () {
+      partie.suivi[partie.actif] = valeursCochees($('suivre-matieres'))[0] || null;
+      $('packs-alerte').textContent = '';
+      majAventuriers();
+    });
+    // v10.36 : niveau 1 à 10 de « Personnaliser » (dizaine de la progression 1-100 : niveau 2 = 11 à 20).
+    for (var nv = 1; nv <= 10; nv++) {
+      choix($('niveau-prog'), 'radio', 'niveau-prog', nv, String(nv), 'Niveau ' + nv + ' : questions de la progression ' + ((nv - 1) * 10 + 1) + ' à ' + nv * 10);
+    }
+    $('niveau-prog').addEventListener('change', function () {
+      partie.niveauProg[partie.actif] = Number(valeursCochees($('niveau-prog'))[0]) || 1;
+      appliquerNiveau(partie.actif);
       majAventuriers();
     });
     // Mathématiques : signes (plusieurs), unités 1 à 10, dizaines, centaines (plusieurs), niveau (un seul).
@@ -659,8 +776,12 @@
         partie.gram[k] = JSON.parse(JSON.stringify(partie.gram[a]));
         partie.phon[k] = JSON.parse(JSON.stringify(partie.phon[a]));
         partie.savoirs[k] = JSON.parse(JSON.stringify(partie.savoirs[a]));
+        // v10.36 : les autres joueurs de la partie sont prêts, avec les mêmes choix « Personnaliser ».
+        partie.niveauProg[k] = partie.niveauProg[a];
       }
-      montrerEtape(3);
+      for (var q = 0; q < nbChoisi(); q++) { partie.parcours[q] = 'perso'; partie.pret[q] = true; }
+      partie.sousEtape = 'matiere';
+      montrerEtape(1);
     });
   }
 
@@ -674,6 +795,7 @@
 
   // Ce qui manque au joueur i pour pouvoir jouer (null si tout est coché).
   function manque(i) {
+    if (partie.parcours[i] === 'suivre') return partie.suivi[i] ? null : 'matiere'; // v10.36 : seulement la matière
     var m = partie.matiere[i];
     if (!m) return partie.francais[i] ? 'francais' : 'matiere';
     if (estSavoir(m)) return reglageSavoir(i).jeux.length ? null : 'jeu';
@@ -763,7 +885,8 @@
       return false;
     }
     alerte.textContent = nom + ' (Joueur ' + (i + 1) + ') doit ' + MANQUES[m][0];
-    $(MANQUES[m][1]).querySelector('input').focus({ preventScroll: true });
+    var cible = partie.parcours[i] === 'suivre' ? 'suivre-matieres' : MANQUES[m][1];
+    $(cible).querySelector('input').focus({ preventScroll: true });
     return false;
   }
 
@@ -775,7 +898,8 @@
       if (manque(i)) {
         partie.actif = i;
         var m = manque(i);
-        partie.sousEtape = ecranDe(m);
+        partie.sousEtape = partie.parcours[i] === 'suivre' ? 'matiere' : ecranDe(m);
+        partie.pret[i] = false;
         montrerEtape(2);
         reglagesComplets(i);
         return false;
@@ -801,6 +925,7 @@
     majDetail();
     // Progression : « Étape 2 sur 3 · Joueur 1 sur 3 ».
     $('prepa-progres').textContent = 'Étape ' + n + ' sur ' + NB_ETAPES + (n === 2 && nb > 1 ? ' · Joueur ' + (partie.actif + 1) + ' sur ' + nb : '');
+    majBasEtape1(); // v10.36 : bouton « Choisir l'aventure » seulement quand tous les joueurs sont prêts
     // « Modifier les choix » (menu, v6.22) : depuis le premier écran on retourne à la partie, et le dernier bouton la reprend.
     $('prepa-retour-texte').textContent = n === 1 ? (partie.modif ? 'Partie' : 'Accueil') : 'Retour';
     $('btn-lancer').textContent = partie.modif ? 'Reprendre la partie' : 'Lancer la partie';
@@ -809,15 +934,25 @@
     sauver();
   }
 
-  // « Valider » de chaque écran : joueur suivant, ou écran suivant après le dernier joueur.
+  // « Valider » de chaque écran (v10.36, demande du 24/11/2026) :
+  //  - étape 1 : « Choisir l'aventure », seulement quand tous les joueurs sont prêts ;
+  //  - étape 2 : après la matière (« Suivre ma progression »), ou après le dernier écran de « Personnaliser », le joueur est
+  //    prêt et on revient à l'étape 1 (pour le joueur suivant) ;
+  //  - étape 3 : le choix de l'aventure, « Lancer la partie » (formulaire).
   function valider() {
-    var n = partie.etapePrepa, nb = nbChoisi();
+    var n = partie.etapePrepa;
     if (n === 1) {
-      if (!choixJ.complet()) return; // une place sans joueur : « Valider » reste grisé
-      partie.actif = 0; partie.sousEtape = 'matiere'; montrerEtape(2); return;
+      if (!choixJ.complet() || !tousPrets()) return; // un joueur pas encore prêt : le bouton reste caché
+      partie.actif = 0; partie.sousEtape = 'matiere'; montrerEtape(3); return;
     }
-    // Étape 2, premier écran : la matière choisie, on passe à ses réglages.
-    if (n === 2 && partie.sousEtape === 'matiere') {
+    if (n === 3) return;
+    // « Suivre ma progression » : la matière est choisie, le joueur est prêt.
+    if (partie.parcours[partie.actif] === 'suivre') {
+      if (!reglagesComplets(partie.actif)) return;
+      finirPreparationJoueur(); return;
+    }
+    // « Personnaliser », premier écran : la matière choisie, on passe à ses réglages.
+    if (partie.sousEtape === 'matiere') {
       var m = manque(partie.actif);
       if (ecranDe(m) === 'matiere') { reglagesComplets(partie.actif); return; }
       partie.sousEtape = { conjugaison: 'modes', orthographe: 'packs', phonemes: 'sons' }[partie.matiere[partie.actif]] || 'reglages';
@@ -826,35 +961,39 @@
     }
     // Orthographe, deuxième écran : les packs choisis, on passe aux questions.
     // Phonèmes (v7.3) : les sons choisis, on passe aux jeux.
-    if (n === 2 && (partie.sousEtape === 'packs' || partie.sousEtape === 'sons')) {
+    if (partie.sousEtape === 'packs' || partie.sousEtape === 'sons') {
       if (ecranDe(manque(partie.actif)) === partie.sousEtape) { reglagesComplets(partie.actif); return; }
       partie.sousEtape = 'reglages';
       montrerEtape(2);
       return;
     }
-    // Conjugaison : l'écran des modes, groupes et temps est le dernier (v6.49) : on passe au joueur suivant.
-    if (n === 2 && !reglagesComplets(partie.actif)) return;
-    if (n === 2) partie.sousEtape = 'matiere'; // le joueur suivant commence par sa matière
-    if (n === 2 && partie.actif < nb - 1) { partie.actif++; montrerEtape(2); return; }
-    if (n === 2) { partie.actif = 0; montrerEtape(3); }
+    // Dernier écran de « Personnaliser » (conjugaison : modes, groupes et temps ; sinon les réglages) : le joueur est prêt.
+    if (!reglagesComplets(partie.actif)) return;
+    finirPreparationJoueur();
+  }
+  // Le joueur de l'étape 2 a fini : retour à l'étape 1, où le suivant se prépare (ou « Choisir l'aventure » apparaît).
+  function finirPreparationJoueur() {
+    partie.pret[partie.actif] = true;
+    partie.sousEtape = 'matiere';
+    montrerEtape(1);
   }
 
-  // « ← Retour » : joueur précédent, ou écran précédent (l'accueil depuis le premier écran).
+  // « ← Retour » : écran précédent de « Personnaliser », puis l'étape 1 ; de l'étape 3, l'étape 1 aussi (l'accueil depuis l'étape 1).
   function revenir() {
     var n = partie.etapePrepa, nb = nbChoisi();
-    // Étape 2 : des réglages on revient à la matière ; de la matière, aux réglages du joueur précédent.
-    if (n === 2 && partie.sousEtape === 'reglages') {
-      partie.sousEtape = { orthographe: 'packs', phonemes: 'sons' }[partie.matiere[partie.actif]] || 'matiere';
-      montrerEtape(2);
-      return;
+    if (n === 2 && partie.parcours[partie.actif] !== 'suivre') {
+      // Des réglages on revient à la matière ; de la matière, à l'étape 1.
+      if (partie.sousEtape === 'reglages') {
+        partie.sousEtape = { orthographe: 'packs', phonemes: 'sons' }[partie.matiere[partie.actif]] || 'matiere';
+        montrerEtape(2);
+        return;
+      }
+      if (partie.sousEtape === 'modes' || partie.sousEtape === 'packs' || partie.sousEtape === 'sons') { partie.sousEtape = 'matiere'; montrerEtape(2); return; }
     }
-    if (n === 2 && (partie.sousEtape === 'modes' || partie.sousEtape === 'packs' || partie.sousEtape === 'sons')) { partie.sousEtape = 'matiere'; montrerEtape(2); return; }
-    if (n === 2 && partie.actif > 0) { partie.actif--; partie.sousEtape = 'reglages'; montrerEtape(2); return; }
-    if (n === 3) partie.sousEtape = 'reglages';
+    if (n === 2) { partie.sousEtape = 'matiere'; montrerEtape(1); return; }
+    if (n === 3) { partie.actif = 0; partie.sousEtape = 'matiere'; montrerEtape(1); return; }
     if (n === 1 && partie.modif) { if (verifierReglages()) reprendreApresModif(); return; }
     if (n === 1) { afficher('ecran-accueil'); return; }
-    partie.actif = n === 2 ? 0 : nb - 1; // on revient sur le dernier joueur de l'écran précédent
-    montrerEtape(n - 1);
   }
 
   // Met à jour l'écran 2 pour le joueur actif (réglages des cartes).
@@ -868,14 +1007,24 @@
     $('reglages-titre').className = 'legende-joueur joueur-' + couleur;
     // Matière choisie : seuls ses réglages s'affichent.
     var a = partie.actif, mat = partie.matiere[a], fr = partie.francais[a] || mat === 'orthographe' || mat === 'conjugaison' || mat === 'grammaire' || mat === 'phonemes';
+    // v10.36 : « Suivre ma progression » = seulement la matière ; tout le reste de l'étape est caché.
+    var suivre = partie.parcours[a] === 'suivre';
+    $('choix-suivre').hidden = !suivre;
+    $('reglages-joueur').classList.toggle('mode-suivre', suivre);
+    if (suivre) { majSuivre(a, actif); return; }
     $('matieres').querySelectorAll('input').forEach(function (i) { i.checked = i.value === 'francais' ? !!fr : i.value === mat; });
     $('francais').querySelectorAll('input').forEach(function (i) { i.checked = i.value === mat; });
     $('reglage-francais').hidden = !fr;
     $('reglages-maths').hidden = mat !== 'maths';
-    $('reglage-niveau-maths').hidden = mat !== 'maths';
+    $('reglage-niveau-maths').hidden = true; // v10.36 : Facile…Expert remplacés par le niveau 1 à 10 (reglage-niveau-prog)
     $('reglage-type-maths').hidden = mat !== 'maths';
     $('type-maths').querySelectorAll('input').forEach(function (i) { i.checked = i.value === (partie.maths[a].type || 'calcul'); });
     // Niveau de calcul : une phrase d'aide sous les choix ; au niveau Facile, les nombres deviennent des tables.
+    // v10.36 : niveau 1 à 10 (toutes les matières sauf les phonèmes, dont les niveaux viennent après), coché = celui du joueur.
+    var avecNiveau = !!mat && mat !== 'phonemes';
+    $('reglage-niveau-prog').hidden = !avecNiveau;
+    if (avecNiveau && !partie.niveauProg[a]) { partie.niveauProg[a] = niveauEnregistre(a, mat); appliquerNiveau(a); }
+    $('niveau-prog').querySelectorAll('input').forEach(function (i) { i.checked = Number(i.value) === partie.niveauProg[a]; });
     var nvm = partie.maths[a].niveau;
     // v6.14 : le niveau décide des groupes de nombres et des nombres de signes proposés.
     var permis = K.groupes(nvm).map(function (g) { return g.id; });
@@ -911,7 +1060,7 @@
     $('jeux-phon').querySelectorAll('input').forEach(function (i) { i.checked = ph.jeux.indexOf(i.value) >= 0; });
     // Géographie et Histoire (v7.0) : niveau, puis les jeux de la matière (les familles des autres matières sont cachées).
     var rs = reglageSavoir(a);
-    $('reglage-niveau-savoir').hidden = !rs;
+    $('reglage-niveau-savoir').hidden = true;
     $('reglage-mode-savoir').hidden = !rs;
     $('savoir-jeux').hidden = !rs;
     if (rs) {
@@ -937,13 +1086,13 @@
       });
     }
     var cc = partie.conj[a];
-    $('reglage-niveau-conj').hidden = mat !== 'conjugaison';
+    $('reglage-niveau-conj').hidden = true;
     var on = partie.orthoNiveau[a] || 'facile';
-    $('reglage-niveau-ortho').hidden = mat !== 'orthographe';
+    $('reglage-niveau-ortho').hidden = true;
     $('niveau-ortho').querySelectorAll('input').forEach(function (i) { i.checked = i.value === on; });
     // Grammaire (v6.54).
     var gr = partie.gram[a];
-    $('reglage-niveau-gram').hidden = mat !== 'grammaire';
+    $('reglage-niveau-gram').hidden = true;
     $('niveau-gram').querySelectorAll('input').forEach(function (i) { i.checked = i.value === gr.niveau; });
     $('jeux-gram').querySelectorAll('input').forEach(function (i) { i.checked = gr.jeux.indexOf(i.value) >= 0; });
     var pleinG = gr.jeux.length === TOUS_JEUX.length;
@@ -1043,6 +1192,55 @@
     return liste;
   }
 
+  // ---------- « Suivre ma progression » (v10.36, demande du 24/11/2026) ----------
+  // Le joueur ne choisit que la matière. Ses cartes viennent de cette matière, au niveau enregistré dans son profil pour chaque
+  // sous-matière (js/joueurs.js) : Maths = calcul mental ou problème (une chance sur deux) ; Français = orthographe, conjugaison,
+  // grammaire ou phonèmes (une chance sur quatre) ; Histoire = une période ; Géographie = une famille de jeux (tirées au hasard).
+  // Les générateurs lisent encore Facile…Expert : le niveau 1 à 10 du profil y est traduit (provisoire, backlog ligne 485).
+  // Hypothèses à valider : sous-matière tirée au hasard à chaque carte ; Géographie et Histoire en mode Quiz.
+  function estSuivi(i) { return partie.parcours[i] === 'suivre' && !!partie.suivi[i] && !partie.rapide && !partie.defi; }
+  function niveauSousMatiere(i, m, s) {
+    var j = partie.profils[i] && profil(partie.profils[i]);
+    return niveauId(j ? window.Joueurs.niveauDe(window.Joueurs.score(j, m, s)) : 1);
+  }
+  // Orthographe du joueur « Suivre » : tous les thèmes, les mots et les questions du niveau de son orthographe (comme la partie rapide).
+  function preparerSuivis() {
+    for (var i = 0; i < nbChoisi(); i++) {
+      if (estSuivi(i)) {
+        var o = window.Rapide.ortho(niveauSousMatiere(i, 'francais', 'orthographe'), TOUS_TYPES);
+        partie.packs[i] = TOUS_PACKS.slice();
+        partie.types[i] = o.types.length ? o.types.slice() : TOUS_TYPES.slice();
+        partie.mots[i] = o.mots.slice();
+      } else if (!partie.defi && !partie.rapide) partie.mots[i] = null; // plus de séries imposées par un parcours « Suivre » précédent
+    }
+  }
+  // Ce que demande la prochaine carte du joueur i : { matiere, maths | conj | gram | phon | carte, sous: { m, s } }.
+  function carteSuivie(i) {
+    var m = partie.suivi[i], W = window.Joueurs, subs = W.matiere(m).subs.map(function (x) { return x.id; });
+    if (estSavoir(m)) subs = subs.filter(function (f) { return jeuxProposes(m, 'quiz').some(function (x) { return x.famille === f; }); });
+    var s = subs[Math.floor(Math.random() * subs.length)], niv = niveauSousMatiere(i, m, s), sous = { m: m, s: s };
+    if (m === 'maths') {
+      var mt = window.Defis.reglages('maths', niv, Math.random).maths;
+      mt.type = s === 'probleme' ? 'probleme' : 'calcul';
+      return { matiere: 'maths', maths: mt, sous: sous };
+    }
+    if (m === 'francais') {
+      if (s === 'conjugaison') return { matiere: 'conjugaison', conj: window.Defis.reglages('conjugaison', niv, Math.random).conj, sous: sous };
+      if (s === 'grammaire') return { matiere: 'grammaire', gram: window.Rapide.gramTout(niv), sous: sous };
+      if (s === 'phonemes') return { matiere: 'phonemes', phon: window.Rapide.phonTout(), sous: sous };
+      return { matiere: 'orthographe', sous: sous };
+    }
+    var jeux = jeuxProposes(m, 'quiz').filter(function (x) { return x.famille === s; }).map(function (x) { return x.id; });
+    var carte = SV.generer({ jeux: jeux, niveau: niv, mode: 'quiz' }, m) || SV.generer({ jeux: jeuxProposes(m, 'quiz').map(function (x) { return x.id; }), niveau: niv, mode: 'quiz' }, m);
+    return { matiere: m, carte: carte, sous: sous };
+  }
+  // Sous-matière la plus jouée par un joueur « Suivre » pendant la partie : c'est elle qui reçoit le point de niveau (ligne 446).
+  function sousSuivie(j) {
+    var meilleure = null, n = 0;
+    Object.keys(j.sous || {}).forEach(function (k) { if (j.sous[k] > n) { n = j.sous[k]; meilleure = k; } });
+    return meilleure ? { m: meilleure.split('.')[0], s: meilleure.split('.')[1] } : null;
+  }
+
   // Pioche dans le tas du joueur (tas vide → on remélange toutes ses cartes) et tire au hasard
   // une question parmi les types cochés par le joueur qui ont du sens pour ce mot.
   // Si aucun type coché ne convient à la carte, elle repart sous le tas et on en prend une autre.
@@ -1064,6 +1262,15 @@
       if (t.phon) return cartePhonemes(j, t.phon); // v10.4 : phonèmes aussi en partie rapide (tous les jeux, tous les sons)
       // v8.5 : Géographie et Histoire en partie rapide : tous les jeux de la matière jouables dans le mode choisi.
       if (t.savoir) return SV.generer({ jeux: jeuxProposes(mat, t.savoir.mode).map(function (x) { return x.id; }), niveau: t.savoir.niveau, mode: t.savoir.mode }, mat);
+    }
+    // « Suivre ma progression » (v10.36) : matière du joueur, niveau de son profil ; on note la sous-matière jouée.
+    if (estSuivi(j.index)) {
+      var cs = carteSuivie(j.index);
+      j.sous = j.sous || {};
+      j.sous[cs.sous.m + '.' + cs.sous.s] = (j.sous[cs.sous.m + '.' + cs.sous.s] || 0) + 1;
+      if (cs.carte) return cs.carte;
+      mat = cs.matiere; if (cs.maths) mr = cs.maths; if (cs.conj) cr = cs.conj; if (cs.gram) gr = cs.gram;
+      if (cs.phon) return cartePhonemes(j, cs.phon);
     }
     // Géographie et Histoire (v7.0) : un jeu choisi par le joueur, une série et un format tirés au hasard.
     if (estSavoir(mat)) {
@@ -1209,6 +1416,7 @@
     annulerMinuteurs();
     partie.modif = false;
     lireChoix();
+    preparerSuivis();
     var av = partie.aventure;
     partie.joueurs = [];
     for (var i = 0; i < partie.nbJoueurs; i++) {
@@ -2537,7 +2745,8 @@
     if (!partie.defi && !partie.avantDefi) {
       partie.avantDefi = copie({ profils: partie.profils, aventure: (document.querySelector('input[name="aventure"]:checked') || {}).value,
         choix: partie.choix, matiere: partie.matiere, francais: partie.francais, maths: partie.maths, conj: partie.conj,
-        packs: partie.packs, types: partie.types, orthoNiveau: partie.orthoNiveau, gram: partie.gram });
+        packs: partie.packs, types: partie.types, orthoNiveau: partie.orthoNiveau, gram: partie.gram,
+        parcours: partie.parcours, pret: partie.pret, suivi: partie.suivi, niveauProg: partie.niveauProg });
     }
   }
   // v10.36 (demande du 24/11/2026, backlog lignes 475 à 477) : le joueur n'a choisi que ses profils (ids : 1 = défi solo,
@@ -2563,6 +2772,7 @@
       partie.mots[i] = o.mots.slice();
     }
     partie.defi = { type: d.type, jour: d.jour, niveau: d.niveau, matiere: 'mixte', mixte: true };
+    partie.parcours = [null, null, null, null]; // v10.38 : un défi a ses propres réglages (pas de « Suivre ma progression »)
     partie.etapePrepa = 3; partie.sousEtape = 'matiere'; partie.actif = 0;
     majDetail(); majAventuriers();
     lancerPartie();
@@ -2587,6 +2797,7 @@
     if (choixJ) majChoixJoueurs();
     if (a.orthoNiveau) partie.orthoNiveau = a.orthoNiveau;
     if (a.gram) partie.gram = a.gram;
+    ['parcours', 'pret', 'suivi', 'niveauProg'].forEach(function (cle) { if (a[cle]) partie[cle] = a[cle]; });
   }
 
   // ---------- Partie rapide (v6.43) ----------
@@ -2600,6 +2811,7 @@
       poserProfils(sl);
       document.querySelector('input[name="aventure"][value="' + d.aventure + '"]').checked = true;
       reglagesRapide(d);
+      partie.parcours = [null, null, null, null]; // v10.36 : une partie rapide a ses propres réglages
       partie.etapePrepa = 3; partie.sousEtape = 'matiere'; partie.actif = 0;
       majDetail(); majAventuriers();
       lancerPartie();
@@ -2672,7 +2884,9 @@
   $('btn-nouvelle').addEventListener('click', function () {
     $('fin').close();
     if (partie.rapide) { accueilApresFin(); return; } // partie rapide (v6.45) : retour à l'accueil, la partie est effacée
-    annulerMinuteurs(); partie.modif = false; quitterDefi(); preparer(1);
+    annulerMinuteurs(); partie.modif = false; quitterDefi();
+    partie.parcours = [null, null, null, null]; partie.pret = [false, false, false, false]; // v10.36 : chacun se prépare de nouveau
+    preparer(1);
   });
   // v7.1 : la partie est finie, on revient à l'accueil sans confirmation (rien n'est perdu : étoiles déjà comptées).
   $('btn-fin-accueil').addEventListener('click', function () { $('fin').close(); accueilApresFin(); });
@@ -2718,7 +2932,8 @@
     var avRadio = document.querySelector('input[name="aventure"]:checked');
     var d = {
       ecran: partie.ecran || 'ecran-accueil',
-      nb: nbChoisi(), profils: partie.profils, prepaV: 2, // prepaV 2 : préparation en 3 étapes (v10.29)
+      nb: nbChoisi(), profils: partie.profils, prepaV: 3, // prepaV 3 : parcours « Suivre ma progression » / « Personnaliser » (v10.36)
+      parcours: partie.parcours, pret: partie.pret, suivi: partie.suivi, niveauProg: partie.niveauProg,
       aventure: avRadio ? avRadio.value : partie.aventure.id,
       choix: partie.choix, packs: partie.packs, types: partie.types, actif: partie.actif,
       matiere: partie.matiere, francais: partie.francais, maths: partie.maths, conj: partie.conj,
@@ -2729,7 +2944,7 @@
     if (partie.regles && partie.joueurs.length) {
       d.jeu = {
         aventure: partie.aventure.id, objectif: partie.objectif, regles: partie.regles,
-        joueurs: partie.joueurs.map(function (j) { return { id: j.aventurier.id, nom: j.nom, profil: j.profil || null, sousMat: j.sousMat || null, tas: j.tas.map(carteVersDonnees) }; }),
+        joueurs: partie.joueurs.map(function (j) { return { id: j.aventurier.id, nom: j.nom, profil: j.profil || null, sousMat: j.sousMat || null, sous: j.sous || null, tas: j.tas.map(carteVersDonnees) }; }),
         carte: carteVersDonnees(partie.carte), vue: partie.vue || 'cache', etapesVues: partie.etapesVues || 0
       };
     }
@@ -2747,8 +2962,10 @@
     try {
       // Préparation : nombre de joueurs, aventure, aventuriers et réglages des cartes.
       // Sauvegarde d'avant la v10.29 (préparation en 4 étapes, sans profils) : on repart de l'accueil.
-      if (d.prepaV !== 2) { try { sessionStorage.removeItem(CLE); } catch (e3) { /* rien */ } return false; }
+      if (d.prepaV !== 3) { try { sessionStorage.removeItem(CLE); } catch (e3) { /* rien */ } return false; }
       partie.profils = Array.isArray(d.profils) ? d.profils : [];
+      // v10.36 : parcours de chaque joueur (suivre / personnaliser), préparation finie ou non, matière suivie, niveau 1 à 10.
+      ['parcours', 'pret', 'suivi', 'niveauProg'].forEach(function (cle) { if (Array.isArray(d[cle]) && d[cle].length === 4) partie[cle] = d[cle]; });
       var av = document.querySelector('input[name="aventure"][value="' + d.aventure + '"]');
       if (av) av.checked = true;
       partie.choix = d.choix; partie.packs = d.packs.map(function (l) { return l.filter(function (id) { return TOUS_PACKS.indexOf(id) >= 0; }); }); partie.types = d.types.map(function (l) { return l.filter(function (id) { return TOUS_TYPES.indexOf(id) >= 0; }); }); partie.actif = d.actif || 0;
@@ -2799,7 +3016,7 @@
         partie.regles = g.regles;
         partie.joueurs = g.joueurs.map(function (s, i) {
           var perso = P.trouver(s.id), pf = s.profil && profil(s.profil);
-          return { nom: pf ? pf.nom : (s.nom || perso.nom), aventurier: perso, profil: s.profil || null, sousMat: s.sousMat || null, couleur: COULEURS[i], index: i, tas: s.tas.map(donneesVersCarte) };
+          return { nom: pf ? pf.nom : (s.nom || perso.nom), aventurier: perso, profil: s.profil || null, sousMat: s.sousMat || null, sous: s.sous || null, couleur: COULEURS[i], index: i, tas: s.tas.map(donneesVersCarte) };
         });
         partie.carte = donneesVersCarte(g.carte);
         partie.etapesVues = g.etapesVues;
@@ -2901,10 +3118,13 @@
         r.etape = 'suivant'; // des joueurs ajoutés n'ont pas encore joué au volcan
       }
     }
+    preparerSuivis();
+    var anciens = partie.joueurs;
     partie.joueurs = [];
     for (var k = 0; k < nb; k++) {
       var jk = joueurDePlace(k);
-      partie.joueurs.push({ nom: jk.nom, aventurier: jk.aventurier, profil: jk.profil, couleur: COULEURS[k], index: k, tas: melanger(cartesDuJoueur(k)) });
+      partie.joueurs.push({ nom: jk.nom, aventurier: jk.aventurier, profil: jk.profil, couleur: COULEURS[k], index: k, tas: melanger(cartesDuJoueur(k)),
+        sousMat: sousMatiereDe(k), sous: anciens[k] && anciens[k].profil === jk.profil ? anciens[k].sous || null : null });
     }
     partie.objectif = A.objectif(partie.aventure, nb);
     r.objectif = partie.objectif;
@@ -2961,7 +3181,11 @@
     afficher('ecran-preparation');
     montrerEtape(n);
   }
-  $('btn-commencer').addEventListener('click', function () { preparer(1); });
+  // v10.36 : à chaque nouvelle préparation, chaque joueur choisit de nouveau « Suivre ma progression » ou « Personnaliser ».
+  $('btn-commencer').addEventListener('click', function () {
+    partie.parcours = [null, null, null, null]; partie.pret = [false, false, false, false];
+    preparer(1);
+  });
   $('btn-prepa-retour').addEventListener('click', revenir);
 
   // ---------- Touche « précédent » du téléphone ou de la tablette (v6.23) ----------
