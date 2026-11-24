@@ -69,9 +69,9 @@ test('« Suivre ma progression » : seulement la matière à choisir, avec le ni
   await expect(page.locator('#choix-matiere')).toBeHidden();
   await expect(page.locator('#suivre-matieres input')).toHaveCount(6); // v10.42 : + Lettres et Chiffres (sans niveau)
   await expect(page.locator('#suivre-matieres label').first()).toContainText('Maths');
-  // Léa a 55 sur 100 en calcul et en problèmes : la moyenne de ses maths est 55 / 2 sous-matières = 55 → niveau 6.
-  await expect(page.locator('#suivre-matieres label').first()).toContainText('niveau 6 sur 10');
-  await expect(page.locator('#suivre-matieres label').nth(1)).toContainText('niveau 1 sur 10');
+  // v10.45 : aucun niveau sur les boutons de matière (Léa a pourtant 55 sur 100 en maths).
+  await expect(page.locator('#suivre-matieres label').first()).not.toContainText('niveau');
+  await expect(page.locator('#suivre-matieres small')).toHaveCount(0);
   // Sans matière, « Valider » refuse et le dit.
   await page.getByRole('button', { name: 'Valider', exact: true }).click();
   await expect(page.locator('#packs-alerte')).toContainText('doit choisir une matière');

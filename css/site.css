@@ -2354,6 +2354,11 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
   .cj-ajouter { min-height: 40px; margin-top: 4px; }
 }
 
+/* v10.45 : la poubelle (retire le joueur de la partie) est tout à droite de la ligne : à côté du nom sur écran étroit
+   (les boutons de préparation passent dessous), après les boutons de préparation sur écran large. */
+.cj-retirer { margin-left: auto; align-self: center; }
+@media (min-width: 760px) { .cj-retirer { order: 5; } }
+
 /* v10.36 (demande du 24/11/2026) : à côté de chaque joueur, « Suivre ma progression » et « Personnaliser », et ce qui est prêt.
    Écran étroit : les 2 boutons sont sous le nom, sur toute la largeur (aucun débordement) ; écran large : sur la même ligne. */
 .cj-ligne { flex-wrap: wrap; }
@@ -2379,6 +2384,7 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
   .cj-places:has(.cj-ligne:nth-child(3)) .cj-niv { display: none; }
   .cj-places:has(.cj-ligne:nth-child(3)) .cj-resume { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
   .cj-places:has(.cj-ligne:nth-child(3)) .cj-ligne:has(.cj-resume.pret) .cj-nom::after { content: " ✓ prêt"; color: #1f6a34; font-size: .8rem; font-weight: 700; }
+  .cj-places:has(.cj-ligne:nth-child(3)) .cj-ligne:has(.cj-resume.pret) .cj-nom[data-matiere]::after { content: " ✓ " attr(data-matiere); } /* v10.45 : la matière à la place des niveaux */
   .cj-places:has(.cj-ligne:nth-child(3)) .cj-ligne { padding-block: 6px; gap: 4px 8px; }
   .cj-places:has(.cj-ligne:nth-child(3)) .cj-parcours-btn { flex: 1 1 0; font-size: .82rem; line-height: 1.05; min-height: 34px; padding: 1px 4px; }
   .cj-places:has(.cj-ligne:nth-child(3)) ~ .etape-actions .prepa-aide { font-size: .8rem; }

@@ -6,6 +6,9 @@
 // Baby jeux (nombre de places fixé). Deux joueurs peuvent avoir le même personnage : même figurine, pion de couleur différente.
 // v10.36 (demande du 24/11/2026) : à l'étape 1 de la préparation, chaque joueur choisi a 2 boutons à côté de lui, « Suivre ma
 // progression » et « Personnaliser » (option opts.parcours) ; une fois sa préparation faite, la ligne indique ce qu'il a choisi.
+// v10.45 (demande du 24/11/2026) : plus de niveaux dans les cartes ni dans la liste des joueurs ; à l'étape 1 de la préparation,
+// la ligne du joueur dit la matière choisie ; plus de bouton « Changer » ; un seul joueur = aucun bouton ; plusieurs joueurs =
+// une poubelle tout à droite de chaque ligne (elle retire le joueur de la PARTIE, son profil du compte n'est pas touché).
 (function () {
   'use strict';
 
@@ -13,12 +16,10 @@
   var COULEURS = ['rouge', 'jaune', 'bleu', 'vert'];
   var MAX = 4;
   function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  // Même poubelle que sur la carte d'un profil (js/joueurs-ecran.js).
+  var POUBELLE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg>';
   function perso(id) { return (A && A.trouver(id)) || (A && A.LISTE[0]); }
   function parId(id) { var l = J.duCompte(); for (var i = 0; i < l.length; i++) if (l[i].id === id) return l[i]; return null; }
-  function abrege(j) {
-    var ab = { francais: 'Fr', maths: 'Ma', histoire: 'Hi', geographie: 'Gé' };
-    return 'Niv. ' + J.niveauGlobal(j) + ' · ' + J.MATIERES.map(function (m) { return ab[m.id] + ' ' + J.niveauMatiere(j, m.id); }).join(' · ');
-  }
 
   // opts : { fixe: nombre de places imposé (sinon 1 à 4, on ajoute et on retire), slots: [id ou null…], idBase,
   //          surChangement(slots), surCreer(),
@@ -50,12 +51,18 @@
       var h = '<div class="cj-places">';
       slots.forEach(function (id, i) {
         var j = id && parId(id), coul = COULEURS[i], p = j && perso(j.perso);
+        // Matière choisie (étape 1 de la préparation seulement) ; sans elle, la ligne dit qu'elle reste à choisir.
+        var e = j && opts.parcours ? opts.parcours.etat(i) || {} : null;
+        var mat = e ? (e.matiere ? esc(e.matiere) : 'Matière à choisir') : '';
+        // Une poubelle par joueur dès qu'il y en a plusieurs (mode libre) ; un joueur seul : aucun bouton.
+        var poubelle = !opts.fixe && slots.length > 1;
         h += '<div class="cj-ligne joueur-' + coul + (j ? '' : ' vide') + '" data-place="' + i + '">' +
           (j ? '<img class="cj-avatar" src="' + p.image + '" alt="" width="58" height="58">' : '') +
           '<div class="cj-qui"><div class="cj-etiq">Joueur ' + (i + 1) + ' · pion ' + coul + '</div>' +
-          (j ? '<div class="cj-nom">' + esc(j.nom) + '</div><div class="cj-niv">' + abrege(j) + '</div>' : '<div class="cj-niv">Choisis un joueur</div>') + '</div>' +
-          '<button type="button" class="btn btn-secondaire cj-btn" data-ouvrir="' + i + '" aria-label="' + (j ? 'Changer le joueur ' : 'Choisir le joueur ') + (i + 1) + '">' + (j ? 'Changer' : 'Choisir') + '</button>' +
-          (!opts.fixe && i > 0 ? '<button type="button" class="btn btn-secondaire cj-btn cj-retirer" data-retirer="' + i + '" aria-label="Retirer le joueur ' + (i + 1) + '">✕</button>' : '') +
+          (j ? '<div class="cj-nom"' + (e && e.matiere ? ' data-matiere="' + esc(e.matiere) + '"' : '') + '>' + esc(j.nom) + '</div>' + (mat ? '<div class="cj-niv">' + mat + '</div>' : '') : '<div class="cj-niv">Choisis un joueur</div>') + '</div>' +
+          // « Changer » n'existe plus : seule une place vide propose « Choisir » (et, en défi ou partie rapide, les places imposées).
+          (!j || opts.fixe ? '<button type="button" class="btn btn-secondaire cj-btn" data-ouvrir="' + i + '" aria-label="' + (j ? 'Changer le joueur ' : 'Choisir le joueur ') + (i + 1) + '">' + (j ? 'Changer' : 'Choisir') + '</button>' : '') +
+          (poubelle ? '<button type="button" class="icone-btn suppr cj-retirer" data-retirer="' + i + '" aria-label="Retirer ' + (j ? esc(j.nom) : 'le joueur ' + (i + 1)) + ' de la partie (joueur ' + (i + 1) + ')">' + POUBELLE + '</button>' : '') +
           (j && opts.parcours ? boutonsParcours(i, j) : '') +
           '</div>';
       });
@@ -67,7 +74,7 @@
           var pris = slots.indexOf(j.id) >= 0 && slots[ouvert] !== j.id, p = perso(j.perso);
           h += '<button type="button" class="cj-profil" data-choisir="' + j.id + '"' + (pris ? ' disabled' : '') + (slots[ouvert] === j.id ? ' aria-pressed="true"' : '') + '>' +
             '<img src="' + p.image + '" alt="" width="52" height="52"><span class="cj-pnom">' + esc(j.nom) + '</span>' +
-            '<small>' + (pris ? 'Déjà dans la partie' : 'Niv. ' + J.niveauGlobal(j)) + '</small></button>';
+            (pris ? '<small>Déjà dans la partie</small>' : '') + '</button>';
         });
         if (opts.surCreer) h += '<button type="button" class="cj-profil cj-creer" data-creer="1"><span aria-hidden="true">＋</span><small>Créer un joueur</small></button>';
         h += '</div></div>';
