@@ -67,7 +67,7 @@ test('« Suivre ma progression » : seulement la matière à choisir, avec le ni
   await page.locator('.cj-parcours-btn[data-parcours="suivre"]').click();
   await expect(page.locator('#choix-suivre')).toBeVisible();
   await expect(page.locator('#choix-matiere')).toBeHidden();
-  await expect(page.locator('#suivre-matieres input')).toHaveCount(4);
+  await expect(page.locator('#suivre-matieres input')).toHaveCount(6); // v10.42 : + Lettres et Chiffres (sans niveau)
   await expect(page.locator('#suivre-matieres label').first()).toContainText('Maths');
   // Léa a 55 sur 100 en calcul et en problèmes : la moyenne de ses maths est 55 / 2 sous-matières = 55 → niveau 6.
   await expect(page.locator('#suivre-matieres label').first()).toContainText('niveau 6 sur 10');
