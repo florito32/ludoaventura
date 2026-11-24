@@ -110,23 +110,45 @@ test('« Personnaliser » : niveau de 1 à 10 (dizaine de la progression), celui
   await expect(page.locator('#niveau-prog input[value="1"]')).toBeChecked();
 });
 
-test('« Suivre ma progression » : les cartes viennent de la matière, au niveau enregistré dans le profil', async ({ page }) => {
+test('« Suivre ma progression » : les calculs sont dans une fenêtre de 5 niveaux autour du niveau du profil (v10.39)', async ({ page }) => {
   await ouvrir(page);
   await etape1(page, 1);
-  await suivreMaProgression(page, 0, 'maths'); // Léa : 55 en calcul et en problèmes → niveau 6 → « Difficile »
+  await suivreMaProgression(page, 0, 'maths'); // Léa : 55 en calcul et en problèmes → calculs de niveau 53 à 57
   await aventure(page).click();
   await page.getByRole('radio', { name: /^Viking/ }).check();
   await page.getByRole('button', { name: 'Lancer la partie' }).click();
   await page.getByRole('heading', { name: 'Le plateau' }).waitFor();
   const cartes = await page.evaluate(() => {
     const p = window.Aventura.partie, j = p.joueurs[0], r = [];
-    for (let i = 0; i < 40; i++) { const c = window.Aventura.piocherCarte(j); r.push({ type: c.type, nom: c.packNom }); }
+    for (let i = 0; i < 40; i++) { const c = window.Aventura.piocherCarte(j); r.push({ type: c.type, nom: c.packNom, prog: window.ProgressionCalcul.niveau(c) }); }
     return { cartes: r, sous: j.sous };
   });
-  for (const c of cartes.cartes) expect(c.nom).toMatch(/^(Calcul|Problème) · Difficile/);
+  for (const c of cartes.cartes) {
+    expect(c.nom).toMatch(/^(Calcul|Problème) · niveau \d+/);
+    expect(c.prog).toBeGreaterThanOrEqual(53);
+    expect(c.prog).toBeLessThanOrEqual(57);
+  }
   expect(Object.keys(cartes.sous).sort()).toEqual(['maths.calcul', 'maths.probleme']); // les deux sous-matières des maths sont tirées
   expect(cartes.cartes.some((c) => c.nom.startsWith('Calcul'))).toBe(true);
   expect(cartes.cartes.some((c) => c.nom.startsWith('Problème'))).toBe(true);
+});
+
+test('« Suivre ma progression » : un joueur à 26 en calcul reçoit des calculs de niveau 24 à 28 (exemple de l\'utilisateur)', async ({ page }) => {
+  await ouvrir(page, { v: 1, total: 0, joueurs: [{ id: 'j-1', nom: 'Léa', perso: 'lea', cree: '2026-11-01T00:00:00Z', maj: '2026-11-01T00:00:00Z',
+    niv: { 'maths.calcul': 26, 'maths.probleme': 26 } }] });
+  await etape1(page, 1);
+  await suivreMaProgression(page, 0, 'maths');
+  await aventure(page).click();
+  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await page.getByRole('heading', { name: 'Le plateau' }).waitFor();
+  const niveaux = await page.evaluate(() => {
+    const j = window.Aventura.partie.joueurs[0], r = [];
+    for (let i = 0; i < 60; i++) r.push(window.ProgressionCalcul.niveau(window.Aventura.piocherCarte(j)));
+    return r;
+  });
+  expect(Math.min(...niveaux)).toBeGreaterThanOrEqual(24);
+  expect(Math.max(...niveaux)).toBeLessThanOrEqual(28);
+  expect(new Set(niveaux).size).toBeGreaterThan(1); // la fenêtre est bien utilisée, pas un seul niveau
 });
 
 test('« Suivre ma progression » en Français : orthographe, conjugaison, grammaire et phonèmes, chacun à son niveau', async ({ page }) => {

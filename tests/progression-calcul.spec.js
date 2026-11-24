@@ -1,4 +1,4 @@
-// Difficulté « progression » des calculs, de 1 à 100 (demande du 23/11/2026) : logique seule, aucun écran.
+// Difficulté « progression » des calculs, de 1 à 100 (demandes du 23/11/2026 et du 24/11/2026, règle 3) : logique seule, aucun écran.
 const { test, expect } = require('@playwright/test');
 const P = require('../js/progression-calcul.js');
 const K = require('../js/calcul.js');
@@ -60,5 +60,49 @@ test.describe('progression des calculs (1 à 100)', () => {
     expect(signes(60)).toBeLessThan(signes(100));
     const tousNiveauxDuJeu = K.NIVEAUX.map((x) => x.id);
     expect(tousNiveauxDuJeu).toHaveLength(4);
+  });
+
+  // Règle 3 (24/11/2026) : l'échelle suit l'apprentissage du calcul.
+  test('règle 3 : pour chaque opération, deux petits nombres < dizaines < centaines < milliers', () => {
+    const echelle = {
+      plus: [[3, 4], [23, 45], [234, 178], [2345, 1789]],
+      moins: [[9, 4], [72, 38], [745, 356], [4871, 1956]],
+      fois: [[7, 8], [23, 4], [23, 12], [234, 12]],
+      divise: [[42, 6], [84, 4], [96, 12], [756, 3]],
+    };
+    for (const [op, paires] of Object.entries(echelle)) {
+      const n = paires.map((p) => P.niveau(p, [op]));
+      for (let i = 1; i < n.length; i++) expect(n[i], op + ' ' + paires[i]).toBeGreaterThan(n[i - 1]);
+    }
+  });
+
+  test('règle 3 : addition < soustraction < multiplication < division, avec des nombres de même taille', () => {
+    // deux petits nombres : 8 + 7 · 9 − 4 · 7 × 8 · 72 ÷ 8 (les divisions se font sur la table de 8)
+    const n = [P.niveau([8, 7], ['plus']), P.niveau([9, 7], ['moins']), P.niveau([8, 7], ['fois']), P.niveau([56, 7], ['divise'])];
+    for (let i = 1; i < n.length; i++) expect(n[i]).toBeGreaterThan(n[i - 1]);
+    // dizaines
+    const d = [P.niveau([34, 28], ['plus']), P.niveau([62, 28], ['moins']), P.niveau([34, 6], ['fois']), P.niveau([84, 6], ['divise'])];
+    for (let i = 1; i < d.length; i++) expect(d[i]).toBeGreaterThan(d[i - 1]);
+  });
+
+  test('règle 3 : une addition de centaines est plus difficile qu\'une multiplication de deux petits nombres', () => {
+    for (const [a, b] of [[745, 356], [234, 178], [500, 300], [123, 456]]) {
+      for (const [x, y] of [[7, 8], [9, 9], [6, 7], [4, 5]]) expect(P.niveau([a, b], ['plus'])).toBeGreaterThan(P.niveau([x, y], ['fois']));
+    }
+  });
+
+  test('règle 3 : les calculs les plus faciles sont des additions de deux petits nombres', () => {
+    expect(P.niveau([1, 1], ['plus'])).toBeLessThanOrEqual(2);
+    expect(P.niveau([2, 3], ['plus'])).toBeLessThan(P.niveau([5, 4], ['moins']));
+    expect(P.niveau([2, 3], ['plus'])).toBeLessThan(P.niveau([2, 3], ['fois']));
+  });
+
+  test('fenêtre : on tire des calculs dont le niveau est dans les 5 niveaux demandés, pour toutes les fenêtres', () => {
+    const h = hasardFixe(2026);
+    for (let bas = 1; bas <= 96; bas++) {
+      const c = P.genererDans(bas, bas + 4, h);
+      expect(P.niveau(c), 'fenêtre ' + bas + ' à ' + (bas + 4)).toBeGreaterThanOrEqual(bas);
+      expect(P.niveau(c)).toBeLessThanOrEqual(bas + 4);
+    }
   });
 });
