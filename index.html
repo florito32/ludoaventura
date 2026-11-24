@@ -752,6 +752,13 @@
         <!-- Tour de jeu : qui joue, sur quelle croix, et l'étape en cours (js/regles.js). -->
         <section class="bloc tour" id="tour" aria-labelledby="tour-titre">
           <h3 id="tour-titre">Tour de jeu</h3>
+          <!-- Évaluation d'une matière (v10.49, js/plateau.js → lancerEvaluation) : sans plateau, la question et sa progression. -->
+          <div class="eval-entete" id="eval-entete" hidden>
+            <p class="eval-titre" id="eval-titre"></p>
+            <p class="eval-compte" id="eval-compte" role="status"></p>
+            <div class="eval-pastilles" id="eval-pastilles" aria-hidden="true"></div>
+            <button type="button" class="btn btn-secondaire eval-quitter" id="btn-eval-quitter">Quitter l’évaluation</button>
+          </div>
           <div class="tour-joueur">
             <img id="tour-portrait" src="img/aventuriers/lea.webp" alt="" width="200" height="220">
             <p>À <strong id="tour-nom"></strong> de jouer</p>
@@ -863,6 +870,18 @@
 </dialog>
 
 <!-- Menu de la partie (v6.22, js/plateau.js). Échap, la croix ou un toucher à côté le referment : la partie continue. -->
+<!-- Bilan d'une évaluation (v10.49, js/plateau.js → finEval) : la progression trouvée, ce qui monte, et le choix « garder / prendre » des sous-matières déjà plus hautes. -->
+<dialog class="fin eval-fin" id="eval-fin" aria-labelledby="eval-fin-titre">
+  <p class="fin-icone" aria-hidden="true">🎯</p>
+  <h2 id="eval-fin-titre">Évaluation terminée</h2>
+  <p id="eval-fin-texte"></p>
+  <ul class="eval-liste" id="eval-fin-liste"></ul>
+  <div class="menu-actions">
+    <button type="button" class="btn btn-principal" id="eval-fin-ok">Enregistrer ma progression</button>
+    <button type="button" class="btn btn-secondaire" id="eval-fin-non">Ne rien enregistrer</button>
+  </div>
+</dialog>
+
 <dialog class="fin menu-partie" id="menu-partie" aria-labelledby="menu-titre">
   <button type="button" class="menu-fermer" id="btn-menu-fermer" aria-label="Fermer le menu et continuer la partie"><span aria-hidden="true">✕</span></button>
   <h2 id="menu-titre">Menu</h2>
@@ -1070,6 +1089,7 @@
 <script src="js/questions.js"></script>
 <script src="js/calcul.js"></script>
 <script src="js/progression-fenetre.js"></script>
+<script src="js/evaluation.js"></script>
 <script src="js/progression-calcul-seuils.js"></script>
 <script src="js/progression-calcul.js"></script>
 <script src="js/problemes.js"></script>

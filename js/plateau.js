@@ -116,6 +116,7 @@
   // packs[i] = packs où le joueur i pioche (tous niveaux mêlés : plus de choix du niveau depuis la v4.8).
   // Packs et types de questions sont décochés au départ : c'est au joueur de les cocher (demande du 02/11/2026).
   var partie = {
+    eval: null, // évaluation en cours (v10.49) : { etat, matiere, nomMatiere, profil, nomJoueur, niveau } ; null en partie normale
     nbJoueurs: 1, aventure: A.LISTE[0], joueurs: [], choix: ['lea', 'tom', 'nour', 'malo'], actif: 0, regles: null,
     // profils[i] = joueur du compte (js/joueurs.js) qui joue à la place i ; choix[i] = son personnage (v10.29, 23/11/2026).
     profils: [],
@@ -1240,28 +1241,30 @@
     }
   }
   // Ce que demande la prochaine carte du joueur i : { matiere, maths | conj | gram | phon | carte, sous: { m, s } }.
-  function carteSuivie(i) {
+  // v10.49 (évaluation) : force = niveau 1 à 100 imposé à la place de celui du profil (null : le niveau du profil, comme avant).
+  function carteSuivie(i, force) {
     var m = partie.suivi[i], W = window.Joueurs;
+    function np(mm, ss) { return force != null ? force : niveauProfil(i, mm, ss); }
     // v10.41 : Lettres et Chiffres n'ont ni niveau ni sous-matière : une carte tirée parmi leurs jeux, rien n'est noté dans le profil.
     if (estBaby(m)) return { matiere: m, baby: true, sous: null };
     var subs = W.matiere(m).subs.map(function (x) { return x.id; });
     if (estSavoir(m)) subs = subs.filter(function (f) { return jeuxProposes(m, 'quiz').some(function (x) { return x.famille === f; }); });
-    var s = subs[Math.floor(Math.random() * subs.length)], niv = niveauSousMatiere(i, m, s), sous = { m: m, s: s };
+    var s = subs[Math.floor(Math.random() * subs.length)], niv = force != null ? niveauId(W.niveauDe(force)) : niveauSousMatiere(i, m, s), sous = { m: m, s: s };
     if (m === 'maths') {
       // v10.39 : un calcul dont le niveau de progression (1 à 100) est dans la fenêtre de 5 niveaux du profil (js/progression-calcul.js).
-      var fm = window.ProgressionFenetre.fenetre(niveauProfil(i, m, s)), calcul = window.ProgressionCalcul.genererDans(fm.bas, fm.haut, Math.random);
+      var fm = window.ProgressionFenetre.fenetre(np(m, s)), calcul = window.ProgressionCalcul.genererDans(fm.bas, fm.haut, Math.random);
       return { matiere: 'maths', calcul: calcul, probleme: s === 'probleme', sous: sous };
     }
     if (m === 'francais') {
       // v10.41 : une carte dont le niveau de progression (1 à 100) est dans la fenêtre de 5 niveaux du profil (js/progression-francais.js).
-      var ff = window.ProgressionFenetre.fenetre(niveauProfil(i, m, s)), tir = window.ProgressionFrancais.tirer(s, ff.bas, ff.haut, Math.random);
+      var ff = window.ProgressionFenetre.fenetre(np(m, s)), tir = window.ProgressionFrancais.tirer(s, ff.bas, ff.haut, Math.random);
       if (tir) return { matiere: s === 'phonemes' ? 'phonemes' : s, progression: tir, sous: sous };
       return { matiere: 'orthographe', sous: sous };
     }
     // v10.42 : Histoire et Géographie : questions dont le niveau de progression (1 à 100) est dans la fenêtre de 5 niveaux du profil.
     // Si la fenêtre ne donne rien (série trop courte), elle s'élargit peu à peu ; en dernier recours, le niveau Facile…Expert du profil.
     var jeux = jeuxProposes(m, 'quiz').filter(function (x) { return x.famille === s; }).map(function (x) { return x.id; });
-    var tous = jeuxProposes(m, 'quiz').map(function (x) { return x.id; }), fs = window.ProgressionFenetre.fenetre(niveauProfil(i, m, s)), carte = null;
+    var tous = jeuxProposes(m, 'quiz').map(function (x) { return x.id; }), fs = window.ProgressionFenetre.fenetre(np(m, s)), carte = null;
     [0, 2, 5, 10, 25, 50, 100].forEach(function (ecart) {
       var fenetre = { bas: Math.max(1, fs.bas - ecart), haut: Math.min(100, fs.haut + ecart) };
       if (!carte) carte = SV.generer({ jeux: jeux, mode: 'quiz', fenetre: fenetre }, m);
@@ -1386,6 +1389,7 @@
   // une question parmi les types cochés par le joueur qui ont du sens pour ce mot.
   // Si aucun type coché ne convient à la carte, elle repart sous le tas et on en prend une autre.
   function piocherCarte(j) {
+    if (partie.eval) { var ce = carteEval(j); if (ce) return ce; } // v10.49 : question de l'évaluation, au niveau demandé
     var mat = partie.matiere[j.index], mr = partie.maths[j.index], cr = partie.conj[j.index], gr = partie.gram[j.index];
     // Partie rapide (v6.43) : chaque carte tire sa matière parmi celles choisies, avec des réglages du niveau
     // choisi (v6.45) tirés pour cette carte (orthographe : thèmes, mots et questions du niveau, déjà dans le tas du joueur).
@@ -1805,7 +1809,7 @@
       annoncer(j.nom + ' pioche une carte dans son tas.');
       // v8.5 (demande du 13/11/2026) : la toute première question de la partie (premier joueur, première croix)
       // s'appelle « Première question ».
-      bouton(r.manche === 1 && r.joueur === 0 ? 'Première question' : 'Question suivante', 'btn-principal', function () {
+      var pioche = function () {
         partie.carte = piocherCarte(j);
         partie.vue = 'cache'; // nouvelle carte : mot caché
         R.piocher(r);
@@ -1817,7 +1821,10 @@
         // Dictée (v6.31) : le mot est caché, la voix le lit tout de suite (« Écouter » le relit).
         var q = partie.carte.question;
         if (q && q.dictee) window.Voix.lire(window.Voix.texteCarte(partie.carte));
-      });
+      };
+      // Évaluation (v10.49) : pas de plateau ni de bouton, la question suivante vient toute seule.
+      if (partie.eval) { enteteEval(); pioche(); }
+      else bouton(r.manche === 1 && r.joueur === 0 ? 'Première question' : 'Question suivante', 'btn-principal', pioche);
     } else if (r.etape === 'repondre' && estCarteSavoir(partie.carte) && !aSaisir(partie.carte)) {
       // Géographie et Histoire (v7.0) : le joueur répond dans la carte, le jeu corrige.
       annoncer(j.nom + ' répond dans la carte.');
@@ -2811,6 +2818,7 @@
   function lancerDe(type) {
     var r = partie.regles;
     if (r.etape !== 'lancer' || r.de !== type || partie.roule) return;
+    if (partie.eval) { clearTimeout(minuteurDe); minuteurDe = null; suiteEval(); return; } // v10.49 : pas de dé, on passe à la question suivante
     clearTimeout(minuteurDe); minuteurDe = null; // lancé (par les tests) avant le lancer automatique
     partie.roule = true;
     majPlein(); // v9.0 : le plateau revient pour le dé
@@ -2949,6 +2957,100 @@
     ['parcours', 'pret', 'suivi', 'niveauProg'].forEach(function (cle) { if (a[cle]) partie[cle] = a[cle]; });
   }
 
+  // ---------- Évaluation d'une matière (v10.49, demande du 24/11/2026, backlog lignes 512 à 517) ----------
+  // Bouton « Évaluer » en face de chaque matière d'un profil (Mon compte → Statistiques) : 10 questions de la matière, sans plateau
+  // (le plateau est caché, la partie « Suivre ma progression » sert de support), dont le niveau 1 à 100 suit les réponses
+  // (js/evaluation.js). Ni étoiles, ni statistiques, ni point de niveau : seulement la progression trouvée, donnée au profil.
+  // Tirée à chaque question parmi les sous-matières de la matière, au niveau demandé (même tirage que « Suivre ma progression »).
+  function carteEval(j) {
+    var niv = window.Evaluation.poser(partie.eval.etat);
+    partie.eval.niveau = niv;
+    for (var essai = 0; essai < 40; essai++) {
+      var cs = carteSuivie(0, niv), c = null;
+      if (cs.carte) c = cs.carte;
+      else if (cs.calcul) c = carteCalculProgression(cs.calcul, cs.probleme);
+      else if (cs.progression) c = carteFrancaisProgression(j, cs.sous.s, cs.progression);
+      if (c && c.format !== 'I') return c; // « Qui suis-je ? » n'a pas de dé : écartée
+    }
+    return null;
+  }
+  // En-tête de l'évaluation : matière, numéro de la question et 10 pastilles.
+  function enteteEval() {
+    var e = partie.eval, n = window.Evaluation.numero(e.etat) + 1, tot = window.Evaluation.NB_QUESTIONS;
+    $('eval-titre').textContent = 'Évaluation · ' + e.nomMatiere + ' · ' + e.nomJoueur;
+    $('eval-compte').textContent = 'Question ' + n + ' sur ' + tot;
+    var h = '';
+    for (var k = 0; k < tot; k++) h += '<i class="' + (k < n - 1 ? 'fait' : k === n - 1 ? 'en-cours' : '') + '"></i>';
+    $('eval-pastilles').innerHTML = h;
+    $('eval-entete').hidden = false;
+  }
+  function lancerEvaluation(idProfil, matiereId) {
+    var J = window.Joueurs, m = J.matiere(matiereId), pr = profil(idProfil);
+    if (!m || !pr) return;
+    annulerMinuteurs();
+    // D'abord marquer l'évaluation (plus aucune sauvegarde), puis effacer l'ancienne : un rechargement repart de l'accueil.
+    partie.eval = { etat: window.Evaluation.nouvelle(), matiere: matiereId, nomMatiere: m.nom, profil: idProfil, nomJoueur: pr.nom, niveau: null };
+    try { sessionStorage.removeItem(CLE); } catch (e) { /* rien */ }
+    partie.rapide = null; partie.defi = null; partie.avantDefi = null; partie.modif = false;
+    partie.mots = [null, null, null, null];
+    poserProfils([idProfil]);
+    partie.parcours = ['suivre', null, null, null]; partie.pret = [true, false, false, false];
+    partie.suivi = [matiereId, null, null, null];
+    $('ecran-plateau').classList.add('mode-eval');
+    lancerPartie();
+  }
+  // Après une réponse (bonne : la réaction passe ; fausse : « J'ai compris ») : on note le résultat, puis question suivante ou bilan.
+  function suiteEval() {
+    var E = window.Evaluation, e = partie.eval, r = partie.regles;
+    E.repondre(e.etat, r.de === 'fort');
+    if (E.terminee(e.etat)) { finEval(); return; }
+    var id = r.id;
+    partie.regles = R.nouvellePartie(1, 9999);
+    partie.regles.id = id;
+    partie.carte = null; partie.vue = 'cache'; partie.roule = false;
+    $('carte-piochee').hidden = true;
+    rendre({ sansDeplacement: true });
+  }
+  function quitterEval() {
+    window.Confirmer({ titre: 'Quitter l’évaluation ?', texte: 'Rien ne sera enregistré : ta progression reste comme elle est.', oui: 'Oui, quitter' }).then(function (oui) { if (oui) retourAccueil(); });
+  }
+  // Bilan : la progression trouvée, ce qui monte tout seul, et pour chaque sous-matière déjà plus haute le choix « garder » ou « prendre ».
+  function finEval() {
+    var E = window.Evaluation, J = window.Joueurs, e = partie.eval, c = J.compteDeLaPage(), pr = c && J.trouver(c.etat, e.profil), m = J.matiere(e.matiere);
+    annulerMinuteurs();
+    if (!pr) { retourAccueil(); return; }
+    var trouve = E.progression(e.etat), actuels = {};
+    m.subs.forEach(function (s) { actuels[s.id] = J.score(pr, m.id, s.id); });
+    var plan = E.plan(actuels, m.subs, trouve);
+    function esc(t) { return String(t).replace(/[&<>"]/g, function (x) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[x]; }); }
+    $('eval-fin-texte').textContent = 'Tu as réussi ' + E.reussies(e.etat) + (E.reussies(e.etat) > 1 ? ' questions' : ' question') + ' sur ' + E.NB_QUESTIONS + '. Ta progression en ' + e.nomMatiere + ' : ' + trouve + ' sur 100 (niveau ' + J.niveauDe(trouve) + ' sur 10).';
+    var h = '';
+    plan.forEach(function (p) {
+      if (p.action === 'monte') h += '<li class="monte"><span>' + esc(p.nom) + '</span><strong>' + p.actuel + ' → ' + p.propose + '</strong></li>';
+      else if (p.action === 'egal') h += '<li><span>' + esc(p.nom) + '</span><strong>' + p.actuel + ' (inchangé)</strong></li>';
+      else h += '<li class="demande"><fieldset><legend>' + esc(p.nom) + ' : tu es déjà à ' + p.actuel + '</legend>' +
+        '<label><input type="radio" name="eval-' + p.id + '" value="garder" checked> Garder ' + p.actuel + '</label>' +
+        '<label><input type="radio" name="eval-' + p.id + '" value="prendre"> Passer à ' + p.propose + '</label></fieldset></li>';
+    });
+    $('eval-fin-liste').innerHTML = h;
+    $('eval-fin-ok').onclick = function () {
+      plan.forEach(function (p) {
+        if (p.action === 'monte') J.ajouterPoints(c.etat, e.profil, m.id, p.id, p.propose - p.actuel);
+        else if (p.action === 'demande') {
+          var ch = $('eval-fin-liste').querySelector('input[name="eval-' + p.id + '"]:checked');
+          if (ch && ch.value === 'prendre') J.fixerScore(c.etat, e.profil, m.id, p.id, p.propose);
+        }
+      });
+      J.enregistrer();
+      try { sessionStorage.setItem('ludoaventura-apres-eval', e.profil); } catch (x) { /* rien */ }
+      $('eval-fin').close();
+      retourAccueil();
+    };
+    $('eval-fin-non').onclick = function () { $('eval-fin').close(); retourAccueil(); };
+    $('eval-fin').showModal();
+  }
+  $('btn-eval-quitter').addEventListener('click', quitterEval);
+
   // ---------- Partie rapide (v6.43) ----------
   // d : tirée par js/rapide.js (joueurs, matières, aventure). Comme pour un défi, on remplit la préparation
   // (réglages « tout coché », gardés si le joueur passe par « Modifier les choix »), puis on lance.
@@ -3076,7 +3178,7 @@
   }
 
   function sauver() {
-    if (!pretASauver) return;
+    if (!pretASauver || partie.eval) return; // v10.49 : une évaluation interrompue (rechargement) n'est pas reprise
     var avRadio = document.querySelector('input[name="aventure"]:checked');
     var d = {
       ecran: partie.ecran || 'ecran-accueil',
@@ -3213,7 +3315,10 @@
   // « Modifier les choix » : retour à la préparation (tous les choix gardés), puis « Reprendre la partie »
   //   la continue là où elle en était, avec les nouveaux réglages.
   // « Retour à l'accueil » : la partie est arrêtée et tout repart de zéro.
-  function ouvrirMenu() { if (!$('menu-partie').open) { montrerChoix(); $('menu-partie').showModal(); } }
+  function ouvrirMenu() {
+    if (partie.eval) { quitterEval(); return; } // v10.49 : pas de menu de partie pendant une évaluation
+    if (!$('menu-partie').open) { montrerChoix(); $('menu-partie').showModal(); }
+  }
   // Le menu montre ses 3 choix, ou la question de confirmation (v6.25, choix de l'utilisateur).
   var aConfirmer = null;
   function montrerChoix() {
@@ -3384,6 +3489,17 @@
   reprendre();
   pretASauver = true;
   sauver();
+  // Après une évaluation (v10.49) : la page est rechargée, on revient sur Mon compte, statistiques du joueur ouvertes.
+  // (au chargement complet : js/joueurs-ecran.js, qui dessine les cartes, est chargé après ce fichier)
+  window.addEventListener('load', function () {
+    try {
+      var apresEval = sessionStorage.getItem('ludoaventura-apres-eval');
+      if (!apresEval) return;
+      sessionStorage.removeItem('ludoaventura-apres-eval');
+      if (window.JoueursEcran && window.JoueursEcran.ouvrirStats) window.JoueursEcran.ouvrirStats(apresEval);
+      afficher('ecran-compte');
+    } catch (e) { /* rien */ }
+  });
   // Défi quitté (v6.47) : un défi noté « en cours » qui n'est pas la partie reprise a été arrêté
   // (retour à l'accueil, jeu fermé…) : plus de récompense pour ce défi aujourd'hui.
   if (window.Recompenses) {
@@ -3413,7 +3529,7 @@
     }, { once: true });
   });
 
-  window.Aventura = { afficher: afficher, demanderJoueurs: demanderJoueurs, lancerDefi: lancerDefi, lancerRapide: lancerRapide, reprendreRapide: reprendreRapide, annulerModif: annulerModif, piocherCarte: piocherCarte, cases: CASES, route: ROUTE, trajet: trajet, decalages: DECALAGES, partie: partie, cartesDuJoueur: cartesDuJoueur, majConstruction: majConstruction,
+  window.Aventura = { afficher: afficher, demanderJoueurs: demanderJoueurs, lancerEvaluation: lancerEvaluation, lancerDefi: lancerDefi, lancerRapide: lancerRapide, reprendreRapide: reprendreRapide, annulerModif: annulerModif, piocherCarte: piocherCarte, cases: CASES, route: ROUTE, trajet: trajet, decalages: DECALAGES, partie: partie, cartesDuJoueur: cartesDuJoueur, majConstruction: majConstruction,
     // Tests : lancer le dé sans attendre le lancer automatique (il n'y a plus de bouton depuis v4.3).
     lancerDe: function () { lancerDe(partie.regles.de); } };
 })();

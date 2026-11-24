@@ -116,6 +116,21 @@
     return j.niv[cle(matiereId, sousId)];
   }
 
+  // Fixe le niveau d'une sous-matière à une valeur (évaluation, v10.49). Contrairement à +1 point, il peut BAISSER : la date de
+  // cette décision est gardée (nivT), pour que la fusion avec un autre appareil ne remette pas l'ancien niveau plus haut.
+  // Renvoie le nouveau score, ou -1 si la sous-matière n'existe pas.
+  function fixerScore(etat, id, matiereId, sousId, valeur, maintenant) {
+    var j = trouver(etat, id), m = matiere(matiereId);
+    if (!j || !m || !m.subs.some(function (s) { return s.id === sousId; })) return -1;
+    var quand = maintenantISO(maintenant), k = cle(matiereId, sousId);
+    j.niv = j.niv || {};
+    j.nivT = j.nivT || {};
+    j.niv[k] = borne(valeur);
+    j.nivT[k] = quand;
+    j.maj = quand;
+    return j.niv[k];
+  }
+
   // ---------- Suppression (v10.32, demande du 23/11/2026) ----------
   // Détruit le joueur, sa progression et ses gains (niveaux, étoiles, pierres, coffres, statistiques). Son identifiant est
   // gardé dans « supprimes » : à la fusion avec un autre appareil, il ne revient pas. Le total du compte (classements) ne baisse pas.
@@ -159,6 +174,18 @@
     if (typeof require === 'function') { try { return require('./etoiles.js'); } catch (e) { return null; } }
     return null;
   }
+  // Niveaux d'un même joueur vus de deux côtés : le plus haut des deux (on ne perd jamais un niveau gagné), sauf pour une
+  // sous-matière fixée par une évaluation (nivT, v10.49) : la décision la plus récente l'emporte, même si elle baisse le niveau.
+  function fusionnerNiveaux(x, j) {
+    var tx = x.nivT && typeof x.nivT === 'object' ? x.nivT : {}, tj = j.nivT && typeof j.nivT === 'object' ? j.nivT : {};
+    Object.keys(j.niv || {}).forEach(function (k) {
+      var a = String(tx[k] || ''), b = String(tj[k] || '');
+      if (a === b) x.niv[k] = Math.max(borne(x.niv[k]), borne(j.niv[k]));
+      else if (b > a) { x.niv[k] = borne(j.niv[k]); tx[k] = b; }
+    });
+    Object.keys(tj).forEach(function (k) { if (String(tj[k]) > String(tx[k] || '')) tx[k] = tj[k]; });
+    if (Object.keys(tx).length) x.nivT = tx; else delete x.nivT;
+  }
   // ---------- Fusion (compte ↔ appareil) ----------
   // Même joueur (même id) : nom et personnage les plus récents, niveaux = le plus haut des deux (on ne perd jamais un
   // niveau gagné). Joueurs présents d'un seul côté : gardés. Les noms identiques de deux joueurs différents (créés chacun
@@ -174,7 +201,7 @@
       if (plusRecent) { x.nom = j.nom; x.perso = j.perso; }
       x.maj = String(j.maj || '') > String(x.maj || '') ? j.maj : x.maj;
       x.cree = String(j.cree || '') && String(j.cree) < String(x.cree || '9') ? j.cree : x.cree;
-      Object.keys(j.niv || {}).forEach(function (k) { x.niv[k] = Math.max(borne(x.niv[k]), borne(j.niv[k])); });
+      fusionnerNiveaux(x, j);
       // Statistiques (v10.32) : le plus grand de chaque compteur ; la série en cours vient du côté le plus récent.
       MATIERES.forEach(function (m) {
         var sx = statDe(x, m.id), sj = statDe(j, m.id);
@@ -216,7 +243,7 @@
     cle: cle, toutesLesCles: toutesLesCles, matiere: matiere,
     score: score, scoreMatiere: scoreMatiere, niveauDe: niveauDe, niveauMatiere: niveauMatiere, scoreGlobal: scoreGlobal, niveauGlobal: niveauGlobal,
     lister: lister, trouver: trouver, verifierNom: verifierNom, creer: creer, assurerPremier: assurerPremier,
-    renommer: renommer, changerPerso: changerPerso, ajouterPoints: ajouterPoints, fusionner: fusionner,
+    renommer: renommer, changerPerso: changerPerso, ajouterPoints: ajouterPoints, fixerScore: fixerScore, fusionner: fusionner,
     supprimer: supprimer, statDe: statDe, enregistrerPartie: enregistrerPartie, statTotal: statTotal,
     duCompte: duCompte, enregistrer: enregistrer, compteDeLaPage: compteDeLaPage
   };

@@ -55,8 +55,10 @@
   // Une matière dans « Statistiques » : jauge, puis parties jouées, réussies, réussies d'affilée (en ce moment, et record).
   function blocMatiere(j, m) {
     var st = J.statDe(j, m.id);
-    return '<div class="jm-bloc m-' + m.id + '">' + jauge(j, m) + '<p class="jm-detail">' + pluriel(st.jouees, 'partie jouée', 'parties jouées') + ' · ' +
-      pluriel(st.reussies, 'réussie', 'réussies') + ' · ' + st.serie + ' d’affilée (record : ' + st.record + ')</p></div>';
+    // v10.49 : « Évaluer » (10 questions, sans plateau) donne au joueur sa progression de départ dans cette matière.
+    return '<div class="jm-bloc m-' + m.id + '">' + jauge(j, m) + '<div class="jm-pied"><p class="jm-detail">' + pluriel(st.jouees, 'partie jouée', 'parties jouées') + ' · ' +
+      pluriel(st.reussies, 'réussie', 'réussies') + ' · ' + st.serie + ' d’affilée (record : ' + st.record + ')</p>' +
+      '<button type="button" class="btn btn-secondaire btn-evaluer" data-act="evaluer" data-matiere="' + m.id + '" aria-label="Évaluer ' + m.nom + ' : ' + esc(j.nom) + '">Évaluer</button></div></div>';
   }
   function choixPerso(idBase, choisi) {
     return '<div class="perso-choix" role="group" aria-label="Personnage">' + A.LISTE.map(function (p) {
@@ -148,6 +150,7 @@
     if (act === 'voir-coffres' && window.Recompenses) { window.Recompenses.voir(id, 'ecran-coffres'); return; }
     if (act === 'aide-etoiles' && window.Recompenses) { window.Recompenses.aideEtoiles(); return; }
     if (act === 'coffres' && window.Recompenses) { window.Recompenses.ouvrirCoffresDe(id); return; }
+    if (act === 'evaluer' && window.Aventura) { window.Aventura.lancerEvaluation(id, b.getAttribute('data-matiere')); return; }
     if (act === 'stats') {
       ouverts[id] = !ouverts[id];
       var panneau = $('stats-' + id); panneau.hidden = !ouverts[id]; b.setAttribute('aria-expanded', String(ouverts[id]));
@@ -205,5 +208,7 @@
       if (e.detail === 'ecran-compte') rendre(); else edition = null;
     });
   }
-  window.JoueursEcran = { rendre: rendre };
+  // Ouvre les statistiques d'un joueur (retour d'une évaluation, v10.49).
+  function ouvrirStats(id) { ouverts[id] = true; rendre(); }
+  window.JoueursEcran = { rendre: rendre, ouvrirStats: ouvrirStats };
 })();

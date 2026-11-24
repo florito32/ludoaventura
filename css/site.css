@@ -2595,3 +2595,36 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 @media (pointer: coarse) { .mj-clavier { display: none; } }
 @media (max-height: 560px) { .mj-jeu .btn { min-height: 44px; padding-block: 6px; } .mj-reponse { min-height: 44px; } .mj-puce { min-height: 40px; } }
 @media (prefers-reduced-motion: reduce) { .mj-barre span { transition: none; } .mj-puce:active, .mj-reponse:active, .mj-manette .btn.appuye { transform: none; } }
+
+/* ---------- Évaluation d'une matière (v10.49, js/plateau.js → lancerEvaluation, js/evaluation.js) ----------
+   Sans plateau : la question occupe l'écran, avec en haut la matière, le numéro de la question et 10 pastilles. */
+.jm-pied { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.btn-evaluer { min-height: 44px; padding: 4px 14px; font-size: .9rem; }
+.eval-entete { display: grid; gap: 4px; justify-items: center; text-align: center; margin: 0 0 8px; }
+.eval-entete[hidden] { display: none; }
+.eval-titre { margin: 0; font-weight: 800; font-size: 1.05rem; }
+.eval-compte { margin: 0; font-weight: 700; color: var(--encre-douce); }
+.eval-pastilles { display: flex; gap: 5px; }
+.eval-pastilles i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--encre); background: #fff; }
+.eval-pastilles i.fait { background: var(--encre); }
+.eval-pastilles i.en-cours { background: #f4c542; }
+.eval-quitter { min-height: 40px; padding: 2px 12px; font-size: .85rem; }
+.mode-eval .plateau { display: none; }
+.mode-eval .tour-joueur { display: none; }
+.mode-eval .table { grid-template-columns: 1fr; justify-items: center; }
+.mode-eval .panneau { width: min(100%, 720px); }
+.eval-fin { max-height: calc(100dvh - 24px); overflow: auto; }
+.eval-liste { list-style: none; margin: 10px 0 14px; padding: 0; display: grid; gap: 8px; text-align: left; }
+.eval-liste li { display: flex; justify-content: space-between; gap: 10px; padding: 6px 10px; background: #fff; border: 2px solid var(--parchemin-bord); border-radius: 10px; }
+.eval-liste li.monte strong { color: #1f7a3a; }
+.eval-liste li.demande { display: block; }
+.eval-liste fieldset { border: 0; margin: 0; padding: 0; display: grid; gap: 4px; }
+.eval-liste legend { font-weight: 800; padding: 0; margin-bottom: 4px; }
+.eval-liste label { display: flex; align-items: center; gap: 8px; min-height: 40px; font-weight: 700; cursor: pointer; }
+/* « Évaluer » reste sur la ligne du détail de SA matière (pas en dessous), et chaque matière est séparée de la suivante. */
+.jm-pied { flex-wrap: nowrap; }
+.jm-pied .jm-detail { flex: 1 1 auto; min-width: 0; }
+.jm-pied .btn-evaluer { flex: none; }
+.joueur-jauges .jm-bloc { padding-bottom: 8px; border-bottom: 1px dashed var(--parchemin-bord); }
+.joueur-jauges .jm-bloc:last-child { border-bottom: 0; padding-bottom: 0; }
+.mode-eval #tour-titre { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
