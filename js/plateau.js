@@ -1212,10 +1212,9 @@
   function preparerSuivis() {
     for (var i = 0; i < nbChoisi(); i++) {
       if (estSuivi(i)) {
-        var o = window.Rapide.ortho(niveauSousMatiere(i, 'francais', 'orthographe'), TOUS_TYPES);
         partie.packs[i] = TOUS_PACKS.slice();
-        partie.types[i] = o.types.length ? o.types.slice() : TOUS_TYPES.slice();
-        partie.mots[i] = o.mots.slice();
+        partie.types[i] = TOUS_TYPES.slice();
+        partie.mots[i] = [1, 2, 3, 4, 5]; // v10.41 : le niveau de progression (1 à 100) trie les mots, pas les séries
       } else if (!partie.defi && !partie.rapide) partie.mots[i] = null; // plus de séries imposées par un parcours « Suivre » précédent
     }
   }
@@ -1230,13 +1229,20 @@
       return { matiere: 'maths', calcul: calcul, probleme: s === 'probleme', sous: sous };
     }
     if (m === 'francais') {
+      // v10.41 : cartes de niveau de progression dans la fenêtre de 5 niveaux du profil (carteFenetre, js/progression-francais.js).
+      return { matiere: s, fenetre: window.ProgressionFenetre.fenetre(niveauProfil(i, m, s)), sous: sous };
+    }
+    if (m === 'francais-ancien') {
       if (s === 'conjugaison') return { matiere: 'conjugaison', conj: window.Defis.reglages('conjugaison', niv, Math.random).conj, sous: sous };
       if (s === 'grammaire') return { matiere: 'grammaire', gram: window.Rapide.gramTout(niv), sous: sous };
       if (s === 'phonemes') return { matiere: 'phonemes', phon: window.Rapide.phonTout(), sous: sous };
       return { matiere: 'orthographe', sous: sous };
     }
     var jeux = jeuxProposes(m, 'quiz').filter(function (x) { return x.famille === s; }).map(function (x) { return x.id; });
-    var carte = SV.generer({ jeux: jeux, niveau: niv, mode: 'quiz' }, m) || SV.generer({ jeux: jeuxProposes(m, 'quiz').map(function (x) { return x.id; }), niveau: niv, mode: 'quiz' }, m);
+    // v10.41 : questions dont le niveau de progression (1 à 100) est dans la fenêtre de 5 niveaux du profil (js/progression-savoirs.js).
+    // Famille « cartes » : zones calculées sans niveau par question, tirage au niveau Facile…Expert comme avant (à valider).
+    var fs = window.ProgressionFenetre.fenetre(niveauProfil(i, m, s));
+    var carte = SV.generer({ jeux: jeux, niveau: niv, mode: 'quiz', fenetre: { bas: fs.bas, haut: fs.haut, niveau: window.ProgressionSavoirs.niveau } }, m) || SV.generer({ jeux: jeux, niveau: niv, mode: 'quiz' }, m) || SV.generer({ jeux: jeuxProposes(m, 'quiz').map(function (x) { return x.id; }), niveau: niv, mode: 'quiz' }, m);
     return { matiere: m, carte: carte, sous: sous };
   }
   // Sous-matière la plus jouée par un joueur « Suivre » pendant la partie : c'est elle qui reçoit le point de niveau (ligne 446).
@@ -1256,6 +1262,57 @@
     }
     f.packNom = 'Calcul · niveau ' + f.prog;
     return f;
+  }
+
+  // ---------- Français « Suivre ma progression » : cartes dans la fenêtre de 5 niveaux (v10.41) ----------
+  // Chaque carte tirée a un niveau de progression de 1 à 100 (js/progression-francais.js) : on tire jusqu'à en trouver une dans la
+  // fenêtre ; sinon la plus proche de son centre. Renvoie null si le niveau d'une carte n'est pas calculable (le tirage normal sert).
+  function carteFenetre(j, matiere, f) {
+    var PF = window.ProgressionFrancais, centre = (f.bas + f.haut) / 2;
+    if (!PF) return null;
+    if (matiere === 'orthographe') return carteOrthoFenetre(j, f);
+    var meilleure = null, ecart = 1e9, vusG = (j.gramVus || []).slice(), vusP = (j.phonVus || []).slice();
+    for (var essai = 0; essai < 400; essai++) {
+      var c, prog = null;
+      if (matiere === 'conjugaison') {
+        c = V.generer(window.Rapide.conjTout(V.NIVEAUX[Math.floor(Math.random() * V.NIVEAUX.length)].id));
+        c.type = 'conjugaison'; c.packNom = 'Conjugaison';
+        prog = PF.conjugaison.carte(c.verbe, c.temps, c.personne);
+      } else if (matiere === 'grammaire') {
+        c = carteGrammaire(j, window.Rapide.gramTout(G.NIVEAUX[Math.floor(Math.random() * G.NIVEAUX.length)].id));
+        var p = String(c.cle || '').split('|');
+        prog = c.cle ? PF.grammaire.element(p[0], p[1], Number(p[2])) : null;
+      } else {
+        c = cartePhonemes(j, window.Rapide.phonTout());
+        prog = c.mot ? PF.phonemes.carte(c.jeu, c.son, c.mot) : null;
+      }
+      if (prog === null) continue;
+      var e = prog >= f.bas && prog <= f.haut ? 0 : Math.abs(prog - centre);
+      if (e < ecart) { ecart = e; meilleure = c; }
+      if (!e) break;
+    }
+    // Les cartes essayées en passant ne comptent pas dans « déjà vues » : seule la carte gardée y entre.
+    if (matiere === 'grammaire') { j.gramVus = vusG; if (meilleure && meilleure.cle) j.gramVus.push(meilleure.cle); }
+    if (matiere === 'phonemes') { j.phonVus = vusP; if (meilleure && meilleure.cle) j.phonVus.push(meilleure.cle); }
+    if (meilleure && matiere === 'conjugaison') meilleure.packNom = 'Conjugaison · niveau ' + Math.round(centre);
+    return meilleure;
+  }
+  // Orthographe : un mot dont le niveau est dans la fenêtre (élargie si besoin), avec une question de son niveau si possible.
+  function carteOrthoFenetre(j, f) {
+    var PF = window.ProgressionFrancais, tous = cartesDuJoueur(j.index), choisis = partie.types[j.index] || TOUS_TYPES;
+    for (var e = 0; e <= 100; e += e < 10 ? 2 : 10) {
+      var bons = tous.filter(function (c) { var n = !c.lettre && PF.orthographe.mot(c.mot); return n && n >= f.bas - e && n <= f.haut + e; });
+      if (!bons.length) continue;
+      for (var essai = 0; essai < 30; essai++) {
+        var c = bons[Math.floor(Math.random() * bons.length)], poss = Q.possibles(c.mot, C.INFOS[c.mot], choisis);
+        if (!poss.length) continue;
+        var dedans = poss.filter(function (q) { var n = PF.orthographe.carte(c.mot, q.id); return n && n >= f.bas - e && n <= f.haut + e; });
+        c.question = (dedans.length ? dedans : poss)[Math.floor(Math.random() * (dedans.length || poss.length))];
+        c.params = c.question.preparer ? c.question.preparer(c.mot, C.INFOS[c.mot]) : null;
+        return c;
+      }
+    }
+    return null;
   }
 
   // Pioche dans le tas du joueur (tas vide → on remélange toutes ses cartes) et tire au hasard
@@ -1286,6 +1343,7 @@
       j.sous = j.sous || {};
       j.sous[cs.sous.m + '.' + cs.sous.s] = (j.sous[cs.sous.m + '.' + cs.sous.s] || 0) + 1;
       if (cs.carte) return cs.carte;
+      if (cs.fenetre) { var cf = carteFenetre(j, cs.matiere, cs.fenetre); if (cf) return cf; }
       if (cs.calcul) return carteCalculProgression(cs.calcul, cs.probleme);
       mat = cs.matiere; if (cs.maths) mr = cs.maths; if (cs.conj) cr = cs.conj; if (cs.gram) gr = cs.gram;
       if (cs.phon) return cartePhonemes(j, cs.phon);

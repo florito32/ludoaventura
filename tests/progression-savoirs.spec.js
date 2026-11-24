@@ -73,3 +73,34 @@ test.describe('progression de l’Histoire et de la Géographie (1 à 100)', () 
     expect(total).toBe(7949);
   });
 });
+
+// v10.41 : « Suivre ma progression » en Histoire et Géographie : tirage dans une fenêtre de niveaux de progression.
+test.describe('Savoirs : tirage dans une fenêtre de niveaux (v10.41)', () => {
+  test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
+  test('une fenêtre qui ne contient qu\'une question tire cette question', () => {
+    const S = require('../js/savoirs.js');
+    require('../js/histoire.js'); require('../js/geographie.js');
+    ['pre', 'mag', 'ren', 'mod', 'ant', 'xix', 'xx'].forEach((f) => require('../js/histoire-' + f + '.js'));
+    const PS = require('../js/progression-savoirs.js');
+    const jeux = S.JEUX.filter((j) => j.matiere === 'histoire' && j.famille === 'xix').map((j) => j.id);
+    for (let b = 1; b <= 96; b += 19) {
+      for (let k = 0; k < 8; k++) {
+        const c = S.generer({ jeux, niveau: 'facile', mode: 'quiz', fenetre: { bas: b, haut: b + 4, niveau: PS.niveau } }, 'histoire');
+        expect(c).toBeTruthy();
+        expect(c.type).toBe('savoir');
+      }
+    }
+    // fenêtre factice : une seule question de la série 0 du premier jeu est dans la fenêtre → c'est elle qui sort
+    const jeu = S.trouver(jeux[0]);
+    const serieQcm = jeu.series.findIndex((s) => s.k === 'qcm' && s.niveaux.facile && s.niveaux.facile.length > 3 && s.niveaux.facile.some((x) => x[2].length >= 3));
+    if (serieQcm < 0) return;
+    const rang = s0(jeu.series[serieQcm]);
+    const fen = { bas: 50, haut: 50, niveau: (j, si, n, i) => (j === jeu.id && si === serieQcm && n === 'facile' && i === rang ? 50 : 99) };
+    for (let k = 0; k < 10; k++) {
+      const c = S.generer({ jeux: [jeu.id], niveau: 'facile', mode: 'quiz', fenetre: fen }, 'histoire');
+      expect(c).toBeTruthy();
+      expect(c.niveau).toBe('facile');
+    }
+    function s0(s) { return s.niveaux.facile.findIndex((x) => x[2].length >= 3); }
+  });
+});

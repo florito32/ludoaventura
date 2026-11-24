@@ -2,6 +2,9 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.41', date: '2026-11-24', changes: [
+    "« Suivre ma progression » en Français, Histoire et Géographie : tes questions sont maintenant de ton niveau, à 2 niveaux près (comme en Maths)."
+  ] },
   { v: '10.40', date: '2026-11-24', changes: [
     "« Suivre ma progression » en Maths : tes calculs sont maintenant de ton niveau, à 2 niveaux près. Si tu es au niveau 26 en calcul, tu reçois des calculs de niveau 24 à 28.",
     "Les calculs sont rangés dans l’ordre où on les apprend : additions, puis soustractions, multiplications et divisions ; les petits nombres avant les dizaines, les centaines et les milliers. Une addition de centaines est plus difficile qu’une multiplication de deux petits nombres (745 + 356 est plus dur que 7 × 8)."

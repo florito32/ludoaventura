@@ -151,22 +151,48 @@ test('« Suivre ma progression » : un joueur à 26 en calcul reçoit des calcul
   expect(new Set(niveaux).size).toBeGreaterThan(1); // la fenêtre est bien utilisée, pas un seul niveau
 });
 
-test('« Suivre ma progression » en Français : orthographe, conjugaison, grammaire et phonèmes, chacun à son niveau', async ({ page }) => {
+test('« Suivre ma progression » en Français : chaque sous-matière dans sa fenêtre de 5 niveaux (v10.41)', async ({ page }) => {
   await ouvrir(page, { v: 1, total: 0, joueurs: [{ id: 'j-1', nom: 'Léa', perso: 'lea', cree: '2026-11-01T00:00:00Z', maj: '2026-11-01T00:00:00Z',
-    niv: { 'francais.orthographe': 5, 'francais.conjugaison': 95, 'francais.grammaire': 35, 'francais.phonemes': 0 } }] });
+    niv: { 'francais.orthographe': 50, 'francais.conjugaison': 95, 'francais.grammaire': 35, 'francais.phonemes': 20 } }] });
   await etape1(page, 1);
   await suivreMaProgression(page, 0, 'francais');
   await aventure(page).click();
   await page.getByRole('button', { name: 'Lancer la partie' }).click();
   await page.getByRole('heading', { name: 'Le plateau' }).waitFor();
   const r = await page.evaluate(() => {
-    const j = window.Aventura.partie.joueurs[0], vus = {};
-    for (let i = 0; i < 120; i++) { const c = window.Aventura.piocherCarte(j); const k = (c.packNom || '').split(' · ')[0] + ' · ' + (c.type || ''); vus[k] = c.packNom; }
-    return { sous: j.sous, conj: Object.values(vus).filter((n) => n.startsWith('Conjugaison')), gram: Object.values(vus).filter((n) => n.startsWith('Grammaire')) };
+    const j = window.Aventura.partie.joueurs[0], PF = window.ProgressionFrancais, res = { conj: [], gram: [], phon: [], ortho: [] };
+    for (let i = 0; i < 160; i++) {
+      const c = window.Aventura.piocherCarte(j), nom = c.packNom || '';
+      if (nom.startsWith('Conjugaison')) res.conj.push(PF.conjugaison.carte(c.verbe, c.temps, c.personne));
+      else if (nom.startsWith('Phonèmes') && c.mot) res.phon.push(PF.phonemes.carte(c.jeu, c.son, c.mot));
+      else if (nom.startsWith('Grammaire') && c.cle) { const p = c.cle.split('|'); res.gram.push(PF.grammaire.element(p[0], p[1], Number(p[2]))); }
+      else if (c.question && c.mot && !nom.startsWith('Grammaire')) res.ortho.push(PF.orthographe.mot(c.mot));
+    }
+    return { res, sous: j.sous };
   });
   expect(Object.keys(r.sous).sort()).toEqual(['francais.conjugaison', 'francais.grammaire', 'francais.orthographe', 'francais.phonemes']);
-  for (const n of r.conj) expect(n).toContain('Expert'); // 95 → niveau 10 → Expert
-  for (const n of r.gram) expect(n).toContain('Moyen'); // 35 → niveau 4 → Moyen
+  const dans = (liste, bas, haut) => { expect(liste.length).toBeGreaterThan(0); for (const n of liste) { expect(n).toBeGreaterThanOrEqual(bas); expect(n).toBeLessThanOrEqual(haut); } };
+  dans(r.res.conj, 93, 97);  // 95 → 93 à 97
+  dans(r.res.gram, 33, 37);  // 35 → 33 à 37
+  dans(r.res.phon, 18, 22);  // 20 → 18 à 22
+  dans(r.res.ortho, 48, 52); // 50 → 48 à 52
+});
+
+test('« Suivre ma progression » en Histoire et Géographie : questions de la fenêtre de 5 niveaux du profil (v10.41)', async ({ page }) => {
+  await ouvrir(page, { v: 1, total: 0, joueurs: [{ id: 'j-1', nom: 'Léa', perso: 'lea', cree: '2026-11-01T00:00:00Z', maj: '2026-11-01T00:00:00Z',
+    niv: { 'histoire.xix': 60, 'histoire.pre': 60, 'geographie.france': 60, 'geographie.monde': 60, 'geographie.nature': 60, 'geographie.cartes': 60 } }] });
+  await etape1(page, 1);
+  await suivreMaProgression(page, 0, 'histoire');
+  await aventure(page).click();
+  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await page.getByRole('heading', { name: 'Le plateau' }).waitFor();
+  const r = await page.evaluate(() => {
+    const j = window.Aventura.partie.joueurs[0], cartes = [];
+    for (let i = 0; i < 40; i++) { const c = window.Aventura.piocherCarte(j); cartes.push({ type: c.type, matiere: c.matiere }); }
+    return { cartes, sous: Object.keys(j.sous) };
+  });
+  for (const c of r.cartes) { expect(c.type).toBe('savoir'); expect(c.matiere).toBe('histoire'); }
+  expect(r.sous.length).toBeGreaterThan(1);
 });
 
 test('fin de partie : le point de niveau va à la sous-matière la plus jouée par un joueur qui suit sa progression', async ({ page }) => {
