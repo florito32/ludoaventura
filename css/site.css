@@ -2378,7 +2378,7 @@ body:has(#ecran-baby:not([hidden])) .pied { padding-block: 4px calc(4px + env(sa
   .cj-places:has(.cj-ligne:nth-child(3)) .cj-resume { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
   .cj-places:has(.cj-ligne:nth-child(3)) .cj-ligne:has(.cj-resume.pret) .cj-nom::after { content: " ✓ prêt"; color: #1f6a34; font-size: .8rem; font-weight: 700; }
   .cj-places:has(.cj-ligne:nth-child(3)) .cj-ligne { padding-block: 6px; gap: 4px 8px; }
-  .cj-places:has(.cj-ligne:nth-child(3)) .cj-parcours-btn { flex: 1 1 0; white-space: nowrap; font-size: .85rem; min-height: 34px; padding: 1px 4px; }
+  .cj-places:has(.cj-ligne:nth-child(3)) .cj-parcours-btn { flex: 1 1 0; font-size: .82rem; line-height: 1.05; min-height: 34px; padding: 1px 4px; }
   .cj-places:has(.cj-ligne:nth-child(3)) ~ .etape-actions .prepa-aide { font-size: .8rem; }
 }
 .etape-actions-joueurs { align-items: center; }
