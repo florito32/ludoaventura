@@ -2,6 +2,9 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.42', date: '2026-11-24', changes: [
+    "« Suivre ma progression » en Histoire et en Géographie : les questions sont maintenant de ton niveau, à 2 niveaux près (niveau 40 : questions de niveau 38 à 42). Si une série a trop peu de questions, la fenêtre s’élargit un peu."
+  ] },
   { v: '10.41', date: '2026-11-24', changes: [
     "« Suivre ma progression » en Français : orthographe, conjugaison, grammaire et phonèmes te posent maintenant des questions de ton niveau, à 2 niveaux près (niveau 26 en conjugaison : questions de niveau 24 à 28)."
   ] },
