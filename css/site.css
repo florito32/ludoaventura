@@ -2631,3 +2631,45 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .joueur-jauges .jm-bloc { padding-bottom: 8px; border-bottom: 1px dashed var(--parchemin-bord); }
 .joueur-jauges .jm-bloc:last-child { border-bottom: 0; padding-bottom: 0; }
 .mode-eval #tour-titre { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Mini-jeu « Quiz » (v10.51, js/mj-quiz.js) ---------- */
+.quiz { display: grid; gap: 12px; width: 100%; }
+.quiz-niveaux { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.quiz-info { margin: 0; color: var(--encre-douce); font-weight: 700; }
+.quiz-entete { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-weight: 800; }
+.quiz-chrono { font-variant-numeric: tabular-nums; font-size: 1.3rem; }
+.quiz-barre { height: 12px; border: 2px solid var(--encre); border-radius: 99px; background: #fff; overflow: hidden; }
+.quiz-barre i { display: block; height: 100%; width: 100%; background: var(--bleu); }
+.quiz-barre i.urgent { background: var(--rouge-texte); }
+/* Les pages : la nouvelle question est dessous, l'ancienne se tourne autour de son bord gauche (comme une page de livre) puis disparaît. */
+.quiz-pages { position: relative; perspective: 1400px; }
+.quiz-page { display: grid; gap: 10px; padding: 12px; background: var(--parchemin); border: 3px solid var(--encre); border-radius: 14px; box-shadow: 0 4px 0 var(--encre); backface-visibility: hidden; }
+.quiz-page.sortante { position: absolute; inset: 0; z-index: 2; transform-origin: left center; animation: quiz-tourne 700ms ease-in forwards; pointer-events: none; }
+@keyframes quiz-tourne { from { transform: rotateY(0); filter: brightness(1); } to { transform: rotateY(90deg); filter: brightness(.75); } }
+.quiz-question { margin: 0; font-size: 1.15rem; line-height: 1.25; }
+.quiz-sujet:empty { display: none; }
+.quiz-options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.quiz-options.longues { grid-template-columns: 1fr; }
+/* Réponses : bonne = vert ; fausse touchée = rouge (plus de texte barré) ; le signe ✓ / ✗ évite de ne compter que sur la couleur. */
+.quiz-page .btn-option.bonne { background: #1f7a3a; border-color: #14501f; color: #fff; opacity: 1; }
+.quiz-page .btn-option.fausse { background: #c62828; border-color: #7f1818; color: #fff; text-decoration: none; opacity: 1; }
+.quiz-page .btn-option.bonne::before { content: '✓ '; }
+.quiz-page .btn-option.fausse::before { content: '✗ '; }
+.quiz-annonce { margin: 0; min-height: 1.4em; font-weight: 700; }
+.quiz-attente { margin: 0; font-weight: 700; }
+.quiz-contexte { color: var(--encre-douce); font-size: .95rem; }
+.quiz-score { font-size: 1.5rem; }
+.quiz-felicitations { color: #1f5a2f; }
+@media (max-width: 420px) { .quiz-options:not(.longues) { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { .quiz-page.sortante { animation: none; } }
+/* Écrans bas (téléphone carré ou en paysage) : le quiz resserre ses marges et sa carte pour que les 4 réponses restent visibles pendant le chronomètre. */
+@media (max-height: 600px) {
+  .quiz { gap: 6px; }
+  .quiz-page { padding: 8px; gap: 6px; }
+  .quiz-question { font-size: 1rem; }
+  .quiz-sujet .carte-geo svg { max-height: 24vh; }
+  .quiz-sujet .carte-geo .carte-zoom .btn-zoom { width: 30px; height: 30px; font-size: 1rem; }
+  .quiz-sujet .indices li { padding: 1px 6px; font-size: .85rem; }
+  .quiz-annonce { min-height: 1.2em; font-size: .9rem; }
+  #minijeu-corps .quiz .minijeu-qui, .carte-page.minijeu:has(.quiz) .minijeu-qui { display: none; }
+}

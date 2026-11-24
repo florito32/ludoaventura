@@ -5,7 +5,8 @@
 // Mini-jeux : « La fabrique à mots » (ex-Baby jeux › Lettres, contenu et gestes dans js/baby.js et js/baby-carte.js) et
 // « Les sons » (v10.43, ex-matière Phonèmes de l'aventure : un des 6 jeux de js/phonemes.js tiré au hasard, sur tous les sons ;
 // les gestes sont ceux de js/grammaire-carte.js, empruntés avec GrammaireCarte.viser), puis « Course aux étoiles » (js/mj-etoiles.js)
-// et « Aventure des multiplications » (js/mj-aventure.js), repris de florito32/minijeux (v10.47).
+// et « Aventure des multiplications » (js/mj-aventure.js), repris de florito32/minijeux (v10.47), puis « Quiz » Histoire / Géographie
+// (js/mj-quiz.js, v10.51 : choix de la matière, de la sous-matière et du niveau 1 à 10 ; scores dans Supabase).
 // Pour en ajouter un : une ligne dans JEUX, et soit sa fonction de départ dans DEPARTS (elle rend { carte, titre… }), soit un champ
 // « module » : un script qui expose window.X.monter(hote, { fini(gagne, ligneHtml) }) et rend { detruire() }.
 (function () {
@@ -18,7 +19,8 @@
     { id: 'fabrique', nom: 'La fabrique à mots', icone: '🏭', aide: 'Fabrique des mots avec des lettres et des sons, puis écoute-les.' },
     { id: 'sons', nom: 'Les sons', icone: '👂', aide: 'Complète, trie, relie : trouve les sons des mots (phonèmes).' },
     { id: 'etoiles', nom: 'Course aux étoiles', icone: '⭐', module: 'MJEtoiles', aide: 'Choisis la bonne réponse parmi trois, gagne des étoiles et bats ton record.' },
-    { id: 'aventure', nom: 'Aventure des multiplications', icone: '🏃', module: 'MJAventure', aide: 'Cours, saute et casse les caisses qui donnent le bon résultat.' }
+    { id: 'aventure', nom: 'Aventure des multiplications', icone: '🏃', module: 'MJAventure', aide: 'Cours, saute et casse les caisses qui donnent le bon résultat.' },
+    { id: 'quiz', nom: 'Quiz', icone: '❓', module: 'MJQuiz', aide: 'Histoire et Géographie : 10 ou 15 questions, 15 secondes pour répondre, un niveau de 1 à 10 à choisir.' }
   ];
   var etat = null; // partie en cours : { jeu, profil, carte, fini }
 
@@ -86,7 +88,7 @@
       $('minijeu-corps').innerHTML = '<section class="carte-page minijeu"><p class="minijeu-qui">' + (etat.profil && nomJoueur(etat.profil) ? esc(nomJoueur(etat.profil)) + ' joue' : '') +
         '</p><div class="minijeu-jeu" id="minijeu-jeu"></div></section>';
       var moi = etat;
-      etat.inst = window[j.module].monter($('minijeu-jeu'), { fini: function (gagne, ligne) { if (etat === moi) terminer(gagne, null, null, false, ligne); } });
+      etat.inst = window[j.module].monter($('minijeu-jeu'), { profil: etat.profil, fini: function (gagne, ligne) { if (etat === moi) terminer(gagne, null, null, false, ligne); } });
       return;
     }
     dessiner();

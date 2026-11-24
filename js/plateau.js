@@ -3051,59 +3051,8 @@
   }
   $('btn-eval-quitter').addEventListener('click', quitterEval);
 
-  // ---------- Partie rapide (v6.43) ----------
-  // d : tirée par js/rapide.js (joueurs, matières, aventure). Comme pour un défi, on remplit la préparation
-  // (réglages « tout coché », gardés si le joueur passe par « Modifier les choix »), puis on lance.
-  // Les réglages d'avant sont gardés de côté et reviennent avec « Nouvelle partie ».
-  function lancerRapide(d) {
-    demanderJoueurs(d.joueurs, function (sl) {
-      garderAvant();
-      partie.defi = null;
-      poserProfils(sl);
-      document.querySelector('input[name="aventure"][value="' + d.aventure + '"]').checked = true;
-      reglagesRapide(d);
-      partie.parcours = [null, null, null, null]; // v10.36 : une partie rapide a ses propres réglages
-      partie.etapePrepa = 3; partie.sousEtape = 'matiere'; partie.actif = 0;
-      majDetail(); majAventuriers();
-      lancerPartie();
-    });
-  }
-  // Réglages des cartes d'une partie rapide (matières, niveau, mode) :
-  // au lancement, et quand on les modifie en cours de partie (v9.2).
-  function reglagesRapide(d) {
-    var R2 = window.Rapide, premiere = d.matieres.indexOf('maths') >= 0 ? 'maths' : 'orthographe';
-    // v6.45 : orthographe = tous les thèmes, avec les mots et les questions du niveau choisi.
-    var o = R2.ortho(d.niveau, TOUS_TYPES);
-    for (var i = 0; i < 4; i++) {
-      partie.matiere[i] = premiere;
-      partie.francais[i] = premiere !== 'maths';
-      partie.maths[i] = R2.mathsTout('moyen');
-      partie.conj[i] = R2.conjTout('moyen');
-      partie.packs[i] = TOUS_PACKS.filter(function (p) { return o.packs.indexOf(p) >= 0; });
-      if (!partie.packs[i].length) partie.packs[i] = TOUS_PACKS.slice();
-      partie.types[i] = o.types.length ? o.types.slice() : TOUS_TYPES.slice();
-      partie.mots[i] = o.mots.slice();
-      partie.gram[i] = R2.gramTout(d.niveau); // v6.55
-    }
-    partie.rapide = { matieres: d.matieres.slice(), niveau: d.niveau, mode: d.mode || 'quiz' };
-  }
-  // « Modifier les choix » d'une partie rapide (v9.2, demande du 16/11/2026) : on revient à son
-  // écran de réglages (pas à la préparation de l'aventure), puis « Reprendre la partie » garde l'aventure, l'aventurier
-  // et les points ; les nouveaux réglages valent dès la carte suivante (une carte pas encore répondue est repiochée).
-  function modifierRapide() {
-    partie.modif = true;
-    afficher('ecran-rapide');
-  }
-  function reprendreRapide(d) {
-    if (!partie.rapide || !partie.regles) return;
-    reglagesRapide(d);
-    reprendreApresModif();
-  }
-  // « ← Partie » sur l'écran des réglages : retour au plateau, rien ne change.
-  function annulerModif() {
-    partie.modif = false;
-    reprendreLePlateau(partie.vue);
-  }
+  // Partie rapide : retirée le 24/11/2026 (demande de l'utilisateur, backlog ligne 519). Son tirage de cartes (js/rapide.js) sert encore
+  // au défi du jour ; l'écran, le lancement et « Modifier les choix » de la partie rapide n'existent plus.
 
   // ---------- Fin de partie ----------
   function montrerFin() {
@@ -3161,7 +3110,7 @@
   // sessionStorage : « survit aux rechargements et restaurations de la page ; fermer l'onglet efface les données »
   // (MDN, Window.sessionStorage). Les objets (aventure, aventuriers, questions) sont enregistrés par leur identifiant.
   var CLE = 'ludoaventura-partie';
-  var PAGES_ACCUEIL = ['ecran-coffres', 'ecran-rapide', 'ecran-minijeux', 'ecran-minijeu']; // écrans ouverts depuis l'accueil (v6.36 ; v10.36 : plus d'écran du défi, c'est une fenêtre)
+  var PAGES_ACCUEIL = ['ecran-coffres', 'ecran-minijeux', 'ecran-minijeu']; // écrans ouverts depuis l'accueil (v6.36 ; v10.36 : plus d'écran du défi, c'est une fenêtre)
   var pretASauver = false; // pas de sauvegarde pendant la construction initiale de la page
 
   function carteVersDonnees(c) {
@@ -3206,9 +3155,7 @@
     var d;
     try { d = JSON.parse(sessionStorage.getItem(CLE) || 'null'); } catch (e) { d = null; }
     // Écrans des étoiles (v6.36) : ils s'ouvrent depuis l'accueil, on y revient.
-    // Exception (v9.2) : réglages d'une partie rapide ouverts par « Modifier les choix » : la partie est reprise.
-    var modifRapide = d && d.modif && d.jeu && d.rapide && d.ecran === 'ecran-rapide';
-    if (!d || !d.ecran || d.ecran === 'ecran-accueil' || (PAGES_ACCUEIL.indexOf(d.ecran) >= 0 && !modifRapide)) return false;
+    if (!d || !d.ecran || d.ecran === 'ecran-accueil' || PAGES_ACCUEIL.indexOf(d.ecran) >= 0) return false;
     try {
       // Préparation : nombre de joueurs, aventure, aventuriers et réglages des cartes.
       // Sauvegarde d'avant la v10.29 (préparation en 4 étapes, sans profils) : on repart de l'accueil.
@@ -3406,8 +3353,6 @@
     // Changer les réglages d'un défi en fait une partie libre (v6.37, hypothèse à valider) : on garde ceux du défi.
     if (partie.defi && window.Recompenses) window.Recompenses.compte.marquerQuitte(partie.defi.type); // défi quitté (v6.47)
     if (partie.defi) { partie.defi = null; partie.avantDefi = null; partie.mots = [null, null, null, null]; }
-    // Partie rapide ou Baby jeux (v9.2) : retour à leurs propres réglages, la partie garde son mode.
-    if (partie.rapide) { modifierRapide(); return; }
     preparer(1);
   });
   $('btn-accueil').addEventListener('click', function () {
@@ -3529,7 +3474,7 @@
     }, { once: true });
   });
 
-  window.Aventura = { afficher: afficher, demanderJoueurs: demanderJoueurs, lancerEvaluation: lancerEvaluation, lancerDefi: lancerDefi, lancerRapide: lancerRapide, reprendreRapide: reprendreRapide, annulerModif: annulerModif, piocherCarte: piocherCarte, cases: CASES, route: ROUTE, trajet: trajet, decalages: DECALAGES, partie: partie, cartesDuJoueur: cartesDuJoueur, majConstruction: majConstruction,
+  window.Aventura = { afficher: afficher, demanderJoueurs: demanderJoueurs, lancerEvaluation: lancerEvaluation, lancerDefi: lancerDefi, piocherCarte: piocherCarte, cases: CASES, route: ROUTE, trajet: trajet, decalages: DECALAGES, partie: partie, cartesDuJoueur: cartesDuJoueur, majConstruction: majConstruction,
     // Tests : lancer le dé sans attendre le lancer automatique (il n'y a plus de bouton depuis v4.3).
     lancerDe: function () { lancerDe(partie.regles.de); } };
 })();

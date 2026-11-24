@@ -416,5 +416,5 @@
     return t;
   }
 
-  racine.SavoirsCarte = { montrer: montrer, correction: correction, texteOral: texteOral };
+  racine.SavoirsCarte = { montrer: montrer, correction: correction, texteOral: texteOral, sujet: sujet, zoomer: zoomCarte }; // sujet, zoomer : repris par le mini-jeu Quiz (js/mj-quiz.js)
 })(this);
