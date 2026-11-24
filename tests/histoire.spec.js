@@ -295,7 +295,7 @@ test('écran des réglages : la matière Histoire, son niveau, ses jeux rangés 
   await ouvrirNeuf(page);
   await versReglages(page, 1);
   await choisir(page, '#matieres', 'Histoire');
-  await expect(page.locator('#reglage-niveau-savoir')).not.toHaveAttribute('hidden', '');
+  await expect(page.locator('#reglage-niveau-prog')).not.toHaveAttribute('hidden', ''); // v10.36 : niveau de 1 à 10
   await choisir(page, '#niveau-savoir', 'Moyen');
   await choisir(page, '#mode-savoir', 'Normal');
   await valider(page);
@@ -342,6 +342,7 @@ test('écran des réglages : la matière Histoire, son niveau, ses jeux rangés 
   for (const x of pb) { expect(x.debord, x.nom).toBe(false); expect(x.dehors, x.nom).toBe(false); expect(x.lignes, x.nom).toBeLessThanOrEqual(1); }
   await pasDeDebordement(page);
   await valider(page);
+  await page.getByRole('button', { name: 'Choisir l\'aventure' }).click(); // v10.36 : l'aventure se choisit après l'étape 1
   await expect(page.getByRole('button', { name: 'Lancer la partie' })).toBeVisible();
 });
 

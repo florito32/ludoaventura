@@ -174,6 +174,7 @@ test('écran des sons : catégories, sons sur deux colonnes avec un mot d\'exemp
   await expect(page.locator('#sons-phon input:checked')).toHaveCount(1);
   await valider(page);
   await valider(page);
+  await page.getByRole('button', { name: 'Choisir l\'aventure' }).click(); // v10.36 : l'aventure se choisit après l'étape 1
   await expect(page.getByRole('button', { name: 'Lancer la partie' })).toBeVisible();
 });
 

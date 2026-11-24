@@ -200,7 +200,7 @@ test('écran des réglages : Géographie, son niveau, le mode Quiz / Normal (v8.
   await choisir(page, '#matieres', 'Mathématiques');
   await expect(page.locator('#reglage-mode-savoir')).toHaveAttribute('hidden', '');
   await choisir(page, '#matieres', 'Géographie');
-  await expect(page.locator('#reglage-niveau-savoir')).not.toHaveAttribute('hidden', '');
+  await expect(page.locator('#reglage-niveau-prog')).not.toHaveAttribute('hidden', ''); // v10.36 : niveau de 1 à 10
   await expect(page.locator('#reglage-mode-savoir')).not.toHaveAttribute('hidden', '');
   await expect(page.locator('#mode-savoir input[value="quiz"]')).toBeChecked();
   await expect(page.locator('#mode-savoir-aide, #niveau-savoir-aide')).toHaveCount(0); // v8.5 : plus de commentaires
@@ -225,6 +225,7 @@ test('écran des réglages : Géographie, son niveau, le mode Quiz / Normal (v8.
   expect(p.jeux).toHaveLength(13);
   await pasDeDebordement(page);
   await valider(page);
+  await page.getByRole('button', { name: 'Choisir l\'aventure' }).click(); // v10.36 : l'aventure se choisit après l'étape 1
   await expect(page.getByRole('button', { name: 'Lancer la partie' })).toBeVisible();
 });
 

@@ -4,6 +4,8 @@
 // joueurs du compte, « Ajouter un joueur » en ajoute un (4 au plus), un joueur déjà dans la partie est grisé.
 // Utilisé par l'étape 1 de la préparation (js/plateau.js) et par la fenêtre « Qui joue ? » des défis, parties rapides et
 // Baby jeux (nombre de places fixé). Deux joueurs peuvent avoir le même personnage : même figurine, pion de couleur différente.
+// v10.36 (demande du 24/11/2026) : à l'étape 1 de la préparation, chaque joueur choisi a 2 boutons à côté de lui, « Suivre ma
+// progression » et « Personnaliser » (option opts.parcours) ; une fois sa préparation faite, la ligne indique ce qu'il a choisi.
 (function () {
   'use strict';
 
@@ -19,13 +21,27 @@
   }
 
   // opts : { fixe: nombre de places imposé (sinon 1 à 4, on ajoute et on retire), slots: [id ou null…], idBase,
-  //          surChangement(slots), surCreer() }
+  //          surChangement(slots), surCreer(),
+  //          parcours: { etat(i) → { parcours: 'suivre' | 'perso' | null, pret: vrai/faux, resume: texte }, choisir(i, parcours) } }
   function creer(zone, opts) {
     var idBase = opts.idBase || 'cj';
     var slots = (opts.slots && opts.slots.length ? opts.slots : [null]).slice(0, MAX);
     if (opts.fixe) { while (slots.length < opts.fixe) slots.push(null); slots.length = opts.fixe; }
     var ouvert = null; // place dont la liste est ouverte
     var focus = null;
+
+    // Les 2 boutons de préparation du joueur de la place i (étape 1) : le bouton déjà choisi reste « appuyé » et la ligne
+    // dit ce qui est prêt (« ✓ Maths · suit sa progression »).
+    function boutonsParcours(i, j) {
+      var e = opts.parcours.etat(i) || {}, nom = esc(j.nom);
+      function b(type, texte) {
+        return '<button type="button" class="btn cj-btn cj-parcours-btn ' + (e.parcours === type ? 'btn-principal' : 'btn-secondaire') + '" data-parcours="' + type + '" data-place="' + i + '"' +
+          ' aria-pressed="' + (e.parcours === type ? 'true' : 'false') + '" aria-label="' + texte + ' : ' + nom + ' (joueur ' + (i + 1) + ')">' + texte + '</button>';
+      }
+      return '<div class="cj-parcours" role="group" aria-label="Préparation de ' + nom + '">' +
+        b('suivre', 'Suivre ma progression') + b('perso', 'Personnaliser') +
+        '<p class="cj-resume' + (e.pret ? ' pret' : '') + '" role="status">' + (e.pret ? '✓ ' + esc(e.resume || 'Prêt') : 'À préparer') + '</p></div>';
+    }
 
     function rendre() {
       var liste = J.duCompte();
@@ -40,6 +56,7 @@
           (j ? '<div class="cj-nom">' + esc(j.nom) + '</div><div class="cj-niv">' + abrege(j) + '</div>' : '<div class="cj-niv">Choisis un joueur</div>') + '</div>' +
           '<button type="button" class="btn btn-secondaire cj-btn" data-ouvrir="' + i + '" aria-label="' + (j ? 'Changer le joueur ' : 'Choisir le joueur ') + (i + 1) + '">' + (j ? 'Changer' : 'Choisir') + '</button>' +
           (!opts.fixe && i > 0 ? '<button type="button" class="btn btn-secondaire cj-btn cj-retirer" data-retirer="' + i + '" aria-label="Retirer le joueur ' + (i + 1) + '">✕</button>' : '') +
+          (j && opts.parcours ? boutonsParcours(i, j) : '') +
           '</div>';
       });
       h += '</div>';
@@ -67,6 +84,7 @@
       else if (b.hasAttribute('data-retirer')) { var k = Number(b.getAttribute('data-retirer')); slots.splice(k, 1); ouvert = null; focus = '[data-ajouter]'; changer(); }
       else if (b.hasAttribute('data-choisir')) { slots[ouvert] = b.getAttribute('data-choisir'); focus = '[data-ouvrir="' + ouvert + '"]'; ouvert = null; changer(); }
       else if (b.hasAttribute('data-creer')) { if (opts.surCreer) opts.surCreer(); return; }
+      else if (b.hasAttribute('data-parcours')) { if (opts.parcours) opts.parcours.choisir(Number(b.getAttribute('data-place')), b.getAttribute('data-parcours')); return; }
       else return;
       rendre();
     });

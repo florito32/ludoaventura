@@ -59,11 +59,11 @@ test('didacticiel : préparation et premier tour, flèche et bulle à chaque ét
   await flecheSur(page, '#btn-commencer');
   await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
 
-  // Étape 1 : la flèche montre la liste des joueurs, puis « Valider ».
-  await expect(texte(page)).toContainText('Qui joue ?');
-  await flecheSur(page, '#btn-valider-joueurs');
+  // Étape 1 (v10.36) : la flèche montre « Suivre ma progression » du joueur ; ce joueur choisit « Personnaliser ».
+  await expect(texte(page)).toContainText('Suivre ma progression');
+  await flecheSur(page, '.cj-parcours-btn[data-parcours="suivre"]');
   await bulleSansBouton(page);
-  await A.valider(page);
+  await A.personnaliser(page, 0);
 
   await expect(texte(page)).toContainText('choisis ta matière');
   await flecheSur(page, '#matieres');
@@ -90,6 +90,10 @@ test('didacticiel : préparation et premier tour, flèche et bulle à chaque ét
   await bulleSansBouton(page);
   await A.valider(page);
 
+  // Tous les joueurs sont prêts : retour à l'étape 1, la flèche montre « Choisir l'aventure ».
+  await expect(texte(page)).toContainText('Tout le monde est prêt');
+  await flecheSur(page, '#btn-valider-joueurs');
+  await page.getByRole('button', { name: 'Choisir l\'aventure' }).click();
   await expect(texte(page)).toContainText('Choisis ton aventure');
   await page.getByRole('button', { name: 'Lancer la partie' }).click();
 
@@ -141,9 +145,9 @@ test('didacticiel : continue après un rechargement de la page', async ({ page }
   await page.goto('./');
   await page.getByRole('button', { name: 'Oui, guide-moi' }).click();
   await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
-  await expect(texte(page)).toContainText('Qui joue');
+  await expect(texte(page)).toContainText('Suivre ma progression');
   await page.reload();
-  await expect(texte(page)).toContainText('Qui joue');
+  await expect(texte(page)).toContainText('Suivre ma progression');
   await page.getByRole('button', { name: 'Arrêter le guide' }).click();
   await expect(bulle(page)).toBeHidden();
 });

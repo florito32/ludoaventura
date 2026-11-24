@@ -29,7 +29,7 @@ test('mathématiques : le parcours onglets → bandeaux, le choix marqué dans l
   // Problèmes → le bandeau du niveau (4 choix l'un sous l'autre) ; l'onglet garde le choix.
   await choisir(page, '#type-maths', 'Problèmes');
   await expect(onglet(page, 'type')).toContainText('Problèmes');
-  await expect(page.locator('#reglage-niveau-maths')).toBeVisible();
+  await expect(page.locator('#reglage-niveau-prog')).toBeVisible();
   const n = await page.locator('#niveau-maths .pack span').evaluateAll((l) => l.map((e) => { const r = e.getBoundingClientRect(); return Math.round(r.x); }));
   expect(n).toHaveLength(4);
   expect(new Set(n).size).toBe(1);
@@ -46,12 +46,12 @@ test('mathématiques : le parcours onglets → bandeaux, le choix marqué dans l
   expect(await choisi.evaluate((e) => getComputedStyle(e, '::after').content)).toContain('✓');
   // Revenir sur un choix précédent : on retouche l'onglet, le bandeau se rouvre avec le choix marqué.
   await onglet(page, 'niveau').click();
-  await expect(page.locator('#reglage-niveau-maths')).toBeVisible();
-  await expect(page.locator('#niveau-maths input[value="moyen"]')).toBeChecked();
-  const coche = page.locator('#niveau-maths label', { hasText: 'Moyen' }).locator('span');
+  await expect(page.locator('#reglage-niveau-prog')).toBeVisible();
+  await expect(page.locator('#niveau-prog input[value="4"]')).toBeChecked(); // v10.36 : Moyen = niveau 4
+  const coche = page.locator('#niveau-prog label', { hasText: /^\s*4\s*$/ }).locator('span');
   expect(await coche.evaluate((e) => getComputedStyle(e).color)).toBe('rgb(59, 42, 30)');
   await choisir(page, '#niveau-maths', 'Difficile');
-  await expect(onglet(page, 'niveau')).toContainText('Difficile');
+  await expect(onglet(page, 'niveau')).toContainText('6');
   // Un seul « Valider » visible à la fois ; celui du bandeau passe à l'écran suivant.
   if (!(await page.locator('#reglage-nb-signes').isVisible())) await onglet(page, 'signes').click(); // (déjà ouvert après le niveau)
   await expect(page.getByRole('button', { name: 'Valider mes choix' })).toBeVisible();
@@ -67,10 +67,10 @@ test('un clic ailleurs, ou Échap, ferme le bandeau ; le « Valider » du bas re
   await versReglages(page, 1);
   await cocher(page, '#matieres', 'francais');
   await cocher(page, '#francais', 'orthographe');
-  await expect(page.locator('#reglage-niveau-ortho')).toBeVisible(); // Français → Orthographe → son niveau (dernier bandeau)
+  await expect(page.locator('#reglage-niveau-prog')).toBeVisible(); // Français → Orthographe → son niveau (dernier bandeau)
   await expect(page.getByRole('button', { name: 'Valider mes choix' })).toBeVisible();
   await page.keyboard.press('Escape');
-  await expect(page.locator('#reglage-niveau-ortho')).toBeHidden();
+  await expect(page.locator('#reglage-niveau-prog')).toBeHidden();
   await expect(page.getByRole('button', { name: 'Valider', exact: true })).toBeVisible();
   await expect(onglet(page, 'signes')).toBeHidden(); // pas de signes en français
   await sansDebordement(page);
@@ -86,6 +86,6 @@ test('géographie : l\'onglet s\'appelle « Mode » ; l\'écran tient sans défi
   await expect(onglet(page, 'type')).toContainText('Mode');
   await expect(page.locator('#reglage-mode-savoir')).toBeVisible();
   await choisir(page, '#mode-savoir', 'Normal');
-  await expect(page.locator('#reglage-niveau-savoir')).toBeVisible();
+  await expect(page.locator('#reglage-niveau-prog')).toBeVisible();
   await sansDebordement(page);
 });

@@ -61,22 +61,22 @@ test('le niveau d\'orthographe se choisit sur l\'écran de la matière, et Exper
   await rapide(page);
   await page.goto('./');
   await versReglages(page, 1);
-  await expect(page.locator('#niveau-ortho')).toBeHidden();
+  await expect(page.locator('#niveau-prog')).toBeHidden();
   await cocher(page, '#matieres', 'francais');
   await cocher(page, '#francais', 'orthographe');
-  await expect(page.locator('#niveau-ortho input')).toHaveCount(4);
-  await expect(page.locator('#niveau-ortho input[value="facile"]')).toBeChecked();
-  await expect(page.locator('#niveau-ortho-aide')).toHaveCount(0); // v8.5
+  // v10.36 : niveau de 1 à 10 (le niveau 9 = l'ancien Expert, la série 5).
+  await expect(page.locator('#niveau-prog input')).toHaveCount(10);
+  await expect(page.locator('#niveau-prog input[value="1"]')).toBeChecked();
   await expect(page.locator('#niveau-conj')).toBeHidden();
   await choisir(page, '#niveau-ortho', 'Expert');
-  await expect(page.locator('#niveau-ortho input[value="expert"]')).toBeChecked();
+  await expect(page.locator('#niveau-prog input[value="9"]')).toBeChecked();
   // Tout tient sans défiler.
   const deborde = await page.evaluate(() => {
     const c = document.querySelector('#reglages-joueur');
     return Math.max(document.documentElement.scrollHeight - innerHeight, c.scrollHeight - c.clientHeight);
   });
   expect(deborde).toBeLessThanOrEqual(1);
-  const boutons = await page.locator('#niveau-ortho .pack span').evaluateAll((l) => l.some((e) => e.scrollWidth > e.clientWidth + 1));
+  const boutons = await page.locator('#niveau-prog .pack span').evaluateAll((l) => l.some((e) => e.scrollWidth > e.clientWidth + 1));
   expect(boutons).toBe(false);
   await valider(page);
   // Thèmes puis questions, comme avant.
@@ -88,6 +88,7 @@ test('le niveau d\'orthographe se choisit sur l\'écran de la matière, et Exper
   // Rechargement : le niveau est gardé.
   await page.reload();
   expect(await page.evaluate(() => window.Aventura.partie.orthoNiveau[0])).toBe('expert');
+  await page.getByRole('button', { name: 'Choisir l\'aventure' }).click();
   await page.getByRole('button', { name: 'Lancer la partie' }).click();
   await page.getByRole('heading', { name: 'Le plateau' }).waitFor();
   const tas = await page.evaluate(() => window.Aventura.partie.joueurs[0].tas.map((c) => c.mot));
@@ -109,6 +110,7 @@ test('Moyen pioche la série 3 ; « Mêmes réglages pour tous » copie le nivea
   await page.locator('#types-questions input[value="nombre"]').check();
   await page.getByRole('button', { name: 'Mêmes réglages pour tous' }).click();
   expect(await page.evaluate(() => window.Aventura.partie.orthoNiveau.slice(0, 2))).toEqual(['moyen', 'moyen']);
+  await page.getByRole('button', { name: 'Choisir l\'aventure' }).click();
   await page.getByRole('button', { name: 'Lancer la partie' }).click();
   await page.getByRole('heading', { name: 'Le plateau' }).waitFor();
   const tas = await page.evaluate(() => window.Aventura.partie.joueurs[1].tas.map((c) => c.mot));

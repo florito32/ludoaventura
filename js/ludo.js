@@ -57,11 +57,12 @@
     var e = document.querySelector('.ecran:not([hidden])');
     return e ? e.id : null;
   }
-  function nomJoueur(p) {
-    var j = p.profils && p.profils[p.actif] && window.Joueurs && window.Joueurs.duCompte().filter(function (x) { return x.id === p.profils[p.actif]; })[0];
+  function nomJoueur(p, k) {
+    k = k === undefined ? p.actif : k;
+    var j = p.profils && p.profils[k] && window.Joueurs && window.Joueurs.duCompte().filter(function (x) { return x.id === p.profils[k]; })[0];
     if (j) return j.nom;
-    var a = window.Aventuriers.trouver(p.choix[p.actif]);
-    return a ? a.nom : 'Joueur ' + (p.actif + 1);
+    var a = window.Aventuriers.trouver(p.choix[k]);
+    return a ? a.nom : 'Joueur ' + (k + 1);
   }
   function vide(id) { return !document.querySelector('#' + id + ' input:checked'); }
 
@@ -83,9 +84,14 @@
     var n = p.etapePrepa, nom = nomJoueur(p), valider;
     var cle = 'prepa-' + n + '-' + p.actif + '-' + p.sousEtape;
     if (n === 1) {
-      return { cle: cle, cible: $('btn-valider-joueurs'), // Joueur 1 est déjà choisi : la flèche va droit sur « Valider »
-       
-        texte: 'Qui joue ? Touche « Choisir » pour prendre un joueur de ton compte, « Ajouter un joueur » pour être plus nombreux (4 au plus), puis « Valider ».' };
+      // v10.36 : chaque joueur choisit « Suivre ma progression » ou « Personnaliser » ; « Choisir l'aventure » apparaît quand tous sont prêts.
+      var suite = $('btn-valider-joueurs');
+      if (suite && !suite.hidden) return { cle: 'prepa-1-prets', cible: suite, texte: 'Tout le monde est prêt ! Touche « Choisir l’aventure ».' };
+      var k = 0;
+      while (k < p.profils.length && (p.pret[k] || !p.profils[k])) k++;
+      var bouton = document.querySelector('.cj-parcours-btn[data-parcours="suivre"][data-place="' + k + '"]');
+      return { cle: 'prepa-1-' + k, cible: bouton || suite,
+        texte: nomJoueur(p, k) + ', touche « Suivre ma progression » (tu choisis seulement ta matière, les questions sont de ton niveau) ou « Personnaliser » (tu règles ta partie, niveau de 1 à 10). « Ajouter un joueur » pour être plus nombreux (4 au plus).' };
     }
     if (n === 3) {
       return { cle: cle, choix: $('liste-aventures'), cible: $('btn-lancer'),
@@ -96,19 +102,24 @@
     valider = (window.Selecteur && window.Selecteur.boutonValider()) || $('btn-valider-reglages');
     var ongletNiveau = window.Selecteur && window.Selecteur.onglet('niveau');
     var mat = p.matiere[p.actif];
+    if (p.parcours[p.actif] === 'suivre') {
+      if (!p.suivi[p.actif]) return { cle: cle + '-s1', cible: $('suivre-matieres'),
+        texte: nom + ', choisis ta matière : les questions de tes cartes seront de ton niveau dans cette matière.' };
+      return { cle: cle + '-s2', cible: valider, texte: 'C’est noté ! Touche « Valider » : tu reviens à l’étape 1.' };
+    }
     if (p.sousEtape === 'matiere') {
       if (!mat && !p.francais[p.actif]) return { cle: cle + '-a', cible: $('matieres'),
         texte: nom + ', choisis ta matière : Mathématiques ou Français. Les questions de tes cartes viendront de là.' };
       if (!mat) return { cle: cle + '-b', cible: $('francais'),
         texte: 'En français, choisis Orthographe (des mots à écrire, compter, découper…), Conjugaison (des verbes à conjuguer) ou Grammaire (des phrases à remettre en ordre, des contraires, des erreurs à trouver…).' };
       if (mat === 'maths') return { cle: cle + '-c', choix: ongletNiveau || $('niveau-maths'), cible: valider,
-        texte: 'Choisis ton niveau : Facile, ce sont les tables ; plus c’est dur, plus les nombres sont grands. Puis le nombre de signes par calcul, et « Valider ».' };
+        texte: 'Choisis ton niveau, de 1 à 10 : plus il est haut, plus les nombres sont grands. Puis le nombre de signes par calcul, et « Valider ».' };
       if (mat === 'conjugaison') return { cle: cle + '-e', choix: ongletNiveau || $('niveau-conj'), cible: valider,
-        texte: 'Choisis ton niveau : plus il est haut, plus les verbes sont rares ou pièges. Puis « Valider ».' };
+        texte: 'Choisis ton niveau, de 1 à 10 : plus il est haut, plus les verbes sont rares ou pièges. Puis « Valider ».' };
       if (mat === 'grammaire') return { cle: cle + '-g', choix: ongletNiveau || $('niveau-gram'), cible: valider,
-        texte: 'Choisis ton niveau : plus il est haut, plus les phrases sont longues et les pièges nombreux. Puis « Valider » pour choisir tes jeux.' };
+        texte: 'Choisis ton niveau, de 1 à 10 : plus il est haut, plus les phrases sont longues et les pièges nombreux. Puis « Valider » pour choisir tes jeux.' };
       if (mat === 'orthographe') return { cle: cle + '-f', choix: ongletNiveau || $('niveau-ortho'), cible: valider,
-        texte: 'Choisis ton niveau : plus il est haut, plus les mots sont longs, rares ou pièges. Puis « Valider » pour choisir tes thèmes.' };
+        texte: 'Choisis ton niveau, de 1 à 10 : plus il est haut, plus les mots sont longs, rares ou pièges. Puis « Valider » pour choisir tes thèmes.' };
       return { cle: cle + '-d', cible: valider, texte: 'C’est noté ! Touche « Valider » pour régler tes questions.' };
     }
     // Conjugaison (v6.49) : un seul écran pour les modes, les groupes et les temps.
@@ -261,7 +272,7 @@
       if (el.getClientRects().length) zones.push({ r: el.getBoundingClientRect(), poids: 20 });
     });
     // « Tout sélectionner » (v6.27) reste toujours visible : sur petit écran, c'est le moyen sûr de choisir sans que la bulle gêne.
-    var actions = '.accueil-actions .btn, .etape:not([hidden]) .etape-actions .btn, .etape:not([hidden]) .btn-tout, #tour-actions .btn, #carte-saisie, .barre .btn-retour, .version-badge';
+    var actions = '.accueil-actions .btn, .etape:not([hidden]) .etape-actions .btn, .etape:not([hidden]) .cj-parcours-btn, .etape:not([hidden]) .btn-valider-bandeau, .etape:not([hidden]) .btn-tout, #tour-actions .btn, #carte-saisie, .barre .btn-retour, .version-badge';
     document.querySelectorAll(actions).forEach(function (el) {
       if (el.getClientRects().length) zones.push({ r: el.getBoundingClientRect(), poids: 1000 });
     });

@@ -455,8 +455,11 @@
         <div class="etape-corps">
           <div class="choix-joueurs" id="choix-joueurs"></div>
         </div>
-        <div class="etape-actions">
-          <button type="button" class="btn btn-principal" id="btn-valider-joueurs">Valider</button>
+        <!-- v10.36 (demande du 24/11/2026) : à côté de chaque joueur, « Suivre ma progression » ou « Personnaliser » ; le bouton du bas
+             n'apparaît que lorsque tous les joueurs ont fini de se préparer, et mène au choix de l'aventure (étape 3). -->
+        <div class="etape-actions etape-actions-joueurs">
+          <p class="prepa-aide" id="prepa-aide" role="status" aria-live="polite"></p>
+          <button type="button" class="btn btn-principal" id="btn-valider-joueurs" hidden>Choisir l'aventure</button>
         </div>
       </fieldset>
 
@@ -470,6 +473,12 @@
           <!-- Premier écran de l'étape 3 : la matière (Mathématiques, ou Français puis Orthographe / Conjugaison). -->
           <!-- v10.13 (demande du 18/11/2026) : onglets à gauche (js/selecteur.js), un seul bandeau déroulant ouvert à droite
                (la rangée .reglage-ligne du choix en cours). Les rangées ci-dessous restent la source de vérité (js/plateau.js). -->
+          <!-- v10.36 : « Suivre ma progression » : seulement la matière (les questions viennent du niveau enregistré dans le profil). -->
+          <div class="reglage choix-suivre" id="choix-suivre" hidden>
+            <p class="reglage-titre" id="suivre-titre">Je suis ma progression en :</p>
+            <div class="packs" id="suivre-matieres" role="radiogroup" aria-labelledby="suivre-titre"></div>
+            <p class="reglage-aide" id="suivre-aide">Les questions seront celles de ton niveau enregistré dans cette matière.</p>
+          </div>
           <div class="reglage choix-matiere avec-rail" id="choix-matiere">
           <nav class="rail-choix" id="rail-choix" aria-label="Choix de la partie"></nav>
           <div class="zone-choix" id="zone-choix" aria-live="polite"></div>
@@ -502,6 +511,13 @@
               <label class="pack"><input type="radio" name="type-maths" value="calcul"><span>Calcul mental</span></label>
               <label class="pack"><input type="radio" name="type-maths" value="probleme"><span>Problèmes</span></label>
             </div>
+          </div>
+          <!-- v10.36 : « Personnaliser » : niveau de 1 à 10 = une dizaine de la progression 1-100 (niveau 2 = niveaux 11 à 20).
+               Il remplace Facile / Moyen / Difficile / Expert ci-dessous, qui restent dans la page (source de vérité des générateurs) mais cachés. -->
+          <div class="reglage-ligne" id="reglage-niveau-prog" hidden>
+            <p class="reglage-titre" id="niveau-prog-titre">Niveau <span>(1 à 10)</span></p>
+            <div class="packs niveaux-prog" id="niveau-prog" role="radiogroup" aria-labelledby="niveau-prog-titre"></div>
+            <p class="reglage-aide" id="niveau-prog-aide">Chaque niveau regroupe dix niveaux de la progression : le niveau 2, c’est les niveaux 11 à 20.</p>
           </div>
           <!-- Mathématiques : le niveau se choisit tout de suite, sur cet écran (v5.9). Facile = les tables. -->
           <div class="reglage-ligne" id="reglage-niveau-maths" hidden>

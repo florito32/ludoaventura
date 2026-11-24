@@ -8,7 +8,7 @@ const titrePrepa = (page) => page.getByRole('heading', { name: 'Préparer la par
 test('préparation : la touche précédent revient à l\'étape précédente, puis à l\'accueil', async ({ page }) => {
   await page.goto('./');
   await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
-  await valider(page); // Joueur 1 → réglages
+  await page.locator('.cj-parcours-btn[data-parcours="perso"]').first().click(); // v10.36 : Joueur 1 → « Personnaliser » → réglages
   await expect(page.locator('#prepa-progres')).toHaveText('Étape 2 sur 3');
   await page.goBack();
   await expect(titrePrepa(page)).toBeVisible();
