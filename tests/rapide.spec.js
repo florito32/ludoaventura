@@ -6,7 +6,6 @@ const V = require('../js/conjugaison.js');
 const A = require('../js/aventures.js');
 const D = require('../js/defis.js');
 const G = require('../js/grammaire.js');
-const PH = require('../js/phonemes.js');
 const { rapide, lancerRapideQui } = require('./aide');
 
 test.describe('tirage de la partie rapide', () => {
@@ -55,16 +54,15 @@ test.describe('tirage de la partie rapide', () => {
     for (let k = 0; k < 300; k++) { const t = R.carte(['maths'], 'moyen'); expect(t.matiere).toBe('maths'); typesMaths.add(t.maths.type); }
     expect([...typesMaths].sort()).toEqual(['calcul', 'probleme']);
     // v6.55 : Français = orthographe, conjugaison ou grammaire (tous les jeux, au niveau choisi) ;
-    // v10.4 : et phonèmes (tous les jeux, tous les sons).
+    // v10.43 : plus de phonèmes (devenus le mini-jeu « Les sons »).
     const vues = new Set();
     for (let k = 0; k < 400; k++) {
       const t = R.carte(['francais'], 'moyen');
-      expect(['orthographe', 'conjugaison', 'grammaire', 'phonemes']).toContain(t.matiere);
+      expect(['orthographe', 'conjugaison', 'grammaire']).toContain(t.matiere);
       if (t.matiere === 'grammaire') expect(t.gram).toEqual({ niveau: 'moyen', jeux: G.JEUX.map((j) => j.id) });
-      if (t.matiere === 'phonemes') expect(t.phon).toEqual({ jeux: PH.JEUX.map((j) => j.id), sons: PH.TOUS_SONS });
       vues.add(t.matiere);
     }
-    expect(vues.size).toBe(4);
+    expect(vues.size).toBe(3);
     // Partie rapide gardée d'avant la v6.45 (sans niveau) : tout coché, comme avant.
     expect(R.carte(['maths']).maths.signes).toHaveLength(4);
   });
@@ -119,7 +117,7 @@ test('accueil → Partie rapide solo : matières (« Tout » / « Aucune » à c
   // Français seulement : orthographe (mots du niveau) et conjugaison (temps du niveau).
   const tirees = await page.evaluate(() => {
     const j = window.Aventura.partie.joueurs[0], t = [];
-    for (let k = 0; k < 200; k++) { const c = window.Aventura.piocherCarte(j); t.push(/^Phonèmes/.test(c.packNom || '') ? 'phonemes' : c.type === 'conjugaison' ? 'conjugaison:' + c.temps : c.type === 'calcul' ? 'calcul' : c.type === 'grammaire' ? 'grammaire:' + c.niveau : c.pack === 'grammaire' ? 'grammaire:mot' : 'ortho:' + c.niveau); }
+    for (let k = 0; k < 200; k++) { const c = window.Aventura.piocherCarte(j); t.push(c.type === 'conjugaison' ? 'conjugaison:' + c.temps : c.type === 'calcul' ? 'calcul' : c.type === 'grammaire' ? 'grammaire:' + c.niveau : c.pack === 'grammaire' ? 'grammaire:mot' : 'ortho:' + c.niveau); }
     return t;
   });
   expect(tirees).not.toContain('calcul');
@@ -128,8 +126,8 @@ test('accueil → Partie rapide solo : matières (« Tout » / « Aucune » à c
   // v6.55 : la grammaire aussi, au niveau choisi.
   expect(tirees.some((t) => t.startsWith('grammaire:'))).toBe(true);
   for (const t of tirees.filter((x) => x.startsWith('grammaire:'))) expect(['grammaire:difficile', 'grammaire:mot']).toContain(t);
-  // v10.4 : les phonèmes aussi.
-  expect(tirees).toContain('phonemes');
+  // v10.43 : les phonèmes ne tombent plus en partie rapide (mini-jeu « Les sons »).
+  expect(tirees.some((t) => /honem/.test(t))).toBe(false);
   await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await expect(page.locator('#carte-piochee')).toBeVisible();
   // Recharger pendant la partie la reprend en partie rapide, avec son niveau.
@@ -223,8 +221,8 @@ test('partie rapide : « Modifier les choix » revient aux réglages de la parti
 });
 
 // v10.4 (demande du 17/11/2026, backlog ligne 290) : n'importe quelle question des matières, hors Baby jeux :
-// problèmes de maths et phonèmes compris ; une carte de chaque s'affiche sur le plateau.
-test('partie rapide : problèmes de maths et phonèmes s’affichent sur le plateau', async ({ page }) => {
+// problèmes de maths compris (v10.43 : les phonèmes sont un mini-jeu) ; aucune carte de phonèmes ne tombe.
+test('partie rapide : problèmes de maths, et plus de phonèmes, sur le plateau', async ({ page }) => {
   await rapide(page);
   await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); } catch (e) { /* */ } });
   await page.goto('./');
@@ -245,18 +243,8 @@ test('partie rapide : problèmes de maths et phonèmes s’affichent sur le plat
   });
   expect(vus.probleme).toBeGreaterThan(0);
   expect(vus.calcul).toBeGreaterThan(0);
-  expect(vus.phonemes).toBeGreaterThan(0);
+  expect(vus.phonemes).toBe(0);
   expect(vus.baby).toBe(0);
-  // Une carte de phonèmes s'affiche sur le plateau sans déborder (l'affichage des problèmes est testé par problemes.spec.js).
-  await page.evaluate(() => {
-    const R = window.Rapide;
-    R.carte = function () { return { matiere: 'phonemes', phon: R.phonTout() }; };
-  });
-  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
-  await expect(page.locator('#carte-piochee')).toBeVisible();
-  await expect(page.locator('#carte-piochee')).toContainText('Phonèmes');
-  const largeur = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth);
-  expect(largeur).toBe(true);
 });
 
 test('v10.27 : « Qui joue ? » est demandé au lancement ; « Annuler » ne lance rien ; « C’est parti » lance avec le joueur du compte', async ({ page }) => {

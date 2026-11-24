@@ -2,16 +2,18 @@
 // Un mode à part, qui ne fonctionne pas comme les autres : pas de plateau, pas de pion, pas de matière, pas de niveau ni de
 // progression. Le joueur choisit son mini-jeu dans la liste, puis son profil (« Qui joue ? », seulement pour attribuer les
 // étoiles), joue, et gagne 10 étoiles à chaque partie terminée, gagnée ou perdue.
-// Pour l'instant un seul mini-jeu, « La fabrique à mots » (ex-Baby jeux › Lettres, contenu et gestes dans js/baby.js et
-// js/baby-carte.js). Pour en ajouter un : une ligne dans JEUX, et sa fonction de départ dans DEPARTS (elle rend { carte, titre… }).
+// Mini-jeux : « La fabrique à mots » (ex-Baby jeux › Lettres, contenu et gestes dans js/baby.js et js/baby-carte.js) et
+// « Les sons » (v10.43, ex-matière Phonèmes de l'aventure : un des 6 jeux de js/phonemes.js tiré au hasard, sur tous les sons ;
+// les gestes sont ceux de js/grammaire-carte.js, empruntés avec GrammaireCarte.viser). Pour en ajouter un : une ligne dans JEUX, et sa fonction de départ dans DEPARTS (elle rend { carte, titre… }).
 (function () {
   'use strict';
 
-  var B = window.Baby, BC = window.BabyCarte, R = window.Recompenses;
+  var B = window.Baby, BC = window.BabyCarte, R = window.Recompenses, PH = window.Phonemes, GC = window.GrammaireCarte;
   var $ = function (id) { return document.getElementById(id); };
   var ETOILES = 10; // par partie terminée, gagnée ou perdue
   var JEUX = [
-    { id: 'fabrique', nom: 'La fabrique à mots', icone: '🏭', aide: 'Fabrique des mots avec des lettres et des sons, puis écoute-les.' }
+    { id: 'fabrique', nom: 'La fabrique à mots', icone: '🏭', aide: 'Fabrique des mots avec des lettres et des sons, puis écoute-les.' },
+    { id: 'sons', nom: 'Les sons', icone: '👂', aide: 'Complète, trie, relie : trouve les sons des mots (phonèmes).' }
   ];
   var etat = null; // partie en cours : { jeu, profil, carte, fini }
 
@@ -37,11 +39,39 @@
 
   // ---------- Une partie ----------
   var DEPARTS = {
-    fabrique: function () { return B.generer('fabrique', B.defaut(), Math.random); }
+    fabrique: function () { return B.generer('fabrique', B.defaut(), Math.random); },
+    // Un jeu de sons au hasard, sur tous les sons (aucun niveau). Une carte qui ne sort pas est remplacée par un autre jeu.
+    sons: function () {
+      var jeux = PH.JEUX.map(function (x) { return x.id; }).sort(function () { return Math.random() - 0.5; }), c = null;
+      for (var k = 0; k < jeux.length && !c; k++) c = PH.generer(jeux[k], PH.TOUS_SONS, Math.random, []);
+      c.type = 'grammaire';
+      c.consigne = c.consigne || PH.jeu(c.jeu).nom;
+      return c;
+    }
   };
+  var cible = null; // cible précédente du moteur de js/grammaire-carte.js (à rendre en quittant « Les sons »)
+  function visee(boite) {
+    var r = GC.viser(boite, {
+      carte: function () { return etat && etat.carte; },
+      actif: function () { return !!etat && !etat.fini; },
+      fini: function (reponse) { corrigerSons(reponse); },
+      sauver: function () { /* un mini-jeu ne se reprend pas */ }
+    });
+    if (!cible) cible = r; // seule la toute première cible (celle du plateau) est à rendre
+  }
+  function rendre() { if (cible) { GC.viser(cible.boite, cible.rappels); cible = null; } }
+  // « Les sons » : la réponse est donnée, on montre la correction puis le résultat (10 étoiles).
+  function corrigerSons(reponse) {
+    var c = etat.carte;
+    c.reponseDonnee = reponse;
+    c.juste = PH.juste(c, reponse);
+    GC.afficher(c);
+    terminer(c.juste, null, PH.solution(c), true);
+  }
   function lancer(idJeu, idProfil) {
     var j = jeuDe(idJeu);
     if (!j || !DEPARTS[idJeu]) return;
+    rendre();
     etat = { jeu: j, profil: idProfil || null, carte: DEPARTS[idJeu](), fini: false };
     $('titre-minijeu').textContent = j.nom;
     window.Aventura.afficher('ecran-minijeu');
@@ -54,6 +84,14 @@
   function dessiner() {
     if (!etat) return;
     var c = etat.carte;
+    if (c.module === 'phonemes') {
+      $('minijeu-corps').innerHTML = '<section class="carte-page minijeu" aria-live="polite">' +
+        '<p class="minijeu-qui">' + (etat.profil && nomJoueur(etat.profil) ? esc(nomJoueur(etat.profil)) + ' joue' : '') + '</p>' +
+        '<p class="minijeu-consigne">' + esc(c.consigne) + '</p><div class="carte-gram" id="minijeu-gram"></div><div id="minijeu-fin"></div></section>';
+      visee($('minijeu-gram'));
+      GC.afficher(c);
+      return;
+    }
     $('minijeu-corps').innerHTML = '<section class="carte-page minijeu" aria-live="polite">' +
       '<p class="minijeu-qui">' + (etat.profil && nomJoueur(etat.profil) ? esc(nomJoueur(etat.profil)) + ' joue' : '') + '</p>' +
       '<p class="minijeu-consigne">' + esc(c.consigne) + '</p>' +
@@ -71,7 +109,7 @@
 
   // Fin de partie : 10 étoiles pour le profil choisi, une seule fois, gagnée ou perdue. Aucun niveau, aucune progression
   // (rien n'est noté dans les matières du joueur).
-  function terminer(gagne, texte) {
+  function terminer(gagne, texte, solution, dansCarte) {
     if (!etat || etat.fini) return;
     etat.fini = true;
     var gain = null;
@@ -83,12 +121,13 @@
     var h = '<section class="carte-page minijeu minijeu-fin" role="status">' +
       '<p class="minijeu-bravo">' + (gagne ? 'Bravo' + (nom ? ' ' + esc(nom) : '') + ' !' : 'Dommage, mais tu as bien joué !') + '</p>' +
       (texte ? '<p class="minijeu-resultat">Ton mot : <strong>' + esc(texte) + '</strong></p>' : '') +
+      (solution ? '<p class="minijeu-resultat">' + esc(solution) + '</p>' : '') +
       '<p class="fin-gain">' + ico('i-etoile', 'ico-gain') + '<strong>+' + ETOILES + ' étoiles</strong></p>' +
       (gain && gain.apres > gain.avant ? '<p class="fin-niveau">Niveau ' + gain.apres + ' atteint !</p>' : '') +
       (gain && gain.coffres && gain.coffres.length ? '<p class="petit">Un coffre t’attend dans « Mon compte ».</p>' : '') +
       '<div class="minijeu-actions"><button type="button" class="btn btn-principal" id="minijeu-rejouer">Rejouer</button>' +
       '<button type="button" class="btn btn-secondaire" id="minijeu-liste">Autres mini-jeux</button></div></section>';
-    $('minijeu-corps').innerHTML = h;
+    if (dansCarte) $('minijeu-fin').innerHTML = h; else $('minijeu-corps').innerHTML = h; // « Les sons » : la carte corrigée reste visible
     var b = $('minijeu-rejouer'); if (b) b.focus({ preventScroll: true });
     if (window.Voix && window.Voix.taire) window.Voix.taire();
   }
@@ -104,16 +143,18 @@
   $('minijeu-corps').addEventListener('click', function (e) {
     if (!etat) return;
     if (e.target.closest('#minijeu-rejouer')) { lancer(etat.jeu.id, etat.profil); return; }
-    if (e.target.closest('#minijeu-liste')) { window.Aventura.afficher('ecran-minijeux'); return; }
-    if (!etat.fini) BC.toucher(etat.carte, e, outils);
+    if (e.target.closest('#minijeu-liste')) { rendre(); window.Aventura.afficher('ecran-minijeux'); return; }
+    if (etat.fini) return;
+    if (etat.carte.module === 'phonemes') GC.toucher(e); else BC.toucher(etat.carte, e, outils);
   });
   $('minijeu-retour').addEventListener('click', function () {
-    etat = null;
+    etat = null; rendre();
     if (window.Voix && window.Voix.taire) window.Voix.taire();
     window.Aventura.afficher('ecran-minijeux');
   });
-  document.addEventListener('aventura-ecran', function (e) { if (e.detail === 'ecran-minijeux') liste(); });
+  // Le moteur des cartes de grammaire revient au plateau dès qu'on quitte l'écran d'un mini-jeu.
+  document.addEventListener('aventura-ecran', function (e) { if (e.detail !== 'ecran-minijeu') rendre(); if (e.detail === 'ecran-minijeux') liste(); });
   if (!$('ecran-minijeux').hidden) liste();
 
-  window.Minijeux = { JEUX: JEUX, ETOILES: ETOILES };
+  window.Minijeux = { JEUX: JEUX, ETOILES: ETOILES, carte: function () { return etat && etat.carte; } }; // carte() : pour les tests
 })();

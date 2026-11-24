@@ -372,5 +372,8 @@
     }
   }
 
-  racine.GrammaireCarte = { brancher: brancher, afficher: afficher, traits: traits };
+  // v10.43 : un autre écran (les mini-jeux) peut emprunter le moteur : viser() le tourne vers sa boîte et rend l'ancienne cible,
+  // à remettre avec viser(ancienne.boite, ancienne.rappels) quand l'écran se ferme ; toucher() reçoit les clics de cette boîte.
+  function viser(element, r) { var avant = { boite: boite, rappels: rappels }; boite = element; rappels = r; enCorrection = false; return avant; }
+  racine.GrammaireCarte = { brancher: brancher, afficher: afficher, traits: traits, viser: viser, toucher: toucher };
 })(this);

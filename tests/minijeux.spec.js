@@ -40,8 +40,8 @@ test('Mini-jeux : la liste, « Qui joue ? », la fabrique à mots et +10 étoile
   const avant = await compte(page);
   await page.locator('#btn-minijeux').click();
   await expect(page.getByRole('heading', { name: 'Mini-jeux' })).toBeVisible();
-  const carte = page.locator('.minijeu-carte');
-  await expect(carte).toHaveCount(1);
+  const carte = page.locator('.minijeu-carte[data-jeu="fabrique"]');
+  await expect(page.locator('.minijeu-carte')).toHaveCount(2); // La fabrique à mots, Les sons (v10.43)
   await expect(carte).toContainText('La fabrique à mots');
   await expect(carte).toContainText('+10');
   expect(await debordements(page)).toEqual([]);
@@ -67,16 +67,16 @@ test('Mini-jeux : la liste, « Qui joue ? », la fabrique à mots et +10 étoile
   await jouerFabrique(page);
   expect((await compte(page)).total - avant.total).toBe(20);
   await page.locator('#minijeu-liste').click();
-  await expect(page.locator('.minijeu-carte')).toBeVisible();
+  await expect(page.locator('.minijeu-carte').first()).toBeVisible();
 });
 
 test('Mini-jeux : le bouton retour revient à la liste sans étoiles, la liste revient à l’accueil', async ({ page }) => {
   await accueil(page);
   const avant = await compte(page);
   await page.locator('#btn-minijeux').click();
-  await page.locator('.minijeu-carte').click();
+  await page.locator('.minijeu-carte[data-jeu="fabrique"]').click();
   await quiJoue(page);
   await page.locator('#minijeu-retour').click(); // partie abandonnée : rien gagné
-  await expect(page.locator('.minijeu-carte')).toBeVisible();
+  await expect(page.locator('.minijeu-carte').first()).toBeVisible();
   expect((await compte(page)).total).toBe(avant.total);
 });
