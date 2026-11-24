@@ -248,9 +248,10 @@ test('« Suivre ma progression » : Lettres et Chiffres, marqués « sans niveau
   await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
   await page.locator('.cj-parcours-btn[data-parcours="suivre"][data-place="0"]').click();
   await expect(page.locator('#suivre-matieres input')).toHaveCount(6);
-  await expect(page.locator('#suivre-matieres label', { hasText: 'Lettres' })).toContainText('sans niveau');
-  await expect(page.locator('#suivre-matieres label', { hasText: 'Chiffres' })).toContainText('sans niveau');
-  await expect(page.locator('#suivre-matieres label', { hasText: 'Maths' })).toContainText('niveau 1 sur 10');
+  // v10.45 : plus aucun niveau affiché sur les boutons de matière (ni « sans niveau », ni « niveau 1 sur 10 »).
+  await expect(page.locator('#suivre-matieres label', { hasText: 'Lettres' })).not.toContainText('niveau');
+  await expect(page.locator('#suivre-matieres label', { hasText: 'Chiffres' })).not.toContainText('niveau');
+  await expect(page.locator('#suivre-matieres label', { hasText: 'Maths' })).not.toContainText('niveau');
   await page.locator('#suivre-matieres input[value="lettres"]').check();
   await page.getByRole('button', { name: 'Valider', exact: true }).click();
   await expect(page.locator('.cj-resume').first()).toContainText('Lettres · sans niveau');

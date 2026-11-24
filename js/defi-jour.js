@@ -12,10 +12,6 @@
 
   function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function compte() { return window.Recompenses && window.Recompenses.compte; }
-  function abrege(j) {
-    var ab = { francais: 'Fr', maths: 'Ma', histoire: 'Hi', geographie: 'Gé' };
-    return J.MATIERES.map(function (m) { return ab[m.id] + ' ' + J.niveauMatiere(j, m.id); }).join(' · ');
-  }
   // Ce que ce profil a déjà fait aujourd'hui avec ce type de défi (solo ou équipe).
   function etatDuJour(j, type) {
     var c = compte(), v = c && c.pourJoueur(j.id);
@@ -33,7 +29,8 @@
       return '<button type="button" class="dj-ligne" data-j="' + esc(j.id) + '" aria-pressed="' + on + '"' + (!on && sel.length >= MAX ? ' disabled' : '') +
         ' style="--c:' + CODES[on ? k : 0] + '">' +
         '<img class="dj-avatar" src="' + p.image + '" alt="" width="46" height="50">' +
-        '<span class="dj-qui"><span class="dj-nom">' + esc(j.nom) + '</span><span class="dj-niv">' + abrege(j) + '</span>' +
+        '<span class="dj-qui"><span class="dj-nom">' + esc(j.nom) + '</span>' + // v10.45 : plus de niveaux dans la liste
+        
         (jour ? '<span class="dj-jour">' + jour + '</span>' : '') + '</span>' +
         '<span class="dj-coche" aria-hidden="true">' + (on ? '✓' : '') + '</span></button>';
     }).join('');

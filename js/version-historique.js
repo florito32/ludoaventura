@@ -2,6 +2,11 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.45', date: '2026-11-24', changes: [
+    "Préparation de la partie : à la place de ses niveaux, chaque joueur voit la matière qu’il a choisie.",
+    "Le bouton « Changer » a disparu. Un joueur seul n’a aucun bouton ; à plusieurs, chaque joueur a une poubelle tout à droite pour le retirer de la partie (son profil reste dans le compte).",
+    "Plus aucun niveau affiché sur les boutons de « Suivre ma progression », dans la liste des joueurs du compte ni dans le choix des joueurs du défi du jour."
+  ] },
   { v: '10.44', date: '2026-11-24', changes: [
     "Les phonèmes deviennent un mini-jeu : « Les sons » (complète le mot, quel son, l’intrus, où est le son, relier, trier). Tu gagnes 10 étoiles par partie, sans changer ton niveau.",
     "Les phonèmes ne sont plus une matière de l’aventure, de la partie rapide ni du profil."

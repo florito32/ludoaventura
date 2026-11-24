@@ -13,7 +13,7 @@ test('préparation : la touche précédent revient à l\'étape précédente, pu
   await page.goBack();
   await expect(titrePrepa(page)).toBeVisible();
   await expect(page.locator('#prepa-progres')).toHaveText('Étape 1 sur 3');
-  await page.locator('[data-ouvrir="0"]').click(); // un toucher entre deux appuis, comme en vrai
+  await page.locator('.cj-nom').first().click(); // un toucher entre deux appuis, comme en vrai (v10.45 : plus de bouton « Changer »)
   await page.goBack();
   await expect(page.getByRole('button', { name: 'Commencer l\'aventure' })).toBeVisible();
 });
