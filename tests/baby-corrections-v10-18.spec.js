@@ -7,18 +7,10 @@
 //  - Plateau : plus de bandeau en haut, le plateau est en haut de l'écran, le menu est sur le plateau à droite ;
 //    bouton plein écran quand le navigateur sait le faire.
 const { test, expect } = require('@playwright/test');
-const { rapide, lancerRapideQui } = require('./aide');
+const { lancerBaby } = require('./aide');
 
 async function ouvrir(page, jeu, chiffres, { calme = true } = {}) {
-  await rapide(page);
-  if (calme) await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.addInitScript((ch) => {
-    try { localStorage.setItem('ludo-vu', '1'); localStorage.setItem('ludoaventura-baby-choix', JSON.stringify(ch)); } catch (e) { /* */ }
-  }, { categories: ['chiffres'], chiffres, jeux: [jeu] });
-  await page.goto('./');
-  await page.getByRole('button', { name: 'Baby jeux' }).click();
-  await page.getByRole('button', { name: 'Choisir les jeux' }).click();
-  await lancerRapideQui(page);
+  await lancerBaby(page, { categories: ['chiffres'], chiffres, jeux: [jeu] }, { calme });
 }
 async function premiereQuestion(page) {
   await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();

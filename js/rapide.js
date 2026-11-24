@@ -122,7 +122,7 @@
   // « ← Partie » ramène au plateau sans rien changer.
   function enModif() {
     var p = window.Aventura && window.Aventura.partie;
-    return !!(p && p.modif && p.regles && p.rapide && !p.rapide.baby);
+    return !!(p && p.modif && p.regles && p.rapide);
   }
 
   // v6.45 : plus de choix du nombre de joueurs (solo) ; niveau ajouté ; « Tout » / « Aucune » à côté du mot « Matières ».

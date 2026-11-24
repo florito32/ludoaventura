@@ -261,4 +261,30 @@ async function coffresJoueur(page, nom) {
   await page.locator('#onglet-profil').click();
   await carteJoueur(page, nom).locator('[data-act="coffres"]').click();
 }
-module.exports = { lancerDefiJour, personnaliser, suivreMaProgression, carteJoueur, mesEtoiles, coffresJoueur, quiJoue, lancerRapideQui, creerJoueurs, ouvrirChoix, cocher, choisir, grammaire, repondre, valider, cocherJoueur, orthographe, maths, conjugaison, matiere, versReglages, lancer, lancerLeDe, lancerPartie, rapide, attendreJoueur, cocherTout, ouvrirNeuf };
+// Lettres et Chiffres (v10.41, demande du 24/11/2026) : des matières sans niveau. Coche la matière, « Valider », et arrive sur ses réglages.
+async function babyMatiere(page, cat) {
+  await cocher(page, '#matieres', cat);
+  await valider(page);
+  await page.locator('#reglages-baby').waitFor();
+}
+// De l'accueil jusqu'au plateau, en Lettres ou en Chiffres (1 joueur, « Personnaliser »). choix = { categories: ['lettres' | 'chiffres'],
+// ecriture, lettres, chiffres, jeux } (comme l'ancien écran Baby jeux) : posé dans les réglages du joueur 1 avant de lancer.
+async function lancerBaby(page, choix = {}, { calme = true } = {}) {
+  await rapide(page);
+  if (calme) await page.emulateMedia({ reducedMotion: 'reduce' }); // jetons immobiles : on peut les toucher sans attendre
+  await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); } catch (e) { /* */ } });
+  await page.goto('./');
+  await creerJoueurs(page, 1);
+  await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
+  await personnaliser(page, 0);
+  const cat = (choix.categories && choix.categories[0]) || 'lettres';
+  await babyMatiere(page, cat);
+  const reg = {};
+  for (const k of ['ecriture', 'lettres', 'chiffres', 'jeux']) if (choix[k]) reg[k] = choix[k];
+  if (Object.keys(reg).length) await page.evaluate((r) => { Object.assign(window.Aventura.partie.baby[0], r); }, reg);
+  await valider(page);
+  await page.getByRole('button', { name: 'Choisir l\'aventure' }).click();
+  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await page.getByRole('heading', { name: 'Le plateau' }).waitFor();
+}
+module.exports = { babyMatiere, lancerBaby, lancerDefiJour, personnaliser, suivreMaProgression, carteJoueur, mesEtoiles, coffresJoueur, quiJoue, lancerRapideQui, creerJoueurs, ouvrirChoix, cocher, choisir, grammaire, repondre, valider, cocherJoueur, orthographe, maths, conjugaison, matiere, versReglages, lancer, lancerLeDe, lancerPartie, rapide, attendreJoueur, cocherTout, ouvrirNeuf };
