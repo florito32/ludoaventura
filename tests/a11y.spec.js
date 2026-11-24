@@ -68,8 +68,8 @@ test('aucune violation WCAG A/AA : accueil, Mes coffres, Défi du jour, coffre',
   expect(await audit(page)).toEqual([]);
 });
 
-// v6.42 et v6.43 : fenêtre « Comment gagner des étoiles ? », écran « Partie rapide » et son plateau.
-test('aucune violation WCAG A/AA : Comment gagner des étoiles, Partie rapide', async ({ page }) => {
+// v6.42 : fenêtre « Comment gagner des étoiles ? » (l'écran « Partie rapide » a été retiré le 24/11/2026, ligne 519).
+test('aucune violation WCAG A/AA : Comment gagner des étoiles', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); window.AVENTURA_AUTO_DE = 600000; } catch (e) { /* */ } });
   await page.goto('./');
@@ -80,17 +80,6 @@ test('aucune violation WCAG A/AA : Comment gagner des étoiles, Partie rapide', 
   await expect(page.getByRole('dialog', { name: 'Comment gagner des étoiles ?' })).toBeVisible();
   expect(await audit(page)).toEqual([]);
   await page.getByRole('button', { name: 'J’ai compris' }).click();
-  await page.locator('#ecran-compte [data-retour-accueil]').click();
-  await page.getByRole('button', { name: 'Partie rapide' }).click();
-  await expect(page.getByRole('heading', { name: 'Partie rapide' })).toBeVisible();
-  expect(await audit(page)).toEqual([]);
-  await page.getByRole('button', { name: 'Lancer la partie' }).click();
-  await expect(page.getByRole('dialog', { name: 'Qui joue ?' })).toBeVisible(); // v10.27 : demandé à chaque lancement
-  expect(await audit(page)).toEqual([]);
-  await page.getByRole('button', { name: 'C’est parti' }).click();
-  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
-  await expect(page.locator('#carte-piochee')).toBeVisible();
-  expect(await audit(page)).toEqual([]);
 });
 
 // v6.54 : grammaire — écran des jeux, cartes « Relier les paires » (liens en cours) et « Remettre la phrase ».

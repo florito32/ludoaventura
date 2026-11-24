@@ -184,9 +184,7 @@
       <div class="accueil-actions">
         <button type="button" class="btn btn-principal" id="btn-commencer">Commencer l'aventure</button>
         <!-- Défi du jour (v10.36, demande du 24/11/2026) : sous « Commencer l'aventure », dans un rectangle ; on y choisit seulement ses profils (js/defi-jour.js). -->
-        <button type="button" class="btn btn-jaune btn-defi" id="btn-defi"><span class="bd-ligne"><svg class="ico" aria-hidden="true"><use href="#i-defi"/></svg>Défi du jour</span><small class="bd-sous"><svg class="ico" aria-hidden="true"><use href="#i-etoile"/></svg>étoiles ×3</small></button>
-        <!-- Partie rapide solo (v6.43, js/rapide.js ; bouton bleu et « solo » en v6.44). -->
-        <button type="button" class="btn btn-bleu" id="btn-rapide"><span aria-hidden="true">⚡</span> Partie rapide solo</button>
+        <button type="button" class="btn btn-bleu btn-defi" id="btn-defi"><span class="bd-ligne"><svg class="ico" aria-hidden="true"><use href="#i-defi"/></svg>Défi du jour</span><small class="bd-sous"><svg class="ico" aria-hidden="true"><use href="#i-etoile"/></svg>étoiles ×3</small></button>
         <!-- Mini-jeux (v10.41, js/minijeux.js) : on choisit un petit jeu et son profil, sans plateau ; 10 étoiles par partie terminée. -->
         <button type="button" class="btn btn-baby" id="btn-minijeux"><span aria-hidden="true">🎮</span> Mini-jeux</button>
         <!-- Didacticiel : Ludo (l'aventurier de l'accueil) guide la préparation et le premier tour (js/ludo.js). -->
@@ -389,16 +387,6 @@
         </section>
       </div>
     </div>
-  </section>
-
-  <!-- ÉCRAN Partie rapide (v6.43, js/rapide.js) -->
-  <section class="ecran page" id="ecran-rapide" aria-labelledby="titre-rapide" hidden>
-    <header class="barre">
-      <button type="button" class="btn-retour" data-retour-accueil><span aria-hidden="true">←</span> Accueil</button>
-      <h2 id="titre-rapide">Partie rapide</h2>
-      <span class="barre-vide" aria-hidden="true"></span>
-    </header>
-    <div class="page-corps" id="rapide-corps"></div>
   </section>
 
   <!-- ÉCRAN Mini-jeux (v10.41, demande du 24/11/2026, js/minijeux.js) : la liste des mini-jeux. Un mode à part : pas de plateau, pas
@@ -1134,6 +1122,7 @@
 <script src="js/defi-jour.js"></script>
 <script src="js/mj-etoiles.js"></script>
 <script src="js/mj-aventure.js"></script>
+<script src="js/mj-quiz.js"></script>
 <script src="js/minijeux.js"></script>
 <script src="js/ludo.js"></script>
 <script src="js/joueurs-ecran.js"></script>

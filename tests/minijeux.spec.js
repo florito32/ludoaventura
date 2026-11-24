@@ -25,14 +25,15 @@ const debordements = (page) => page.evaluate(() => {
   return out.slice(0, 5);
 });
 
-test('l’accueil propose « Mini-jeux » après « Partie rapide solo », et plus « Baby jeux » @smoke', async ({ page }) => {
+test('l’accueil propose « Mini-jeux » après « Défi du jour », sans « Partie rapide solo » ni « Baby jeux » @smoke', async ({ page }) => {
   await accueil(page);
   await expect(page.locator('#btn-minijeux')).toBeVisible();
   await expect(page.locator('#btn-minijeux')).toContainText('Mini-jeux');
   await expect(page.locator('#btn-baby')).toHaveCount(0);
   await expect(page.getByRole('button', { name: /Baby jeux/ })).toHaveCount(0);
-  const ordre = await page.evaluate(() => ['btn-rapide', 'btn-minijeux'].map((id) => document.getElementById(id).getBoundingClientRect().top));
+  const ordre = await page.evaluate(() => ['btn-defi', 'btn-minijeux'].map((id) => document.getElementById(id).getBoundingClientRect().top));
   expect(ordre[1]).toBeGreaterThan(ordre[0]);
+  await expect(page.locator('#btn-rapide')).toHaveCount(0); // ligne 519 : partie rapide retirée
 });
 
 test('Mini-jeux : la liste, « Qui joue ? », la fabrique à mots et +10 étoiles sans toucher à la progression @smoke', async ({ page }) => {
@@ -41,7 +42,7 @@ test('Mini-jeux : la liste, « Qui joue ? », la fabrique à mots et +10 étoile
   await page.locator('#btn-minijeux').click();
   await expect(page.getByRole('heading', { name: 'Mini-jeux' })).toBeVisible();
   const carte = page.locator('.minijeu-carte[data-jeu="fabrique"]');
-  await expect(page.locator('.minijeu-carte')).toHaveCount(4); // La fabrique à mots, Les sons (v10.43), Course aux étoiles, Aventure des multiplications (v10.47)
+  await expect(page.locator('.minijeu-carte')).toHaveCount(5); // La fabrique à mots, Les sons (v10.43), Course aux étoiles, Aventure des multiplications (v10.47), Quiz (v10.51)
   await expect(carte).toContainText('La fabrique à mots');
   await expect(carte).toContainText('+10');
   expect(await debordements(page)).toEqual([]);

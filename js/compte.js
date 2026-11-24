@@ -729,5 +729,9 @@
     if (session) { synchroniser(); lireProfil(); } // ouverture du jeu : on récupère ce qui a été gagné ailleurs, et le pseudo
     if (!reel()) fenetreAuLancement(); // pas de vrai compte (même en invité) : la fenêtre revient à chaque ouverture
   }
-  window.Compte = Object.assign(C, { synchroniser: synchroniser, session: function () { return session; }, invite: invite, etat: etat });
+  // rpc : appelle une fonction de la base avec le jeton du joueur connecté (invité compris) ; rend null si personne n'est connecté.
+  function rpc(nom, corps) {
+    return jeton().then(function (j) { return j ? appel('/rest/v1/rpc/' + nom, { methode: 'POST', jeton: j, corps: corps || {} }) : null; });
+  }
+  window.Compte = Object.assign(C, { synchroniser: synchroniser, session: function () { return session; }, invite: invite, etat: etat, rpc: rpc });
 })(typeof window !== 'undefined' ? window : globalThis);
