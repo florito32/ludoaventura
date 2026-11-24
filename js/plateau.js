@@ -1269,6 +1269,18 @@
     if (!carte) carte = SV.generer({ jeux: jeux, niveau: niv, mode: 'quiz' }, m) || SV.generer({ jeux: tous, niveau: niv, mode: 'quiz' }, m);
     return { matiere: m, carte: carte, sous: sous };
   }
+  // ---------- « Personnaliser » : tirage direct par niveau de progression (v10.45, backlog lignes 480 et 485) ----------
+  // Le niveau 1 à 10 choisi est la dizaine de la progression 1 à 100 (niveau 2 = 11 à 20, demande du 24/11/2026).
+  function fenetreDuNiveau(n) { n = Math.max(1, Math.min(10, Number(n) || 1)); return { bas: n * 10 - 9, haut: n * 10 }; }
+  // Histoire et Géographie : une carte des jeux cochés par le joueur, dans la dizaine ; si ces jeux n'ont rien dans la dizaine,
+  // elle s'élargit peu à peu (hypothèse à valider, comme « Suivre ma progression ») ; null = le tirage Facile…Expert d'avant.
+  function carteSavoirNiveau(rsv, mat, n) {
+    var f = fenetreDuNiveau(n), carte = null;
+    [0, 5, 10, 25, 50, 100].forEach(function (ecart) {
+      if (!carte) carte = SV.generer({ jeux: rsv.jeux, mode: rsv.mode, niveau: rsv.niveau, fenetre: { bas: Math.max(1, f.bas - ecart), haut: Math.min(100, f.haut + ecart) } }, mat);
+    });
+    return carte;
+  }
   // Sous-matière la plus jouée par un joueur « Suivre » pendant la partie : c'est elle qui reçoit le point de niveau (ligne 446).
   function sousSuivie(j) {
     var meilleure = null, n = 0;
@@ -1370,6 +1382,11 @@
     // Géographie et Histoire (v7.0) : un jeu choisi par le joueur, une série et un format tirés au hasard.
     if (estSavoir(mat)) {
       var rsv = partie.savoirs[j.index][mat];
+      // v10.45 : « Personnaliser » avec un niveau 1 à 10 : questions de la dizaine de progression (niveau 2 = 11 à 20).
+      if (!t && partie.parcours[j.index] === 'perso' && partie.niveauProg[j.index]) {
+        var cn = carteSavoirNiveau(rsv, mat, partie.niveauProg[j.index]);
+        if (cn) return cn;
+      }
       return SV.generer(rsv, mat) || SV.generer({ jeux: jeuxProposes(mat, SV.modeDe(rsv)).map(function (x) { return x.id; }), niveau: rsv.niveau, mode: rsv.mode }, mat);
     }
     // Mathématiques : une formule tirée au hasard selon les réglages du joueur (pas de tas).

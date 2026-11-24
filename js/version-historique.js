@@ -2,6 +2,9 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.45', date: '2026-11-24', changes: [
+    "« Personnaliser » en Histoire et en Géographie : le niveau 1 à 10 choisi donne des questions de sa dizaine de progression (niveau 2 = questions 11 à 20), parmi les jeux que tu as cochés."
+  ] },
   { v: '10.44', date: '2026-11-24', changes: [
     "Les phonèmes deviennent un mini-jeu : « Les sons » (complète le mot, quel son, l’intrus, où est le son, relier, trier). Tu gagnes 10 étoiles par partie, sans changer ton niveau.",
     "Les phonèmes ne sont plus une matière de l’aventure, de la partie rapide ni du profil."

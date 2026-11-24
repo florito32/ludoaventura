@@ -303,3 +303,39 @@ for (const [k, nom] of [[0, 'Orthographe'], [1, 'Conjugaison'], [2, 'Grammaire']
     expect(erreurs).toEqual([]);
   });
 }
+
+// v10.45 (backlog lignes 480 et 485) : « Personnaliser » en Histoire et Géographie : le niveau 1 à 10 choisi tire les questions
+// de sa dizaine de progression (niveau 4 = 31 à 40), parmi les jeux cochés par le joueur, en mode Quiz comme en mode normal.
+for (const matiere of ['histoire', 'geographie']) {
+  for (const mode of ['quiz', 'normal']) {
+    test('« Personnaliser » en ' + matiere + ' (' + mode + ') : niveau 4 → questions de la progression 31 à 40 (v10.45)', async ({ page }) => {
+      const erreurs = [];
+      page.on('pageerror', (e) => erreurs.push(e.message));
+      await ouvrir(page);
+      await etape1(page, 1);
+      await suivreMaProgression(page, 0, matiere);
+      await aventure(page).click();
+      await page.getByRole('button', { name: 'Lancer la partie' }).click();
+      await page.getByRole('heading', { name: 'Le plateau' }).waitFor();
+      const r = await page.evaluate(([mat, md]) => {
+        const P = window.Aventura.partie, j = P.joueurs[0], fen = [], jeux = [], autres = [];
+        P.parcours[0] = 'perso'; P.matiere[0] = mat; P.niveauProg[0] = 4;
+        const rsv = P.savoirs[0][mat];
+        rsv.mode = md;
+        const choisis = rsv.jeux && rsv.jeux.length ? rsv.jeux : null;
+        for (let i = 0; i < 40; i++) {
+          const c = window.Aventura.piocherCarte(j);
+          if (!c || c.type !== 'savoir') { autres.push(c && c.type); continue; }
+          fen.push(c.fenetre ? c.fenetre.bas + '-' + c.fenetre.haut : 'aucune');
+          if (choisis && choisis.indexOf(c.jeu) < 0) jeux.push(c.jeu);
+        }
+        return { fen, jeux, autres };
+      }, [matiere, mode]);
+      expect(r.autres).toEqual([]);
+      expect(r.jeux).toEqual([]); // seulement les jeux cochés
+      expect(r.fen.every((f) => f !== 'aucune')).toBe(true);
+      expect(r.fen.filter((f) => f === '31-40').length).toBeGreaterThan(25);
+      expect(erreurs).toEqual([]);
+    });
+  }
+}

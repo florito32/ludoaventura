@@ -392,3 +392,4 @@ Lignes sorties de BACKLOG.md le 17/11/2026 (audit) : terminées, ou « fait à v
 | 497 | Idem : nouveau mode « Mini-jeux » (après Partie rapide solo) : liste de mini-jeux, profil seul (Qui joue ?), sans plateau ni progression, 10 étoiles par partie terminée | terminé (v10.43, validé le 24/11) — tests ✅ |
 | 498 | Idem : « La fabrique à mots » quitte les Lettres et devient le 1er mini-jeu | terminé (v10.43, validé le 24/11) — tests ✅ |
 | 499 | Hypothèses à valider (v10.43) : Lettres/Chiffres absents de partie rapide et défi du jour ; suivi = réglages par défaut tout coché ; fabrique en majuscules ; étoiles dans le trésor du profil choisi | terminé — validé par l'utilisateur le 24/11 |
+| 486 | Niveau 1–10 pour les Phonèmes (sans objet depuis la v10.44 : ils sont un mini-jeu) dans « Personnaliser » (aujourd'hui pas de niveau pour cette matière) | terminé (sans objet depuis la v10.44 : les phonèmes sont un mini-jeu) | — |
