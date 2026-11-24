@@ -2,7 +2,7 @@
 const { test, expect } = require('@playwright/test');
 const D = require('../js/defis.js');
 const A = require('../js/aventures.js');
-const { rapide, lancerLeDe, quiJoue, creerJoueurs } = require('./aide');
+const { rapide, lancerLeDe, quiJoue, creerJoueurs, lancerDefiJour } = require('./aide');
 
 test.describe('tirage des défis', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
@@ -64,67 +64,115 @@ async function gagner(page) {
   }
 }
 
-test('défi solo du jour : le joueur choisit seulement matière et niveau ; gagné, ses étoiles sont doublées une fois @smoke', async ({ page }) => {
+test.describe('défi du jour v2 : tirage', () => {
+  test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
+
+  test('solo ou équipe selon le nombre de profils ; aventure selon le score moyen ; même jour = même défi', () => {
+    const s = D.genererJour('2026-11-24', [10]);
+    expect(s).toMatchObject({ type: 'solo', joueurs: 1, mixte: true, niveau: 'facile' });
+    expect(D.genererJour('2026-11-24', [10])).toEqual(s);
+    expect(D.genererJour('2026-11-24', [10, 20, 30])).toMatchObject({ type: 'equipe', joueurs: 3 });
+    for (const [score, difficulte] of [[0, 'facile'], [33, 'facile'], [34, 'moyen'], [66, 'moyen'], [67, 'difficile'], [100, 'difficile']]) {
+      expect(A.trouver(D.genererJour('2026-11-24', [score]).aventure).difficulte).toBe(difficulte);
+    }
+    expect(D.genererJour('2026-11-24', [50, 90]).niveau).toBe('difficile'); // moyenne 70
+    expect(D.genererJour('2026-11-24', [1, 2, 3, 4, 5]).joueurs).toBe(4); // au plus 4 joueurs
+  });
+
+  test('niveau des questions : le score du joueur (0 à 100) en quatre tranches', () => {
+    expect([0, 24, 25, 49, 50, 74, 75, 100].map(D.niveauPourScore)).toEqual(['facile', 'facile', 'moyen', 'moyen', 'difficile', 'difficile', 'expert', 'expert']);
+    expect(D.MATIERES_DEFI.slice().sort()).toEqual(['francais', 'geographie', 'histoire', 'maths']);
+  });
+});
+
+test('défi solo du jour : on ne choisit que son profil ; gagné, étoiles ×3 une fois, sans progression de niveau @smoke', async ({ page }) => {
   await rapide(page);
   await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); } catch (e) { /* */ } });
   await page.goto('./');
-  await expect(page.locator('#defi-badge')).toBeHidden(); // v10.30 : rien de chiffré sur l'accueil
-  // v6.38 : le défi du jour est en haut de l'écran.
-  const haut = await page.evaluate(() => document.getElementById('btn-defi').getBoundingClientRect().top);
-  expect(haut).toBeLessThan(80);
+  await expect(page.locator('#defi-badge')).toHaveCount(0); // rien de chiffré sur l'accueil
+  // v10.36 : le bouton est un rectangle juste sous « Commencer l'aventure » (même largeur, même colonne).
+  const [bc, bd] = await page.evaluate(() => ['btn-commencer', 'btn-defi'].map((id) => document.getElementById(id).getBoundingClientRect().toJSON()));
+  expect(bd.top).toBeGreaterThanOrEqual(bc.bottom);
+  expect(bd.top - bc.bottom).toBeLessThan(20);
+  expect(Math.abs(bd.left - bc.left)).toBeLessThan(2);
+  expect(Math.abs(bd.width - bc.width)).toBeLessThan(2);
+  await expect(page.locator('#btn-defi')).toContainText('étoiles ×3');
   await page.locator('#btn-defi').click();
-  await expect(page.getByRole('heading', { name: 'Défi du jour' })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Valider' })).toBeDisabled(); // pas avant d'avoir choisi la matière
-  await page.locator('label:has(input[name="defi-matiere"][value="maths"])').click();
-  await page.locator('label:has(input[name="defi-niveau"][value="facile"])').click();
-  // v6.38 : l'aventure reste une surprise (ni aventure, ni aventurier, ni questions avant de valider).
-  await expect(page.locator('#ecran-defi img, .defi-aventure, .defi-aventuriers, .defi-cartes')).toHaveCount(0);
-  await expect(page.locator('#ecran-defi')).not.toContainText('Objectif');
-  await expect(page.locator('.defi-recompense')).toContainText('doublées');
+  const fenetre = page.getByRole('dialog', { name: 'Défi du jour' });
+  await expect(fenetre).toBeVisible();
+  await expect(fenetre.locator('#dj-etat')).toHaveText('Défi solo');
+  await expect(fenetre).toContainText('Étoiles ×3');
+  await expect(fenetre).toContainText('Niveau inchangé');
+  // Ni matière, ni niveau, ni aventure à choisir.
+  await expect(fenetre.locator('input[type="radio"]')).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-  await page.getByRole('button', { name: 'Valider' }).click();
-  await quiJoue(page);
+  await fenetre.getByRole('button', { name: 'Annuler' }).click();
+  await expect(fenetre).toBeHidden();
+  expect(await page.evaluate(() => window.Aventura.partie.defi)).toBeNull(); // « Annuler » ne lance rien
+  await lancerDefiJour(page, 1);
   await expect(page.getByRole('heading', { name: 'Défi solo du jour' })).toBeVisible();
-  const p = await page.evaluate(() => ({ nb: window.Aventura.partie.nbJoueurs, m: window.Aventura.partie.matiere[0], defi: window.Aventura.partie.defi.type, niv: window.Aventura.partie.maths[0].niveau }));
-  expect(p).toEqual({ nb: 1, m: 'maths', defi: 'solo', niv: 'facile' });
+  const p = await page.evaluate(() => ({ nb: window.Aventura.partie.nbJoueurs, defi: window.Aventura.partie.defi }));
+  expect(p.nb).toBe(1); expect(p.defi).toMatchObject({ type: 'solo', mixte: true, matiere: 'mixte' });
+  // Les cartes mêlent les quatre matières.
+  const vues = await page.evaluate(() => { const v = new Set(); for (let k = 0; k < 400; k++) { const c = window.Aventura.piocherCarte({ index: 0, tas: [] }); v.add(c.type + (c.packNom || '').split(' · ')[0]); } return [...v]; });
+  expect(vues.length).toBeGreaterThan(4);
+  // Pour jouer sans aléa : cartes de calcul (le défi reste un défi).
+  await page.evaluate(() => { const pa = window.Aventura.partie; pa.defi.mixte = false; pa.matiere[0] = 'maths'; pa.maths[0] = window.Rapide.mathsTout('facile'); });
+  const niveauAvant = await page.evaluate(() => JSON.stringify(window.Recompenses.compte.etat.joueurs.map((j) => j.niv)));
   await gagner(page);
   await expect(page.locator('#fin-titre')).toHaveText('Aventure réussie !');
   const pts = await page.evaluate(() => window.Aventura.partie.regles.points);
-  await expect(page.locator('#fin-etoiles')).toContainText('+' + (2 * pts) + ' étoiles');
+  await expect(page.locator('#fin-etoiles')).toContainText('+' + (3 * pts) + ' étoiles');
   await expect(page.locator('#fin-etoiles')).toContainText('Défi du jour réussi');
+  // Le défi du jour ne fait pas progresser les niveaux.
+  expect(await page.evaluate(() => JSON.stringify(window.Recompenses.compte.etat.joueurs.map((j) => j.niv)))).toBe(niveauAvant);
   // Rejouer le même défi : étoiles normales.
   await page.getByRole('button', { name: 'Rejouer cette aventure' }).click();
   await gagner(page);
   const pts2 = await page.evaluate(() => window.Aventura.partie.regles.points);
   await expect(page.locator('#fin-etoiles')).toContainText('+' + pts2 + ' étoile');
   await expect(page.locator('#fin-etoiles')).toContainText('déjà réussi');
-  expect(await page.evaluate(() => window.Recompenses.compte.etat.total)).toBe(2 * pts + pts2);
+  expect(await page.evaluate(() => window.Recompenses.compte.etat.total)).toBe(3 * pts + pts2);
   // « Nouvelle partie » : on sort du défi, la préparation est vierge comme avant.
   await page.getByRole('button', { name: 'Nouvelle partie' }).click();
   expect(await page.evaluate(() => [window.Aventura.partie.defi, window.Aventura.partie.matiere[0]])).toEqual([null, null]);
 });
 
-test('défi en équipe : nombre de joueurs choisi, joueurs demandés (v10.27), plateau « Défi en équipe du jour »', async ({ page }) => {
+test('défi en équipe : 3 profils cochés, 4e impossible, cartes au niveau de chacun, plateau « Défi en équipe du jour »', async ({ page }) => {
   await rapide(page);
   await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); } catch (e) { /* */ } });
   await page.goto('./');
-  await creerJoueurs(page, 3);
+  await creerJoueurs(page, 5);
   await page.locator('#btn-defi').click();
-  await page.locator('label:has(input[name="defi-type"][value="equipe"])').click();
-  await page.locator('label:has(input[name="defi-matiere"][value="francais"])').click();
-  await page.locator('label:has(input[name="defi-niveau"][value="difficile"])').click();
-  await page.locator('label:has(input[name="defi-joueurs"][value="3"])').click();
-  await expect(page.locator('.defi-aventuriers, .defi-cartes')).toHaveCount(0);
-  // Les choix sont gardés : on les retrouve en rouvrant l'écran.
-  await page.getByRole('button', { name: 'Accueil' }).click();
-  await page.locator('#btn-defi').click();
-  await expect(page.locator('input[name="defi-joueurs"][value="3"]')).toBeChecked();
-  await page.getByRole('button', { name: 'Valider' }).click();
-  await quiJoue(page);
+  const fenetre = page.getByRole('dialog', { name: 'Défi du jour' });
+  const lignes = fenetre.locator('.dj-ligne');
+  await expect(lignes).toHaveCount(5);
+  for (let i = 1; i < 4; i++) await lignes.nth(i).click();
+  await expect(fenetre.locator('#dj-etat')).toHaveText('Défi en équipe · 4 joueurs');
+  await expect(lignes.nth(4)).toBeDisabled(); // 4 joueurs au plus
+  await lignes.nth(3).click(); // on en retire un
+  await expect(fenetre.locator('#dj-etat')).toHaveText('Défi en équipe · 3 joueurs');
+  await lignes.nth(0).click(); await lignes.nth(1).click(); await lignes.nth(2).click(); // plus personne : « C'est parti » grisé
+  await expect(fenetre.getByRole('button', { name: 'C’est parti !' })).toBeDisabled();
+  for (const i of [0, 1, 2]) await lignes.nth(i).click();
+  await fenetre.getByRole('button', { name: 'C’est parti !' }).click();
   await expect(page.getByRole('heading', { name: 'Défi en équipe du jour' })).toBeVisible();
-  const p = await page.evaluate(() => ({ nb: window.Aventura.partie.nbJoueurs, defi: window.Aventura.partie.defi.type, m: window.Aventura.partie.matiere.slice(0, 3) }));
-  expect(p.nb).toBe(3); expect(p.defi).toBe('equipe');
-  expect(new Set(p.m).size).toBe(1);
+  const p = await page.evaluate(() => ({ nb: window.Aventura.partie.nbJoueurs, defi: window.Aventura.partie.defi.type, profils: window.Aventura.partie.profils.length }));
+  expect(p).toEqual({ nb: 3, defi: 'equipe', profils: 3 });
+  // Chaque joueur reçoit des questions à son niveau : Léa (rang 0) au niveau maximal, Tom (rang 1) au niveau le plus bas.
+  const niveaux = await page.evaluate(() => {
+    const c = window.Recompenses.compte, J = window.Joueurs, l = J.duCompte();
+    for (const m of J.MATIERES) for (const s of m.subs) { J.ajouterPoints(c.etat, l[0].id, m.id, s.id, 100); }
+    const r = [];
+    for (let i = 0; i < 2; i++) {
+      const v = new Set();
+      for (let k = 0; k < 300; k++) { const carte = window.Aventura.piocherCarte({ index: i, tas: [] }); if (carte.packNom && /Calcul|Problème/.test(carte.packNom)) v.add(carte.packNom.split(' · ')[1]); }
+      r.push([...v]);
+    }
+    return r;
+  });
+  expect(niveaux[0]).toEqual(['Expert']);
+  expect(niveaux[1]).toEqual(['Facile']);
   // Le défi survit à un rechargement de la page.
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Défi en équipe du jour' })).toBeVisible();
@@ -147,14 +195,14 @@ test.describe('défi quitté : logique', () => {
     expect(c.recompenserPartie('a', 10, false, 'solo', 'x').gain).toBeNull();
     expect(c.defiQuitte('solo')).toBe(false);
     c.commencerDefi('solo', 'b');
-    expect(c.recompenserPartie('b', 10, true, 'solo', 'x', () => 0.9)).toMatchObject({ base: 10, bonus: 10 });
+    expect(c.recompenserPartie('b', 10, true, 'solo', 'x', () => 0.9)).toMatchObject({ base: 10, bonus: 20 }); // ×3
     // Défi en équipe commencé puis relancé (redémarrer, ou retour à l'accueil puis relancer) : quitté.
     c.commencerDefi('equipe', 'c');
     c.commencerDefi('equipe', 'd');
     expect(c.defiQuitte('equipe')).toBe(true);
     expect(c.defiAFaire('equipe')).toBe(false);
     expect(c.recompenserPartie('d', 30, true, 'equipe', 'x', () => 0)).toMatchObject({ base: 0, gemmes: 0, quitte: true });
-    expect(c.etat.total).toBe(20);
+    expect(c.etat.total).toBe(30); // v10.36 : 10 + 20 (×3)
     expect(c.etat.gemmes).toBe(0);
     // Le défi solo (déjà réussi) reste jouable ; le lendemain, tout est de nouveau possible.
     maintenant = new Date(2026, 10, 11, 9);
@@ -180,11 +228,7 @@ test('défi quitté avant la fin (retour à l’accueil) : on peut le rejouer ma
   await rapide(page);
   await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); } catch (e) { /* */ } });
   await page.goto('./');
-  await page.locator('#btn-defi').click();
-  await page.locator('label:has(input[name="defi-matiere"][value="maths"])').click();
-  await page.locator('label:has(input[name="defi-niveau"][value="facile"])').click();
-  await page.getByRole('button', { name: 'Valider' }).click();
-  await quiJoue(page);
+  await lancerDefiJour(page, 1);
   await expect(page.getByRole('heading', { name: 'Défi solo du jour' })).toBeVisible();
   // Menu → Retour à l'accueil : l'avertissement le dit.
   await page.getByRole('button', { name: 'Menu' }).click();
@@ -192,14 +236,12 @@ test('défi quitté avant la fin (retour à l’accueil) : on peut le rejouer ma
   await expect(page.locator('#menu-confirmer-texte')).toContainText('ne pourra plus rien te rapporter aujourd’hui');
   await page.getByRole('button', { name: 'Oui, arrêter la partie' }).click();
   await expect(page.locator('#btn-commencer')).toBeVisible();
-  // v10.30 : plus de nombre de défis restants sur l'accueil ; l'écran du défi (un seul joueur dans le compte) dit « Quitté ».
-  await expect(page.locator('#defi-badge')).toBeHidden();
+  // L'accueil ne montre aucun nombre ; la fenêtre du défi (un seul joueur dans le compte) dit « Quitté ».
   await page.locator('#btn-defi').click();
-  await expect(page.locator('.defi-type').first()).toContainText('Quitté aujourd’hui');
-  await expect(page.locator('.defi-recompense')).toContainText('ne rapporte plus rien');
+  await expect(page.locator('.dj-ligne').first()).toContainText('Quitté aujourd’hui');
   // On peut toujours y jouer ; gagné, il ne rapporte ni étoiles ni pierres.
-  await page.getByRole('button', { name: 'Valider' }).click();
-  await quiJoue(page);
+  await page.getByRole('button', { name: 'C’est parti !' }).click();
+  await page.evaluate(() => { const pa = window.Aventura.partie; pa.defi.mixte = false; pa.matiere[0] = 'maths'; pa.maths[0] = window.Rapide.mathsTout('facile'); });
   await gagner(page);
   await expect(page.locator('#fin-titre')).toHaveText('Aventure réussie !');
   await expect(page.locator('#fin-etoiles')).toContainText('Tu as quitté ce défi avant la fin');
@@ -215,19 +257,19 @@ test.describe('trésor par joueur', () => {
   function memoire() { const m = {}; return { getItem: (k) => (k in m ? m[k] : null), setItem: (k, v) => { m[k] = String(v); } }; }
   const LE_10 = () => new Date(2026, 10, 10, 10);
 
-  test('fin de partie : chacun ses étoiles, défi doublé une fois par joueur, perdue : rien', () => {
+  test('fin de partie : chacun ses étoiles, défi ×3 une fois par joueur, perdue : rien', () => {
     const c = new E.Compte(memoire(), LE_10);
     const tom = J.creer(c.etat, 'Tom', 'tom').joueur.id;
     const r = c.recompenserJoueurs('a', [{ joueur: 'j-1', unites: 12 }, { joueur: tom, unites: 5 }], true, 'equipe', 'Défi', () => 0.9);
-    expect(r.map((x) => [x.joueur, x.base, x.bonus])).toEqual([['j-1', 12, 12], [tom, 5, 5]]);
+    expect(r.map((x) => [x.joueur, x.base, x.bonus])).toEqual([['j-1', 12, 24], [tom, 5, 10]]);
     expect(c.recompenserJoueurs('a', [{ joueur: 'j-1', unites: 12 }], true, 'equipe', 'Défi')).toBeNull(); // une seule fois
     // Le lendemain n'est pas encore là : Joueur 1 a déjà son défi, un 3e joueur l'a encore.
     const ines = J.creer(c.etat, 'Inès', 'ines').joueur.id;
     const r2 = c.recompenserJoueurs('b', [{ joueur: 'j-1', unites: 4 }, { joueur: ines, unites: 6 }], true, 'equipe', 'Défi', () => 0.9);
-    expect(r2.map((x) => [x.base, x.bonus, !!x.defiDejaFait])).toEqual([[4, 0, true], [6, 6, false]]);
+    expect(r2.map((x) => [x.base, x.bonus, !!x.defiDejaFait])).toEqual([[4, 0, true], [6, 12, false]]);
     expect(c.recompenserJoueurs('c', [{ joueur: tom, unites: 9 }], false, null, 'x')[0].gain).toBeNull();
-    expect([c.pourJoueur('j-1').etat.total, c.pourJoueur(tom).etat.total, c.pourJoueur(ines).etat.total]).toEqual([28, 10, 12]);
-    expect(c.etat.total).toBe(50); // le compte garde la somme (classements)
+    expect([c.pourJoueur('j-1').etat.total, c.pourJoueur(tom).etat.total, c.pourJoueur(ines).etat.total]).toEqual([40, 15, 18]);
+    expect(c.etat.total).toBe(73); // le compte garde la somme (classements)
   });
 
   test('défi quitté : seuls les joueurs de la partie perdent la récompense du jour', () => {
@@ -239,7 +281,7 @@ test.describe('trésor par joueur', () => {
     expect(c.pourJoueur('j-1').defiQuitte('solo')).toBe(false);
     const r = c.recompenserJoueurs('p2', [{ joueur: tom, unites: 8 }], true, 'solo', 'x');
     expect(r[0]).toMatchObject({ quitte: true, base: 0 });
-    expect(c.recompenserJoueurs('p3', [{ joueur: 'j-1', unites: 8 }], true, 'solo', 'x', () => 0.9)[0]).toMatchObject({ base: 8, bonus: 8 });
+    expect(c.recompenserJoueurs('p3', [{ joueur: 'j-1', unites: 8 }], true, 'solo', 'x', () => 0.9)[0]).toMatchObject({ base: 8, bonus: 16 });
   });
 
   test('migration : ce que le compte avait gagné revient à Joueur 1, une seule fois', () => {

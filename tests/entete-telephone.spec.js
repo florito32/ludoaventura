@@ -1,34 +1,37 @@
 // v9.5 (17/11/2026) : barre du haut de l'accueil compacte sur téléphone (choix B de la page A/B).
-// v10.30 (23/11/2026, backlog ligne 453) : rien de chiffré sur l'accueil : il ne reste que « Défi du jour » et le compte.
+// v10.30 (23/11/2026, backlog ligne 453) : rien de chiffré sur l'accueil.
+// v10.36 (24/11/2026, backlog ligne 477) : le défi du jour n'est plus dans la barre du haut : c'est un rectangle jaune juste sous
+// « Commencer l'aventure ». Il ne reste en haut que le compte.
 const { test, expect } = require('@playwright/test');
 
-test('barre du haut : défi du jour et compte tiennent dans l\'écran, sans chevauchement ; aucun nombre @smoke', async ({ page }) => {
+test('accueil : le compte tient en haut, le défi du jour est sous « Commencer », sans débordement ; aucun nombre @smoke', async ({ page }) => {
   await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); } catch (e) { /* */ } });
   await page.goto('./');
-  const ids = ['btn-defi', 'btn-compte'];
-  for (const id of ids) await expect(page.locator('#' + id)).toBeInViewport({ ratio: 1 });
-  const b = await page.evaluate((ids) => ids.map((id) => document.getElementById(id).getBoundingClientRect().toJSON()), ids);
-  expect(b[0].right).toBeLessThanOrEqual(b[1].left + 1);
+  for (const id of ['btn-compte', 'btn-defi', 'btn-commencer', 'btn-rapide', 'btn-baby', 'btn-didacticiel']) await expect(page.locator('#' + id)).toBeInViewport({ ratio: 1 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
-  // Plus de bloc des étoiles ni de bouton du coffre ; aucun chiffre visible dans la barre (ni pastille de défis restants).
-  await expect(page.locator('#btn-etoiles-haut, #btn-coffre-haut, #accueil-total')).toHaveCount(0);
-  await expect(page.locator('#defi-badge')).toBeHidden();
+  // Le défi du jour n'est plus dans la barre du haut.
+  await expect(page.locator('.accueil-haut #btn-defi')).toHaveCount(0);
+  await expect(page.locator('#btn-etoiles-haut, #btn-coffre-haut, #accueil-total, #defi-badge')).toHaveCount(0);
   expect(await page.locator('.accueil-haut').innerText()).not.toMatch(/\d/);
-
-  // Le défi garde son nom pour les lecteurs d'écran.
+  // Ordre des boutons : Commencer, Défi du jour, Partie rapide solo, Baby jeux, Didacticiel ; aucun ne chevauche le suivant.
+  const ids = ['btn-commencer', 'btn-defi', 'btn-rapide', 'btn-baby', 'btn-didacticiel'];
+  const b = await page.evaluate((ids) => ids.map((id) => document.getElementById(id).getBoundingClientRect().toJSON()), ids);
+  for (let i = 0; i < b.length - 1; i++) expect(b[i].bottom).toBeLessThanOrEqual(b[i + 1].top + 1);
+  // Le défi garde son nom pour les lecteurs d'écran et annonce ses étoiles ×3.
   await expect(page.locator('#btn-defi')).toHaveAccessibleName(/Défi du jour/);
+  await expect(page.locator('#btn-defi')).toContainText('étoiles ×3');
+  // Rectangle jaune comme les autres boutons (bordure épaisse, coins arrondis).
+  await expect(page.locator('#btn-defi')).toHaveCSS('background-color', 'rgb(255, 230, 0)');
+  await expect(page.locator('#btn-defi')).toHaveCSS('border-top-width', '3px');
+});
 
-  const largeur = page.viewportSize().width;
-  if (largeur <= 520) {
-    // Téléphone : défi et compte sont des ronds de 48 px à icône seule.
-    for (const i of [0, 1]) {
-      expect(Math.round(b[i].width)).toBe(48);
-      expect(Math.round(b[i].height)).toBe(48);
-    }
-    await expect(page.locator('#btn-defi .pd-texte')).toHaveCSS('position', 'absolute');
-  } else if (largeur >= 1024) {
-    // Ordinateur : le texte du défi reste affiché.
-    await expect(page.locator('#btn-defi .pd-texte')).toBeVisible();
-    await expect(page.locator('#btn-defi .pd-texte')).not.toHaveCSS('position', 'absolute');
-  }
+// v10.36 : avec cinq boutons, l'accueil d'un téléphone en paysage doit toujours tenir dans l'écran (échec vu sur la CI).
+test.describe('téléphone en paysage', () => {
+  test.use({ viewport: { width: 915, height: 412 }, isMobile: true, hasTouch: true });
+  test('accueil : les cinq boutons sont entièrement visibles', async ({ page }, info) => {
+    test.skip(info.project.name !== 'telephone', 'un seul format suffit');
+    await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); } catch (e) { /* */ } });
+    await page.goto('./');
+    for (const id of ['btn-commencer', 'btn-defi', 'btn-rapide', 'btn-baby', 'btn-didacticiel']) await expect(page.locator('#' + id)).toBeInViewport({ ratio: 1 });
+  });
 });

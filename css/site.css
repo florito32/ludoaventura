@@ -63,6 +63,9 @@ main:focus { outline: none; }
 .btn-bleu { background: var(--bleu); color: #fff; box-shadow: 0 4px 0 var(--encre); }
 .btn-bleu:hover { filter: brightness(1.15); }
 .btn-bleu:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--encre); }
+.btn-jaune { background: var(--jaune); color: var(--encre); box-shadow: 0 4px 0 var(--encre); }
+.btn-jaune:hover { filter: brightness(1.04); }
+.btn-jaune:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--encre); }
 .btn-secondaire { background: #fff; color: var(--encre); box-shadow: 0 4px 0 var(--encre); }
 .btn-bonne { background: #1f7a3a; color: #fff; box-shadow: 0 4px 0 var(--encre); }
 .btn-mauvaise { background: #fff; color: var(--rouge-texte); box-shadow: 0 4px 0 var(--encre); }
@@ -1517,10 +1520,6 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .pastille-coffre.a-ouvrir .ico { animation: coffre-appel 1.6s ease-in-out infinite; transform-origin: 50% 90%; }
 @keyframes coffre-appel { 0%, 70%, 100% { transform: none; } 75% { transform: rotate(-9deg) scale(1.08); } 85% { transform: rotate(9deg) scale(1.08); } 92% { transform: rotate(-4deg); } }
 
-/* Défi du jour en haut de l'écran (v6.38). Texte sur deux lignes pour tenir entre les étoiles et le coffre. */
-.pastille-defi { font-size: .85rem; line-height: 1.05; white-space: nowrap; padding-right: 14px; }
-.pd-texte { display: flex; flex-direction: column; text-align: left; }
-.pd-texte span { font-weight: 700; font-size: .78rem; }
 @media (max-height: 560px) {
   .pastille { min-height: 44px; padding-block: 2px; }
   .pastille .ico { width: 28px; height: 28px; }
@@ -1534,8 +1533,7 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
    d'écran. Le bloc des étoiles reste à gauche, les trois icônes sont regroupées à droite. */
 @media (max-width: 520px) {
   .pastille-etoiles { margin-right: auto; }
-  .pastille-defi, .pastille-coffre, .pastille-compte { width: 48px; height: 48px; min-height: 48px; padding: 0; justify-content: center; flex: none; }
-  .pastille-defi .pd-texte { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+  .pastille-coffre, .pastille-compte { width: 48px; height: 48px; min-height: 48px; padding: 0; justify-content: center; flex: none; }
 }
 @media (max-width: 380px) { .pe-niveau .mini-jauge { width: 48px; } }
 
@@ -2447,3 +2445,46 @@ body:has(#ecran-baby:not([hidden])) .pied { padding-block: 4px calc(4px + env(sa
 .joueur-coffres .btn { width: 100%; min-height: 48px; padding: 8px 14px; }
 .joueurs-annonce { margin: 0; color: #fff; font-weight: 700; }
 .joueur-retour { justify-self: start; background: none; border: 0; color: var(--encre); font: inherit; font-weight: 800; min-height: 44px; padding: 0; cursor: pointer; text-decoration: underline; }
+
+/* ---------- Accueil : bouton « Défi du jour » (v10.36) et fenêtre de choix des profils (js/defi-jour.js) ---------- */
+.btn-defi { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; line-height: 1.1; }
+.btn-defi .bd-ligne { display: inline-flex; align-items: center; gap: 6px; }
+.btn-defi .ico { width: 1.5em; height: 1.5em; flex: none; }
+.btn-defi .bd-sous { display: inline-flex; align-items: center; gap: 4px; font-size: .72em; font-weight: 800; letter-spacing: 0; }
+.btn-defi .bd-sous .ico { width: 1.2em; height: 1.2em; }
+.fenetre-defi h2 { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.fenetre-defi h2 .ico { width: 36px; height: 36px; }
+.dj-etat { margin: 0 0 8px; font-weight: 800; color: var(--rouge-texte); }
+.dj-liste { display: flex; flex-direction: column; gap: 7px; text-align: left; }
+.dj-ligne {
+  display: flex; align-items: center; gap: 10px; width: 100%; min-height: 60px; padding: 5px 10px; cursor: pointer;
+  font: inherit; color: var(--encre); background: #fff; border: 3px solid var(--parchemin-bord); border-radius: 12px;
+}
+.dj-ligne[aria-pressed="true"] { border-color: var(--encre); box-shadow: inset 0 0 0 3px var(--c, var(--rouge)); }
+.dj-ligne[disabled] { opacity: .5; cursor: not-allowed; }
+.dj-avatar { width: 46px; height: 50px; flex: none; object-fit: contain; }
+.dj-qui { flex: 1 1 0; min-width: 0; }
+.dj-nom { display: block; font-weight: 800; overflow-wrap: anywhere; }
+.dj-niv, .dj-jour { display: block; font-size: .75rem; color: var(--encre-douce); }
+.dj-coche { flex: none; width: 28px; height: 28px; display: grid; place-items: center; border: 3px solid var(--encre); border-radius: 8px; background: #fff; color: #fff; font-weight: 800; }
+.dj-ligne[aria-pressed="true"] .dj-coche { background: var(--c, var(--rouge)); }
+.dj-puces { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 10px 0 4px; }
+.dj-puce { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border: 2px solid var(--encre); border-radius: 99px; background: #fff; font-weight: 800; font-size: .82rem; }
+.dj-puce.dj-or { background: #ffe9a0; }
+.dj-puce .ico { width: 16px; height: 16px; }
+.fenetre-compte .dj-note { margin: 0 0 10px; font-size: .82rem; color: var(--encre-douce); }
+@media (max-height: 640px) {
+  .dj-liste { gap: 4px; }
+  .dj-ligne { min-height: 46px; padding: 2px 8px; border-width: 2px; }
+  .dj-avatar { width: 34px; height: 38px; }
+  .dj-niv { display: none; }
+  .fenetre-defi h2 .ico { width: 28px; height: 28px; }
+}
+
+/* Accueil sur écran large et peu haut (téléphone en paysage) : cinq boutons compacts, plus larges, pour tenir dans l'écran (v10.36). */
+@media (max-height: 480px) and (min-aspect-ratio: 3/2) {
+  .accueil-actions { width: 62%; right: 2%; bottom: 3%; gap: 5px; }
+  .accueil-actions .btn { min-height: 38px; padding: 3px 8px; font-size: .9rem; border-width: 2px; box-shadow: 0 3px 0 var(--encre); }
+  .accueil-actions .btn-defi { flex-direction: row; gap: 8px; }
+  .accueil-actions .btn-defi .ico { width: 1.3em; height: 1.3em; }
+}

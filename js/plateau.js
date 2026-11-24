@@ -262,6 +262,7 @@
   function noterNiveauxProfils(r) {
     if (r.niveauxNotes || !window.Recompenses || !window.Joueurs) return;
     r.niveauxNotes = true;
+    if (partie.defi) return; // v10.36 : le défi du jour ne fait pas progresser les niveaux (étoiles ×3 seulement)
     var c = window.Recompenses.compte, pts = pointsParJoueur(r), part = partIndividuelle(r);
     partie.joueurs.forEach(function (j, i) {
       var sm = j.profil && j.sousMat;
@@ -1055,8 +1056,10 @@
       j.babyDernier = bc.jeu;
       return bc;
     }
-    if (partie.rapide && window.Rapide) {
-      var t = window.Rapide.carte(partie.rapide.matieres, partie.rapide.niveau, null, partie.rapide.mode);
+    // Défi du jour (v10.36) : chaque carte tire sa matière et son niveau pour le joueur qui la joue (carteDefi).
+    var t = partie.rapide && window.Rapide ? window.Rapide.carte(partie.rapide.matieres, partie.rapide.niveau, null, partie.rapide.mode)
+      : partie.defi && partie.defi.mixte && window.Rapide ? carteDefi(j) : null;
+    if (t) {
       mat = t.matiere; if (t.maths) mr = t.maths; if (t.conj) cr = t.conj; if (t.gram) gr = t.gram;
       if (t.phon) return cartePhonemes(j, t.phon); // v10.4 : phonèmes aussi en partie rapide (tous les jeux, tous les sons)
       // v8.5 : Géographie et Histoire en partie rapide : tous les jeux de la matière jouables dans le mode choisi.
@@ -2537,27 +2540,38 @@
         packs: partie.packs, types: partie.types, orthoNiveau: partie.orthoNiveau, gram: partie.gram });
     }
   }
-  function lancerDefi(d) {
-    demanderJoueurs(d.joueurs, function (sl) {
-      partie.rapide = null;
-      garderAvant();
-      poserProfils(sl);
-      document.querySelector('input[name="aventure"][value="' + d.aventure + '"]').checked = true;
-      for (var i = 0; i < 4; i++) {
-        partie.matiere[i] = d.matiere;
-        partie.francais[i] = d.matiere !== 'maths';
-        partie.maths[i] = d.maths ? copie(d.maths) : mathsVides();
-        partie.conj[i] = d.conj ? copie(d.conj) : conjVide();
-        partie.gram[i] = d.gram ? copie(d.gram) : gramVide(); // v6.55 : défi de grammaire
-        partie.packs[i] = d.packs ? d.packs.slice() : [];
-        partie.types[i] = d.types ? d.types.slice() : [];
-        partie.mots[i] = d.mots ? d.mots.slice() : null;
-      }
-      partie.defi = { type: d.type, jour: d.jour, niveau: d.niveau, matiere: d.matiere };
-      partie.etapePrepa = 3; partie.sousEtape = 'matiere'; partie.actif = 0;
-      majDetail(); majAventuriers();
-      lancerPartie();
-    });
+  // v10.36 (demande du 24/11/2026, backlog lignes 475 à 477) : le joueur n'a choisi que ses profils (ids : 1 = défi solo,
+  // 2 à 4 = défi en équipe) ; d vient de Defis.genererJour (aventure et type). Les cartes de chaque joueur (matière, niveau)
+  // sont tirées une par une dans carteDefi ; ici on prépare seulement l'orthographe, dont les mots sont pris dans le tas du
+  // joueur, au niveau de son Français.
+  function lancerDefi(d, ids) {
+    var R2 = window.Rapide, DF = window.Defis, JO = window.Joueurs;
+    partie.rapide = null;
+    garderAvant();
+    poserProfils(ids);
+    document.querySelector('input[name="aventure"][value="' + d.aventure + '"]').checked = true;
+    for (var i = 0; i < 4; i++) {
+      var pr = ids[i] ? profil(ids[i]) : null;
+      var o = R2.ortho(DF.niveauPourScore(pr ? JO.scoreMatiere(pr, 'francais') : 0), TOUS_TYPES);
+      partie.matiere[i] = 'orthographe';
+      partie.francais[i] = true;
+      partie.maths[i] = R2.mathsTout('moyen');
+      partie.conj[i] = R2.conjTout('moyen');
+      partie.gram[i] = R2.gramTout('facile');
+      partie.packs[i] = TOUS_PACKS.slice();
+      partie.types[i] = o.types.length ? o.types.slice() : TOUS_TYPES.slice();
+      partie.mots[i] = o.mots.slice();
+    }
+    partie.defi = { type: d.type, jour: d.jour, niveau: d.niveau, matiere: 'mixte', mixte: true };
+    partie.etapePrepa = 3; partie.sousEtape = 'matiere'; partie.actif = 0;
+    majDetail(); majAventuriers();
+    lancerPartie();
+  }
+  // Carte du défi du jour pour le joueur j : matière tirée au hasard parmi les quatre, au niveau de ce joueur dans cette matière.
+  function carteDefi(j) {
+    var DF = window.Defis, id = partie.profils[j.index], pr = id ? profil(id) : null;
+    var m = DF.MATIERES_DEFI[Math.floor(Math.random() * DF.MATIERES_DEFI.length)];
+    return window.Rapide.carte([m], DF.niveauPourScore(pr ? window.Joueurs.scoreMatiere(pr, m) : 0), null, 'quiz');
   }
   // Après un défi : réglages d'avant remis en place, mots de tous niveaux.
   function quitterDefi() {
@@ -2644,7 +2658,7 @@
     $('btn-rejouer').textContent = partie.rapide ? 'Recommencer la partie' : 'Rejouer cette aventure';
     $('btn-nouvelle').textContent = partie.rapide ? 'Retour à l’accueil' : 'Nouvelle partie';
     $('btn-fin-accueil').hidden = !!partie.rapide; // v7.1 : 3e bouton, sauf partie rapide (déjà « Retour à l'accueil »)
-    // Étoiles gagnées (v6.36) : toute aventure gagnée rapporte ce que l'équipe a récolté (doublé pour un défi du jour).
+    // Étoiles gagnées (v6.36) : toute aventure gagnée rapporte ce que l'équipe a récolté (triplé pour un défi du jour).
     if (window.Recompenses) {
       // v10.30 (backlog ligne 454) : chacun reçoit les étoiles qu'il a lui-même récoltées (en solo : tout ce qui est récolté).
       var ptsJ = pointsParJoueur(r);
@@ -2683,7 +2697,7 @@
   // sessionStorage : « survit aux rechargements et restaurations de la page ; fermer l'onglet efface les données »
   // (MDN, Window.sessionStorage). Les objets (aventure, aventuriers, questions) sont enregistrés par leur identifiant.
   var CLE = 'ludoaventura-partie';
-  var PAGES_ACCUEIL = ['ecran-coffres', 'ecran-defi', 'ecran-rapide', 'ecran-baby']; // écrans ouverts depuis l'accueil (v6.36)
+  var PAGES_ACCUEIL = ['ecran-coffres', 'ecran-rapide', 'ecran-baby']; // écrans ouverts depuis l'accueil (v6.36 ; v10.36 : plus d'écran du défi, c'est une fenêtre)
   var pretASauver = false; // pas de sauvegarde pendant la construction initiale de la page
 
   function carteVersDonnees(c) {

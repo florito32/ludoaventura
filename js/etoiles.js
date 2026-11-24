@@ -2,7 +2,7 @@
 // Choix de l'utilisateur :
 //  - toute aventure GAGNÉE rapporte en étoiles ce que l'équipe a récolté (1 tronc coupé, 1 pierre taillée… = 1 ⭐) ;
 //    une partie perdue ne rapporte rien ;
-//  - défi du jour gagné : étoiles de la partie doublées, une seule fois par jour et par défi (solo, équipe) ;
+//  - défi du jour gagné : étoiles de la partie triplées (×3, v10.36 ; doublées avant), une seule fois par jour et par défi (solo, équipe) ;
 //  - coffre du jour : 5 à 20 ⭐, un par jour (date du téléphone) ;
 //  - niveaux : niveau 2 à 30 ⭐, puis chaque niveau demande 10 ⭐ de plus (30, 40, 50…) ;
 //  - coffre d'argent aux niveaux 5, 15, 25… (30 à 60 ⭐), coffre d'or aux niveaux 10, 20, 30… (80 à 150 ⭐) ;
@@ -285,7 +285,7 @@
     var base = unites, bonus = 0, dejaFait = false;
     if (defi) {
       e.defis[j] = e.defis[j] || {};
-      if (e.defis[j][defi] === undefined) { bonus = unites; e.defis[j][defi] = base + bonus; }
+      if (e.defis[j][defi] === undefined) { bonus = 2 * unites; e.defis[j][defi] = base + bonus; } // v10.36 : étoiles ×3 (base + 2 fois la base)
       else dejaFait = true;
     }
     var type = defi && !dejaFait ? 'defi-' + defi : 'partie';

@@ -123,6 +123,19 @@ async function quiJoue(page) {
   }
   await fenetre.getByRole('button', { name: 'C’est parti' }).click();
 }
+// Défi du jour (v10.36) : le bouton de l'accueil ouvre la fenêtre « Défi du jour » ; on y coche seulement les profils
+// (n au total, dans l'ordre du compte) puis « C'est parti ! ». Les joueurs doivent exister (creerJoueurs) avant.
+async function lancerDefiJour(page, n = 1) {
+  await page.locator('#btn-defi').click();
+  const fenetre = page.getByRole('dialog', { name: 'Défi du jour' });
+  await fenetre.waitFor();
+  const lignes = fenetre.locator('.dj-ligne');
+  for (let i = 0; i < await lignes.count(); i++) {
+    const coche = (await lignes.nth(i).getAttribute('aria-pressed')) === 'true';
+    if (coche !== (i < n)) await lignes.nth(i).click();
+  }
+  await fenetre.getByRole('button', { name: 'C’est parti !' }).click();
+}
 async function lancerRapideQui(page) {
   await page.getByRole('button', { name: 'Lancer la partie' }).click();
   await quiJoue(page);
@@ -224,4 +237,4 @@ async function coffresJoueur(page, nom) {
   await page.locator('#onglet-profil').click();
   await carteJoueur(page, nom).locator('[data-act="coffres"]').click();
 }
-module.exports = { carteJoueur, mesEtoiles, coffresJoueur, quiJoue, lancerRapideQui, creerJoueurs, ouvrirChoix, cocher, choisir, grammaire, repondre, valider, cocherJoueur, orthographe, maths, conjugaison, matiere, versReglages, lancer, lancerLeDe, lancerPartie, rapide, attendreJoueur, cocherTout, ouvrirNeuf };
+module.exports = { lancerDefiJour, carteJoueur, mesEtoiles, coffresJoueur, quiJoue, lancerRapideQui, creerJoueurs, ouvrirChoix, cocher, choisir, grammaire, repondre, valider, cocherJoueur, orthographe, maths, conjugaison, matiere, versReglages, lancer, lancerLeDe, lancerPartie, rapide, attendreJoueur, cocherTout, ouvrirNeuf };
