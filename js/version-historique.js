@@ -2,6 +2,9 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.39', date: '2026-11-24', changes: [
+    "Défi du jour : tu ne vois plus « Tu as quitté ce défi avant la fin » à tort quand tu as bien terminé ton défi. Si le jeu avait été ouvert une 2e fois pendant ta partie (autre onglet, raccourci, retour dans le navigateur), le défi était noté quitté par erreur ; maintenant, une partie menée jusqu’au bout est toujours récompensée."
+  ] },
   { v: '10.38', date: '2026-11-24', changes: [
     "Préparation de la partie : à côté de chaque joueur (étape 1), deux boutons, « Suivre ma progression » et « Personnaliser ». Le joueur se prépare, revient à l’étape 1 pour le suivant, et « Choisir l’aventure » apparaît en bas quand tous les joueurs sont prêts.",
     "« Suivre ma progression » : le joueur ne choisit que sa matière (Maths, Français, Géographie ou Histoire) ; ses questions viennent de cette matière, au niveau enregistré dans son profil.",
