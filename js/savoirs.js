@@ -97,27 +97,60 @@
   // ---------- Tirage d'une carte ----------
   // reglage = { jeux: ['g04', …], niveau: 'facile', mode: 'quiz' | 'normal' } ; matiere = 'geographie' ou 'histoire'.
   // Renvoie une carte (objet simple, sauvegardable en JSON) : { type: 'savoir', jeu, format, … }.
+  // reglage.fenetre (facultatif, v10.42) : { bas, haut } = « Suivre ma progression » : seules les questions dont le niveau de
+  // progression (1 à 100, js/progression-savoirs.js) est dans la fenêtre sont utilisées ; le niveau Facile…Expert est choisi
+  // parmi ceux qui ont des questions dans la fenêtre. Renvoie null si la fenêtre ne donne rien (l'appelant l'élargit).
   function generer(reglage, matiere) {
-    var niveau = reglage.niveau || 'facile', mode = modeDe(reglage);
+    var niveau = reglage.niveau || 'facile', mode = modeDe(reglage), fenetre = reglage.fenetre || null;
     var choisis = (reglage.jeux || []).map(trouver).filter(function (j) { return j && (!matiere || j.matiere === matiere); });
     if (!choisis.length) choisis = jeuxDe(matiere || 'geographie');
     var tirages = mode === 'quiz' ? QUIZ : NORMAL;
-    for (var essai = 0; essai < 60; essai++) {
-      var jeu = auHasard(choisis);
-      var series = jeu.series.filter(function (s) { return utilisable(s, niveau, mode); });
-      if (!series.length) continue;
-      var s = auPoids(series);
-      var c = tirages[s.k](s, niveau, jeu);
-      if (!c) continue;
-      c.type = 'savoir';
-      c.jeu = jeu.id;
-      c.matiere = jeu.matiere;
-      c.niveau = niveau;
-      c.mode = mode;
-      c.packNom = jeu.nom + ' · ' + NOMS_FORMATS[c.format];
-      return c;
-    }
+    try {
+      for (var essai = 0; essai < 60; essai++) {
+        var jeu = auHasard(choisis), niv = niveau;
+        if (fenetre) {
+          var niveaux = niveauxDansFenetre(jeu, fenetre);
+          if (!niveaux.length) continue;
+          niv = auHasard(niveaux);
+          fen = { jeu: jeu, bas: fenetre.bas, haut: fenetre.haut };
+        }
+        var series = jeu.series.filter(function (s) { return utilisable(s, niv, mode); });
+        if (!series.length) continue;
+        var s = auPoids(series);
+        var c = tirages[s.k](s, niv, jeu);
+        if (!c) continue;
+        c.type = 'savoir';
+        c.jeu = jeu.id;
+        c.matiere = jeu.matiere;
+        c.niveau = niv;
+        c.mode = mode;
+        c.packNom = jeu.nom + ' · ' + NOMS_FORMATS[c.format];
+        if (fenetre) c.fenetre = { bas: fenetre.bas, haut: fenetre.haut };
+        return c;
+      }
+    } finally { fen = null; }
     return null;
+  }
+  // Fenêtre de progression en cours de tirage : { jeu, bas, haut } (null = aucune, toutes les questions).
+  var fen = null;
+  function progression() {
+    if (racine && racine.ProgressionSavoirs) return racine.ProgressionSavoirs;
+    return typeof module !== 'undefined' && module.exports ? require('./progression-savoirs.js') : null;
+  }
+  // Le niveau de progression de la question de rang i de cette série est-il dans la fenêtre en cours ?
+  function dansFenetre(s, niveau, i) {
+    var P = progression(), n = P && P.niveau(fen.jeu.id, fen.jeu.series.indexOf(s), niveau, i);
+    return !!n && n >= fen.bas && n <= fen.haut;
+  }
+  // Niveaux du jeu (Facile…Expert) qui ont au moins une question de ce jeu dans la fenêtre.
+  function niveauxDansFenetre(jeu, f) {
+    var P = progression();
+    return NIVEAUX.map(function (n) { return n.id; }).filter(function (n) {
+      return jeu.series.some(function (s, si) {
+        var t = P && P.DATA[jeu.id + '.' + si + '.' + n];
+        return !!t && t.some(function (v) { return v >= f.bas && v <= f.haut; });
+      });
+    });
   }
   // Cartes de géographie (js/cartes-geo.js) : dans la page (window.CartesGeo) ou dans les tests Node.
   function cartesGeo() {
@@ -126,14 +159,19 @@
   }
   function modeDe(r) { return r && r.mode === 'quiz' ? 'quiz' : 'normal'; }
 
-  function contenu(s, niveau) { return (s.niveaux && s.niveaux[niveau]) || []; }
+  function contenu(s, niveau) {
+    var t = (s.niveaux && s.niveaux[niveau]) || [];
+    return fen ? t.filter(function (x, i) { return dansFenetre(s, niveau, i); }) : t;
+  }
+  // Pour les cartes à toucher : fonction « le rang de la zone est-il dans la fenêtre ? » (ou undefined hors fenêtre).
+  function garderZones(s, niveau) { return fen ? function (i) { return dansFenetre(s, niveau, i); } : undefined; }
   // Une série peut-elle donner une carte à ce niveau, dans ce mode (normal par défaut) ?
   function utilisable(s, niveau, mode) {
     var t = contenu(s, niveau), quiz = mode === 'quiz';
     if (quiz && s.quiz === false) return false; // série réservée au mode Normal
     if (s.k === 'carte') {
       var CG = cartesGeo();
-      return !!CG && CG.zonesDu(s.carte, niveau).length >= (quiz ? 4 : 1);
+      return !!CG && CG.zonesDu(s.carte, niveau, garderZones(s, niveau)).length >= (quiz ? 4 : 1);
     }
     if (s.k === 'paires') return pairesDistinctes(t, 4, true).length >= 4;
     if (s.k === 'ordre') return t.length >= 4;
@@ -262,7 +300,7 @@
     },
     // Toucher sur la carte : { k: 'carte', carte: 'france' | 'europe' | 'monde' } (js/cartes-geo.js).
     carte: function (s, niveau) {
-      var CG = cartesGeo(); return CG ? CG.tirer(s.carte, niveau, hasard, 'normal') : null;
+      var CG = cartesGeo(); return CG ? CG.tirer(s.carte, niveau, hasard, 'normal', garderZones(s, niveau)) : null;
     }
   };
 
@@ -333,7 +371,7 @@
     },
     // Carte : la zone est en vert, 4 noms au choix (choix de l'utilisateur du 13/11/2026).
     carte: function (s, niveau) {
-      var CG = cartesGeo(); return CG ? CG.tirer(s.carte, niveau, hasard, 'quiz') : null;
+      var CG = cartesGeo(); return CG ? CG.tirer(s.carte, niveau, hasard, 'quiz', garderZones(s, niveau)) : null;
     }
   };
 

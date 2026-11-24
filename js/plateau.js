@@ -1235,8 +1235,16 @@
       if (tir) return { matiere: s === 'phonemes' ? 'phonemes' : s, progression: tir, sous: sous };
       return { matiere: 'orthographe', sous: sous };
     }
+    // v10.42 : Histoire et Géographie : questions dont le niveau de progression (1 à 100) est dans la fenêtre de 5 niveaux du profil.
+    // Si la fenêtre ne donne rien (série trop courte), elle s'élargit peu à peu ; en dernier recours, le niveau Facile…Expert du profil.
     var jeux = jeuxProposes(m, 'quiz').filter(function (x) { return x.famille === s; }).map(function (x) { return x.id; });
-    var carte = SV.generer({ jeux: jeux, niveau: niv, mode: 'quiz' }, m) || SV.generer({ jeux: jeuxProposes(m, 'quiz').map(function (x) { return x.id; }), niveau: niv, mode: 'quiz' }, m);
+    var tous = jeuxProposes(m, 'quiz').map(function (x) { return x.id; }), fs = window.ProgressionFenetre.fenetre(niveauProfil(i, m, s)), carte = null;
+    [0, 2, 5, 10, 25, 50, 100].forEach(function (ecart) {
+      var fenetre = { bas: Math.max(1, fs.bas - ecart), haut: Math.min(100, fs.haut + ecart) };
+      if (!carte) carte = SV.generer({ jeux: jeux, mode: 'quiz', fenetre: fenetre }, m);
+      if (!carte) carte = SV.generer({ jeux: tous, mode: 'quiz', fenetre: fenetre }, m);
+    });
+    if (!carte) carte = SV.generer({ jeux: jeux, niveau: niv, mode: 'quiz' }, m) || SV.generer({ jeux: tous, niveau: niv, mode: 'quiz' }, m);
     return { matiere: m, carte: carte, sous: sous };
   }
   // Sous-matière la plus jouée par un joueur « Suivre » pendant la partie : c'est elle qui reçoit le point de niveau (ligne 446).
