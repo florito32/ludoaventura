@@ -24,3 +24,15 @@ test('accueil : le compte tient en haut, le défi du jour est sous « Commencer 
   await expect(page.locator('#btn-defi')).toHaveCSS('background-color', 'rgb(255, 230, 0)');
   await expect(page.locator('#btn-defi')).toHaveCSS('border-top-width', '3px');
 });
+
+// v10.36 : avec cinq boutons, l'accueil d'un téléphone en paysage doit toujours tenir dans l'écran (échec vu sur la CI).
+test.describe('téléphone en paysage', () => {
+  test.use({ viewport: { width: 915, height: 412 }, isMobile: true, hasTouch: true });
+  test('accueil : les cinq boutons sont entièrement visibles', async ({ page }, info) => {
+    test.skip(info.project.name !== 'telephone', 'un seul format suffit');
+    await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); } catch (e) { /* */ } });
+    await page.goto('./');
+    for (const id of ['btn-commencer', 'btn-defi', 'btn-rapide', 'btn-baby', 'btn-didacticiel']) await expect(page.locator('#' + id)).toBeInViewport({ ratio: 1 });
+    expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight + 1)).toBe(true);
+  });
+});

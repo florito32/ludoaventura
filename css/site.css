@@ -2473,3 +2473,11 @@ body:has(#ecran-baby:not([hidden])) .pied { padding-block: 4px calc(4px + env(sa
   .dj-niv { display: none; }
   .fenetre-defi h2 .ico { width: 28px; height: 28px; }
 }
+
+/* Accueil sur écran large et peu haut (téléphone en paysage) : cinq boutons compacts, plus larges, pour tenir dans l'écran (v10.36). */
+@media (max-height: 480px) and (min-aspect-ratio: 3/2) {
+  .accueil-actions { width: 62%; right: 2%; bottom: 3%; gap: 5px; }
+  .accueil-actions .btn { min-height: 38px; padding: 3px 8px; font-size: .9rem; border-width: 2px; box-shadow: 0 3px 0 var(--encre); }
+  .accueil-actions .btn-defi { flex-direction: row; gap: 8px; }
+  .accueil-actions .btn-defi .ico { width: 1.3em; height: 1.3em; }
+}
