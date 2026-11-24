@@ -311,8 +311,14 @@
     if (c && c.jour !== j) { this.ecrire(); return; } // défi d'un autre jour : rien à bloquer aujourd'hui
     e.defisQuittes[j] = e.defisQuittes[j] || {};
     // v10.30 : « solo@j-1 » = quitté par ce joueur seulement ; « solo » (sans joueurs connus) = pour tout le compte.
-    if (c && c.joueurs && c.joueurs.length) c.joueurs.forEach(function (pid) { e.defisQuittes[j][defi + '@' + pid] = true; });
-    else e.defisQuittes[j][defi] = true;
+    // v10.38 : la marque garde l'identifiant de la partie quittée (au lieu de « true »), pour reconnaître plus tard une
+    // fausse alerte : si cette partie est en fait allée jusqu'au bout, elle n'a pas été quittée (voir defiQuitte).
+    // Une marque déjà posée n'est pas écrasée (un vrai abandon plus tôt reste un abandon).
+    var marque = (c && c.id) || true;
+    var self = this;
+    function poser(k) { if (!self.marqueVraie(e.defisQuittes[j][k])) e.defisQuittes[j][k] = marque; } // une fausse alerte ancienne est remplacée
+    if (c && c.joueurs && c.joueurs.length) c.joueurs.forEach(function (pid) { poser(defi + '@' + pid); });
+    else poser(defi);
     // Ménage : seulement aujourd'hui.
     Object.keys(e.defisQuittes).forEach(function (k) { if (k !== j) delete e.defisQuittes[k]; });
     this.ecrire();
@@ -327,7 +333,17 @@
   };
   // Vrai si ce défi a été quitté aujourd'hui.
   // pid (v10.30) : pour un joueur précis (sinon : quitté par le compte entier).
-  Compte.prototype.defiQuitte = function (defi, pid) { var q = this.etat.defisQuittes[this.aujourdhui()]; return !!(q && (q[defi] || (pid && q[defi + '@' + pid]))); };
+  // v10.38 (demande du 24/11/2026) : une marque « quitté » qui vise une partie terminée et récompensée (son identifiant est dans
+  // etat.parties) est une fausse alerte : une 2e ouverture du jeu (autre onglet, raccourci, restauration du navigateur) pendant
+  // le défi l'avait notée « en cours, donc quittée ». Le joueur est allé jusqu'au bout : récompense normale.
+  Compte.prototype.defiQuitte = function (defi, pid) {
+    var q = this.etat.defisQuittes[this.aujourdhui()], self = this;
+    return !!(q && (self.marqueVraie(q[defi]) || (pid && self.marqueVraie(q[defi + '@' + pid]))));
+  };
+  // Marque posée et qui ne vise pas une partie déjà terminée (valeur : identifiant de la partie quittée, ou true pour une ancienne marque).
+  Compte.prototype.marqueVraie = function (v) {
+    return !!v && !(typeof v === 'string' && (this.etat.parties || []).indexOf(v) >= 0);
+  };
   // Défi encore à faire aujourd'hui : ni réussi, ni quitté.
   Compte.prototype.defiAFaire = function (defi) { return this.defiDuJour(defi) === undefined && !this.defiQuitte(defi); };
 
