@@ -2,6 +2,9 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.48', date: '2026-11-24', changes: [
+    "« Personnaliser » : le niveau que tu choisis (de 1 à 10) donne maintenant des questions de sa bande de 10 niveaux (niveau 2 : de 11 à 20), parmi ce que tu as coché, en Maths, Français, Histoire et Géographie."
+  ] },
   { v: '10.47', date: '2026-11-24', changes: [
     "Deux nouveaux mini-jeux de multiplication : « Course aux étoiles » (50 bonnes réponses le plus vite possible, 3 vies, étoiles de bronze, d’argent et d’or) et « Aventure des multiplications » (un petit personnage court, saute et casse par en dessous les caisses qui donnent le bon résultat). Tu choisis tes tables, et chaque partie terminée rapporte 10 étoiles, comme les autres mini-jeux.",
     "Même charte que le reste du jeu : parchemin, contours bruns, boutons en relief, décor de jour."
