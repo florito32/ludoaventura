@@ -2,10 +2,14 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
-  { v: '10.37', date: '2026-11-24', changes: [
+  { v: '10.38', date: '2026-11-24', changes: [
     "Préparation de la partie : à côté de chaque joueur (étape 1), deux boutons, « Suivre ma progression » et « Personnaliser ». Le joueur se prépare, revient à l’étape 1 pour le suivant, et « Choisir l’aventure » apparaît en bas quand tous les joueurs sont prêts.",
     "« Suivre ma progression » : le joueur ne choisit que sa matière (Maths, Français, Géographie ou Histoire) ; ses questions viennent de cette matière, au niveau enregistré dans son profil.",
     "« Personnaliser » : l’étape actuelle (matière, réglages) avec un niveau de 1 à 10 à la place de Facile, Moyen, Difficile et Expert ; chaque niveau regroupe dix niveaux de la progression (le niveau 2, c’est les niveaux 11 à 20)."
+  ] },
+  { v: '10.37', date: '2026-11-24', changes: [
+    "Défi du jour : le bouton est maintenant un rectangle jaune juste sous « Commencer l’aventure ». Tu choisis seulement ton ou tes profils (1 = défi solo, 2 à 4 = défi en équipe) puis tu lances : plus de matière, de niveau ni d’aventure à choisir.",
+    "Les cartes du défi mêlent Français, Maths, Histoire et Géographie, au niveau de chaque joueur dans la matière. Le défi du jour ne fait pas monter les niveaux, mais les étoiles gagnées sont multipliées par 3 (une fois par jour et par profil)."
   ] },
   { v: '10.36', date: '2026-11-24', changes: [
     "Mon compte : dans la carte du joueur, le bouton « Mes étoiles » est remplacé par un bouton coffre (sans texte). Il ouvre la page « Mes coffres » : coffres des prochains niveaux, coffre du jour, défis et méga coffre sur une seule page (l’écran « Ma progression » n’existe plus).",

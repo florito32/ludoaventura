@@ -93,18 +93,18 @@ test.describe('logique des étoiles', () => {
     expect(c.coffresAOuvrir().every((x) => x.type === 'simple')).toBe(true);
   });
 
-  test('partie gagnée : 1 étoile par unité, une seule fois ; perdue : rien ; défi : doublé une fois par jour', () => {
+  test('partie gagnée : 1 étoile par unité, une seule fois ; perdue : rien ; défi : ×3 une fois par jour', () => {
     const c = new E.Compte(memoire(), LE_10);
     expect(c.recompenserPartie('a', 18, true, null, 'Viking').gain.n).toBe(18);
     expect(c.recompenserPartie('a', 18, true, null, 'Viking')).toBeNull(); // rechargement de l'écran de fin
     expect(c.recompenserPartie('b', 12, false, null, 'Viking').gain).toBeNull();
     const d = c.recompenserPartie('c', 20, true, 'solo', 'Défi');
-    expect(d).toMatchObject({ base: 20, bonus: 20 });
-    expect(c.defiDuJour('solo')).toBe(40);
+    expect(d).toMatchObject({ base: 20, bonus: 40 }); // v10.36 : ×3 = base + 2 fois la base
+    expect(c.defiDuJour('solo')).toBe(60);
     expect(c.recompenserPartie('d', 20, true, 'solo', 'Défi')).toMatchObject({ base: 20, bonus: 0, defiDejaFait: true });
-    expect(c.recompenserPartie('e', 22, true, 'equipe', 'Défi')).toMatchObject({ bonus: 22 });
-    expect(c.etat.total).toBe(18 + 40 + 20 + 44);
-    expect(c.derniersJours(7).map((j) => j.n)).toEqual([0, 0, 0, 0, 0, 0, 122]);
+    expect(c.recompenserPartie('e', 22, true, 'equipe', 'Défi')).toMatchObject({ bonus: 44 });
+    expect(c.etat.total).toBe(18 + 60 + 20 + 66);
+    expect(c.derniersJours(7).map((j) => j.n)).toEqual([0, 0, 0, 0, 0, 0, 164]);
   });
 
   test('méga coffre (v6.38) : 100 à 200 étoiles chaque fois que le joueur vient 5 jours d\'affilée', () => {
