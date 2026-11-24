@@ -2,8 +2,12 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
-  { v: '10.47', date: '2026-11-24', changes: [
+  { v: '10.48', date: '2026-11-24', changes: [
     "« Personnaliser » en Histoire et en Géographie : le niveau 1 à 10 choisi donne des questions de sa dizaine de progression (niveau 2 = questions 11 à 20), parmi les jeux que tu as cochés."
+  ] },
+  { v: '10.47', date: '2026-11-24', changes: [
+    "Deux nouveaux mini-jeux de multiplication : « Course aux étoiles » (50 bonnes réponses le plus vite possible, 3 vies, étoiles de bronze, d’argent et d’or) et « Aventure des multiplications » (un petit personnage court, saute et casse par en dessous les caisses qui donnent le bon résultat). Tu choisis tes tables, et chaque partie terminée rapporte 10 étoiles, comme les autres mini-jeux.",
+    "Même charte que le reste du jeu : parchemin, contours bruns, boutons en relief, décor de jour."
   ] },
   { v: '10.46', date: '2026-11-24', changes: [
     "Fenêtre « Défi du jour » : « Étoiles ×3 » est maintenant écrit en gros, de travers, en jaune, tout en haut (plus de bulle). Les niveaux sous les noms, « Niveau inchangé » et la phrase du bas disparaissent."

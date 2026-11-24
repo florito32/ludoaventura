@@ -4,7 +4,10 @@
 // étoiles), joue, et gagne 10 étoiles à chaque partie terminée, gagnée ou perdue.
 // Mini-jeux : « La fabrique à mots » (ex-Baby jeux › Lettres, contenu et gestes dans js/baby.js et js/baby-carte.js) et
 // « Les sons » (v10.43, ex-matière Phonèmes de l'aventure : un des 6 jeux de js/phonemes.js tiré au hasard, sur tous les sons ;
-// les gestes sont ceux de js/grammaire-carte.js, empruntés avec GrammaireCarte.viser). Pour en ajouter un : une ligne dans JEUX, et sa fonction de départ dans DEPARTS (elle rend { carte, titre… }).
+// les gestes sont ceux de js/grammaire-carte.js, empruntés avec GrammaireCarte.viser), puis « Course aux étoiles » (js/mj-etoiles.js)
+// et « Aventure des multiplications » (js/mj-aventure.js), repris de florito32/minijeux (v10.47).
+// Pour en ajouter un : une ligne dans JEUX, et soit sa fonction de départ dans DEPARTS (elle rend { carte, titre… }), soit un champ
+// « module » : un script qui expose window.X.monter(hote, { fini(gagne, ligneHtml) }) et rend { detruire() }.
 (function () {
   'use strict';
 
@@ -13,7 +16,9 @@
   var ETOILES = 10; // par partie terminée, gagnée ou perdue
   var JEUX = [
     { id: 'fabrique', nom: 'La fabrique à mots', icone: '🏭', aide: 'Fabrique des mots avec des lettres et des sons, puis écoute-les.' },
-    { id: 'sons', nom: 'Les sons', icone: '👂', aide: 'Complète, trie, relie : trouve les sons des mots (phonèmes).' }
+    { id: 'sons', nom: 'Les sons', icone: '👂', aide: 'Complète, trie, relie : trouve les sons des mots (phonèmes).' },
+    { id: 'etoiles', nom: 'Course aux étoiles', icone: '⭐', module: 'MJEtoiles', aide: 'Choisis la bonne réponse parmi trois, gagne des étoiles et bats ton record.' },
+    { id: 'aventure', nom: 'Aventure des multiplications', icone: '🏃', module: 'MJAventure', aide: 'Cours, saute et casse les caisses qui donnent le bon résultat.' }
   ];
   var etat = null; // partie en cours : { jeu, profil, carte, fini }
 
@@ -68,13 +73,22 @@
     GC.afficher(c);
     terminer(c.juste, null, PH.solution(c), true);
   }
+  // Démonte le mini-jeu à module en cours (boucle d'animation, clavier, minuteurs).
+  function demonter() { if (etat && etat.inst) { etat.inst.detruire(); etat.inst = null; } }
   function lancer(idJeu, idProfil) {
     var j = jeuDe(idJeu);
-    if (!j || !DEPARTS[idJeu]) return;
-    rendre();
-    etat = { jeu: j, profil: idProfil || null, carte: DEPARTS[idJeu](), fini: false };
+    if (!j || (!DEPARTS[idJeu] && !(j.module && window[j.module]))) return;
+    rendre(); demonter();
+    etat = { jeu: j, profil: idProfil || null, carte: DEPARTS[idJeu] ? DEPARTS[idJeu]() : null, inst: null, fini: false };
     $('titre-minijeu').textContent = j.nom;
     window.Aventura.afficher('ecran-minijeu');
+    if (j.module) { // jeu à lui seul (étoiles, aventure) : il se dessine lui-même dans l'écran et dit quand il est fini
+      $('minijeu-corps').innerHTML = '<section class="carte-page minijeu"><p class="minijeu-qui">' + (etat.profil && nomJoueur(etat.profil) ? esc(nomJoueur(etat.profil)) + ' joue' : '') +
+        '</p><div class="minijeu-jeu" id="minijeu-jeu"></div></section>';
+      var moi = etat;
+      etat.inst = window[j.module].monter($('minijeu-jeu'), { fini: function (gagne, ligne) { if (etat === moi) terminer(gagne, null, null, false, ligne); } });
+      return;
+    }
     dessiner();
     // La consigne est lue une fois toute seule (les petits ne lisent pas encore), comme dans les baby jeux.
     var c = etat.carte;
@@ -109,9 +123,10 @@
 
   // Fin de partie : 10 étoiles pour le profil choisi, une seule fois, gagnée ou perdue. Aucun niveau, aucune progression
   // (rien n'est noté dans les matières du joueur).
-  function terminer(gagne, texte, solution, dansCarte) {
+  function terminer(gagne, texte, solution, dansCarte, ligne) {
     if (!etat || etat.fini) return;
     etat.fini = true;
+    demonter();
     var gain = null;
     try {
       var s = etat.profil && R && R.compte.pourJoueur(etat.profil);
@@ -122,6 +137,7 @@
       '<p class="minijeu-bravo">' + (gagne ? 'Bravo' + (nom ? ' ' + esc(nom) : '') + ' !' : 'Dommage, mais tu as bien joué !') + '</p>' +
       (texte ? '<p class="minijeu-resultat">Ton mot : <strong>' + esc(texte) + '</strong></p>' : '') +
       (solution ? '<p class="minijeu-resultat">' + esc(solution) + '</p>' : '') +
+      (ligne ? '<p class="minijeu-resultat">' + ligne + '</p>' : '') + // résultat d'un jeu à module (HTML fabriqué par le jeu, sans saisie du joueur)
       '<p class="fin-gain">' + ico('i-etoile', 'ico-gain') + '<strong>+' + ETOILES + ' étoiles</strong></p>' +
       (gain && gain.apres > gain.avant ? '<p class="fin-niveau">Niveau ' + gain.apres + ' atteint !</p>' : '') +
       (gain && gain.coffres && gain.coffres.length ? '<p class="petit">Un coffre t’attend dans « Mon compte ».</p>' : '') +
@@ -144,16 +160,16 @@
     if (!etat) return;
     if (e.target.closest('#minijeu-rejouer')) { lancer(etat.jeu.id, etat.profil); return; }
     if (e.target.closest('#minijeu-liste')) { rendre(); window.Aventura.afficher('ecran-minijeux'); return; }
-    if (etat.fini) return;
+    if (etat.fini || !etat.carte) return;
     if (etat.carte.module === 'phonemes') GC.toucher(e); else BC.toucher(etat.carte, e, outils);
   });
   $('minijeu-retour').addEventListener('click', function () {
-    etat = null; rendre();
+    demonter(); etat = null; rendre();
     if (window.Voix && window.Voix.taire) window.Voix.taire();
     window.Aventura.afficher('ecran-minijeux');
   });
   // Le moteur des cartes de grammaire revient au plateau dès qu'on quitte l'écran d'un mini-jeu.
-  document.addEventListener('aventura-ecran', function (e) { if (e.detail !== 'ecran-minijeu') rendre(); if (e.detail === 'ecran-minijeux') liste(); });
+  document.addEventListener('aventura-ecran', function (e) { if (e.detail !== 'ecran-minijeu') { rendre(); demonter(); } if (e.detail === 'ecran-minijeux') liste(); });
   if (!$('ecran-minijeux').hidden) liste();
 
   window.Minijeux = { JEUX: JEUX, ETOILES: ETOILES, carte: function () { return etat && etat.carte; } }; // carte() : pour les tests
