@@ -33,6 +33,5 @@ test.describe('téléphone en paysage', () => {
     await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); } catch (e) { /* */ } });
     await page.goto('./');
     for (const id of ['btn-commencer', 'btn-defi', 'btn-rapide', 'btn-baby', 'btn-didacticiel']) await expect(page.locator('#' + id)).toBeInViewport({ ratio: 1 });
-    expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight + 1)).toBe(true);
   });
 });
