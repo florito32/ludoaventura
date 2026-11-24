@@ -1236,7 +1236,10 @@
       return { matiere: 'orthographe', sous: sous };
     }
     var jeux = jeuxProposes(m, 'quiz').filter(function (x) { return x.famille === s; }).map(function (x) { return x.id; });
-    var carte = SV.generer({ jeux: jeux, niveau: niv, mode: 'quiz' }, m) || SV.generer({ jeux: jeuxProposes(m, 'quiz').map(function (x) { return x.id; }), niveau: niv, mode: 'quiz' }, m);
+    // v10.42 : questions dont le niveau de progression (1 à 100) est dans la fenêtre de 5 niveaux du profil (js/progression-savoirs.js).
+    // Famille « cartes » : zones calculées sans niveau par question, tirage au niveau Facile…Expert comme avant (à valider).
+    var fs = window.ProgressionFenetre.fenetre(niveauProfil(i, m, s));
+    var carte = SV.generer({ jeux: jeux, niveau: niv, mode: 'quiz', fenetre: { bas: fs.bas, haut: fs.haut, niveau: window.ProgressionSavoirs.niveau } }, m) || SV.generer({ jeux: jeux, niveau: niv, mode: 'quiz' }, m) || SV.generer({ jeux: jeuxProposes(m, 'quiz').map(function (x) { return x.id; }), niveau: niv, mode: 'quiz' }, m);
     return { matiere: m, carte: carte, sous: sous };
   }
   // Sous-matière la plus jouée par un joueur « Suivre » pendant la partie : c'est elle qui reçoit le point de niveau (ligne 446).

@@ -98,6 +98,7 @@
   // reglage = { jeux: ['g04', …], niveau: 'facile', mode: 'quiz' | 'normal' } ; matiere = 'geographie' ou 'histoire'.
   // Renvoie une carte (objet simple, sauvegardable en JSON) : { type: 'savoir', jeu, format, … }.
   function generer(reglage, matiere) {
+    if (reglage.fenetre) return genererFenetre(reglage, matiere);
     var niveau = reglage.niveau || 'facile', mode = modeDe(reglage);
     var choisis = (reglage.jeux || []).map(trouver).filter(function (j) { return j && (!matiere || j.matiere === matiere); });
     if (!choisis.length) choisis = jeuxDe(matiere || 'geographie');
@@ -116,6 +117,39 @@
       c.mode = mode;
       c.packNom = jeu.nom + ' · ' + NOMS_FORMATS[c.format];
       return c;
+    }
+    return null;
+  }
+  // v10.41 (« Suivre ma progression », demande du 24/11/2026, règle 1) : carte dont les questions sont toutes de niveau de
+  // progression (1 à 100) dans la fenêtre reglage.fenetre = { bas, haut, niveau: function (jeu, serie, niveau, rang) → 1 à 100 }.
+  // Les séries « carte » (zones calculées) sont écartées. Si la fenêtre ne donne rien (peu de questions, ou 4 paires distinctes
+  // introuvables), elle s'élargit de 2 niveaux, puis de plus en plus vite : la carte la plus proche du niveau du joueur est tirée.
+  function genererFenetre(reglage, matiere) {
+    var mode = modeDe(reglage), f = reglage.fenetre, tirages = mode === 'quiz' ? QUIZ : NORMAL;
+    var choisis = (reglage.jeux || []).map(trouver).filter(function (j) { return j && (!matiere || j.matiere === matiere); });
+    if (!choisis.length) choisis = jeuxDe(matiere || 'geographie');
+    var ids = NIVEAUX.map(function (n) { return n.id; });
+    for (var e = 0; e <= 100; e += e < 10 ? 2 : 10) {
+      var bas = f.bas - e, haut = f.haut + e;
+      for (var essai = 0; essai < 40; essai++) {
+        var jeu = auHasard(choisis), niveau = auHasard(ids), candidates = [];
+        jeu.series.forEach(function (s, si) {
+          if (s.k === 'carte' || !s.niveaux || !s.niveaux[niveau]) return;
+          var gardes = s.niveaux[niveau].filter(function (x, i) { var p = f.niveau(jeu.id, si, niveau, i); return p && p >= bas && p <= haut; });
+          if (!gardes.length) return;
+          var copie = {}, nx = {};
+          Object.keys(s).forEach(function (k) { copie[k] = s[k]; });
+          Object.keys(s.niveaux).forEach(function (k) { nx[k] = s.niveaux[k]; });
+          nx[niveau] = gardes; copie.niveaux = nx;
+          if (utilisable(copie, niveau, mode)) candidates.push(copie);
+        });
+        if (!candidates.length) continue;
+        var s2 = auPoids(candidates), c = tirages[s2.k](s2, niveau, jeu);
+        if (!c) continue;
+        c.type = 'savoir'; c.jeu = jeu.id; c.matiere = jeu.matiere; c.niveau = niveau; c.mode = mode;
+        c.packNom = jeu.nom + ' · ' + NOMS_FORMATS[c.format];
+        return c;
+      }
     }
     return null;
   }

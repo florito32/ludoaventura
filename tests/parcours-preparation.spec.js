@@ -183,6 +183,23 @@ test('« Suivre ma progression » en Français : chaque sous-matière tire dans 
   }
 });
 
+test('« Suivre ma progression » en Histoire et Géographie : questions de la fenêtre de 5 niveaux du profil (v10.42)', async ({ page }) => {
+  await ouvrir(page, { v: 1, total: 0, joueurs: [{ id: 'j-1', nom: 'Léa', perso: 'lea', cree: '2026-11-01T00:00:00Z', maj: '2026-11-01T00:00:00Z',
+    niv: { 'histoire.xix': 60, 'histoire.pre': 60, 'geographie.france': 60, 'geographie.monde': 60, 'geographie.nature': 60, 'geographie.cartes': 60 } }] });
+  await etape1(page, 1);
+  await suivreMaProgression(page, 0, 'histoire');
+  await aventure(page).click();
+  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await page.getByRole('heading', { name: 'Le plateau' }).waitFor();
+  const r = await page.evaluate(() => {
+    const j = window.Aventura.partie.joueurs[0], cartes = [];
+    for (let i = 0; i < 40; i++) { const c = window.Aventura.piocherCarte(j); cartes.push({ type: c.type, matiere: c.matiere }); }
+    return { cartes, sous: Object.keys(j.sous) };
+  });
+  for (const c of r.cartes) { expect(c.type).toBe('savoir'); expect(c.matiere).toBe('histoire'); }
+  expect(r.sous.length).toBeGreaterThan(1);
+});
+
 test('fin de partie : le point de niveau va à la sous-matière la plus jouée par un joueur qui suit sa progression', async ({ page }) => {
   await ouvrir(page);
   await etape1(page, 1);
