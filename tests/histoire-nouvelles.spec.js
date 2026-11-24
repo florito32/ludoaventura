@@ -145,6 +145,8 @@ async function versHistoire(page, { niveau, jeu, mode }) {
   await page.locator('#savoir-liste input[value="' + jeu + '"]').check();
   await lancer(page);
   await page.getByRole('heading', { name: 'Le plateau' }).waitFor();
+  // v10.45 : ces tests vérifient les cartes d'un niveau Facile…Expert donné ; sans niveau 1–10, le tirage reste celui de ce niveau.
+  await page.evaluate(() => { window.Aventura.partie.niveauProg[0] = null; });
 }
 async function piocher(page) {
   await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();

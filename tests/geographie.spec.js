@@ -179,6 +179,8 @@ async function versGeo(page, { niveau = 'facile', jeux = ['g04'], hasard = null,
   for (const j of jeux) await page.locator('#savoir-liste input[value="' + j + '"]').check();
   await lancer(page);
   await page.getByRole('heading', { name: 'Le plateau' }).waitFor();
+  // v10.45 : ces tests vérifient les cartes d'un niveau Facile…Expert donné ; sans niveau 1–10, le tirage reste celui de ce niveau.
+  await page.evaluate(() => { window.Aventura.partie.niveauProg[0] = null; });
   // Hasard fixé : le format de la carte ne dépend plus du hasard.
   if (hasard !== null) await page.evaluate((h) => window.Savoirs.regler(() => h), hasard);
 }
