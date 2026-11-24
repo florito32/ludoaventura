@@ -183,6 +183,39 @@ test('« Suivre ma progression » en Français : chaque sous-matière tire dans 
   }
 });
 
+// v10.42 : Histoire et Géographie : chaque question posée a un niveau de progression dans la fenêtre de 5 niveaux du profil.
+for (const matiere of ['histoire', 'geographie']) {
+  test('« Suivre ma progression » en ' + (matiere === 'histoire' ? 'Histoire' : 'Géographie') + ' : les cartes tirent dans une fenêtre de 5 niveaux autour du niveau du profil (v10.42)', async ({ page }) => {
+    const erreurs = [];
+    page.on('pageerror', (e) => erreurs.push(e.message));
+    // Léa a 40 sur 100 dans chaque sous-matière de la matière jouée → fenêtre 38 à 42.
+    const niv = {};
+    const subs = { histoire: ['pre', 'ant', 'mag', 'ren', 'mod', 'xix', 'xx'], geographie: ['cartes', 'france', 'monde', 'nature'] };
+    subs[matiere].forEach((x) => { niv[matiere + '.' + x] = 40; });
+    await ouvrir(page, { v: 1, total: 0, joueurs: [{ id: 'j-1', nom: 'Léa', perso: 'lea', cree: '2026-11-01T00:00:00Z', maj: '2026-11-01T00:00:00Z', niv }] });
+    await etape1(page, 1);
+    await suivreMaProgression(page, 0, matiere);
+    await aventure(page).click();
+    await page.getByRole('button', { name: 'Lancer la partie' }).click();
+    await page.getByRole('heading', { name: 'Le plateau' }).waitFor();
+    const r = await page.evaluate(() => {
+      const j = window.Aventura.partie.joueurs[0], fen = [], nulles = [];
+      for (let i = 0; i < 60; i++) {
+        const c = window.Aventura.piocherCarte(j);
+        if (!c || c.type !== 'savoir') { nulles.push(c && c.type); continue; }
+        fen.push(c.fenetre ? c.fenetre.haut - c.fenetre.bas : -1);
+      }
+      return { fen, nulles, sous: Object.keys(j.sous) };
+    });
+    expect(r.nulles).toEqual([]); // chaque tirage donne une carte de savoir jouable
+    expect(r.fen.length).toBe(60);
+    // La fenêtre normale (38 à 42, écart 4) est utilisée presque toujours ; elle ne s'élargit que si la série est trop courte.
+    expect(r.fen.filter((e) => e === 4).length).toBeGreaterThan(40);
+    expect(r.sous.every((x) => x.startsWith(matiere + '.'))).toBe(true);
+    expect(erreurs).toEqual([]);
+  });
+}
+
 test('fin de partie : le point de niveau va à la sous-matière la plus jouée par un joueur qui suit sa progression', async ({ page }) => {
   await ouvrir(page);
   await etape1(page, 1);

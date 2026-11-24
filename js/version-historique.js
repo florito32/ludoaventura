@@ -2,10 +2,13 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
-  { v: '10.42', date: '2026-11-24', changes: [
+  { v: '10.43', date: '2026-11-24', changes: [
     "Lettres et Chiffres sont maintenant des matières, comme Maths ou Histoire, à choisir quand tu commences l’aventure (en « Personnaliser » et en « Suivre ma progression »). Elles n’ont pas de niveau : tu gagnes des étoiles, mais ta progression ne change pas.",
     "Nouveau mode « Mini-jeux » sur l’accueil : tu choisis un mini-jeu et ton profil, sans plateau ni pion, et tu gagnes 10 étoiles à chaque partie terminée. Le premier mini-jeu est « La fabrique à mots ».",
     "Le bouton « Baby jeux » disparaît de l’accueil."
+  ] },
+  { v: '10.42', date: '2026-11-24', changes: [
+    "« Suivre ma progression » en Histoire et en Géographie : les questions sont maintenant de ton niveau, à 2 niveaux près (niveau 40 : questions de niveau 38 à 42). Si une série a trop peu de questions, la fenêtre s’élargit un peu."
   ] },
   { v: '10.41', date: '2026-11-24', changes: [
     "« Suivre ma progression » en Français : orthographe, conjugaison, grammaire et phonèmes te posent maintenant des questions de ton niveau, à 2 niveaux près (niveau 26 en conjugaison : questions de niveau 24 à 28)."

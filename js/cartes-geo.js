@@ -16,12 +16,17 @@
     var A = racine && racine.Articles ? racine.Articles : (typeof module !== 'undefined' && module.exports ? require('./articles.js') : null);
     return A ? A.le(nom) : nom;
   }
-  function zonesDu(id, niveau) { return (CARTES[id] || { zones: [] }).zones.filter(function (z) { return z.cible && z.niv === niveau; }); }
+  // garder (facultatif, v10.42) : fonction (rang de la zone parmi celles du niveau) → vrai/faux, pour ne garder que les zones
+  // dont le niveau de progression est dans la fenêtre de « Suivre ma progression » (js/savoirs.js).
+  function zonesDu(id, niveau, garder) {
+    var l = (CARTES[id] || { zones: [] }).zones.filter(function (z) { return z.cible && z.niv === niveau; });
+    return garder ? l.filter(function (z, i) { return garder(i); }) : l;
+  }
   // carte : 'france', 'europe' ou 'monde' ; niveau : 'facile'… ; mode : 'normal' (toucher la zone nommée)
   // ou 'quiz' (la zone est en vert, 4 noms au choix dont un seul bon, choix de l'utilisateur du 13/11/2026).
-  function tirer(id, niveau, hasard, mode) {
+  function tirer(id, niveau, hasard, mode, garder) {
     hasard = hasard || Math.random;
-    var carte = CARTES[id], cibles = zonesDu(id, niveau);
+    var carte = CARTES[id], cibles = zonesDu(id, niveau, garder);
     if (!carte || !cibles.length) return null;
     var z = auHasard(cibles, hasard);
     if (mode !== 'quiz') {
