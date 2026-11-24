@@ -102,7 +102,16 @@ test('défi solo du jour : on ne choisit que son profil ; gagné, étoiles ×3 u
   await expect(fenetre).toBeVisible();
   await expect(fenetre.locator('#dj-etat')).toHaveText('Défi solo');
   await expect(fenetre).toContainText('Étoiles ×3');
-  await expect(fenetre).toContainText('Niveau inchangé');
+  // v10.44 : « Étoiles ×3 » en haut, de travers ; plus de bulle « Niveau inchangé », de niveaux ni de phrase du bas.
+  await expect(fenetre).not.toContainText('Niveau inchangé');
+  await expect(fenetre).not.toContainText('Les questions suivent');
+  await expect(fenetre.locator('.dj-niv, .dj-puces, .dj-note')).toHaveCount(0);
+  await expect(fenetre).not.toContainText('Fr 1');
+  const [gain, titre, liste] = await page.evaluate(() => ['.dj-gain', '#fenetre-defi-titre', '#dj-liste'].map((q) => document.querySelector('#fenetre-defi ' + q).getBoundingClientRect().toJSON()));
+  expect(gain.top + gain.height / 2).toBeLessThan(titre.top); // au-dessus du titre (le cadre incliné peut mordre un peu)
+  expect(titre.bottom).toBeLessThan(liste.top);
+  expect(await page.evaluate(() => getComputedStyle(document.querySelector('#fenetre-defi .dj-gain')).transform)).not.toBe('none'); // de travers
+  expect(await page.evaluate(() => { const d = document.getElementById('fenetre-defi'); return d.scrollWidth <= d.clientWidth; })).toBe(true); // pas de débordement
   // Ni matière, ni niveau, ni aventure à choisir.
   await expect(fenetre.locator('input[type="radio"]')).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
