@@ -3,7 +3,8 @@
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
   { v: '10.48', date: '2026-11-24', changes: [
-    "« Personnaliser » en Histoire et en Géographie : le niveau 1 à 10 choisi donne des questions de sa dizaine de progression (niveau 2 = questions 11 à 20), parmi les jeux que tu as cochés."
+    "« Personnaliser » en Histoire et en Géographie : le niveau 1 à 10 choisi donne des questions de sa dizaine de progression (niveau 2 = questions 11 à 20), parmi les jeux que tu as cochés.",
+    "Sur un écran carré, une longue réponse au clavier à lettres laisse maintenant toujours voir le bouton « Valider »."
   ] },
   { v: '10.47', date: '2026-11-24', changes: [
     "Deux nouveaux mini-jeux de multiplication : « Course aux étoiles » (50 bonnes réponses le plus vite possible, 3 vies, étoiles de bronze, d’argent et d’or) et « Aventure des multiplications » (un petit personnage court, saute et casse par en dessous les caisses qui donnent le bon résultat). Tu choisis tes tables, et chaque partie terminée rapporte 10 étoiles, comme les autres mini-jeux.",
