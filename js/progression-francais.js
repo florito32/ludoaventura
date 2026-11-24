@@ -111,11 +111,10 @@
     var cartes = [];
     Conj.VERBES.forEach(function (v) {
       Object.keys(TEMPS_CONJ).forEach(function (t) {
-        for (var p = 0; p < 6; p++) {
-          // L'impératif n'a que 3 personnes (tu, nous, vous : indices 1, 3, 4).
-          if (/^imperatif/.test(t) && [1, 3, 4].indexOf(p) < 0) continue;
+        // Les personnes que le jeu sait conjuguer à ce temps (l'impératif n'en a que 3 ; « pouvoir » et « valoir » n'en ont aucune).
+        Conj.personnes(v.inf, t).forEach(function (p) {
           cartes.push({ cle: v.inf + '|' + t + '|' + p, score: scoreConj(v, t, p) });
-        }
+        });
       });
     });
     _conj = classer(cartes);
@@ -188,7 +187,41 @@
   // Niveau (1 à 100) d'une carte : jeu, son (code SAMPA), mot (écriture normale).
   function cartePhon(jeu, son, mot) { return phon()[jeu + '|' + son + '|' + mot] || null; }
 
+  // ======================================================================
+  // TIRAGE DANS UNE FENÊTRE (v10.41, « Suivre ma progression », règle 1 du 24/11/2026)
+  // ======================================================================
+  // Clés des cartes d'une sous-matière dont le niveau (1 à 100) est entre bas et haut ; si la fenêtre est vide, elle
+  // s'élargit d'un niveau de chaque côté jusqu'à trouver. Format des clés : voir les tables ci-dessus.
+  var _index = {};
+  function tableDe(sous) {
+    return sous === 'orthographe' ? ortho().cartes : sous === 'conjugaison' ? conj() : sous === 'grammaire' ? gram() : sous === 'phonemes' ? phon() : null;
+  }
+  // niveau (1 à 100) → liste des clés de la sous-matière, construit une fois.
+  function parNiveau(sous) {
+    if (_index[sous]) return _index[sous];
+    var t = tableDe(sous), idx = [], k;
+    for (k = 0; k <= 101; k++) idx.push([]);
+    Object.keys(t).forEach(function (cle) { idx[t[cle]].push(cle); });
+    _index[sous] = idx;
+    return idx;
+  }
+  function clesDans(sous, bas, haut) {
+    var idx = parNiveau(sous), liste = [], n;
+    for (var elargir = 0; elargir < 100 && !liste.length; elargir++) {
+      for (n = Math.max(1, bas - elargir); n <= Math.min(100, haut + elargir); n++) liste = liste.concat(idx[n]);
+    }
+    return liste;
+  }
+  // Une clé au hasard dans la fenêtre : { cle, niveau } (null si la sous-matière est inconnue).
+  function tirer(sous, bas, haut, hasard) {
+    if (!tableDe(sous)) return null;
+    hasard = hasard || Math.random;
+    var l = clesDans(sous, bas, haut), cle = l[Math.floor(hasard() * l.length)];
+    return cle ? { cle: cle, niveau: tableDe(sous)[cle] } : null;
+  }
+
   var api = {
+    tirer: tirer, clesDans: clesDans,
     orthographe: { mot: motOrtho, carte: carteOrtho, scoreMot: scoreMot, TYPES: TYPE_ORTHO, table: function () { return ortho().cartes; } },
     conjugaison: { carte: carteConj, TEMPS: TEMPS_CONJ, table: conj },
     grammaire: { element: elementGram, JEUX: JEU_GRAM, table: gram },

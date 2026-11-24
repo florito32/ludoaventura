@@ -352,23 +352,26 @@
   // jeuId : un des JEUX (sauf pluriel et genre, joués sur les mots d'orthographe par js/plateau.js) ;
   // niveau ; r : hasard (Math.random par défaut) ; eviter : clés de cartes déjà vues récemment.
   // Renvoie un objet simple (sauvegardable tel quel) : { jeu, niveau, cle, consigne, oral, … }.
-  function generer(jeuId, niveau, r, eviter) {
+  // indice (facultatif, v10.41) : rang de l'élément à utiliser dans la liste du jeu (« Suivre ma progression » : js/progression-francais.js).
+  function generer(jeuId, niveau, r, eviter, indice) {
     r = r || Math.random;
     niveau = niveauValide(niveau);
     eviter = eviter || [];
     var c = null;
     for (var essai = 0; essai < 12; essai++) {
-      c = fabriquer(jeuId, niveau, r);
-      if (eviter.indexOf(c.cle) < 0) break;
+      c = fabriquer(jeuId, niveau, r, indice);
+      if (eviter.indexOf(c.cle) < 0 || indice !== undefined) break;
     }
     c.jeu = jeuId; c.niveau = niveau;
     return c;
   }
 
-  function fabriquer(jeuId, niveau, r) {
+  function fabriquer(jeuId, niveau, r, indice) {
     var i, ph;
+    // Rang tiré au hasard dans une liste, ou imposé par « indice » (v10.41).
+    function rang(liste) { return indice !== undefined && indice < liste.length ? indice : Math.floor(r() * liste.length); }
     if (jeuId === 'phrase') {
-      i = Math.floor(r() * PHRASES[niveau].length);
+      i = rang(PHRASES[niveau]);
       ph = lirePhrase(PHRASES[niveau][i]);
       var ordre = ph.mots.map(function (m, k) { return k; }), essai = 0;
       // Les bulles ne doivent pas être déjà dans le bon ordre.
@@ -378,13 +381,13 @@
         mots: ph.mots, ordre: ordre, fin: ph.fin, alts: ph.alts };
     }
     if (jeuId === 'contraires') {
-      i = Math.floor(r() * CONTRAIRES[niveau].length);
+      i = rang(CONTRAIRES[niveau]);
       var l = CONTRAIRES[niveau][i].split(':');
       return { cle: 'contraires|' + niveau + '|' + i, consigne: 'Quel est le contraire de :', mot: l[0], bonne: l[1],
         choix: melanger([l[1]].concat(l[2].split(',')), r), oral: 'Quel est le contraire de : ' + l[0] + ' ?' };
     }
     if (jeuId === 'erreur') {
-      i = Math.floor(r() * ERREURS[niveau].length);
+      i = rang(ERREURS[niveau]);
       var e = lireErreur(ERREURS[niveau][i]);
       e.mots[0] = majuscule(e.mots[0]);
       return { cle: 'erreur|' + niveau + '|' + i, consigne: 'Touche le mot qui est faux :', mots: e.mots, fin: e.fin, faute: e.faute,
@@ -396,7 +399,7 @@
       // Une phrase du niveau qui a au moins un mot d'une nature proposée ; le mot est tiré au hasard,
       // en variant les natures (une nature d'abord, puis un mot de cette nature).
       for (var t = 0; t < 30; t++) {
-        i = Math.floor(r() * PHRASES[niveau].length);
+        i = t === 0 ? rang(PHRASES[niveau]) : Math.floor(r() * PHRASES[niveau].length);
         ph = lirePhrase(PHRASES[niveau][i]);
         n = tirer(natures, r);
         var possibles = [];
@@ -411,14 +414,14 @@
         oral: 'Quelle est la nature du mot « ' + vu.toLocaleLowerCase('fr-FR') + ' » dans la phrase : ' + texte(ph.mots, ph.fin) };
     }
     if (jeuId === 'homophones') {
-      i = Math.floor(r() * HOMOPHONES[niveau].length);
+      i = rang(HOMOPHONES[niveau]);
       var h = HOMOPHONES[niveau][i].split('|');
       var g = groupeDe(niveau, h[1]);
       return { cle: 'homophones|' + niveau + '|' + i, consigne: 'Quel mot complète la phrase ?', phrase: h[0], bonne: h[1], choix: g.slice(),
         oral: 'Quel mot complète la phrase ? Choisis entre : ' + g.join(', ') + '.' };
     }
     if (jeuId === 'relier') {
-      i = Math.floor(r() * RELIER[niveau].length);
+      i = rang(RELIER[niveau]);
       var liste = RELIER[niveau][i];
       var paires = melanger(liste.paires, r).slice(0, NB_PAIRES[niveau]).map(function (p) { return p.split(':'); });
       var gauche = paires.map(function (p) { return p[0]; });
