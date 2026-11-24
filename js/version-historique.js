@@ -2,10 +2,13 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
-  { v: '10.49', date: '2026-11-24', changes: [
+  { v: '10.50', date: '2026-11-24', changes: [
     "Nouveau bouton « Évaluer » en face de chaque matière du profil d’un joueur : 10 questions, sans plateau, pour trouver sa progression de départ.",
     "Les 3 premières questions sont facile, moyenne et difficile ; ensuite le niveau monte quand tu réussis et baisse quand tu rates, de moins en moins.",
     "La progression trouvée est donnée à toutes les sous-matières de la matière ; si l’une est déjà plus haute, tu choisis de la garder ou de la baisser."
+  ] },
+  { v: '10.49', date: '2026-11-24', changes: [
+    "Sur un écran carré, une longue réponse au clavier à lettres laisse maintenant toujours voir le bouton « Valider »."
   ] },
   { v: '10.48', date: '2026-11-24', changes: [
     "« Personnaliser » : le niveau que tu choisis (de 1 à 10) donne maintenant des questions de sa bande de 10 niveaux (niveau 2 : de 11 à 20), parmi ce que tu as coché, en Maths, Français, Histoire et Géographie."
