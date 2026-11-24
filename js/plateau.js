@@ -273,7 +273,7 @@
   // ---------- Niveau 1 à 10 de « Personnaliser » et matière de « Suivre ma progression » (v10.36, demande du 24/11/2026) ----------
   // Chaque sous-matière d'un joueur est notée de 0 à 100 (js/joueurs.js) ; le niveau 1 à 10 en est la dizaine :
   // niveau 2 = progression 11 à 20. Les questions sont encore tirées avec les 4 niveaux Facile…Expert des générateurs :
-  // chaque niveau 1 à 10 est traduit en l'un d'eux (provisoire : le tirage direct par niveau de progression suit, backlog ligne 479).
+  // chaque niveau 1 à 10 est traduit en l'un d'eux (provisoire : le tirage direct par niveau de progression suit, backlog ligne 481).
   var NIVEAU_DE_PROG = ['facile', 'facile', 'facile', 'moyen', 'moyen', 'difficile', 'difficile', 'difficile', 'expert', 'expert'];
   function niveauId(n) { return NIVEAU_DE_PROG[Math.max(1, Math.min(10, Number(n) || 1)) - 1]; }
   var MATIERES_SUIVIES = [{ id: 'maths', nom: 'Maths' }, { id: 'francais', nom: 'Français' }, { id: 'geographie', nom: 'Géographie' }, { id: 'histoire', nom: 'Histoire' }];
@@ -1195,7 +1195,7 @@
   // Le joueur ne choisit que la matière. Ses cartes viennent de cette matière, au niveau enregistré dans son profil pour chaque
   // sous-matière (js/joueurs.js) : Maths = calcul mental ou problème (une chance sur deux) ; Français = orthographe, conjugaison,
   // grammaire ou phonèmes (une chance sur quatre) ; Histoire = une période ; Géographie = une famille de jeux (tirées au hasard).
-  // Les générateurs lisent encore Facile…Expert : le niveau 1 à 10 du profil y est traduit (provisoire, backlog ligne 479).
+  // Les générateurs lisent encore Facile…Expert : le niveau 1 à 10 du profil y est traduit (provisoire, backlog ligne 481).
   // Hypothèses à valider : sous-matière tirée au hasard à chaque carte ; Géographie et Histoire en mode Quiz.
   function estSuivi(i) { return partie.parcours[i] === 'suivre' && !!partie.suivi[i] && !partie.rapide && !partie.defi; }
   function niveauSousMatiere(i, m, s) {
@@ -2897,7 +2897,7 @@
   // sessionStorage : « survit aux rechargements et restaurations de la page ; fermer l'onglet efface les données »
   // (MDN, Window.sessionStorage). Les objets (aventure, aventuriers, questions) sont enregistrés par leur identifiant.
   var CLE = 'ludoaventura-partie';
-  var PAGES_ACCUEIL = ['ecran-etoiles', 'ecran-progression', 'ecran-defi', 'ecran-rapide', 'ecran-baby']; // écrans ouverts depuis l'accueil (v6.36)
+  var PAGES_ACCUEIL = ['ecran-coffres', 'ecran-defi', 'ecran-rapide', 'ecran-baby']; // écrans ouverts depuis l'accueil (v6.36)
   var pretASauver = false; // pas de sauvegarde pendant la construction initiale de la page
 
   function carteVersDonnees(c) {

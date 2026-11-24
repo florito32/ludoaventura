@@ -2,10 +2,14 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
-  { v: '10.36', date: '2026-11-24', changes: [
+  { v: '10.37', date: '2026-11-24', changes: [
     "Préparation de la partie : à côté de chaque joueur (étape 1), deux boutons, « Suivre ma progression » et « Personnaliser ». Le joueur se prépare, revient à l’étape 1 pour le suivant, et « Choisir l’aventure » apparaît en bas quand tous les joueurs sont prêts.",
     "« Suivre ma progression » : le joueur ne choisit que sa matière (Maths, Français, Géographie ou Histoire) ; ses questions viennent de cette matière, au niveau enregistré dans son profil.",
     "« Personnaliser » : l’étape actuelle (matière, réglages) avec un niveau de 1 à 10 à la place de Facile, Moyen, Difficile et Expert ; chaque niveau regroupe dix niveaux de la progression (le niveau 2, c’est les niveaux 11 à 20)."
+  ] },
+  { v: '10.36', date: '2026-11-24', changes: [
+    "Mon compte : dans la carte du joueur, le bouton « Mes étoiles » est remplacé par un bouton coffre (sans texte). Il ouvre la page « Mes coffres » : coffres des prochains niveaux, coffre du jour, défis et méga coffre sur une seule page (l’écran « Ma progression » n’existe plus).",
+    "Un petit « ? » à côté du nombre d’étoiles du joueur ouvre la fenêtre « Comment gagner des étoiles ? »."
   ] },
   { v: '10.35', date: '2026-11-23', changes: [
     "Histoire et Géographie : chaque question a maintenant un niveau de difficulté « progression » de 1 à 100 (100 niveaux par période d’Histoire et par famille de Géographie). Rien ne change à l’écran pour l’instant."

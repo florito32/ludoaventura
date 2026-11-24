@@ -1621,7 +1621,7 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
   .fenetre-pseudo .menu-actions .btn { min-height: 40px; }
 }
 
-/* Écrans « Mes étoiles », « Ma progression », « Défi du jour ». */
+/* Écrans « Mes coffres », « Défi du jour ». */
 .page { width: 100%; max-width: 640px; margin: 0 auto; padding: 8px 12px 16px; }
 .page-corps { display: grid; gap: 12px; }
 .carte-page {
@@ -2422,9 +2422,6 @@ body:has(#ecran-baby:not([hidden])) .pied { padding-block: 4px calc(4px + env(sa
 .jt-coffres .ico { width: 26px; height: 26px; }
 .tresor-de { margin: 0 auto; max-width: 560px; width: 100%; display: flex; align-items: center; gap: 8px; color: #fff; font-size: 1.05rem; }
 .tresor-de img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #fff; background: #fff; object-fit: cover; object-position: top; }
-.vers-progression { margin: 0 auto; max-width: 560px; width: 100%; text-align: center; }
-.vers-progression .btn { display: inline-flex; align-items: center; gap: 6px; }
-.vers-progression .ico { width: 26px; height: 26px; }
 .fin-gains-joueurs { list-style: none; margin: .4rem 0 0; padding: 0; display: grid; gap: .3rem; }
 .fin-gains-joueurs li { display: flex; flex-wrap: wrap; align-items: center; gap: .25rem .7rem; padding: .3rem .6rem; border-radius: .6rem; background: #f3ece2; }
 .fin-gains-joueurs .fg-nom { font-weight: 700; flex: 1 1 auto; text-align: left; min-width: 0; overflow-wrap: anywhere; }
@@ -2483,6 +2480,16 @@ body:has(#ecran-baby:not([hidden])) .pied { padding-block: 4px calc(4px + env(sa
 .jm-detail { margin: 0; font-size: .85rem; color: var(--encre-douce); }
 .js-resume { display: flex; flex-wrap: wrap; gap: 6px 14px; font-weight: 700; align-items: center; }
 .js-resume .btn { min-height: 44px; padding: 6px 14px; }
+/* v10.36 : « Mes coffres » = un coffre sans texte (zone de toucher 48 px) ; « ? » = petit rond rouge (zone de toucher 44 px, rond visible 24 px). */
+.js-resume .btn-icone { min-width: 48px; min-height: 48px; padding: 4px; margin-left: auto; display: inline-grid; place-items: center; }
+.js-resume .btn-icone .ico { width: 34px; height: 34px; }
+.jt-etoiles { display: inline-flex; align-items: center; gap: 4px; }
+.aide-etoiles {
+  position: relative; display: inline-grid; place-items: center; width: 24px; height: 24px; padding: 0; margin-left: 2px; cursor: pointer;
+  border-radius: 50%; border: 0; background: var(--rouge); color: #fff; font-family: inherit; font-weight: 800; font-size: .9rem; line-height: 1;
+}
+.aide-etoiles::after { content: ""; position: absolute; inset: -10px; } /* zone de toucher de 44 px */
+.aide-etoiles:focus-visible { outline: 3px solid var(--encre); outline-offset: 2px; }
 .joueur-coffres { margin: 0; }
 .joueur-coffres .btn { width: 100%; min-height: 48px; padding: 8px 14px; }
 .joueurs-annonce { margin: 0; color: #fff; font-weight: 700; }
