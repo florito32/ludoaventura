@@ -2522,20 +2522,24 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .dj-avatar { width: 46px; height: 50px; flex: none; object-fit: contain; }
 .dj-qui { flex: 1 1 0; min-width: 0; }
 .dj-nom { display: block; font-weight: 800; overflow-wrap: anywhere; }
-.dj-niv, .dj-jour { display: block; font-size: .75rem; color: var(--encre-douce); }
+.dj-jour { display: block; font-size: .75rem; color: var(--encre-douce); }
 .dj-coche { flex: none; width: 28px; height: 28px; display: grid; place-items: center; border: 3px solid var(--encre); border-radius: 8px; background: #fff; color: #fff; font-weight: 800; }
 .dj-ligne[aria-pressed="true"] .dj-coche { background: var(--c, var(--rouge)); }
-.dj-puces { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 10px 0 4px; }
-.dj-puce { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border: 2px solid var(--encre); border-radius: 99px; background: #fff; font-weight: 800; font-size: .82rem; }
-.dj-puce.dj-or { background: #ffe9a0; }
-.dj-puce .ico { width: 16px; height: 16px; }
-.fenetre-compte .dj-note { margin: 0 0 10px; font-size: .82rem; color: var(--encre-douce); }
+/* v10.44 : « Étoiles ×3 » en gros, de travers (−9°), jaune du jeu à contour brun, tout en haut de la fenêtre. */
+.fenetre-defi { overflow-x: hidden; }
+.dj-gain {
+  display: flex; align-items: center; justify-content: center; gap: .15em; margin: 4px 0 14px; line-height: 1; white-space: nowrap;
+  font: 900 clamp(24px, 9vw, 40px) Rockwell, "Roboto Slab", Georgia, serif; text-transform: uppercase; color: var(--jaune);
+  transform: rotate(-9deg);
+  text-shadow: -2px -2px 0 var(--encre), 2px -2px 0 var(--encre), -2px 2px 0 var(--encre), 2px 2px 0 var(--encre), 0 3px 0 var(--encre), 0 4px 0 var(--encre), 0 5px 0 var(--encre);
+}
+.dj-gain .ico { width: .9em; height: .9em; flex: none; }
 @media (max-height: 640px) {
   .dj-liste { gap: 4px; }
   .dj-ligne { min-height: 46px; padding: 2px 8px; border-width: 2px; }
   .dj-avatar { width: 34px; height: 38px; }
-  .dj-niv { display: none; }
   .fenetre-defi h2 .ico { width: 28px; height: 28px; }
+  .dj-gain { font-size: 26px; margin: 0 0 8px; }
 }
 
 /* Accueil sur écran large et peu haut (téléphone en paysage) : cinq boutons compacts, plus larges, pour tenir dans l'écran (v10.36). */

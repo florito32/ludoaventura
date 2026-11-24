@@ -1051,11 +1051,11 @@
 
 <!-- v10.36 : fenêtre « Défi du jour » : on choisit seulement son ou ses profils (1 = solo, 2 à 4 = équipe), js/defi-jour.js. -->
 <dialog class="fin fenetre-compte fenetre-joueurs fenetre-defi" id="fenetre-defi" aria-labelledby="fenetre-defi-titre">
+  <!-- v10.44 : « Étoiles ×3 » en haut, en gros, de travers, en jaune (choix de l'utilisateur au test A/B du 24/11/2026) : plus de bulle, de niveaux ni de phrase du bas. -->
+  <p class="dj-gain"><svg class="ico" aria-hidden="true"><use href="#i-etoile"/></svg><span>Étoiles ×3</span><svg class="ico" aria-hidden="true"><use href="#i-etoile"/></svg></p>
   <h2 id="fenetre-defi-titre"><svg class="ico" aria-hidden="true"><use href="#i-defi"/></svg> Défi du jour</h2>
   <p class="dj-etat" id="dj-etat" role="status" aria-live="polite"></p>
   <div class="dj-liste" id="dj-liste" role="group" aria-label="Qui joue ?"></div>
-  <p class="dj-puces"><span class="dj-puce dj-or"><svg class="ico" aria-hidden="true"><use href="#i-etoile"/></svg>Étoiles ×3</span><span class="dj-puce">Niveau inchangé</span></p>
-  <p class="dj-note">1 joueur : défi solo. 2 à 4 : défi en équipe. Les questions suivent le niveau de chacun.</p>
   <div class="menu-actions">
     <button type="button" class="btn btn-principal" id="dj-ok" disabled>C’est parti !</button>
     <button type="button" class="btn btn-secondaire" id="dj-annuler">Annuler</button>

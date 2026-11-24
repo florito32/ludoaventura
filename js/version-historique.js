@@ -2,6 +2,9 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.46', date: '2026-11-24', changes: [
+    "Fenêtre « Défi du jour » : « Étoiles ×3 » est maintenant écrit en gros, de travers, en jaune, tout en haut (plus de bulle). Les niveaux sous les noms, « Niveau inchangé » et la phrase du bas disparaissent."
+  ] },
   { v: '10.45', date: '2026-11-24', changes: [
     "Préparation de la partie : à la place de ses niveaux, chaque joueur voit la matière qu’il a choisie.",
     "Le bouton « Changer » a disparu. Un joueur seul n’a aucun bouton ; à plusieurs, chaque joueur a une poubelle tout à droite pour le retirer de la partie (son profil reste dans le compte).",
