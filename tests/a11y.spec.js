@@ -1,6 +1,6 @@
 // Accessibilité : audit axe-core (WCAG 2.1 A et AA) sur l'accueil et le plateau.
 const { test, expect } = require('@playwright/test');
-const { lancerPartie, valider, cocherTout, creerJoueurs } = require('./aide');
+const { lancerPartie, personnaliser, cocherTout, creerJoueurs } = require('./aide');
 const AxeBuilder = require('@axe-core/playwright').default;
 
 async function audit(page) {
@@ -19,7 +19,7 @@ test('aucune violation WCAG A/AA : accueil, préparation et plateau', async ({ p
   await page.locator('[data-ajouter]').click();
   expect(await audit(page)).toEqual([]); // liste des joueurs du compte ouverte
   await page.locator('.cj-profil[data-choisir]:not([disabled])').first().click();
-  await valider(page);
+  await personnaliser(page, 0); // v10.36 : « Personnaliser » ouvre l'étape 2 du joueur 1
   expect(await audit(page)).toEqual([]); // étape 2 : cartes du joueur
   await cocherTout(page, 2);
   expect(await audit(page)).toEqual([]); // étape 3 : aventure
