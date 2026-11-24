@@ -2103,53 +2103,57 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .baby .gram-mot-relier { justify-content: center; font: 800 1.6rem/1 system-ui, sans-serif; min-height: 64px; }
 .baby .gram-mot-relier .baby-de { width: 40px; height: 40px; }
 
-/* Écran Baby jeux en deux pages qui tiennent sur un seul écran, sans défiler (v9.2). */
-body:has(#ecran-baby:not([hidden])) { height: 100vh; height: 100dvh; overflow: hidden; }
-body:has(#ecran-baby:not([hidden])) main { min-height: 0; }
-body:has(#ecran-baby:not([hidden])) .pied { padding-block: 4px calc(4px + env(safe-area-inset-bottom)); font-size: .8rem; }
-#ecran-baby:not([hidden]) { flex: 1; min-height: 0; display: flex; flex-direction: column; padding-bottom: 8px; }
-#ecran-baby .barre { margin-bottom: clamp(4px, 1vh, 10px); }
-#baby-corps { flex: 1; min-height: 0; display: flex; }
-#baby-corps .baby-reglages { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: clamp(4px, 1.4vh, 14px);
-  padding: clamp(8px, 1.6vh, 16px) clamp(10px, 3vw, 16px); overflow: hidden; }
-.baby-reglages .defi-choix { margin: 0; min-width: 0; }
-.baby-reglages .defi-choix legend, .baby-reglages .titre-choix { margin-bottom: clamp(2px, .6vh, 6px); }
-.baby-reglages .pack span { min-height: clamp(32px, 5.4vh, 46px); }
-.baby-cats, .baby-ecritures { display: grid !important; gap: 6px !important; }
-.baby-cats { grid-template-columns: 1fr 1fr; }
-.baby-ecritures { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-.baby-cats .pack span, .baby-ecritures .pack span { width: 100%; justify-content: center; text-align: center; padding-inline: 6px; }
-.baby-cats .pack span { font-size: clamp(1rem, 2.6vh, 1.25rem); font-weight: 800; }
-.baby-ecritures .pack span { font-size: clamp(.8rem, 2vh, 1rem); }
+/* Réglages de Lettres et de Chiffres dans « Personnaliser » (v10.41, js/baby-reglages.js ; ex-écran Baby jeux de la v9.2).
+   Le panneau remplit la zone de réglages et défile à l'intérieur si l'écran est bas ; rien ne dépasse en largeur. */
+.reglages-joueur .reglages-baby { height: 100%; min-height: 0; justify-content: flex-start; align-items: stretch; overflow-y: auto; overflow-x: hidden;
+  padding: 2px clamp(4px, 1.5cqi, 12px) 6px; }
+.reglages-baby .baby-reglages { width: min(100%, 760px); margin-inline: auto; display: flex; flex-direction: column; gap: clamp(4px, 1.2cqh, 12px); }
+.baby-reglages .defi-choix { margin: 0; min-width: 0; border: 0; padding: 0; }
+.baby-reglages .defi-choix legend, .baby-reglages .titre-choix { margin-bottom: clamp(2px, .6vh, 6px); font-weight: 800; }
+.baby-reglages .titre-choix { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.baby-ecritures { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px !important; }
+.reglages-joueur .baby-reglages .pack span { height: auto; min-height: clamp(30px, 5vh, 44px); width: 100%; padding: 2px 6px; justify-content: center; text-align: center; line-height: 1.15; font-size: clamp(.8rem, 2vh, 1rem); }
 /* Lettres : 7 par ligne sur téléphone, 9 sur tablette et ordinateur ; chiffres : 5 par ligne. */
 .baby-grille { display: grid !important; gap: clamp(4px, .9vh, 8px) 6px !important; }
 .baby-grille.lettres { grid-template-columns: repeat(7, minmax(0, 1fr)); }
 .baby-grille.chiffres { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 @media (min-width: 600px) { .baby-grille.lettres { grid-template-columns: repeat(9, minmax(0, 1fr)); } }
-.baby-grille .pack span { width: 100%; min-width: 0; padding: 2px; border-radius: 12px; font-size: clamp(.95rem, 2.6vh, 1.3rem); white-space: nowrap; }
-.baby-grille.chiffres .pack span { min-height: clamp(38px, 7vh, 60px); font-size: clamp(1.1rem, 3.2vh, 1.6rem); }
+.reglages-joueur .baby-grille .pack span { min-width: 0; padding: 2px; border-radius: 12px; font-weight: 800; font-size: clamp(.95rem, 2.6vh, 1.3rem); white-space: nowrap; }
+.reglages-joueur .baby-grille.chiffres .pack span { min-height: clamp(36px, 6vh, 54px); font-size: clamp(1.1rem, 3.2vh, 1.6rem); }
 /* Jeux : 2 colonnes. */
 .baby-jeux { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(4px, 1vh, 10px) 8px !important; }
-.baby-jeux .pack span { width: 100%; min-height: clamp(34px, 6.4vh, 54px); border-radius: 14px; padding: 2px 8px; line-height: 1.15;
-  font-size: clamp(.78rem, 2.1vh, 1rem); gap: 6px; }
-.baby-reglages .reglage-alerte { margin: 0; min-height: 0; }
-.baby-reglages .reglage-alerte:empty { display: none; }
-.baby-actions { margin-top: auto; display: flex; gap: 8px; justify-content: center; }
-.baby-actions .btn { flex: 1; max-width: 320px; padding-block: clamp(6px, 1.4vh, 12px); }
+.reglages-joueur .baby-jeux .pack span { border-radius: 14px; padding: 2px 8px; gap: 6px; font-weight: 600; }
 .baby-reglages .pack .baby-ico { font-style: normal; display: inline; border: 0; padding: 0; min-height: 0; background: none; }
-/* Écrans bas (téléphone carré, téléphone couché) : tout se resserre pour tenir sans défiler. */
 @media (max-height: 620px) {
-  #baby-corps .baby-reglages { gap: 4px; padding-block: 6px; }
-  .baby-reglages .defi-choix legend, .baby-reglages .titre-choix { margin-bottom: 2px; font-size: .9rem; }
   .baby-reglages .btn-tout { min-height: 26px; padding-block: 0; }
-  .baby-reglages .pack span { min-height: 30px; }
-  .baby-grille .pack span { min-height: 26px; font-size: .9rem; border-radius: 9px; }
-  .baby-grille { gap: 3px 5px !important; }
-  .baby-grille.chiffres .pack span { min-height: 34px; }
-  .baby-jeux .pack span { min-height: 30px; font-size: .74rem; }
-  .baby-jeux { gap: 4px 6px !important; }
-  .baby-actions .btn { padding-block: 5px; font-size: .95rem; }
+  .reglages-joueur .baby-reglages .pack span { min-height: 28px; }
+  .reglages-joueur .baby-grille .pack span { min-height: 26px; font-size: .9rem; border-radius: 9px; }
+  .reglages-joueur .baby-jeux .pack span { font-size: .74rem; }
 }
+
+/* ---------- Mini-jeux (v10.41, js/minijeux.js) : la liste, puis le jeu et son résultat ---------- */
+.minijeux-intro { margin: 0 0 12px; text-align: center; font-size: 1.05rem; }
+.minijeux-intro .ico { width: 1.1em; height: 1.1em; vertical-align: -.15em; }
+.minijeux-liste { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 12px; }
+.minijeu-carte { display: flex; align-items: center; gap: 12px; text-align: left; width: 100%; min-height: 76px; padding: 10px 14px; border-radius: 16px;
+  border: 3px solid var(--encre); background: var(--jaune); color: var(--encre); box-shadow: 0 4px 0 var(--encre); font: inherit; cursor: pointer; }
+.minijeu-carte:hover { filter: brightness(1.05); }
+.minijeu-carte:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--encre); }
+.minijeu-ico { font-size: 2.2rem; line-height: 1; flex: none; }
+.minijeu-texte { display: grid; gap: 2px; min-width: 0; flex: 1; }
+.minijeu-texte b { font-size: 1.15rem; }
+.minijeu-texte small { font-size: .9rem; color: var(--encre); opacity: .85; }
+.minijeu-gain { flex: none; font-weight: 800; display: inline-flex; align-items: center; gap: 3px; }
+.minijeu-gain .ico { width: 1.2em; height: 1.2em; }
+.minijeu { display: grid; gap: 10px; justify-items: center; text-align: center; }
+.minijeu-qui { margin: 0; min-height: 1.2em; color: var(--encre-douce); font-weight: 700; }
+.minijeu-consigne { margin: 0; font-size: 1.1rem; font-weight: 700; }
+.minijeu-jeu { width: 100%; }
+.minijeu-fin { padding-block: 12px; }
+.minijeu-bravo { margin: 0; font-size: 1.5rem; font-weight: 800; }
+.minijeu-resultat { margin: 0; font-size: 1.2rem; }
+.minijeu-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+@media (prefers-reduced-motion: reduce) { .minijeu-carte:active { transform: none; } }
 
 /* ---------- v10.13 (demande du 18/11/2026) : Histoire et Géographie présentées comme les temps de la conjugaison ----------
    Un cadre par famille : son nom et « Tout » en haut, ses jeux l'un sous l'autre. js/plateau.js (rangerSavoir) range les

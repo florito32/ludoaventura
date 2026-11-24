@@ -1,8 +1,9 @@
 // Baby jeux (v9.1, demande de l'utilisateur du 16/11/2026, backlog lignes 355 à 362).
-// Petits jeux pour les tout-petits, en deux catégories, Lettres et Chiffres (10 jeux chacune).
-// Ils se jouent comme une partie rapide solo (choix de l'utilisateur) : chaque carte piochée sur le plateau
-// est un baby jeu ; bonne réponse = dé FORT, sinon dé FAIBLE (on gagne toujours des points).
-// Réglages (écran « Baby jeux », js/baby-ecran.js) :
+// Petits jeux pour les tout-petits, en deux catégories, Lettres et Chiffres (9 et 10 jeux).
+// v10.41 (demande du 24/11/2026) : Lettres et Chiffres sont des MATIÈRES de l'aventure, comme Maths ou Histoire (« Personnaliser » et
+// « Suivre ma progression »), sans niveau ni progression ; chaque carte piochée sur le plateau est un baby jeu ; bonne réponse =
+// dé FORT, sinon dé FAIBLE (on gagne toujours des points). « La fabrique à mots » est devenue un mini-jeu (catégorie 'mini').
+// Réglages (js/baby-reglages.js, étape « Personnaliser » de la préparation) :
 //  - lettres travaillées (cases A à Z) et écriture : MAJUSCULES, minuscules ou les deux ;
 //  - chiffres travaillés (cases 1 à 10) : toutes les questions portent sur ces chiffres, les mauvaises
 //    réponses sont les autres chiffres (choix de l'utilisateur) ;
@@ -37,7 +38,8 @@
     { id: 'entends-lettre', cat: 'lettres', nom: 'J’entends la lettre', icone: '👂', meca: 'choix' },
     { id: 'premiere-lettre', cat: 'lettres', nom: 'La première lettre', icone: '🐱', meca: 'choix' },
     { id: 'voyelle-consonne', cat: 'lettres', nom: 'Voyelle ou consonne', icone: '🧺', meca: 'trier' },
-    { id: 'fabrique', cat: 'lettres', nom: 'La fabrique à mots', icone: '🏭', meca: 'fabrique' },
+    // v10.41 (demande du 24/11/2026) : « La fabrique à mots » quitte les Lettres, c'est un mini-jeu (js/minijeux.js) : jamais tirée en aventure.
+    { id: 'fabrique', cat: 'mini', nom: 'La fabrique à mots', icone: '🏭', meca: 'fabrique' },
     { id: 'syllabes', cat: 'lettres', nom: 'Les syllabes', icone: '🗣️', meca: 'choix' },
     { id: 'son-ecritures', cat: 'lettres', nom: 'Un son, des écritures', icone: '✏️', meca: 'attrape' },
     { id: 'attrape-chiffre', cat: 'chiffres', nom: 'Attrape le chiffre', icone: '🎲', meca: 'attrape' },
@@ -136,6 +138,37 @@
   }
   function defaut() { return reglagesValides({}); }
 
+  // ---------- Lettres et Chiffres, matières de l'aventure (v10.41, demande du 24/11/2026) ----------
+  // Réglages d'un joueur : { ecriture, lettres, chiffres, jeux } ; les jeux sont ceux des deux catégories (la fabrique à mots est un
+  // mini-jeu, jamais tirée en aventure). Au départ tout est coché. « cat » : 'lettres' ou 'chiffres' (la matière jouée).
+  function idsDe(cat) { return JEUX.filter(function (j) { return j.cat === cat; }).map(function (j) { return j.id; }); }
+  function reglagesMatiere() {
+    return { ecriture: 'maj', lettres: ALPHABET.slice(), chiffres: CHIFFRES.slice(), jeux: idsDe('lettres').concat(idsDe('chiffres')) };
+  }
+  // Réglages lus dans une sauvegarde : valeurs inconnues retirées ; une liste vide reste vide (le joueur doit en cocher au moins un).
+  function reglagesMatiereValides(x) {
+    var v = reglagesMatiere();
+    if (!x || typeof x !== 'object') return v;
+    if (['maj', 'min', 'deux'].indexOf(x.ecriture) >= 0) v.ecriture = x.ecriture;
+    if (Array.isArray(x.lettres)) v.lettres = x.lettres.filter(function (l) { return ALPHABET.indexOf(l) >= 0; });
+    if (Array.isArray(x.chiffres)) v.chiffres = x.chiffres.map(Number).filter(function (n) { return CHIFFRES.indexOf(n) >= 0; });
+    if (Array.isArray(x.jeux)) v.jeux = x.jeux.filter(function (id) { var j = jeu(id); return j && j.cat !== 'mini'; });
+    return v;
+  }
+  // Ce qui manque pour jouer la matière « cat » : 'lettre', 'chiffre', 'jeu' ou '' (rien).
+  function manque(reg, cat) {
+    reg = reglagesMatiereValides(reg);
+    if (cat === 'lettres' && !reg.lettres.length) return 'lettre';
+    if (cat === 'chiffres' && !reg.chiffres.length) return 'chiffre';
+    return idsDe(cat).some(function (id) { return reg.jeux.indexOf(id) >= 0; }) ? '' : 'jeu';
+  }
+  // Réglages à passer à carte() pour une matière : seulement les jeux et la catégorie de cette matière.
+  function pourCarte(reg, cat) {
+    reg = reglagesMatiereValides(reg);
+    var jeux = reg.jeux.filter(function (id) { return jeu(id).cat === cat; });
+    return reglagesValides({ categories: [cat], lettres: reg.lettres, chiffres: reg.chiffres, ecriture: reg.ecriture, jeux: jeux.length ? jeux : idsDe(cat) });
+  }
+
   // Écriture d'une lettre selon le réglage (« Les deux » : au hasard).
   function forme(lettre, ecriture, r) {
     if (ecriture === 'min') return lettre.toLowerCase();
@@ -186,7 +219,7 @@
     var j = jeu(id);
     if (!j) return null;
     var L = reg.lettres, N = reg.chiffres, E = reg.ecriture;
-    var c = { type: 'grammaire', module: 'baby', jeu: id, cat: j.cat, meca: j.meca, packNom: 'Baby jeux · ' + j.nom };
+    var c = { type: 'grammaire', module: 'baby', jeu: id, cat: j.cat, meca: j.meca, packNom: (j.cat === 'lettres' ? 'Lettres' : j.cat === 'chiffres' ? 'Chiffres' : 'Mini-jeux') + ' · ' + j.nom };
     var f, cible, n;
     switch (id) {
       case 'attrape-lettre': {
@@ -481,7 +514,8 @@
   var api = {
     ALPHABET: ALPHABET, VOYELLES: VOYELLES, CONSONNES: CONSONNES, CHIFFRES: CHIFFRES, NOMS: NOMS, CATEGORIES: CATEGORIES,
     ECRITURES: ECRITURES, JEUX: JEUX, IDS: IDS, MOTS: MOTS, SONS: SONS, SONS_FABRIQUE: SONS_FABRIQUE,
-    jeu: jeu, reglagesValides: reglagesValides, defaut: defaut, generer: generer, carte: carte,
+    jeu: jeu, reglagesValides: reglagesValides, defaut: defaut, idsDe: idsDe, reglagesMatiere: reglagesMatiere, reglagesMatiereValides: reglagesMatiereValides,
+    manque: manque, pourCarte: pourCarte, generer: generer, carte: carte,
     juste: juste, solution: solution, pairesJustes: pairesJustes, motLu: motLu
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;

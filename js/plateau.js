@@ -66,12 +66,18 @@
   var TOUS_JEUX_PH = PH.JEUX.map(function (j) { return j.id; });
   var K = window.Calcul;
   var V = window.Conjugaison;
-  var MATIERES = ['maths', 'orthographe', 'conjugaison', 'grammaire', 'phonemes', 'geographie', 'histoire']; // matières jouables (Français → Orthographe, Conjugaison ou Grammaire ; Géographie, Histoire)
+  var MATIERES = ['maths', 'orthographe', 'conjugaison', 'grammaire', 'phonemes', 'geographie', 'histoire', 'lettres', 'chiffres']; // matières jouables (Français → Orthographe, Conjugaison ou Grammaire ; Géographie, Histoire)
   // Géographie et Histoire (v7.0) : jeux et niveau de chaque joueur, pour chacune des deux matières (js/savoirs.js).
   var SV = window.Savoirs;
   var CL = window.ClavierLettres; // v9.3 : clavier à lettres (js/clavier-lettres.js)
   var MATIERES_SAVOIR = ['geographie', 'histoire'];
   function estSavoir(m) { return MATIERES_SAVOIR.indexOf(m) >= 0; }
+  // Lettres et Chiffres (v10.41, demande du 24/11/2026) : matières comme les autres, mais sans niveau ni progression (js/baby.js,
+  // réglages : js/baby-reglages.js). Les baby jeux sont les cartes de ces deux matières ; « La fabrique à mots » est un mini-jeu.
+  var BB = window.Baby;
+  var MATIERES_BABY = ['lettres', 'chiffres'];
+  function estBaby(m) { return MATIERES_BABY.indexOf(m) >= 0; }
+  function babyVide() { return BB.reglagesMatiere(); }
   // v8.0 : mode « quiz » (4 choix) ou « normal » (tout sauf le QCM) ; Quiz présélectionné (hypothèse à valider).
   function savoirVide() { return { geographie: { jeux: [], niveau: 'facile', mode: 'quiz' }, histoire: { jeux: [], niveau: 'facile', mode: 'quiz' } }; }
   // Jeux proposés : ceux qui ont du contenu à chaque niveau (la carte à toucher attend ses cartes, js/cartes-geo.js).
@@ -145,7 +151,9 @@
     // Partie rapide en cours (v6.43, js/rapide.js) : { matieres: ['maths', 'francais'], niveau: 'facile'… } ou null.
     rapide: null,
     // Géographie et Histoire (v7.0) : { geographie: { jeux, niveau }, histoire: { jeux, niveau } } par joueur.
-    savoirs: [savoirVide(), savoirVide(), savoirVide(), savoirVide()]
+    savoirs: [savoirVide(), savoirVide(), savoirVide(), savoirVide()],
+    // Lettres et Chiffres (v10.41) : réglages de chaque joueur { ecriture, lettres, chiffres, jeux } (js/baby.js → reglagesMatiere).
+    baby: [babyVide(), babyVide(), babyVide(), babyVide()]
   };
 
   function afficher(id) {
@@ -218,7 +226,7 @@
     partie.parcours[i] = null; partie.pret[i] = false; partie.suivi[i] = null; partie.niveauProg[i] = null;
     partie.matiere[i] = null; partie.francais[i] = false;
     partie.maths[i] = mathsVides(); partie.conj[i] = conjVide(); partie.gram[i] = gramVide(); partie.phon[i] = phonVide();
-    partie.savoirs[i] = savoirVide(); partie.orthoNiveau[i] = 'facile';
+    partie.savoirs[i] = savoirVide(); partie.orthoNiveau[i] = 'facile'; partie.baby[i] = babyVide();
     partie.packs[i] = []; partie.types[i] = [];
   }
   // Étape 1 : le bouton « Choisir l'aventure » n'apparaît que lorsque tous les joueurs ont fini de se préparer (v10.36).
@@ -238,11 +246,11 @@
     }
   }
   // Ce que la ligne d'un joueur affiche à l'étape 1 : son parcours et ce qui est prêt.
-  var NOMS_MATIERES_COURTS = { maths: 'Maths', francais: 'Français', geographie: 'Géographie', histoire: 'Histoire', orthographe: 'Orthographe', conjugaison: 'Conjugaison', grammaire: 'Grammaire', phonemes: 'Phonèmes' };
+  var NOMS_MATIERES_COURTS = { maths: 'Maths', francais: 'Français', geographie: 'Géographie', histoire: 'Histoire', orthographe: 'Orthographe', conjugaison: 'Conjugaison', grammaire: 'Grammaire', phonemes: 'Phonèmes', lettres: 'Lettres', chiffres: 'Chiffres' };
   function etatParcours(i) {
     var p = partie.parcours[i], pret = !!(p && partie.pret[i]), resume = '';
-    if (pret && p === 'suivre') resume = (NOMS_MATIERES_COURTS[partie.suivi[i]] || '') + ' · suit sa progression';
-    if (pret && p === 'perso') resume = (NOMS_MATIERES_COURTS[partie.matiere[i]] || '') + ' · niveau ' + (partie.niveauProg[i] || '?') + ' (personnalisé)';
+    if (pret && p === 'suivre') resume = (NOMS_MATIERES_COURTS[partie.suivi[i]] || '') + (estBaby(partie.suivi[i]) ? ' · sans niveau' : ' · suit sa progression');
+    if (pret && p === 'perso') resume = (NOMS_MATIERES_COURTS[partie.matiere[i]] || '') + (estBaby(partie.matiere[i]) ? ' · sans niveau (personnalisé)' : ' · niveau ' + (partie.niveauProg[i] || '?') + ' (personnalisé)');
     return { parcours: p, pret: pret, resume: resume };
   }
   // Un des deux boutons de l'étape 1 : on passe à l'étape 2 pour ce joueur (matière seule, ou étape complète).
@@ -276,7 +284,8 @@
   // chaque niveau 1 à 10 est traduit en l'un d'eux (provisoire : le tirage direct par niveau de progression suit, backlog ligne 485).
   var NIVEAU_DE_PROG = ['facile', 'facile', 'facile', 'moyen', 'moyen', 'difficile', 'difficile', 'difficile', 'expert', 'expert'];
   function niveauId(n) { return NIVEAU_DE_PROG[Math.max(1, Math.min(10, Number(n) || 1)) - 1]; }
-  var MATIERES_SUIVIES = [{ id: 'maths', nom: 'Maths' }, { id: 'francais', nom: 'Français' }, { id: 'geographie', nom: 'Géographie' }, { id: 'histoire', nom: 'Histoire' }];
+  var MATIERES_SUIVIES = [{ id: 'maths', nom: 'Maths' }, { id: 'francais', nom: 'Français' }, { id: 'geographie', nom: 'Géographie' }, { id: 'histoire', nom: 'Histoire' },
+    { id: 'lettres', nom: 'Lettres' }, { id: 'chiffres', nom: 'Chiffres' }]; // v10.41 : Lettres et Chiffres n'ont pas de niveau
   // Matière avec jauge (js/joueurs.js) d'une matière jouable de la préparation.
   function matiereJauge(m) { return m === 'maths' || estSavoir(m) ? m : 'francais'; }
   // Niveau 1 à 10 enregistré dans le profil du joueur de la place i pour la matière m (celle de sa jauge, ou sa sous-matière).
@@ -288,7 +297,7 @@
   }
   // « Personnaliser » : le niveau proposé d'abord est celui du profil (le joueur peut le changer).
   function niveauParDefaut(i) {
-    if (partie.matiere[i] && !partie.niveauProg[i] && partie.matiere[i] !== 'phonemes') { partie.niveauProg[i] = niveauEnregistre(i, partie.matiere[i]); appliquerNiveau(i); }
+    if (partie.matiere[i] && !partie.niveauProg[i] && partie.matiere[i] !== 'phonemes' && !estBaby(partie.matiere[i])) { partie.niveauProg[i] = niveauEnregistre(i, partie.matiere[i]); appliquerNiveau(i); }
   }
   // Pose le niveau choisi (1 à 10) dans les réglages de chaque matière du joueur i (ceux que les générateurs lisent).
   function appliquerNiveau(i) {
@@ -309,9 +318,9 @@
     if (window.Selecteur) window.Selecteur.maj(); // le sélecteur est caché : il remet le bouton « Valider » du bas
     var j = partie.profils[a] && profil(partie.profils[a]);
     $('suivre-matieres').innerHTML = MATIERES_SUIVIES.map(function (m) {
-      var niv = j ? window.Joueurs.niveauMatiere(j, m.id) : 1;
+      var niv = j && !estBaby(m.id) ? window.Joueurs.niveauMatiere(j, m.id) : 1;
       return '<label class="pack pack-suivre"><input type="radio" name="suivre" value="' + m.id + '"' + (partie.suivi[a] === m.id ? ' checked' : '') + '>' +
-        '<span><b>' + m.nom + '</b><small>niveau ' + niv + ' sur 10</small></span></label>';
+        '<span><b>' + m.nom + '</b><small>' + (estBaby(m.id) ? 'sans niveau' : 'niveau ' + niv + ' sur 10') + '</small></span></label>';
     }).join('');
     $('reglages-titre').innerHTML = '<img src="' + actif.image + '" alt="" width="200" height="220">' +
       esc(nomDe(a)) + ' (Joueur ' + (a + 1) + ') : quelle matière ?';
@@ -464,7 +473,7 @@
     $('matieres').addEventListener('change', function () {
       var j = partie.actif, v = valeursCochees($('matieres'))[0], avant = partie.matiere[j];
       $('packs-alerte').textContent = '';
-      if (v === 'maths' || estSavoir(v)) { partie.matiere[j] = v; partie.francais[j] = false; }
+      if (v === 'maths' || estSavoir(v) || estBaby(v)) { partie.matiere[j] = v; partie.francais[j] = false; }
       else { partie.francais[j] = true; partie.matiere[j] = valeursCochees($('francais'))[0] || null; }
       if (partie.matiere[j] !== avant) partie.niveauProg[j] = null; // v10.36 : le niveau 1 à 10 repart de celui du profil dans cette matière
       majAventuriers();
@@ -776,6 +785,7 @@
         partie.gram[k] = JSON.parse(JSON.stringify(partie.gram[a]));
         partie.phon[k] = JSON.parse(JSON.stringify(partie.phon[a]));
         partie.savoirs[k] = JSON.parse(JSON.stringify(partie.savoirs[a]));
+        partie.baby[k] = JSON.parse(JSON.stringify(partie.baby[a]));
         // v10.36 : les autres joueurs de la partie sont prêts, avec les mêmes choix « Personnaliser ».
         partie.niveauProg[k] = partie.niveauProg[a];
       }
@@ -799,6 +809,7 @@
     var m = partie.matiere[i];
     if (!m) return partie.francais[i] ? 'francais' : 'matiere';
     if (estSavoir(m)) return reglageSavoir(i).jeux.length ? null : 'jeu';
+    if (estBaby(m)) { var mb = BB.manque(partie.baby[i], m); return mb ? { lettre: 'lettreBaby', chiffre: 'chiffreBaby', jeu: 'jeuBaby' }[mb] : null; } // v10.41
     if (m === 'maths') {
       if (!partie.maths[i].signes.length) return 'signe';
       // Au moins un nombre de signes, et au moins une table (Facile) ou un nombre (dans les groupes du niveau).
@@ -846,6 +857,9 @@
   // Message et endroit où mettre le focus pour chaque chose qui manque.
   var MANQUES = {
     matiere: ['choisir une matière.', 'matieres'],
+    lettreBaby: ['choisir au moins une lettre.', 'reglages-baby'],
+    chiffreBaby: ['choisir au moins un chiffre.', 'reglages-baby'],
+    jeuBaby: ['choisir au moins un jeu.', 'reglages-baby'],
     francais: ['choisir Orthographe, Conjugaison, Grammaire ou Phonèmes.', 'francais'],
     categorie: ['choisir au moins une catégorie de sons.', 'cats-phon'],
     son: ['choisir au moins un son.', 'sons-phon'],
@@ -1021,7 +1035,7 @@
     $('type-maths').querySelectorAll('input').forEach(function (i) { i.checked = i.value === (partie.maths[a].type || 'calcul'); });
     // Niveau de calcul : une phrase d'aide sous les choix ; au niveau Facile, les nombres deviennent des tables.
     // v10.36 : niveau 1 à 10 (toutes les matières sauf les phonèmes, dont les niveaux viennent après), coché = celui du joueur.
-    var avecNiveau = !!mat && mat !== 'phonemes';
+    var avecNiveau = !!mat && mat !== 'phonemes' && !estBaby(mat); // v10.41 : Lettres et Chiffres n'ont pas de niveau
     $('reglage-niveau-prog').hidden = !avecNiveau;
     if (avecNiveau && !partie.niveauProg[a]) { partie.niveauProg[a] = niveauEnregistre(a, mat); appliquerNiveau(a); }
     $('niveau-prog').querySelectorAll('input').forEach(function (i) { i.checked = Number(i.value) === partie.niveauProg[a]; });
@@ -1152,9 +1166,14 @@
     $('ortho-packs').hidden = ecran !== 'packs';
     $('phon-sons').hidden = ecran !== 'sons';
     if (ecran !== 'reglages') { $('reglages-maths').hidden = $('reglages-ortho').hidden = $('reglages-gram').hidden = $('reglages-phon').hidden = $('savoir-jeux').hidden = true; }
-    var NOMS_MATIERES = { maths: 'Mathématiques', orthographe: 'Orthographe', conjugaison: 'Conjugaison', grammaire: 'Grammaire', phonemes: 'Phonèmes', geographie: 'Géographie', histoire: 'Histoire' };
+    // Lettres et Chiffres (v10.41) : leurs réglages (écriture, lettres ou chiffres, jeux) ; pas de niveau.
+    $('reglages-baby').hidden = !(estBaby(mat) && ecran === 'reglages');
+    if (!$('reglages-baby').hidden && window.BabyReglages) {
+      window.BabyReglages.rendre($('reglages-baby'), partie.baby[a], mat, a + '|' + mat, function () { $('packs-alerte').textContent = ''; sauver(); });
+    }
+    var NOMS_MATIERES = { maths: 'Mathématiques', orthographe: 'Orthographe', conjugaison: 'Conjugaison', grammaire: 'Grammaire', phonemes: 'Phonèmes', geographie: 'Géographie', histoire: 'Histoire', lettres: 'Lettres', chiffres: 'Chiffres' };
     var sousTitre = surMatiere ? 'quelle matière ?' : NOMS_MATIERES[mat] +
-      (mat === 'conjugaison' ? ', les réglages' : '') + (mat === 'grammaire' || estSavoir(mat) ? ', les jeux' : '') +
+      (mat === 'conjugaison' ? ', les réglages' : '') + (mat === 'grammaire' || estSavoir(mat) ? ', les jeux' : '') + (estBaby(mat) ? ', les réglages' : '') +
       (mat === 'orthographe' ? (ecran === 'packs' ? ', les thèmes' : ', les questions') : '') +
       (mat === 'phonemes' ? (ecran === 'sons' ? ', les sons' : ', les jeux') : '');
     $('reglages-titre').innerHTML = '<img src="' + actif.image + '" alt="" width="200" height="220">' +
@@ -1221,7 +1240,10 @@
   }
   // Ce que demande la prochaine carte du joueur i : { matiere, maths | conj | gram | phon | carte, sous: { m, s } }.
   function carteSuivie(i) {
-    var m = partie.suivi[i], W = window.Joueurs, subs = W.matiere(m).subs.map(function (x) { return x.id; });
+    var m = partie.suivi[i], W = window.Joueurs;
+    // v10.41 : Lettres et Chiffres n'ont ni niveau ni sous-matière : une carte tirée parmi leurs jeux, rien n'est noté dans le profil.
+    if (estBaby(m)) return { matiere: m, baby: true, sous: null };
+    var subs = W.matiere(m).subs.map(function (x) { return x.id; });
     if (estSavoir(m)) subs = subs.filter(function (f) { return jeuxProposes(m, 'quiz').some(function (x) { return x.famille === f; }); });
     var s = subs[Math.floor(Math.random() * subs.length)], niv = niveauSousMatiere(i, m, s), sous = { m: m, s: s };
     if (m === 'maths') {
@@ -1306,6 +1328,15 @@
     return f;
   }
 
+  // Carte de Lettres ou de Chiffres du joueur j (v10.41) : un baby jeu (js/baby.js) tiré parmi ceux qu'il a cochés, pas deux fois le même
+  // de suite si possible. « Suivre ma progression » : les réglages de départ (tout coché).
+  function carteBaby(j, cat) {
+    var reg = partie.parcours[j.index] === 'suivre' ? BB.reglagesMatiere() : partie.baby[j.index];
+    var c = BB.carte(BB.pourCarte(reg, cat), Math.random, j.babyDernier);
+    j.babyDernier = c.jeu;
+    return c;
+  }
+
   // Pioche dans le tas du joueur (tas vide → on remélange toutes ses cartes) et tire au hasard
   // une question parmi les types cochés par le joueur qui ont du sens pour ce mot.
   // Si aucun type coché ne convient à la carte, elle repart sous le tas et on en prend une autre.
@@ -1313,12 +1344,6 @@
     var mat = partie.matiere[j.index], mr = partie.maths[j.index], cr = partie.conj[j.index], gr = partie.gram[j.index];
     // Partie rapide (v6.43) : chaque carte tire sa matière parmi celles choisies, avec des réglages du niveau
     // choisi (v6.45) tirés pour cette carte (orthographe : thèmes, mots et questions du niveau, déjà dans le tas du joueur).
-    // Baby jeux (v9.1) : chaque carte est un petit jeu de lettres ou de chiffres (js/baby.js), tiré parmi ceux cochés.
-    if (partie.rapide && partie.rapide.baby && window.Baby) {
-      var bc = window.Baby.carte(partie.rapide.baby, Math.random, j.babyDernier);
-      j.babyDernier = bc.jeu;
-      return bc;
-    }
     // Défi du jour (v10.36) : chaque carte tire sa matière et son niveau pour le joueur qui la joue (carteDefi).
     var t = partie.rapide && window.Rapide ? window.Rapide.carte(partie.rapide.matieres, partie.rapide.niveau, null, partie.rapide.mode)
       : partie.defi && partie.defi.mixte && window.Rapide ? carteDefi(j) : null;
@@ -1331,6 +1356,7 @@
     // « Suivre ma progression » (v10.36) : matière du joueur, niveau de son profil ; on note la sous-matière jouée.
     if (estSuivi(j.index)) {
       var cs = carteSuivie(j.index);
+      if (cs.baby) return carteBaby(j, partie.suivi[j.index]); // v10.41 : Lettres ou Chiffres, sans sous-matière à noter
       j.sous = j.sous || {};
       j.sous[cs.sous.m + '.' + cs.sous.s] = (j.sous[cs.sous.m + '.' + cs.sous.s] || 0) + 1;
       if (cs.carte) return cs.carte;
@@ -1339,6 +1365,8 @@
       mat = cs.matiere; if (cs.maths) mr = cs.maths; if (cs.conj) cr = cs.conj; if (cs.gram) gr = cs.gram;
       if (cs.phon) return cartePhonemes(j, cs.phon);
     }
+    // Lettres et Chiffres (v10.41) : un baby jeu parmi ceux cochés par le joueur (« Suivre ma progression » : tous).
+    if (estBaby(mat)) return carteBaby(j, mat);
     // Géographie et Histoire (v7.0) : un jeu choisi par le joueur, une série et un format tirés au hasard.
     if (estSavoir(mat)) {
       var rsv = partie.savoirs[j.index][mat];
@@ -1525,7 +1553,7 @@
     $('rouleau-img').alt = 'Aventure ' + av.nom;
     $('rouleau-nom').textContent = av.nom;
     // Défi du jour (v6.37) : le titre du plateau le rappelle.
-    $('titre-plateau').textContent = partie.defi ? (partie.defi.type === 'solo' ? 'Défi solo du jour' : 'Défi en équipe du jour') : partie.rapide ? (partie.rapide.baby ? 'Baby jeux' : 'Partie rapide') : 'Le plateau';
+    $('titre-plateau').textContent = partie.defi ? (partie.defi.type === 'solo' ? 'Défi solo du jour' : 'Défi en équipe du jour') : partie.rapide ? 'Partie rapide' : 'Le plateau';
     $('titre-points').textContent = av.objet.titre; // « Pierres taillées » plutôt que « Points de l'équipe »
     $('objectif').textContent = partie.objectif;
     $('objectif-texte').textContent = libelleObjectif(av, partie.nbJoueurs);
@@ -2782,7 +2810,7 @@
   // comme si le joueur l'avait faite, puis on lance la partie. Les réglages d'avant sont gardés de côté
   // et reviennent après le défi (« Nouvelle partie »).
   function copie(x) { return JSON.parse(JSON.stringify(x)); }
-  // « Qui joue ? » (v10.29) : demandé à chaque lancement d'un défi du jour, d'une partie rapide ou de Baby jeux.
+  // « Qui joue ? » (v10.29) : demandé à chaque lancement d'un défi du jour, d'une partie rapide ou d'un mini-jeu (v10.41).
   // n places imposées par le défi ; on propose d'abord les joueurs de la dernière partie. « C'est parti » reste grisé tant
   // qu'une place est vide ; « Annuler » ne lance rien.
   function demanderJoueurs(n, suite) {
@@ -2884,7 +2912,7 @@
       lancerPartie();
     });
   }
-  // Réglages des cartes d'une partie rapide ou de Baby jeux (matières, niveau, mode, réglages baby) :
+  // Réglages des cartes d'une partie rapide (matières, niveau, mode) :
   // au lancement, et quand on les modifie en cours de partie (v9.2).
   function reglagesRapide(d) {
     var R2 = window.Rapide, premiere = d.matieres.indexOf('maths') >= 0 ? 'maths' : 'orthographe';
@@ -2902,14 +2930,13 @@
       partie.gram[i] = R2.gramTout(d.niveau); // v6.55
     }
     partie.rapide = { matieres: d.matieres.slice(), niveau: d.niveau, mode: d.mode || 'quiz' };
-    if (d.baby) partie.rapide.baby = d.baby; // Baby jeux (v9.1) : réglages de js/baby-ecran.js
   }
-  // « Modifier les choix » d'une partie rapide ou de Baby jeux (v9.2, demande du 16/11/2026) : on revient à leur
+  // « Modifier les choix » d'une partie rapide (v9.2, demande du 16/11/2026) : on revient à son
   // écran de réglages (pas à la préparation de l'aventure), puis « Reprendre la partie » garde l'aventure, l'aventurier
   // et les points ; les nouveaux réglages valent dès la carte suivante (une carte pas encore répondue est repiochée).
   function modifierRapide() {
     partie.modif = true;
-    afficher(partie.rapide.baby ? 'ecran-baby' : 'ecran-rapide');
+    afficher('ecran-rapide');
   }
   function reprendreRapide(d) {
     if (!partie.rapide || !partie.regles) return;
@@ -2978,7 +3005,7 @@
   // sessionStorage : « survit aux rechargements et restaurations de la page ; fermer l'onglet efface les données »
   // (MDN, Window.sessionStorage). Les objets (aventure, aventuriers, questions) sont enregistrés par leur identifiant.
   var CLE = 'ludoaventura-partie';
-  var PAGES_ACCUEIL = ['ecran-coffres', 'ecran-rapide', 'ecran-baby']; // écrans ouverts depuis l'accueil (v6.36 ; v10.36 : plus d'écran du défi, c'est une fenêtre)
+  var PAGES_ACCUEIL = ['ecran-coffres', 'ecran-rapide', 'ecran-minijeux', 'ecran-minijeu']; // écrans ouverts depuis l'accueil (v6.36 ; v10.36 : plus d'écran du défi, c'est une fenêtre)
   var pretASauver = false; // pas de sauvegarde pendant la construction initiale de la page
 
   function carteVersDonnees(c) {
@@ -3006,7 +3033,7 @@
       matiere: partie.matiere, francais: partie.francais, maths: partie.maths, conj: partie.conj,
       etapePrepa: partie.etapePrepa, sousEtape: partie.sousEtape, modif: !!partie.modif,
       mots: partie.mots, orthoNiveau: partie.orthoNiveau, gram: partie.gram, phon: partie.phon, defi: partie.defi, avantDefi: partie.avantDefi || null, rapide: partie.rapide,
-      savoirs: partie.savoirs
+      savoirs: partie.savoirs, baby: partie.baby
     };
     if (partie.regles && partie.joueurs.length) {
       d.jeu = {
@@ -3023,8 +3050,8 @@
     var d;
     try { d = JSON.parse(sessionStorage.getItem(CLE) || 'null'); } catch (e) { d = null; }
     // Écrans des étoiles (v6.36) : ils s'ouvrent depuis l'accueil, on y revient.
-    // Exception (v9.2) : réglages d'une partie rapide ou de Baby jeux ouverts par « Modifier les choix » : la partie est reprise.
-    var modifRapide = d && d.modif && d.jeu && d.rapide && (d.ecran === 'ecran-rapide' || d.ecran === 'ecran-baby');
+    // Exception (v9.2) : réglages d'une partie rapide ouverts par « Modifier les choix » : la partie est reprise.
+    var modifRapide = d && d.modif && d.jeu && d.rapide && d.ecran === 'ecran-rapide';
     if (!d || !d.ecran || d.ecran === 'ecran-accueil' || (PAGES_ACCUEIL.indexOf(d.ecran) >= 0 && !modifRapide)) return false;
     try {
       // Préparation : nombre de joueurs, aventure, aventuriers et réglages des cartes.
@@ -3058,6 +3085,7 @@
       partie.avantDefi = d.avantDefi || null;
       partie.rapide = d.jeu ? d.rapide || null : null;
       if (d.savoirs) partie.savoirs = d.savoirs.map(function (x) { return x && x.geographie ? x : savoirVide(); });
+      if (Array.isArray(d.baby) && d.baby.length === 4) partie.baby = d.baby.map(function (x) { return BB.reglagesMatiereValides(x); }); // v10.41
       if (d.matiere) {
         partie.matiere = d.matiere.map(function (m) { return MATIERES.indexOf(m) >= 0 ? m : null; });
         partie.francais = d.francais || partie.francais;
@@ -3331,7 +3359,7 @@
     }, { once: true });
   });
 
-  window.Aventura = { afficher: afficher, lancerDefi: lancerDefi, lancerRapide: lancerRapide, reprendreRapide: reprendreRapide, annulerModif: annulerModif, piocherCarte: piocherCarte, cases: CASES, route: ROUTE, trajet: trajet, decalages: DECALAGES, partie: partie, cartesDuJoueur: cartesDuJoueur, majConstruction: majConstruction,
+  window.Aventura = { afficher: afficher, demanderJoueurs: demanderJoueurs, lancerDefi: lancerDefi, lancerRapide: lancerRapide, reprendreRapide: reprendreRapide, annulerModif: annulerModif, piocherCarte: piocherCarte, cases: CASES, route: ROUTE, trajet: trajet, decalages: DECALAGES, partie: partie, cartesDuJoueur: cartesDuJoueur, majConstruction: majConstruction,
     // Tests : lancer le dé sans attendre le lancer automatique (il n'y a plus de bouton depuis v4.3).
     lancerDe: function () { lancerDe(partie.regles.de); } };
 })();

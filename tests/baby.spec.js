@@ -1,16 +1,19 @@
-// Baby jeux (v9.1, demande du 16/11/2026, backlog lignes 355 à 362 ; v9.2 : lignes 368 à 372) : bouton de l'accueil, réglages,
-// 20 petits jeux de lettres et de chiffres joués sur le plateau comme une partie rapide.
+// Baby jeux (v9.1, demande du 16/11/2026, backlog lignes 355 à 362) : petits jeux de lettres et de chiffres.
+// v10.41 (demande du 24/11/2026) : Lettres et Chiffres sont des matières de l'aventure (« Personnaliser » et « Suivre ma progression »),
+// sans niveau ; « La fabrique à mots » est un mini-jeu (tests/minijeux.spec.js).
 const { test, expect } = require('@playwright/test');
 const B = require('../js/baby.js');
-const { rapide, lancerRapideQui } = require('./aide');
+const { rapide, lancerBaby, creerJoueurs, personnaliser, suivreMaProgression, cocher, valider, babyMatiere } = require('./aide');
 
 test.describe('contenu des baby jeux', () => {
   test.beforeEach(() => test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit'));
 
-  test('20 jeux, 10 de lettres et 10 de chiffres, tous jouables et justes avec la bonne réponse', () => {
+  // v10.41 : « La fabrique à mots » est un mini-jeu (catégorie 'mini', js/minijeux.js) : 9 jeux de lettres, 10 de chiffres, 1 mini-jeu.
+  test('20 jeux, 9 de lettres, 10 de chiffres et 1 mini-jeu, tous jouables et justes avec la bonne réponse', () => {
     expect(B.JEUX).toHaveLength(20);
-    expect(B.JEUX.filter((j) => j.cat === 'lettres')).toHaveLength(10);
+    expect(B.JEUX.filter((j) => j.cat === 'lettres')).toHaveLength(9);
     expect(B.JEUX.filter((j) => j.cat === 'chiffres')).toHaveLength(10);
+    expect(B.JEUX.filter((j) => j.cat === 'mini').map((j) => j.id)).toEqual(['fabrique']);
     const reglages = [{}, { lettres: ['A', 'B'], chiffres: [3], ecriture: 'min' }, { lettres: ['Z'], chiffres: [10, 1], ecriture: 'deux' }];
     for (const id of B.IDS) {
       for (const reg of reglages) {
@@ -145,142 +148,159 @@ async function resoudre(page) {
       await boite.locator('[data-cote="g"][data-i="' + g + '"]').click();
       await boite.locator('[data-cote="d"][data-i="' + c.bonnes[g] + '"]').click();
     }
-  } else if (c.meca === 'fabrique') {
-    await boite.locator('.baby-touche', { hasText: /^B$/i }).first().click();
-    await boite.locator('.baby-touche', { hasText: /^OU$/i }).first().click();
-    await expect(boite.getByRole('button', { name: 'J’ai fini' })).toBeDisabled(); // il faut d'abord lire le mot
-    await boite.getByRole('button', { name: 'Lire' }).click();
-    await boite.getByRole('button', { name: 'J’ai fini' }).click();
   }
 }
 
-async function ouvrirBaby(page, choix) {
-  await rapide(page);
-  await page.emulateMedia({ reducedMotion: 'reduce' }); // jetons immobiles : on peut les toucher sans attendre
-  await page.addInitScript((ch) => {
-    try { localStorage.setItem('ludo-vu', '1'); if (ch) localStorage.setItem('ludoaventura-baby-choix', JSON.stringify(ch)); } catch (e) { /* */ }
-  }, choix || null);
-  await page.goto('./');
-  await page.getByRole('button', { name: 'Baby jeux' }).click();
-  await expect(page.getByRole('heading', { name: 'Baby jeux' })).toBeVisible();
-}
-
-// Rien ne dépasse et rien n'est caché sous le bas de l'écran : la page ne défile pas (v9.2).
-async function tientSurUnEcran(page) {
+// Le panneau des réglages de Lettres / Chiffres (dans « Personnaliser ») ne dépasse jamais en largeur : il défile en hauteur si l'écran est bas.
+async function reglagesTiennent(page) {
   return page.evaluate(() => {
-    const h = window.innerHeight, w = window.innerWidth, out = [];
-    if (document.documentElement.scrollHeight > h + 1) out.push('page haute : ' + document.documentElement.scrollHeight + ' > ' + h);
-    if (document.documentElement.scrollWidth > w + 1) out.push('page large');
-    const cadre = document.querySelector('#baby-corps .baby-reglages').getBoundingClientRect();
-    document.querySelectorAll('#ecran-baby button, #ecran-baby label').forEach((e) => {
-      const r = e.getBoundingClientRect(), dedans = !e.closest('.baby-reglages') || (r.bottom <= cadre.bottom + 1 && r.right <= cadre.right + 1);
-      if (r.width && (r.bottom > h + 1 || r.right > w + 1 || !dedans)) out.push((e.id || e.textContent.trim()).slice(0, 20) + ' en dehors');
+    const w = window.innerWidth, out = [];
+    if (document.documentElement.scrollWidth > w + 1) out.push('page large : ' + document.documentElement.scrollWidth + ' > ' + w);
+    const z = document.getElementById('reglages-baby').getBoundingClientRect();
+    document.querySelectorAll('#reglages-baby button, #reglages-baby label').forEach((e) => {
+      const r = e.getBoundingClientRect();
+      if (r.width && (r.right > z.right + 1 || r.left < z.left - 1)) out.push((e.textContent.trim() || e.className).slice(0, 20) + ' déborde');
     });
     return out.slice(0, 5);
   });
 }
 
-test('Baby jeux, page 1 : Lettres OU Chiffres, écriture, lettres ou chiffres ; page 2 : les jeux ; tout tient sur un écran @smoke', async ({ page }) => {
-  await ouvrirBaby(page);
-  // Lettres ou Chiffres : boutons radio, un seul choix possible.
-  await expect(page.locator('input[name="baby-cat"]')).toHaveCount(2);
-  await expect(page.locator('input[name="baby-cat"][type="radio"]')).toHaveCount(2);
-  await expect(page.getByRole('radio', { name: /Lettres/ })).toBeChecked();
+// v10.41 (demande du 24/11/2026) : Lettres et Chiffres sont des matières de l'aventure, sans niveau.
+test('Lettres et Chiffres : matières de « Personnaliser », sans niveau, avec leurs réglages et un message si rien n’est coché @smoke', async ({ page }) => {
+  await rapide(page);
+  await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); } catch (e) { /* */ } });
+  await page.goto('./');
+  await creerJoueurs(page, 1);
+  await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
+  await personnaliser(page, 0);
+  // Six matières : les quatre d'avant, plus Lettres et Chiffres.
+  await expect(page.locator('input[name="matiere"]')).toHaveCount(6);
+  await expect(page.locator('#matieres label', { hasText: /^Lettres$/ })).toBeVisible();
+  await expect(page.locator('#matieres label', { hasText: /^Chiffres$/ })).toBeVisible();
+  // Lettres : pas d'onglet « Niveau » (ni niveau de 1 à 10) ; « Valider » mène aux réglages.
+  await cocher(page, '#matieres', 'lettres');
+  await expect(page.locator('.onglet[data-etape="niveau"]')).toBeHidden();
+  await expect(page.locator('#reglage-niveau-prog')).toBeHidden();
+  await valider(page);
+  await expect(page.locator('#reglages-baby')).toBeVisible();
+  await expect(page.locator('#reglages-titre')).toContainText('Lettres, les réglages');
   await expect(page.locator('input[name="baby-ecriture"]')).toHaveCount(3);
   await expect(page.locator('input[name="baby-lettre"]')).toHaveCount(26);
+  await expect(page.locator('input[name="baby-lettre"]:checked')).toHaveCount(26); // tout est coché au départ
   await expect(page.locator('input[name="baby-chiffre"]')).toHaveCount(0);
-  await expect(page.locator('input[name="baby-jeu"]')).toHaveCount(0);
-  expect(await tientSurUnEcran(page)).toEqual([]);
-  // Les lettres s'affichent dans l'écriture choisie.
+  // 9 jeux de lettres : la fabrique à mots n'y est plus (c'est un mini-jeu).
+  await expect(page.locator('input[name="baby-jeu"]')).toHaveCount(9);
+  await expect(page.locator('#reglages-baby')).not.toContainText('fabrique');
+  expect(await reglagesTiennent(page)).toEqual([]);
+  // L'écriture change l'aspect des lettres.
   await page.getByRole('radio', { name: 'Les deux' }).check();
   await expect(page.locator('.baby-grille.lettres .pack').first()).toHaveText('A a');
-  expect(await tientSurUnEcran(page)).toEqual([]);
-  // Chiffres : l'écriture et les lettres disparaissent, les chiffres 1 à 10 apparaissent.
-  await page.getByRole('radio', { name: /Chiffres/ }).check();
-  await expect(page.getByRole('radio', { name: /Lettres/ })).not.toBeChecked();
+  // « Aucun » puis « Valider » : message, on reste là.
+  await page.locator('[data-tout="lettres"]').click();
+  await expect(page.locator('input[name="baby-lettre"]:checked')).toHaveCount(0);
+  await valider(page);
+  await expect(page.locator('#packs-alerte')).toContainText('doit choisir au moins une lettre');
+  await page.locator('input[name="baby-lettre"][value="M"]').check();
+  await page.locator('[data-tout="jeux"]').click();
+  await valider(page);
+  await expect(page.locator('#packs-alerte')).toContainText('doit choisir au moins un jeu');
+  await page.locator('input[name="baby-jeu"][value="alphabet"]').check();
+  expect(await reglagesTiennent(page)).toEqual([]);
+  // Retour à la matière : Chiffres, avec ses chiffres et ses 10 jeux.
+  await page.getByRole('button', { name: /Retour/ }).click();
+  await cocher(page, '#matieres', 'chiffres');
+  await valider(page);
+  await expect(page.locator('#reglages-titre')).toContainText('Chiffres, les réglages');
   await expect(page.locator('input[name="baby-ecriture"]')).toHaveCount(0);
   await expect(page.locator('input[name="baby-lettre"]')).toHaveCount(0);
   await expect(page.locator('input[name="baby-chiffre"]')).toHaveCount(10);
-  expect(await tientSurUnEcran(page)).toEqual([]);
-  // Aucun chiffre : on ne passe pas aux jeux.
+  await expect(page.locator('input[name="baby-jeu"]')).toHaveCount(10);
+  expect(await reglagesTiennent(page)).toEqual([]);
   await page.locator('[data-tout="chiffres"]').click();
-  await page.getByRole('button', { name: 'Choisir les jeux' }).click();
-  await expect(page.locator('#baby-alerte')).toHaveText('Choisis au moins un chiffre.');
   await page.locator('input[name="baby-chiffre"][value="2"]').check();
   await page.locator('input[name="baby-chiffre"][value="3"]').check();
-  await page.getByRole('button', { name: 'Choisir les jeux' }).click();
-  // Page 2 : les 10 jeux de chiffres seulement.
-  await expect(page.locator('input[name="baby-jeu"]')).toHaveCount(10);
-  await expect(page.getByRole('checkbox', { name: /Attrape le chiffre/ })).toBeVisible();
-  expect(await tientSurUnEcran(page)).toEqual([]);
-  // Retour à la page 1 et de nouveau la page 2.
-  await page.getByRole('button', { name: 'Chiffres', exact: false }).filter({ hasText: '←' }).click();
-  await expect(page.locator('input[name="baby-chiffre"]')).toHaveCount(10);
-  await page.getByRole('button', { name: 'Choisir les jeux' }).click();
-  await lancerRapideQui(page);
-  await expect(page.getByRole('heading', { name: 'Baby jeux' })).toBeVisible();
-  const p = await page.evaluate(() => ({ nb: window.Aventura.partie.joueurs.length, baby: window.Aventura.partie.rapide.baby, diff: window.Aventura.partie.aventure.difficulte }));
-  expect(p.nb).toBe(1);
-  expect(p.diff).toBe('facile');
-  expect(p.baby.categories).toEqual(['chiffres']);
+  // Valider : le joueur est prêt, sans niveau.
+  await valider(page);
+  await expect(page.locator('.cj-resume').first()).toContainText('Chiffres · sans niveau');
+  await page.getByRole('button', { name: 'Choisir l\'aventure' }).click();
+  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await page.getByRole('heading', { name: 'Le plateau' }).waitFor();
+  const p = await page.evaluate(() => ({ mat: window.Aventura.partie.matiere[0], baby: window.Aventura.partie.baby[0], niv: window.Aventura.partie.niveauProg[0] }));
+  expect(p.mat).toBe('chiffres');
   expect(p.baby.chiffres).toEqual([2, 3]);
+  expect(p.niv).toBeNull();
   await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await expect(page.locator('#carte-piochee')).toBeVisible();
-  expect(await page.evaluate(() => window.Aventura.partie.carte.cat)).toBe('chiffres');
-  // Recharger reprend la partie en Baby jeux.
+  const c = await page.evaluate(() => window.Aventura.partie.carte);
+  expect(c.cat).toBe('chiffres');
+  expect(c.packNom).toMatch(/^Chiffres · /);
+  // Recharger reprend la partie, réglages compris.
   await page.reload();
-  await expect(page.getByRole('heading', { name: 'Baby jeux' })).toBeVisible();
-  expect((await page.evaluate(() => window.Aventura.partie.rapide.baby)).chiffres).toEqual([2, 3]);
+  expect((await page.evaluate(() => window.Aventura.partie.baby[0])).chiffres).toEqual([2, 3]);
 });
 
-// « Modifier les choix » en cours de partie (v9.2) : retour aux réglages de Baby jeux, pas à la préparation de l'aventure.
-test('Baby jeux : « Modifier les choix » revient aux réglages Baby jeux, puis « Reprendre la partie » garde l’aventure et les points', async ({ page }) => {
-  test.skip(test.info().project.name !== 'ordinateur' && test.info().project.name !== 'telephone', 'deux formats suffisent');
-  await ouvrirBaby(page, { categories: ['lettres'], lettres: ['A', 'B'], ecriture: 'maj' });
-  await page.getByRole('button', { name: 'Choisir les jeux' }).click();
-  await lancerRapideQui(page);
-  await expect(page.getByRole('button', { name: /^(Première question|Question suivante)$/ })).toBeVisible();
-  const avant = await page.evaluate(() => { const p = window.Aventura.partie; p.regles.points = 7; return { av: p.aventure.id, perso: p.choix[0] }; });
-  await page.getByRole('button', { name: 'Menu' }).click();
-  await page.getByRole('button', { name: 'Modifier les choix' }).click();
-  await expect(page.locator('#ecran-baby')).toBeVisible();
-  await expect(page.locator('#ecran-preparation')).toBeHidden();
-  await expect(page.getByRole('radio', { name: /Lettres/ })).toBeChecked();
-  await expect(page.locator('input[name="baby-lettre"]:checked')).toHaveCount(2);
-  await expect(page.locator('#ecran-baby .btn-retour')).toHaveText(/Partie/);
-  // « ← Partie » : retour au plateau, la carte est toujours là.
-  await page.locator('#ecran-baby .btn-retour').click();
-  await expect(page.locator('#ecran-plateau')).toBeVisible();
-  await expect(page.getByRole('button', { name: /^(Première question|Question suivante)$/ })).toBeVisible();
-  // De nouveau : on passe aux chiffres, et on reprend.
-  await page.getByRole('button', { name: 'Menu' }).click();
-  await page.getByRole('button', { name: 'Modifier les choix' }).click();
-  await page.getByRole('radio', { name: /Chiffres/ }).check();
-  // Un rechargement pendant la modification garde la partie.
-  await page.reload();
-  await expect(page.locator('#ecran-baby')).toBeVisible();
-  await expect(page.locator('#ecran-baby .btn-retour')).toHaveText(/Partie/);
-  await page.getByRole('radio', { name: /Chiffres/ }).check();
-  await page.getByRole('button', { name: 'Choisir les jeux' }).click();
-  await page.getByRole('button', { name: 'Reprendre la partie' }).click();
-  await expect(page.locator('#ecran-plateau')).toBeVisible();
-  const apres = await page.evaluate(() => { const p = window.Aventura.partie; return { av: p.aventure.id, perso: p.choix[0], pts: p.regles.points, cat: p.rapide.baby.categories, modif: p.modif }; });
-  expect(apres).toEqual({ av: avant.av, perso: avant.perso, pts: 7, cat: ['chiffres'], modif: false });
-  await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
-  expect(await page.evaluate(() => window.Aventura.partie.carte.cat)).toBe('chiffres');
+test('« Suivre ma progression » : Lettres et Chiffres, marqués « sans niveau », jouables sans noter de progression', async ({ page }) => {
+  await rapide(page);
+  await page.emulateMedia({ reducedMotion: 'reduce' }); // jetons immobiles
+  await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); } catch (e) { /* */ } });
+  await page.goto('./');
+  await creerJoueurs(page, 1);
+  await page.getByRole('button', { name: 'Commencer l\'aventure' }).click();
+  await page.locator('.cj-parcours-btn[data-parcours="suivre"][data-place="0"]').click();
+  await expect(page.locator('#suivre-matieres input')).toHaveCount(6);
+  await expect(page.locator('#suivre-matieres label', { hasText: 'Lettres' })).toContainText('sans niveau');
+  await expect(page.locator('#suivre-matieres label', { hasText: 'Chiffres' })).toContainText('sans niveau');
+  await expect(page.locator('#suivre-matieres label', { hasText: 'Maths' })).toContainText('niveau 1 sur 10');
+  await page.locator('#suivre-matieres input[value="lettres"]').check();
+  await page.getByRole('button', { name: 'Valider', exact: true }).click();
+  await expect(page.locator('.cj-resume').first()).toContainText('Lettres · sans niveau');
+  await page.getByRole('button', { name: 'Choisir l\'aventure' }).click();
+  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await page.getByRole('heading', { name: 'Le plateau' }).waitFor();
+  const avant = await page.evaluate(() => localStorage.getItem('ludoaventura-etoiles'));
+  for (let i = 0; i < 3; i++) {
+    const suivante = page.getByRole('button', { name: /^(Première question|Question suivante)$/ });
+    await suivante.click();
+    expect(await page.evaluate(() => window.Aventura.partie.carte.cat)).toBe('lettres');
+    expect(await page.evaluate(() => window.Aventura.partie.carte.jeu)).not.toBe('fabrique'); // la fabrique n'est plus tirée
+    await resoudre(page);
+    await page.waitForFunction(() => window.Aventura.partie.regles.etape === 'lancer');
+    await page.evaluate(() => window.Aventura.lancerDe());
+  }
+  // Aucune sous-matière notée : rien à ajouter à la progression.
+  expect(await page.evaluate(() => window.Aventura.partie.joueurs[0].sous || null)).toBeNull();
+  const apres = await page.evaluate(() => JSON.parse(localStorage.getItem('ludoaventura-etoiles')).joueurs.map((j) => j.niv || {}));
+  for (const niv of apres) expect(Object.keys(niv).filter((k) => /lettres|chiffres/.test(k))).toEqual([]);
+  void avant;
 });
 
-test('les 20 baby jeux se jouent au toucher, sans déborder, et la bonne réponse donne le dé FORT', async ({ page }) => {
+// Fin d'une aventure en Lettres : aucun point de niveau, aucune statistique (les matières à jauge ne bougent pas).
+test('une aventure réussie en Lettres ne fait bouger ni la progression ni les statistiques du joueur', async ({ page }) => {
+  test.skip(test.info().project.name !== 'ordinateur', 'test de logique : un seul format suffit');
+  await lancerBaby(page, { categories: ['lettres'] });
+  const avant = await page.evaluate(() => JSON.stringify(JSON.parse(localStorage.getItem('ludoaventura-etoiles')).joueurs.map((j) => [j.niv || {}, j.st || {}])));
+  await page.evaluate(() => {
+    const r = window.Aventura.partie.regles;
+    r.historique = [{ manche: 1, joueur: 0, de: 'fort', points: 999 }];
+    r.points = 999; r.etape = 'fin';
+  });
+  await page.reload();
+  await expect(page.locator('#fin')).toBeVisible();
+  await expect(page.locator('#fin-titre')).toHaveText('Aventure réussie !');
+  const apres = await page.evaluate(() => JSON.stringify(JSON.parse(localStorage.getItem('ludoaventura-etoiles')).joueurs.map((j) => [j.niv || {}, j.st || {}])));
+  expect(apres).toBe(avant);
+});
+
+test('les 19 baby jeux de Lettres et de Chiffres se jouent au toucher, sans déborder, et la bonne réponse donne le dé FORT', async ({ page }) => {
   test.setTimeout(240000);
-  await ouvrirBaby(page);
-  await page.getByRole('button', { name: 'Choisir les jeux' }).click();
-  await lancerRapideQui(page);
-  await expect(page.getByRole('heading', { name: 'Baby jeux' })).toBeVisible();
-  for (const id of B.IDS) {
+  await lancerBaby(page, { categories: ['lettres'] });
+  const ids = B.IDS.filter((id) => B.jeu(id).cat !== 'mini');
+  expect(ids).toHaveLength(19);
+  for (const id of ids) {
     const suivante = page.getByRole('button', { name: /^(Première question|Question suivante)$/ });
     await expect(page.locator('#fin').or(suivante).first()).toBeVisible();
-    if (await page.locator('#fin').isVisible()) await page.getByRole('button', { name: 'Recommencer la partie' }).click();
-    await page.evaluate(([x, k]) => { const b = window.Aventura.partie.rapide.baby; b.jeux = [x]; b.categories = [k]; }, [id, B.jeu(id).cat]);
+    if (await page.locator('#fin').isVisible()) await page.getByRole('button', { name: 'Rejouer cette aventure' }).click();
+    await page.evaluate(([x, k]) => { const p = window.Aventura.partie; p.matiere[0] = k; p.baby[0].jeux = [x]; }, [id, B.jeu(id).cat]);
     await suivante.click();
     await expect(page.locator('#carte-gram .baby')).toBeVisible();
     expect(await page.evaluate(() => window.Aventura.partie.carte.jeu)).toBe(id);
@@ -307,9 +327,7 @@ test('les 20 baby jeux se jouent au toucher, sans déborder, et la bonne répons
 
 test('attrape la lettre : une mauvaise lettre se grise ; 2 erreurs → dé FAIBLE après « J’ai compris »', async ({ page }) => {
   test.skip(test.info().project.name !== 'ordinateur' && test.info().project.name !== 'telephone', 'deux formats suffisent');
-  await ouvrirBaby(page, { categories: ['lettres'], lettres: ['L'], ecriture: 'maj', jeux: ['attrape-lettre'] });
-  await page.getByRole('button', { name: 'Choisir les jeux' }).click();
-  await lancerRapideQui(page);
+  await lancerBaby(page, { categories: ['lettres'], lettres: ['L'], ecriture: 'maj', jeux: ['attrape-lettre'] });
   await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   const c = await page.evaluate(() => window.Aventura.partie.carte);
   expect(c.modele).toBe('L');
@@ -324,12 +342,7 @@ test('attrape la lettre : une mauvaise lettre se grise ; 2 erreurs → dé FAIBL
 
 test('les jetons se baladent (animation) quand l’appareil n’a pas demandé moins d’animations', async ({ page }) => {
   test.skip(test.info().project.name !== 'ordinateur', 'un format suffit');
-  await rapide(page);
-  await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); localStorage.setItem('ludoaventura-baby-choix', JSON.stringify({ categories: ['chiffres'], jeux: ['attrape-chiffre'] })); } catch (e) { /* */ } });
-  await page.goto('./');
-  await page.getByRole('button', { name: 'Baby jeux' }).click();
-  await page.getByRole('button', { name: 'Choisir les jeux' }).click();
-  await lancerRapideQui(page);
+  await lancerBaby(page, { categories: ['chiffres'], jeux: ['attrape-chiffre'] }, { calme: false });
   await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   await expect(page.locator('.baby-modele .baby-de').first()).toBeVisible(); // le dé classique
   const anim = await page.locator('.baby-jeton').first().evaluate((e) => getComputedStyle(e).animationName);
@@ -341,10 +354,7 @@ test('les jetons se baladent (animation) quand l’appareil n’a pas demandé m
 // « Touche ta réponse » les séparent, comme dans « Remettre la phrase ».
 for (const id of ['lettre-manque', 'chiffre-manque']) {
   test('« ' + id + ' » : la suite et les boutons de réponse se distinguent nettement, sans déborder', async ({ page }) => {
-    await ouvrirBaby(page);
-    await page.getByRole('button', { name: 'Choisir les jeux' }).click();
-    await lancerRapideQui(page);
-    await page.evaluate(([x, k]) => { const b = window.Aventura.partie.rapide.baby; b.jeux = [x]; b.categories = [k]; }, [id, B.jeu(id).cat]);
+    await lancerBaby(page, { categories: [B.jeu(id).cat], jeux: [id] });
     await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
     const boite = page.locator('#carte-gram');
     await expect(boite.locator('.baby-suite')).toBeVisible();
@@ -377,9 +387,7 @@ for (const id of ['lettre-manque', 'chiffre-manque']) {
 
 // « J’en ajoute » (v10.10, demande du 17/11/2026) : phrase claire, objets du départ + objets ajoutés, rien ne déborde (cas le plus chargé : 10 + 3).
 test('J’en ajoute : la carte dit « Tu as 10 … Tu en reçois N de plus », montre les objets, tient sur tous les écrans', async ({ page }) => {
-  await ouvrirBaby(page, { categories: ['chiffres'], chiffres: [10], jeux: ['encore-un'] });
-  await page.getByRole('button', { name: 'Choisir les jeux' }).click();
-  await lancerRapideQui(page);
+  await lancerBaby(page, { categories: ['chiffres'], chiffres: [10], jeux: ['encore-un'] });
   await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
   const carte = page.locator('#carte-piochee');
   await expect(carte).toBeVisible();
