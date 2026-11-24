@@ -1,12 +1,12 @@
 // Étoiles, coffres et progression à l'écran (v6.36, demande du 10/11/2026, backlog lignes 164 à 173).
 // v10.30 (demande du 23/11/2026, backlog lignes 447, 453, 454) : étoiles, pierres, niveaux et coffres sont propres à chaque
 // joueur du compte (js/etoiles.js → pourJoueur). L'accueil ne montre plus aucun nombre : tout se voit dans la carte du
-// joueur (Mon compte), qui ouvre « Mes étoiles », « Ma progression » et ses coffres. « Joueur affiché » = celui de la carte.
+// joueur (Mon compte), qui ouvre « Mes coffres » (v10.36) et ses coffres. « Joueur affiché » = celui de la carte.
 // La logique (niveaux, coffres, sauvegarde sur l'appareil) est dans js/etoiles.js ; ici :
 //  - la barre du haut de l'accueil : étoiles + niveau (→ « Mes étoiles »), défi du jour, coffre (→ ouvrir, sinon
 //    « Ma progression ») ; les raccourcis « Mes étoiles » et « Progrès » faisaient doublon (retirés en v6.38) ;
 //  - la série de jours d'affilée et le méga coffre (v6.38) ;
-//  - les écrans « Mes étoiles » et « Ma progression » ;
+//  - l'écran « Mes coffres » (v10.36 : ancien « Mes étoiles » + « Ma progression ») ;
 //  - la fenêtre d'ouverture d'un coffre ;
 //  - les étoiles gagnées à la fin d'une partie (appelé par js/plateau.js → montrerFin).
 // Dépend de js/etoiles.js ; chargé AVANT js/plateau.js (qui peut rouvrir l'écran de fin dès son chargement),
@@ -140,21 +140,21 @@
     majTout();
     demarrerGain(); // v10.3 : sur l'accueil, les étoiles de tous les coffres ouverts s'envolent vers le compteur
     if (ouvertDepuis && document.contains(ouvertDepuis) && !ouvertDepuis.closest('[hidden]')) ouvertDepuis.focus();
-    else if (ouvertPour) { // la carte du joueur a été redessinée : on revient sur son bouton des étoiles
-      var b = document.querySelector('.joueur-carte[data-id="' + ouvertPour + '"] [data-act="etoiles"]');
+    else if (ouvertPour) { // la carte du joueur a été redessinée : on revient sur son bouton « Mes coffres »
+      var b = document.querySelector('.joueur-carte[data-id="' + ouvertPour + '"] [data-act="voir-coffres"]');
       if (b) b.focus();
     }
   });
 
-  // En-tête des écrans « Mes étoiles » et « Ma progression » (v10.30) : le joueur dont on parle.
+  // En-tête de l'écran « Mes coffres » (v10.30, v10.36) : le joueur dont on parle.
   function enTeteJoueur() {
     var id = idVu(), j = J && J.trouver(compte.etat, id), p = j && window.Aventuriers && window.Aventuriers.trouver(j.perso);
     if (!j) return '';
     return '<p class="tresor-de">' + (p ? '<img src="' + p.image + '" alt="" width="40" height="40">' : '') + '<span>Joueur : <strong id="tresor-nom">' + esc(j.nom) + '</strong></span></p>';
   }
 
-  // ---------- Écran « Mes étoiles » ----------
-  function pageEtoiles() {
+  // ---------- Écran « Mes coffres » (v10.36) : étoiles et niveau, coffres des prochains niveaux, coffre du jour, défis, méga coffre ----------
+  function pageCoffres() {
     var v = vue(), nv = v.niveau(), e = v.etat, h = '';
     h += enTeteJoueur();
     h += '<section class="carte-page resume-etoiles">' + ico('i-etoile', 'ico-geant') +
@@ -189,15 +189,8 @@
         NOMS_COFFRES[E.coffreDuNiveau(gros)].toLowerCase() + '</strong> au niveau ' + gros + ', encore ' + etoiles(E.seuil(gros) - e.total) + '.</span></p><ol hidden>';
     }
     h += '</ol></section>';
-    // v10.30 : « Ma progression » (coffre du jour, défis, méga coffre) du même joueur.
-    h += '<p class="vers-progression"><button type="button" class="btn btn-secondaire" data-vers-progression="1">' + ico('i-coffre', 'coffre-jour') + ' Coffre du jour, défis et méga coffre</button></p>';
-
-    $('etoiles-corps').innerHTML = h;
-  }
-
-  // ---------- Écran « Ma progression » (la journée) ----------
-  function pageProgression() {
-    var v = vue(), e = v.etat, auj = v.aujourdhui(), aujN = e.parJour[auj] || 0, h = enTeteJoueur();
+    // v10.36 : la journée (coffre du jour, défis) et le méga coffre sont sur la même page (ancien écran « Ma progression »).
+    var auj = v.aujourdhui(), aujN = e.parJour[auj] || 0;
     var coffreJour = v.coffreDuJourOuvert();
     var defisActifs = !!window.Defis;
     var taches = [{
@@ -245,11 +238,10 @@
     }
     h += '<p class="petit">Un jour sans jouer et la série repart de zéro.</p></section>';
 
-    // v6.44 : l'encadré « Coffres de niveau » est retiré (il est déjà dans « Mes étoiles », bouton de l'étoile).
-    $('progression-corps').innerHTML = h;
+    $('coffres-corps').innerHTML = h;
   }
 
-  // Boutons « Ouvrir » des écrans (coffre précis) et « Jouer » (défi).
+  // Boutons « Ouvrir » de l'écran (coffre précis) et « Jouer » (défi).
   function surClicPage(ev) {
     var b = ev.target.closest('[data-ouvrir]');
     if (b) {
@@ -258,18 +250,17 @@
       if (c) ouvrirCoffres([c]);
       return;
     }
-    if (ev.target.closest('[data-vers-progression]')) { aller('ecran-progression'); return; }
     var d = ev.target.closest('[data-defi]');
     if (d && window.Defis) window.Defis.ouvrir(d.dataset.defi);
   }
-  $('etoiles-corps').addEventListener('click', surClicPage);
-  // « Comment gagner des étoiles ? » (v6.42) : fenêtre ouverte à la demande.
-  $('etoiles-corps').addEventListener('click', function (ev) {
-    if (ev.target.closest('#btn-comment-gagner')) $('comment-gagner').showModal();
+  $('coffres-corps').addEventListener('click', surClicPage);
+  // « Comment gagner des étoiles ? » (v6.42) : fenêtre ouverte à la demande (ici, et par le « ? » de la carte du joueur).
+  function ouvrirCommentGagner() { if (!$('comment-gagner').open) $('comment-gagner').showModal(); }
+  $('coffres-corps').addEventListener('click', function (ev) {
+    if (ev.target.closest('#btn-comment-gagner')) ouvrirCommentGagner();
   });
   $('btn-comment-ok').addEventListener('click', function () { $('comment-gagner').close(); });
   $('comment-gagner').addEventListener('click', function (ev) { if (ev.target === $('comment-gagner')) $('comment-gagner').close(); }); // toucher le fond ferme
-  $('progression-corps').addEventListener('click', surClicPage);
 
   // ---------- Écran « Défi du jour » (v6.37) ----------
   // Le joueur choisit : solo ou en équipe, la matière, le niveau (et le nombre de joueurs en équipe) ;
@@ -343,7 +334,7 @@
   document.querySelectorAll('[data-retour-accueil]').forEach(function (b) {
     b.addEventListener('click', function () { aller('ecran-accueil'); });
   });
-  // « Mes étoiles » et « Ma progression » reviennent à « Mon compte », d'où on les ouvre (v10.30).
+  // « Mes coffres » revient à « Mon compte », d'où on l'ouvre (v10.30).
   document.querySelectorAll('[data-retour-compte]').forEach(function (b) {
     b.addEventListener('click', function () { aller('ecran-compte'); });
   });
@@ -355,8 +346,7 @@
   function majTout() {
     majAccueil();
     var ecran = window.Aventura && window.Aventura.partie.ecran;
-    if (ecran === 'ecran-etoiles') pageEtoiles();
-    if (ecran === 'ecran-progression') pageProgression();
+    if (ecran === 'ecran-coffres') pageCoffres();
     if (ecran === 'ecran-defi' && window.Defis) pageDefi();
     if (ecran === 'ecran-compte' && window.JoueursEcran && !$('coffre').open) window.JoueursEcran.rendre(); // trésor des cartes
   }
@@ -441,7 +431,7 @@
   var CLE_GAIN = 'ludoaventura-gain-accueil';
   var DUREE_GAIN_MAX = 3000; // ms
   // v10.3 : ce qui attend est gardé dans l'onglet (sessionStorage) : js/plateau.js y ajoute le gain d'une partie avant de
-  // recharger l'accueil, et un coffre ouvert ailleurs que sur l'accueil (fin de partie, « Ma progression ») attend d'y arriver.
+  // recharger l'accueil, et un coffre ouvert ailleurs que sur l'accueil (fin de partie, « Mes coffres ») attend d'y arriver.
   function retenir(n) {
     retenu = n > 0 ? n : 0;
     try { if (retenu) sessionStorage.setItem(CLE_GAIN, JSON.stringify({ n: retenu })); else sessionStorage.removeItem(CLE_GAIN); } catch (e) { /* rien */ }
@@ -544,7 +534,7 @@
     if (!v) return null;
     return { total: v.etat.total, gemmes: v.etat.gemmes || 0, niveau: v.niveau().niveau, coffres: v.coffresAOuvrir().length };
   }
-  function voir(pid, ecran) { choisirVu(pid); aller(ecran || 'ecran-etoiles'); }
+  function voir(pid, ecran) { choisirVu(pid); aller(ecran || 'ecran-coffres'); }
   function ouvrirCoffresDe(pid) {
     choisirVu(pid);
     var l = vue().coffresAOuvrir();
@@ -552,5 +542,5 @@
   }
 
   window.Recompenses = { compte: compte, finDePartie: finDePartie, majTout: majTout, ouvrirCoffres: ouvrirCoffres, gainTotal: gainTotal,
-    resume: resume, voir: voir, ouvrirCoffresDe: ouvrirCoffresDe, vue: vue, idVu: idVu };
+    resume: resume, voir: voir, aideEtoiles: ouvrirCommentGagner, ouvrirCoffresDe: ouvrirCoffresDe, vue: vue, idVu: idVu };
 })();
