@@ -66,14 +66,16 @@
   }
 
   function ico(id, classe) { return '<svg class="ico ' + (classe || '') + '" aria-hidden="true"><use href="#' + id + '"/></svg>'; }
-  // Étoiles, niveau des étoiles, pierres précieuses et « Mes étoiles » (écran des coffres de niveau, coffre du jour, méga coffre).
+  // Étoiles (avec le « ? » qui explique comment en gagner), niveau, pierres précieuses et « Mes coffres » (v10.36 : bouton
+  // coffre sans texte ; l'écran montre les coffres des prochains niveaux, le coffre du jour, les défis et le méga coffre).
   function resumeTresor(j) {
     var R = window.Recompenses, t = R && R.resume && R.resume(j.id);
     if (!t) return '';
-    return '<div class="js-resume"><span class="jt-etoiles">' + ico('i-etoile') + '<strong>' + t.total + '</strong> ' + (t.total > 1 ? 'étoiles' : 'étoile') + '</span>' +
+    return '<div class="js-resume"><span class="jt-etoiles">' + ico('i-etoile') + '<strong>' + t.total + '</strong> ' + (t.total > 1 ? 'étoiles' : 'étoile') +
+      '<button type="button" class="aide-etoiles" data-act="aide-etoiles" aria-haspopup="dialog" aria-controls="comment-gagner" aria-label="Comment gagner des étoiles ?"><span aria-hidden="true">?</span></button></span>' +
       '<span class="jt-niveau">niveau ' + t.niveau + '</span>' +
       '<span class="jt-gemmes">' + ico('i-gemme') + '<strong>' + t.gemmes + '</strong> ' + (t.gemmes > 1 ? 'pierres' : 'pierre') + '</span>' +
-      '<button type="button" class="btn btn-secondaire" data-act="etoiles">Mes étoiles</button></div>';
+      '<button type="button" class="btn btn-secondaire btn-icone" data-act="voir-coffres" aria-label="Mes coffres" title="Mes coffres">' + ico('i-coffre', 'coffre-jour') + '</button></div>';
   }
   // Ses coffres à ouvrir restent visibles sur la carte fermée : ils s'ouvrent ici, hors partie (backlog ligne 447).
   function coffres(j) {
@@ -143,7 +145,8 @@
     var b = e.target.closest('button'); if (!b) return;
     var c = compte(), carte_ = b.closest('.joueur-carte'), id = carte_ && carte_.getAttribute('data-id');
     var act = b.getAttribute('data-act'), sel = function (i, a) { return '.joueur-carte[data-id="' + i + '"] [data-act="' + a + '"]'; };
-    if (act === 'etoiles' && window.Recompenses) { window.Recompenses.voir(id, 'ecran-etoiles'); return; }
+    if (act === 'voir-coffres' && window.Recompenses) { window.Recompenses.voir(id, 'ecran-coffres'); return; }
+    if (act === 'aide-etoiles' && window.Recompenses) { window.Recompenses.aideEtoiles(); return; }
     if (act === 'coffres' && window.Recompenses) { window.Recompenses.ouvrirCoffresDe(id); return; }
     if (act === 'stats') {
       ouverts[id] = !ouverts[id];

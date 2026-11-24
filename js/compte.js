@@ -522,7 +522,7 @@
     // Pas connecté : on arrive sur « Identifiant et connexion » ; connecté : sur « Profil et joueurs ».
     if (e.detail === 'ecran-compte') { majPage(); if (mode === 'connexion') choisirOnglet(ongletCourant || (reel() ? 'profil' : 'id')); }
     else {
-      if (e.detail !== 'ecran-etoiles' && e.detail !== 'ecran-progression') ongletCourant = null;
+      if (e.detail !== 'ecran-coffres') ongletCourant = null;
       if (mode !== 'nouveau') { mode = 'connexion'; editionPseudo = false; fermerFormulaires(); dire(''); }
     }
   });
@@ -530,7 +530,7 @@
   // ---------- Onglets de « Mon compte » (v10.32) ----------
   // Profil et joueurs | Identifiant et connexion | Confidentialité et RGPD | Aide et mentions légales. Flèches, Début et Fin au clavier.
   var NOMS_ONGLETS = ['profil', 'id', 'rgpd', 'aide'];
-  var ongletCourant = null; // gardé en allant voir « Mes étoiles » ou « Ma progression » : on revient sur le même onglet
+  var ongletCourant = null; // gardé en allant voir « Mes coffres » : on revient sur le même onglet
   function choisirOnglet(nom, avecFocus) {
     ongletCourant = nom;
     NOMS_ONGLETS.forEach(function (n) {

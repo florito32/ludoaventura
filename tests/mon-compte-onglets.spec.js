@@ -235,15 +235,15 @@ test('supprimer le dernier joueur : un nouveau « Joueur 1 » vide apparaît', a
   expect(j.niv).toEqual({});
 });
 
-test('revenir de « Mes étoiles » ramène sur l’onglet Joueurs', async ({ page }) => {
+test('revenir de « Mes coffres » ramène sur l’onglet Joueurs', async ({ page }) => {
   await preparer(page, { etat: ETAT_2 });
   await page.goto('./');
   await page.locator('#btn-compte').click();
   await page.locator('#onglet-profil').click();
   await carte(page, 'Léa').getByRole('button', { name: 'Statistiques' }).click();
-  await carte(page, 'Léa').getByRole('button', { name: 'Mes étoiles' }).click();
-  await expect(page.getByRole('heading', { name: 'Mes étoiles' })).toBeVisible();
-  await page.locator('#ecran-etoiles [data-retour-compte]').click();
+  await carte(page, 'Léa').getByRole('button', { name: 'Mes coffres' }).click();
+  await expect(page.getByRole('heading', { name: 'Mes coffres' })).toBeVisible();
+  await page.locator('#ecran-coffres [data-retour-compte]').click();
   await expect(page.locator('#onglet-profil')).toHaveAttribute('aria-selected', 'true');
   await expect(carte(page, 'Léa')).toBeVisible();
 });
