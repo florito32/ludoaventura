@@ -216,6 +216,65 @@ for (const matiere of ['histoire', 'geographie']) {
   });
 }
 
+// v10.45 : « Personnaliser » : le niveau 1 à 10 est une bande de 10 niveaux (niveau 2 = 11 à 20) de la progression 1–100 ;
+// les questions sont tirées dans cette bande, parmi ce que le joueur a coché.
+async function partiePerso(page) {
+  await ouvrir(page);
+  await etape1(page, 1);
+  await suivreMaProgression(page, 0, 'maths');
+  await aventure(page).click();
+  await page.getByRole('button', { name: 'Lancer la partie' }).click();
+  await page.getByRole('heading', { name: 'Le plateau' }).waitFor();
+}
+test('« Personnaliser » en Maths : les calculs sont de la bande du niveau choisi (niveau 8 = 71 à 80)', async ({ page }) => {
+  await partiePerso(page);
+  const r = await page.evaluate(() => {
+    window.AVENTURA_SANS_BANDE = false;
+    const p = window.Aventura.partie, j = p.joueurs[0];
+    p.parcours[0] = 'perso'; p.niveauProg[0] = 8; p.matiere[0] = 'maths';
+    p.maths[0] = Object.assign({}, window.ProgressionCalcul.reglagesTout('difficile'), { type: 'calcul' });
+    const n = [];
+    for (let i = 0; i < 40; i++) n.push(window.ProgressionCalcul.niveau(window.Aventura.piocherCarte(j)));
+    return n;
+  });
+  expect(r.filter((n) => n >= 71 && n <= 80).length).toBeGreaterThanOrEqual(34); // presque toutes (repli sur l'ancien tirage si rien ne sort)
+});
+test('« Personnaliser » en Histoire : les questions sont tirées dans la bande du niveau choisi (niveau 3 = 21 à 30)', async ({ page }) => {
+  await partiePerso(page);
+  const r = await page.evaluate(() => {
+    window.AVENTURA_SANS_BANDE = false;
+    const p = window.Aventura.partie, j = p.joueurs[0];
+    p.parcours[0] = 'perso'; p.niveauProg[0] = 3; p.matiere[0] = 'histoire';
+    p.savoirs[0].histoire = { jeux: window.Savoirs.jeuxDe('histoire').map((x) => x.id), niveau: 'facile', mode: 'quiz' };
+    const f = [];
+    for (let i = 0; i < 40; i++) { const c = window.Aventura.piocherCarte(j); f.push(c.fenetre ? c.fenetre.bas + '-' + c.fenetre.haut : 'aucune'); }
+    return f;
+  });
+  expect(r.filter((x) => x === '21-30').length).toBe(40);
+});
+test('« Personnaliser » en Français : les cartes respectent la bande et les réglages cochés', async ({ page }) => {
+  await partiePerso(page);
+  const r = await page.evaluate(() => {
+    window.AVENTURA_SANS_BANDE = false;
+    const p = window.Aventura.partie, j = p.joueurs[0], sortie = {};
+    p.parcours[0] = 'perso'; p.niveauProg[0] = 5;
+    // Conjugaison : seulement le présent de l'indicatif (ses cartes les plus hautes sont au niveau 31 : on prend les plus proches de la bande).
+    p.matiere[0] = 'conjugaison'; p.conj[0] = { modes: ['indicatif'], temps: ['indicatif.present'], groupes: [1, 2, 3], niveau: 'facile' };
+    sortie.conj = []; for (let i = 0; i < 30; i++) { const c = window.Aventura.piocherCarte(j); sortie.conj.push([c.temps, (/niveau (\d+)/.exec(c.packNom) || [])[1]]); }
+    // Grammaire : seulement « Relier ».
+    p.matiere[0] = 'grammaire'; p.gram[0] = { niveau: 'facile', jeux: ['relier'] };
+    sortie.gram = []; for (let i = 0; i < 30; i++) { const c = window.Aventura.piocherCarte(j); sortie.gram.push([c.jeu, (/niveau (\d+)/.exec(c.packNom) || [])[1]]); }
+    // Orthographe : seulement la question « nombre ».
+    p.matiere[0] = 'orthographe'; p.types[0] = ['nombre'];
+    sortie.ortho = []; for (let i = 0; i < 30; i++) { const c = window.Aventura.piocherCarte(j); sortie.ortho.push([c.question && c.question.id, (/niveau (\d+)/.exec(c.packNom || '') || [])[1]]); }
+    return sortie;
+  });
+  for (const [temps, n] of r.conj) { expect(temps).toBe('indicatif.present'); if (n) { expect(Number(n)).toBeGreaterThanOrEqual(20); expect(Number(n)).toBeLessThanOrEqual(55); } }
+  for (const [jeu, n] of r.gram) { expect(jeu).toBe('relier'); if (n) { expect(Number(n)).toBeGreaterThanOrEqual(20); expect(Number(n)).toBeLessThanOrEqual(55); } }
+  for (const [q, n] of r.ortho) { expect(q).toBe('nombre'); if (n) { expect(Number(n)).toBeGreaterThanOrEqual(20); expect(Number(n)).toBeLessThanOrEqual(55); } }
+  expect(r.conj.some(([, n]) => n)).toBe(true);
+});
+
 test('fin de partie : le point de niveau va à la sous-matière la plus jouée par un joueur qui suit sa progression', async ({ page }) => {
   await ouvrir(page);
   await etape1(page, 1);

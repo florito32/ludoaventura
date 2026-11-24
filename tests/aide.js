@@ -3,7 +3,7 @@
 // Les tests raccourcissent la pause entre deux joueurs (2,2 s en vrai) et repoussent le lancer
 // automatique du dé (1,6 s en vrai) pour pouvoir lancer le dé (lancerLeDe) sans course.
 async function rapide(page, { autoDe = 600000, pause = 80 } = {}) {
-  await page.addInitScript(([a, p]) => { window.AVENTURA_PAUSE = p; window.AVENTURA_DUREE_DE = 0; window.AVENTURA_AUTO_DE = a; }, [autoDe, pause]);
+  await page.addInitScript(([a, p]) => { window.AVENTURA_PAUSE = p; window.AVENTURA_DUREE_DE = 0; window.AVENTURA_AUTO_DE = a; window.AVENTURA_SANS_BANDE = true; /* v10.45 : les tests de formats gardent l'ancien tirage de « Personnaliser » */ }, [autoDe, pause]);
   page.__rapide = true;
 }
 

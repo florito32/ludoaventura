@@ -1329,6 +1329,50 @@
     return f;
   }
 
+  // « Personnaliser » (v10.45, demande du 24/11/2026) : le niveau 1 à 10 choisi est une bande de 10 niveaux de la progression
+  // (niveau 2 = 11 à 20) ; les questions sont tirées dans cette bande, parmi ce que le joueur a coché (matière, jeux, temps, thèmes…).
+  // Si les réglages ne laissent rien dans la bande, on retombe sur le tirage d'avant (hypothèse à valider).
+  function bandePerso(i) {
+    var n = partie.niveauProg[i];
+    if (partie.parcours[i] !== 'perso' || partie.rapide || partie.defi || !n || window.AVENTURA_SANS_BANDE) return null; // AVENTURA_SANS_BANDE : réservé aux tests des formats de cartes
+    return { bas: (n - 1) * 10 + 1, haut: n * 10 };
+  }
+  // Filtre des clés de la table du Français (js/progression-francais.js) : la clé respecte-t-elle les réglages du joueur i ?
+  function filtreDuJoueur(i, sous) {
+    if (sous === 'orthographe') {
+      var types = partie.types[i], packs = partie.packs[i].filter(function (id) { return TOUS_PACKS.indexOf(id) >= 0; }), mots = {};
+      PACKS.forEach(function (p) {
+        if (packs.length && packs.indexOf(p.id) < 0) return;
+        Object.keys(p.niveaux).forEach(function (n) { p.niveaux[n].forEach(function (m) { mots[m] = true; }); });
+      });
+      return function (k) { return mots[k[0]] === true && (!types.length || types.indexOf(k[1]) >= 0); };
+    }
+    if (sous === 'conjugaison') {
+      var cr = partie.conj[i];
+      return function (k) {
+        var verbe = V.VERBES.filter(function (v) { return v.inf === k[0]; })[0];
+        return (!cr.temps.length || cr.temps.indexOf(k[1]) >= 0) && (!cr.groupes.length || !verbe || cr.groupes.indexOf(verbe.groupe) >= 0);
+      };
+    }
+    var gr = partie.gram[i];
+    return function (k) { return !gr.jeux.length || gr.jeux.indexOf(k[0]) >= 0; };
+  }
+  // Une carte de la bande parmi les réglages du joueur ; si les réglages n'ont rien dans la bande, la carte la plus proche (±1 niveau de plus à chaque essai).
+  function carteFrancaisPerso(j, sous, bande) {
+    var P = window.ProgressionFrancais, table = P && P[sous] && P[sous].table();
+    if (!table) return null;
+    var ok = filtreDuJoueur(j.index, sous), milieu = (bande.bas + bande.haut) / 2, proches = [], ecart = 1e9;
+    Object.keys(table).forEach(function (cle) {
+      if (!ok(cle.split('|'))) return;
+      var niv = table[cle], e = niv >= bande.bas && niv <= bande.haut ? 0 : Math.abs(niv - milieu);
+      if (e < ecart) { ecart = e; proches = []; }
+      if (e === ecart) proches.push(cle);
+    });
+    if (!proches.length) return null;
+    var cle = proches[Math.floor(Math.random() * proches.length)];
+    return carteFrancaisProgression(j, sous, { cle: cle, niveau: table[cle] });
+  }
+
   // Carte de Lettres ou de Chiffres du joueur j (v10.41) : un baby jeu (js/baby.js) tiré parmi ceux qu'il a cochés, pas deux fois le même
   // de suite si possible. « Suivre ma progression » : les réglages de départ (tout coché).
   function carteBaby(j, cat) {
@@ -1370,12 +1414,16 @@
     if (estBaby(mat)) return carteBaby(j, mat);
     // Géographie et Histoire (v7.0) : un jeu choisi par le joueur, une série et un format tirés au hasard.
     if (estSavoir(mat)) {
-      var rsv = partie.savoirs[j.index][mat];
+      var rsv = partie.savoirs[j.index][mat], bs = bandePerso(j.index);
+      if (bs) { var cb = SV.generer({ jeux: rsv.jeux, mode: rsv.mode, fenetre: bs }, mat); if (cb) return cb; }
       return SV.generer(rsv, mat) || SV.generer({ jeux: jeuxProposes(mat, SV.modeDe(rsv)).map(function (x) { return x.id; }), niveau: rsv.niveau, mode: rsv.mode }, mat);
     }
     // Mathématiques : une formule tirée au hasard selon les réglages du joueur (pas de tas).
     if (mat === 'maths') {
-      var m = mr, f = K.generer(m);
+      var m = mr, f = K.generer(m), bm = bandePerso(j.index);
+      if (bm && window.ProgressionCalcul) { // v10.45 : un calcul de la bande, avec les signes et les nombres cochés
+        for (var essaiM = 0; essaiM < 300; essaiM++) { var nf = window.ProgressionCalcul.niveau(f); if (nf >= bm.bas && nf <= bm.haut) break; f = K.generer(m); }
+      }
       f.type = 'calcul';
       // v9.0 : problème = le même calcul, raconté sur un thème tiré au hasard (même réponse).
       if (m.type === 'probleme' && window.Problemes) {
@@ -1385,6 +1433,11 @@
       }
       f.packNom = 'Calcul · ' + K.niveau(m.niveau).nom + (f.table ? ' · table de ' + f.table : '');
       return f;
+    }
+    // « Personnaliser » : orthographe, conjugaison, grammaire dans la bande de niveaux choisie (v10.45).
+    if (mat === 'orthographe' || mat === 'conjugaison' || mat === 'grammaire') {
+      var bf = bandePerso(j.index), cf = bf && carteFrancaisPerso(j, mat, bf);
+      if (cf) return cf;
     }
     // Conjugaison : un verbe, un temps et un pronom tirés selon les réglages du joueur.
     if (mat === 'conjugaison') {
