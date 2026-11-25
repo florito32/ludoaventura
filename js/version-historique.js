@@ -2,6 +2,9 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.57', date: '2026-11-25', changes: [
+    "Chasse aux lettres : quand tu touches une lettre, une autre mauvaise lettre disparaît aussi, et deux nouvelles lettres apparaissent (une bonne et une mauvaise si tu as trouvé une bonne lettre, deux mauvaises sinon)."
+  ] },
   { v: '10.56', date: '2026-11-25', changes: [
     "Plus aucun niveau n’est écrit sur les cartes de question : ni « Facile / Moyen / Difficile / Expert » (défi du jour, Conjugaison, Grammaire), ni « niveau N » (Maths et Français en « Suivre ma progression »)."
   ] },

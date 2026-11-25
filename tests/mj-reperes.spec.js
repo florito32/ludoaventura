@@ -113,6 +113,48 @@ test('Chasse aux lettres : toucher une lettre (bonne ou mauvaise) la fait dispar
   expect(await debordements(page)).toEqual([]);
 });
 
+// Demande du 25/11/2026 (12 h 24) : toucher une lettre fait disparaître DEUX lettres et en fait apparaître DEUX.
+const bilan = (page, bon) => page.evaluate((bonne) => {
+  const j = window.MJReperes.courant(), av = j.slots.filter((s) => s.occ).map((s) => s.data);
+  const s0 = j.slots.find((s) => s.occ && !!s.data.cible === bonne);
+  s0.el.click();
+  const ap = j.slots.filter((s) => s.occ).map((s) => s.data);
+  const perdues = av.filter((d) => ap.indexOf(d) < 0), nouvelles = ap.filter((d) => av.indexOf(d) < 0);
+  return {
+    avant: { total: av.length, cibles: av.filter((d) => d.cible).length },
+    apres: { total: ap.length, cibles: ap.filter((d) => d.cible).length },
+    perdues: { total: perdues.length, cibles: perdues.filter((d) => d.cible).length },
+    nouvelles: { total: nouvelles.length, cibles: nouvelles.filter((d) => d.cible).length }
+  };
+}, bon);
+
+test('Chasse aux lettres : une bonne lettre touchée disparaît avec une mauvaise ; une bonne et une mauvaise apparaissent', async ({ page }) => {
+  await ouvrir(page, { duree: 60, delai: 30, compte: 0 });
+  await jouer(page, 'm', 'maj', 'imp');
+  for (let k = 0; k < 8; k++) {
+    const b = await bilan(page, true);
+    expect(b.perdues).toEqual({ total: 2, cibles: 1 });
+    expect(b.nouvelles).toEqual({ total: 2, cibles: 1 });
+    expect(b.apres).toEqual(b.avant); // toujours 13 lettres, autant de demandées
+  }
+  expect((await etat(page)).bons).toBe(8);
+  expect(await debordements(page)).toEqual([]);
+  expect(await chevauchements(page)).toEqual([]);
+});
+
+test('Chasse aux lettres : une mauvaise lettre touchée disparaît avec une autre mauvaise ; deux mauvaises apparaissent', async ({ page }) => {
+  await ouvrir(page, { duree: 60, delai: 30, compte: 0 });
+  await jouer(page, 'm', 'maj', 'imp');
+  for (let k = 0; k < 8; k++) {
+    const b = await bilan(page, false);
+    expect(b.perdues).toEqual({ total: 2, cibles: 0 });
+    expect(b.nouvelles).toEqual({ total: 2, cibles: 0 });
+    expect(b.apres).toEqual(b.avant);
+  }
+  const e = await etat(page);
+  expect(e.mauvais).toBe(8); expect(e.bons).toBe(0); expect(e.occ).toBe(13);
+});
+
 test('Chasse aux lettres : toutes les 2 secondes (ici 0,4 s), une lettre non demandée est remplacée ; les lettres demandées ne bougent pas seules', async ({ page }) => {
   await ouvrir(page, { duree: 60, delai: 0.4, compte: 0 });
   await jouer(page, 'n', 'maj', 'imp');
