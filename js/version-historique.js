@@ -2,6 +2,9 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.56', date: '2026-11-25', changes: [
+    "Plus aucun niveau n’est écrit sur les cartes de question : ni « Facile / Moyen / Difficile / Expert » (défi du jour, Conjugaison, Grammaire), ni « niveau N » (Maths et Français en « Suivre ma progression »)."
+  ] },
   { v: '10.55', date: '2026-11-25', changes: [
     "Mini-jeux : chaque jeu est maintenant une petite tuile (l’icône et le nom), pour en voir beaucoup sur le même écran.",
     "À côté de chaque tuile, une pastille « i » rouge ouvre une fenêtre : le nom du jeu, comment on y joue et une capture d’écran d’une partie. Elle se ferme avec « Fermer » ou en touchant à côté.",

@@ -163,8 +163,9 @@ test('« Suivre ma progression » en Français : chaque sous-matière tire dans 
     const j = window.Aventura.partie.joueurs[0], noms = {};
     const ratees = [];
     for (let i = 0; i < 300; i++) {
-      const c = window.Aventura.piocherCarte(j), m = /^(\S+) · niveau (\d+)/.exec(c.packNom || '');
-      if (m) (noms[m[1]] = noms[m[1]] || []).push(Number(m[2])); else ratees.push(c.packNom);
+      const c = window.Aventura.piocherCarte(j), m = /^(\S+)/.exec(c.packNom || '');
+      if (m && c.prog) (noms[m[1]] = noms[m[1]] || []).push(Number(c.prog)); else ratees.push(c.packNom);
+      if (/niveau/i.test(c.packNom || '')) ratees.push('niveau écrit : ' + c.packNom); // v10.54 : aucun niveau sur la carte
       // La carte est jouable : orthographe = une réponse attendue ; conjugaison = une bonne forme ; grammaire = une consigne.
       try {
         if (c.question) { const a = c.question.attendu(c.mot, window.Cartes.INFOS[c.mot], c.params); if (a === undefined || a === '') ratees.push('attendu vide ' + c.mot); }
@@ -275,13 +276,13 @@ test('« Personnaliser » en Français : les cartes respectent la bande et les r
     p.parcours[0] = 'perso'; p.niveauProg[0] = 5;
     // Conjugaison : seulement le présent de l'indicatif (ses cartes les plus hautes sont au niveau 31 : on prend les plus proches de la bande).
     p.matiere[0] = 'conjugaison'; p.conj[0] = { modes: ['indicatif'], temps: ['indicatif.present'], groupes: [1, 2, 3], niveau: 'facile' };
-    sortie.conj = []; for (let i = 0; i < 30; i++) { const c = window.Aventura.piocherCarte(j); sortie.conj.push([c.temps, (/niveau (\d+)/.exec(c.packNom) || [])[1]]); }
+    sortie.conj = []; for (let i = 0; i < 30; i++) { const c = window.Aventura.piocherCarte(j); sortie.conj.push([c.temps, c.prog]); }
     // Grammaire : seulement « Relier ».
     p.matiere[0] = 'grammaire'; p.gram[0] = { niveau: 'facile', jeux: ['relier'] };
-    sortie.gram = []; for (let i = 0; i < 30; i++) { const c = window.Aventura.piocherCarte(j); sortie.gram.push([c.jeu, (/niveau (\d+)/.exec(c.packNom) || [])[1]]); }
+    sortie.gram = []; for (let i = 0; i < 30; i++) { const c = window.Aventura.piocherCarte(j); sortie.gram.push([c.jeu, c.prog]); }
     // Orthographe : seulement la question « nombre ».
     p.matiere[0] = 'orthographe'; p.types[0] = ['nombre'];
-    sortie.ortho = []; for (let i = 0; i < 30; i++) { const c = window.Aventura.piocherCarte(j); sortie.ortho.push([c.question && c.question.id, (/niveau (\d+)/.exec(c.packNom || '') || [])[1]]); }
+    sortie.ortho = []; for (let i = 0; i < 30; i++) { const c = window.Aventura.piocherCarte(j); sortie.ortho.push([c.question && c.question.id, c.prog]); }
     return sortie;
   });
   for (const [temps, n] of r.conj) { expect(temps).toBe('indicatif.present'); if (n) { expect(Number(n)).toBeGreaterThanOrEqual(20); expect(Number(n)).toBeLessThanOrEqual(55); } }
@@ -371,8 +372,10 @@ for (const [k, nom] of [[0, 'Orthographe'], [1, 'Conjugaison'], [2, 'Grammaire']
     await page.evaluate((idx) => { const o = Math.random; Math.random = () => { Math.random = o; return (idx + 0.1) / 3; }; }, k);
     await page.getByRole('button', { name: /^(Première question|Question suivante)$/ }).click();
     await expect(page.locator('#carte-piochee')).toBeVisible();
-    const c = await page.evaluate(() => window.Aventura.partie.carte.packNom);
-    expect(c).toMatch(new RegExp('^' + nom + ' · niveau (3[89]|4[0-2])'));
+    const c = await page.evaluate(() => ({ titre: window.Aventura.partie.carte.packNom, prog: window.Aventura.partie.carte.prog }));
+    expect(c.titre).toMatch(new RegExp('^' + nom)); // v10.54 : le niveau n'est pas écrit sur la carte
+    expect(c.titre).not.toMatch(/niveau/i);
+    expect(c.prog).toBeGreaterThanOrEqual(38); expect(c.prog).toBeLessThanOrEqual(42);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
     expect(erreurs).toEqual([]);
   });

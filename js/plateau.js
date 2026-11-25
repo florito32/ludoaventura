@@ -1286,8 +1286,14 @@
   // Carte de Français tirée à partir d'une clé de la progression (v10.41) : { cle, niveau }.
   //  orthographe : « mot|type de question » ; conjugaison : « verbe|temps|personne » ; grammaire : « jeu|niveau du jeu|rang » ;
   //  phonèmes : « jeu|son|mot ». Renvoie null si la clé ne donne rien (le tirage habituel prend alors le relais).
+  // v10.54 : le niveau n'est plus écrit sur la carte ; il reste dans c.prog (non affiché), pour les tests.
   function carteFrancaisProgression(j, sousId, tir) {
-    var k = tir.cle.split('|'), nom = ' · niveau ' + tir.niveau;
+    var c = carteFrancaisProgression0(j, sousId, tir);
+    if (c) c.prog = tir.niveau;
+    return c;
+  }
+  function carteFrancaisProgression0(j, sousId, tir) {
+    var k = tir.cle.split('|'), nom = ''; // v10.54 : aucun niveau écrit sur la carte (demande du 25/11/2026)
     if (sousId === 'orthographe') {
       var q = Q.trouver(k[1]), info = C.INFOS[k[0]], pack = null, serie = 0;
       C.PACKS.forEach(function (p) { // tous les thèmes, y compris « mots simples » et « mots compliqués » (hors des familles affichées)
@@ -1443,14 +1449,15 @@
         }
       }
       f.type = 'calcul';
+      f.niveauJeu = m.niveau; // v10.54 : niveau du générateur (facile…expert), jamais affiché ; sert aux tests
       // v9.0 : problème = le même calcul, raconté sur un thème tiré au hasard (même réponse).
       // v10.53 : le joueur choisit « Calcul mental » ou « Problèmes » (rétabli) ; le niveau n'est jamais écrit sur la carte.
       if (m.type === 'probleme' && window.Problemes) {
         window.Problemes.habiller(f);
-        f.packNom = 'Problème' + (partie.defi ? ' · ' + K.niveau(m.niveau).nom : ''); // défi du jour : titre inchangé
+        f.packNom = 'Problème';
         return f;
       }
-      f.packNom = 'Calcul' + (partie.defi ? ' · ' + K.niveau(m.niveau).nom : '') + (f.table ? ' · table de ' + f.table : '');
+      f.packNom = 'Calcul' + (f.table ? ' · table de ' + f.table : '');
       return f;
     }
     // « Personnaliser » : orthographe, conjugaison, grammaire dans la bande de niveaux choisie (v10.45).
@@ -1462,7 +1469,7 @@
     if (mat === 'conjugaison') {
       var cj = V.generer(cr);
       cj.type = 'conjugaison';
-      cj.packNom = 'Conjugaison · ' + V.NIVEAUX.filter(function (n) { return n.id === cr.niveau; })[0].nom;
+      cj.packNom = 'Conjugaison';
       return cj;
     }
     if (mat === 'grammaire') return carteGrammaire(j, gr);
@@ -1507,7 +1514,7 @@
     if (!jeux.length) jeux = TOUS_JEUX;
     var id = jeux[Math.floor(Math.random() * jeux.length)];
     var vus = j.gramVus || (j.gramVus = []);
-    var titre = 'Grammaire · ' + niveauNom(niveau);
+    var titre = 'Grammaire';
     if (G.jeu(id).mot) {
       var mots = motsGrammaire(niveau, id, partie.mots[j.index]).filter(function (m) { return vus.indexOf(m) < 0; });
       if (!mots.length) mots = motsGrammaire(niveau, id, partie.mots[j.index]);

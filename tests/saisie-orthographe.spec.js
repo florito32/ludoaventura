@@ -328,7 +328,7 @@ test.describe('genre et pluriel : logique', () => {
 
 test('Au pluriel : « UN … → DES … » affiché, bonne réponse écrite → dé FORT', async ({ page }) => {
   const c = await partieGrammaire(page, ['pluriel']);
-  await expect(page.locator('#carte-titre')).toHaveText('Grammaire · Facile · Au pluriel');
+  await expect(page.locator('#carte-titre')).toHaveText('Grammaire · Au pluriel');
   const info = C.INFOS[c.mot];
   await expect(page.locator('#carte-mot')).toHaveText((info.genre === 'f' ? 'UNE ' : 'UN ') + c.mot + ' → DES …');
   await page.getByLabel('Ta réponse').fill(info.pluriel.toLowerCase()); // v9.3 : les cases ne prennent que le mot (« des » est déjà écrit)
