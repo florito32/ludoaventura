@@ -73,7 +73,6 @@ const VOIX = [
 
 test('maths : « Écouter » lit le calcul avec la meilleure voix française, tout de suite', async ({ page }) => {
   await voixEspion(page, VOIX);
-  await page.addInitScript(() => { window.AVENTURA_TYPE_MATHS = 'calcul'; }); // v10.52 : calculs et problèmes sont mélangés : carte de calcul forcée
   await rapide(page);
   await ouvrirNeuf(page);
   await versReglages(page, 1);

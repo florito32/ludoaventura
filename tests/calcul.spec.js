@@ -66,8 +66,6 @@ test.describe('logique des calculs', () => {
 
 async function versMaths(page, joueurs = 1) {
   if (!page.__rapide) { await rapide(page); page.__rapide = true; }
-  // v10.52 : en Maths, calculs et problèmes sont mélangés ; ces tests regardent les cartes de calcul mental (carte forcée).
-  await page.addInitScript(() => { window.AVENTURA_TYPE_MATHS = 'calcul'; });
   await page.goto('./');
   await versReglages(page, joueurs);
 }

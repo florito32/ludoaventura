@@ -124,7 +124,7 @@ test('« Suivre ma progression » : les calculs sont dans une fenêtre de 5 nive
     return { cartes: r, sous: j.sous };
   });
   for (const c of cartes.cartes) {
-    expect(c.nom).toMatch(/^(Calcul|Problème) · niveau \d+/);
+    expect(c.nom).toMatch(/^(Calcul|Problème)$/); // le niveau n'est pas montré au joueur (v10.53)
     expect(c.prog).toBeGreaterThanOrEqual(53);
     expect(c.prog).toBeLessThanOrEqual(57);
   }
@@ -239,20 +239,20 @@ test('« Personnaliser » en Maths : les calculs sont de la bande du niveau choi
   });
   expect(r.filter((n) => n >= 71 && n <= 80).length).toBeGreaterThanOrEqual(34); // presque toutes (repli sur l'ancien tirage si rien ne sort)
 });
-test('« Personnaliser » en Maths (v10.52) : calculs et problèmes mélangés, titres « niveau N » sans Facile / Moyen / Difficile / Expert', async ({ page }) => {
+test('« Personnaliser » en Maths (v10.53) : niveau 2 = calculs de 11 à 20 même si les réglages cochés n\'en donnent pas ; le niveau n\'est pas écrit', async ({ page }) => {
   await partiePerso(page);
   const r = await page.evaluate(() => {
     window.AVENTURA_SANS_BANDE = false;
     const p = window.Aventura.partie, j = p.joueurs[0];
-    p.parcours[0] = 'perso'; p.niveauProg[0] = 8; p.matiere[0] = 'maths';
-    p.maths[0] = Object.assign({}, window.ProgressionCalcul.reglagesTout('difficile'), { type: 'calcul' });
-    const t = [];
-    for (let i = 0; i < 60; i++) t.push(window.Aventura.piocherCarte(j).packNom);
-    return t;
+    p.parcours[0] = 'perso'; p.niveauProg[0] = 2; p.matiere[0] = 'maths';
+    // Seulement la table de 7 en multiplication : ses calculs vont de 5 à 31, aucun n'est de 11 à 20 (c'était le cas du niveau 29).
+    p.maths[0] = { type: 'calcul', signes: ['fois'], nbSignes: [1], nombres: [7], dizaines: [], centaines: [], milliers: [], niveau: 'facile' };
+    const n = [], t = [];
+    for (let i = 0; i < 40; i++) { const c = window.Aventura.piocherCarte(j); n.push(window.ProgressionCalcul.niveau(c)); t.push(c.packNom); }
+    return { n, t };
   });
-  expect(r.filter((n) => n.startsWith('Problème')).length).toBeGreaterThan(10);
-  expect(r.filter((n) => n.startsWith('Calcul')).length).toBeGreaterThan(10);
-  for (const n of r) expect(n).toMatch(/^(Calcul|Problème) · niveau \d+/);
+  expect(r.n.filter((x) => x >= 11 && x <= 20).length).toBe(40);
+  for (const t of r.t) expect(t).not.toMatch(/niveau|Facile|Moyen|Difficile|Expert/i);
 });
 test('« Personnaliser » en Histoire : les questions sont tirées dans la bande du niveau choisi (niveau 3 = 21 à 30)', async ({ page }) => {
   await partiePerso(page);
