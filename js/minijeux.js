@@ -8,7 +8,10 @@
 // et « Aventure des multiplications » (js/mj-aventure.js), repris de florito32/minijeux (v10.47), puis « Quiz » Histoire / Géographie
 // (js/mj-quiz.js, v10.51 : choix de la matière, de la sous-matière et du niveau 1 à 10 ; scores dans Supabase), puis « Chasse aux lettres »
 // (js/mj-reperes.js, v10.54 : repérage visuel des lettres qui se ressemblent, une minute, record par profil).
-// Pour en ajouter un : une ligne dans JEUX, et soit sa fonction de départ dans DEPARTS (elle rend { carte, titre… }), soit un champ
+// Liste (v10.54, demande du 25/11/2026) : une petite tuile par jeu (icône + nom, rien d'autre : les 10 étoiles sont dites en haut de
+// l'écran) avec, à côté, une pastille « i » rouge qui ouvre une fenêtre : nom du jeu, explication (champ « aide ») et capture d'écran
+// de la partie (img/minijeux/<id>.webp, faite par outils/captures_minijeux.py). Ça vaut pour tous les jeux de JEUX, y compris les futurs.
+// Pour en ajouter un : une ligne dans JEUX (+ sa capture : python3 outils/captures_minijeux.py <id>), et soit sa fonction de départ dans DEPARTS (elle rend { carte, titre… }), soit un champ
 // « module » : un script qui expose window.X.monter(hote, { fini(gagne, ligneHtml) }) et rend { detruire() }.
 (function () {
   'use strict';
@@ -16,6 +19,7 @@
   var B = window.Baby, BC = window.BabyCarte, R = window.Recompenses, PH = window.Phonemes, GC = window.GrammaireCarte;
   var $ = function (id) { return document.getElementById(id); };
   var ETOILES = 10; // par partie terminée, gagnée ou perdue
+  var IMAGES = 'img/minijeux/'; // une capture d'écran par jeu : <id>.webp
   var JEUX = [
     { id: 'fabrique', nom: 'La fabrique à mots', icone: '🏭', aide: 'Fabrique des mots avec des lettres et des sons, puis écoute-les.' },
     { id: 'sons', nom: 'Les sons', icone: '👂', aide: 'Complète, trie, relie : trouve les sons des mots (phonèmes).' },
@@ -39,9 +43,9 @@
     var h = '<section class="carte-page minijeux"><p class="minijeux-intro">Choisis un mini-jeu. À chaque partie terminée, tu gagnes ' +
       ETOILES + ' ' + ico('i-etoile', 'ico-gain') + ' étoiles, sans rien changer à ton niveau.</p><div class="minijeux-liste" role="group" aria-label="Mini-jeux">';
     JEUX.forEach(function (j) {
-      h += '<button type="button" class="minijeu-carte" data-jeu="' + j.id + '"><span class="minijeu-ico" aria-hidden="true">' + j.icone + '</span>' +
-        '<span class="minijeu-texte"><b>' + esc(j.nom) + '</b><small>' + esc(j.aide) + '</small></span>' +
-        '<span class="minijeu-gain" aria-hidden="true">+' + ETOILES + ' ' + ico('i-etoile') + '</span></button>';
+      h += '<div class="minijeu-case"><button type="button" class="minijeu-carte" data-jeu="' + j.id + '"><span class="minijeu-ico" aria-hidden="true">' + j.icone + '</span>' +
+        '<span class="minijeu-nom">' + esc(j.nom) + '</span></button>' +
+        '<button type="button" class="minijeu-info" data-info="' + j.id + '" aria-label="Comment on joue à ' + esc(j.nom) + ' ?"><span aria-hidden="true">i</span></button></div>';
     });
     $('minijeux-corps').innerHTML = h + '</div></section>';
   }
@@ -155,12 +159,27 @@
 
   // ---------- Branchements ----------
   $('btn-minijeux').addEventListener('click', function () { window.Aventura.afficher('ecran-minijeux'); });
+  // Pastille « i » : la fenêtre d'explication d'un jeu (nom, explication, capture d'écran). Se ferme avec « Fermer », Échap ou un clic à côté.
+  function expliquer(j) {
+    var f = $('minijeu-info');
+    if (!f || !j) return;
+    $('minijeu-info-titre').textContent = j.nom;
+    $('minijeu-info-texte').textContent = j.aide;
+    var img = $('minijeu-info-img');
+    img.alt = 'Capture d’écran de ' + j.nom + ' : une partie en cours';
+    img.src = IMAGES + j.id + '.webp';
+    if (!f.open) f.showModal();
+  }
   $('minijeux-corps').addEventListener('click', function (e) {
+    var i = e.target.closest('.minijeu-info');
+    if (i) { expliquer(jeuDe(i.dataset.info)); return; }
     var b = e.target.closest('.minijeu-carte');
     if (!b) return;
     // « Qui joue ? » : un seul profil, pour recevoir les étoiles.
     window.Aventura.demanderJoueurs(1, function (sl) { lancer(b.dataset.jeu, sl && sl[0]); });
   });
+  $('minijeu-info-fermer').addEventListener('click', function () { $('minijeu-info').close(); });
+  $('minijeu-info').addEventListener('click', function (e) { if (e.target === this) this.close(); }); // clic sur le fond grisé
   $('minijeu-corps').addEventListener('click', function (e) {
     if (!etat) return;
     if (e.target.closest('#minijeu-rejouer')) { lancer(etat.jeu.id, etat.profil); return; }

@@ -47,7 +47,7 @@ test('Course aux étoiles : tables, 3 réponses, 50 bonnes réponses, +10 étoil
   await accueil(page);
   const avant = await compte(page);
   await page.locator('#btn-minijeux').click();
-  await expect(page.locator('.minijeu-carte', { hasText: 'Course aux étoiles' })).toContainText('+10');
+  await expect(page.locator('.minijeu-carte', { hasText: 'Course aux étoiles' })).not.toContainText('+10');
   expect(await debordements(page)).toEqual([]);
   await demarrerEtoiles(page, [3]);
   expect(await debordements(page)).toEqual([]);
@@ -129,8 +129,8 @@ test('Aventure : le nombre à trouver, 1 caisse sur 3 lui correspond, tout tient
   expect(s.caisses.filter((b) => b.correct).length * 3).toBe(s.caisses.length);
   for (const b of s.caisses) expect(b.a * b.b === s.cible).toBe(b.correct);
   // Le canvas est bien dessiné (pas vide) et le nombre est sous le jeu.
-  const dessine = await page.locator('[data-canvas]').evaluate((c) => { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 0; i < d.length; i += 4000) if (d[i + 3]) n++; return n; });
-  expect(dessine).toBeGreaterThan(0);
+  // Le premier dessin arrive à l'image suivante (requestAnimationFrame) : on attend au lieu de lire tout de suite (test instable en CI, 25/11).
+  await expect.poll(() => page.locator('[data-canvas]').evaluate((c) => { const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 0; i < d.length; i += 4000) if (d[i + 3]) n++; return n; })).toBeGreaterThan(0);
   const [cv, cible] = [await page.locator('[data-canvas]').boundingBox(), await page.locator('.mj-cible').boundingBox()];
   expect(cible.y).toBeGreaterThanOrEqual(cv.y + cv.height - 1);
   expect(await debordements(page)).toEqual([]);
