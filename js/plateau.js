@@ -378,7 +378,9 @@
       var sm = j.profil && (sousSuivie(j) || j.sousMat); // v10.36 : « Suivre ma progression » = la sous-matière la plus jouée
       if (!sm) return;
       var reussi = pts[i] >= part;
-      if (reussi) window.Joueurs.ajouterPoints(c.etat, j.profil, sm.m, sm.s, 1);
+      // v10.52 (demande du 25/11/2026) : en Maths le joueur reçoit des calculs ET des problèmes : les deux sous-matières gagnent +1.
+      var cibles = sm.m === 'maths' ? [{ m: 'maths', s: 'calcul' }, { m: 'maths', s: 'probleme' }] : [sm];
+      if (reussi) cibles.forEach(function (t) { window.Joueurs.ajouterPoints(c.etat, j.profil, t.m, t.s, 1); });
       // v10.32 : statistiques du joueur (parties jouées / réussies / d'affilée par matière), pour « Statistiques » dans Mon compte.
       window.Joueurs.enregistrerPartie(c.etat, j.profil, sm.m, reussi);
     });
@@ -1033,7 +1035,7 @@
     $('reglage-francais').hidden = !fr;
     $('reglages-maths').hidden = mat !== 'maths';
     $('reglage-niveau-maths').hidden = true; // v10.36 : Facile…Expert remplacés par le niveau 1 à 10 (reglage-niveau-prog)
-    $('reglage-type-maths').hidden = mat !== 'maths';
+    $('reglage-type-maths').hidden = true; // v10.52 : plus de choix « Calcul mental » ou « Problèmes » : les deux sont mélangés
     $('type-maths').querySelectorAll('input').forEach(function (i) { i.checked = i.value === (partie.maths[a].type || 'calcul'); });
     // Niveau de calcul : une phrase d'aide sous les choix ; au niveau Facile, les nombres deviennent des tables.
     // v10.36 : niveau 1 à 10 (toutes les matières sauf les phonèmes, dont les niveaux viennent après), coché = celui du joueur.
@@ -1430,12 +1432,16 @@
       }
       f.type = 'calcul';
       // v9.0 : problème = le même calcul, raconté sur un thème tiré au hasard (même réponse).
-      if (m.type === 'probleme' && window.Problemes) {
+      // v10.52 (demande du 25/11/2026) : en Maths, calculs mentaux et problèmes sont mélangés (une chance sur deux) ; le défi du
+      // jour garde le type qu'il impose. AVENTURA_TYPE_MATHS : réservé aux tests (force « calcul » ou « probleme »).
+      var typeM = window.AVENTURA_TYPE_MATHS || (partie.defi || partie.rapide ? m.type : (Math.random() < 0.5 ? 'probleme' : 'calcul'));
+      if (typeM === 'probleme' && window.Problemes) {
         window.Problemes.habiller(f);
-        f.packNom = 'Problème · ' + K.niveau(m.niveau).nom;
+        f.packNom = 'Problème · ' + (bm && window.ProgressionCalcul ? 'niveau ' + window.ProgressionCalcul.niveau(f) : K.niveau(m.niveau).nom);
         return f;
       }
-      f.packNom = 'Calcul · ' + K.niveau(m.niveau).nom + (f.table ? ' · table de ' + f.table : '');
+      // v10.52 : « Personnaliser » : le titre donne le niveau 1 à 100 de la carte (plus Facile / Moyen / Difficile / Expert).
+      f.packNom = 'Calcul · ' + (bm && window.ProgressionCalcul ? 'niveau ' + window.ProgressionCalcul.niveau(f) : K.niveau(m.niveau).nom) + (f.table ? ' · table de ' + f.table : '');
       return f;
     }
     // « Personnaliser » : orthographe, conjugaison, grammaire dans la bande de niveaux choisie (v10.45).

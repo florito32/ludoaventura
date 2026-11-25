@@ -21,14 +21,13 @@ test('mathématiques : le parcours onglets → bandeaux, le choix marqué dans l
   // Au départ : le bandeau de la matière est ouvert, les onglets suivants sont grisés.
   await expect(page.locator('#reglage-matiere')).toBeVisible();
   await expect(onglet(page, 'type')).toBeDisabled();
-  // Mathématiques → le bandeau « En mathématiques » (Calcul mental / Problèmes) s'ouvre tout seul.
+  // Mathématiques → v10.52 : plus de choix « Calcul mental / Problèmes » (les deux sont mélangés) : pas d'onglet « Exercice »,
+  // le bandeau du niveau s'ouvre tout de suite.
   await choisir(page, '#matieres', 'Mathématiques');
-  await expect(page.locator('#reglage-type-maths')).toBeVisible();
+  await expect(page.locator('#reglage-type-maths')).toBeHidden();
+  await expect(onglet(page, 'type')).toBeHidden();
   await expect(page.locator('#reglage-matiere')).toBeHidden();
   await expect(onglet(page, 'matiere')).toContainText('Mathématiques');
-  // Problèmes → le bandeau du niveau (4 choix l'un sous l'autre) ; l'onglet garde le choix.
-  await choisir(page, '#type-maths', 'Problèmes');
-  await expect(onglet(page, 'type')).toContainText('Problèmes');
   await expect(page.locator('#reglage-niveau-prog')).toBeVisible();
   const n = await page.locator('#niveau-maths .pack span').evaluateAll((l) => l.map((e) => { const r = e.getBoundingClientRect(); return Math.round(r.x); }));
   expect(n).toHaveLength(4);
@@ -58,7 +57,6 @@ test('mathématiques : le parcours onglets → bandeaux, le choix marqué dans l
   await expect(page.getByRole('button', { name: 'Valider', exact: true })).toHaveCount(0);
   await valider(page);
   await expect(page.locator('#reglages-maths')).toBeVisible();
-  expect(await page.evaluate(() => window.Aventura.partie.maths[0].type)).toBe('probleme');
 });
 
 test('un clic ailleurs, ou Échap, ferme le bandeau ; le « Valider » du bas revient', async ({ page }) => {

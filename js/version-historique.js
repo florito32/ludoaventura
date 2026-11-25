@@ -2,6 +2,11 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.52', date: '2026-11-25', changes: [
+    "Mathématiques : tu reçois des calculs mentaux et des problèmes, mélangés (le choix « Calcul mental » ou « Problèmes » a disparu).",
+    "Une aventure réussie fait gagner +1 point à la fois en calcul mental et en problèmes (si tu as ramené ta part).",
+    "« Personnaliser » : le titre des cartes de Maths indique « niveau N » (de 1 à 100) à la place de Facile, Moyen, Difficile ou Expert."
+  ] },
   { v: '10.51', date: '2026-11-24', changes: [
     "Nouveau mini-jeu « Quiz » : Histoire ou Géographie, une période ou une famille de jeux, et un niveau de 1 à 10.",
     "10 questions aux niveaux 1 à 5, 15 questions aux niveaux 6 à 10 ; 4 réponses dont une seule bonne ; 15 secondes pour répondre.",

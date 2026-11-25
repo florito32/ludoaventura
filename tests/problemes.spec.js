@@ -57,12 +57,14 @@ test.describe('logique des problèmes', () => {
 });
 
 // Va jusqu'à la première question d'une partie de mathématiques à 1 joueur.
+// v10.52 : plus de choix « Calcul mental » / « Problèmes » (les deux sont mélangés) ; type force la carte ('probleme' ou 'calcul'),
+// null laisse le tirage au hasard.
 async function partieMaths(page, { type = 'probleme', niveau = 'moyen', signes = ['plus', 'fois'], nombres = [3, 7] } = {}) {
   await rapide(page, { autoDe: 600000 });
+  if (type) await page.addInitScript((t) => { window.AVENTURA_TYPE_MATHS = t; }, type);
   await page.goto('./');
   await versReglages(page, 1);
   await cocher(page, '#matieres', 'maths');
-  if (type) await page.getByRole('radio', { name: type === 'probleme' ? 'Problèmes' : 'Calcul mental' }).check();
   await cocher(page, '#niveau-maths', niveau);
   await valider(page);
   await page.locator('#reglages-maths').waitFor();
@@ -78,17 +80,23 @@ async function taper(page, texte) {
 }
 
 test.describe('Calcul mental ou Problèmes', () => {
-  test('« Calcul mental » est choisi au départ ; « Problèmes » raconte le calcul sur un thème', async ({ page }) => {
+  test('v10.52 : plus de choix « Calcul mental » / « Problèmes » ; une partie de Maths mélange les deux', async ({ page }) => {
+    await partieMaths(page, { type: null });
+    await expect(page.getByRole('radio', { name: 'Calcul mental' })).toHaveCount(0); // (le choix n'est plus affiché)
+    const vus = await page.evaluate(() => {
+      const v = { probleme: 0, calcul: 0 };
+      for (let k = 0; k < 80; k++) { const c = window.Aventura.piocherCarte({ index: 0, tas: [] }); v[c.probleme ? 'probleme' : 'calcul']++; }
+      return v;
+    });
+    expect(vus.probleme).toBeGreaterThan(10);
+    expect(vus.calcul).toBeGreaterThan(10);
+  });
+  test('v10.52 : la préparation ne montre plus le choix Calcul mental / Problèmes', async ({ page }) => {
     await rapide(page);
     await page.goto('./');
     await versReglages(page, 1);
     await cocher(page, '#matieres', 'maths');
-    await expect(page.getByRole('radio', { name: 'Calcul mental' })).toBeChecked();
-    await expect(page.getByRole('radio', { name: 'Problèmes' })).not.toBeChecked();
-    // L'un ou l'autre : choisir « Problèmes » retire « Calcul mental ».
-    await page.getByRole('radio', { name: 'Problèmes' }).check();
-    await expect(page.locator('#type-maths input[value="calcul"]')).not.toBeChecked(); // (le bandeau s'est refermé)
-    expect(await page.evaluate(() => window.Aventura.partie.maths[0].type)).toBe('probleme');
+    await expect(page.locator('#reglage-type-maths')).toBeHidden();
   });
 
   test('problème : l\'énoncé sans la formule, réponse au pavé, correction avec le calcul', async ({ page }) => {
