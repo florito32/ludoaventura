@@ -2137,17 +2137,25 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 /* ---------- Mini-jeux (v10.41, js/minijeux.js) : la liste, puis le jeu et son résultat ---------- */
 .minijeux-intro { margin: 0 0 12px; text-align: center; font-size: 1.05rem; }
 .minijeux-intro .ico { width: 1.1em; height: 1.1em; vertical-align: -.15em; }
-.minijeux-liste { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 12px; }
-.minijeu-carte { display: flex; align-items: center; gap: 12px; text-align: left; width: 100%; min-height: 76px; padding: 10px 14px; border-radius: 16px;
-  border: 3px solid var(--encre); background: var(--jaune); color: var(--encre); box-shadow: 0 4px 0 var(--encre); font: inherit; cursor: pointer; }
+/* v10.54 (demande du 25/11/2026) : de petites tuiles (icône + nom) avec une pastille « i » rouge à côté, pour en voir beaucoup d'un coup. */
+.minijeux-liste { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 18px 10px; justify-items: center; padding: 8px 8px 0; }
+.minijeu-case { position: relative; width: 100%; max-width: 112px; }
+.minijeu-carte { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-align: center; width: 100%; min-height: 88px; padding: 8px 4px;
+  border-radius: 16px; border: 3px solid var(--encre); background: var(--jaune); color: var(--encre); box-shadow: 0 4px 0 var(--encre); font: inherit; cursor: pointer; }
 .minijeu-carte:hover { filter: brightness(1.05); }
 .minijeu-carte:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--encre); }
-.minijeu-ico { font-size: 2.2rem; line-height: 1; flex: none; }
-.minijeu-texte { display: grid; gap: 2px; min-width: 0; flex: 1; }
-.minijeu-texte b { font-size: 1.15rem; }
-.minijeu-texte small { font-size: .9rem; color: var(--encre); opacity: .85; }
-.minijeu-gain { flex: none; font-weight: 800; display: inline-flex; align-items: center; gap: 3px; }
-.minijeu-gain .ico { width: 1.2em; height: 1.2em; }
+.minijeu-ico { font-size: 2rem; line-height: 1; flex: none; }
+.minijeu-nom { font-weight: 800; font-size: .78rem; line-height: 1.15; max-width: 100%; hyphens: auto; overflow-wrap: break-word; }
+/* La pastille « i » : ronde, fond rouge, « i » blanc, posée sur le coin haut droit de la tuile ; la zone à toucher fait 44 px. */
+.minijeu-info { position: absolute; top: -9px; right: -9px; width: 26px; height: 26px; padding: 0; display: grid; place-items: center; border-radius: 50%;
+  border: 2px solid var(--encre); background: var(--rouge); color: #fff; font: italic 800 1rem/1 Georgia, "Times New Roman", serif; cursor: pointer; }
+.minijeu-info::after { content: ""; position: absolute; inset: -9px; border-radius: 50%; }
+.minijeu-info:hover { filter: brightness(1.1); }
+.minijeu-info:active { transform: scale(.92); }
+.minijeu-info-fenetre { max-height: calc(100dvh - 24px); overflow-y: auto; }
+.minijeu-info-fenetre h2 { margin-top: 0; }
+.minijeu-info-fenetre p { margin: 0 0 10px; font-size: 1.05rem; }
+.minijeu-info-img { display: block; margin: 0 auto; width: auto; max-width: 100%; height: auto; max-height: min(52dvh, 420px); border: 3px solid var(--encre); border-radius: 12px; background: #fff; }
 .minijeu { display: grid; gap: 10px; justify-items: center; text-align: center; }
 .minijeu-qui { margin: 0; min-height: 1.2em; color: var(--encre-douce); font-weight: 700; }
 .minijeu-consigne { margin: 0; font-size: 1.1rem; font-weight: 700; }
@@ -2156,7 +2164,7 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .minijeu-bravo { margin: 0; font-size: 1.5rem; font-weight: 800; }
 .minijeu-resultat { margin: 0; font-size: 1.2rem; }
 .minijeu-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-@media (prefers-reduced-motion: reduce) { .minijeu-carte:active { transform: none; } }
+@media (prefers-reduced-motion: reduce) { .minijeu-carte:active, .minijeu-info:active { transform: none; } }
 
 /* ---------- v10.13 (demande du 18/11/2026) : Histoire et Géographie présentées comme les temps de la conjugaison ----------
    Un cadre par famille : son nom et « Tout » en haut, ses jeux l'un sous l'autre. js/plateau.js (rangerSavoir) range les

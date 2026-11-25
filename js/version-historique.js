@@ -2,6 +2,11 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.55', date: '2026-11-25', changes: [
+    "Mini-jeux : chaque jeu est maintenant une petite tuile (l’icône et le nom), pour en voir beaucoup sur le même écran.",
+    "À côté de chaque tuile, une pastille « i » rouge ouvre une fenêtre : le nom du jeu, comment on y joue et une capture d’écran d’une partie. Elle se ferme avec « Fermer » ou en touchant à côté.",
+    "Les « +10 étoiles » ne sont plus écrits sur les tuiles (c’est déjà dit en haut de l’écran). Les prochains mini-jeux auront la même présentation."
+  ] },
   { v: '10.54', date: '2026-11-25', changes: [
     "Nouveau mini-jeu « Chasse aux lettres » : trouve le plus de fois possible la lettre demandée en une minute (b ou d, m ou n, p ou q…).",
     "Avant de jouer : choisis ta lettre (ou « Au hasard »), majuscule, minuscule ou mélange, écriture d'imprimerie ou cursive ; ton record est affiché.",

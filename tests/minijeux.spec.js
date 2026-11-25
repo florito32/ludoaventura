@@ -44,7 +44,7 @@ test('Mini-jeux : la liste, « Qui joue ? », la fabrique à mots et +10 étoile
   const carte = page.locator('.minijeu-carte[data-jeu="fabrique"]');
   await expect(page.locator('.minijeu-carte')).toHaveCount(6); // La fabrique à mots, Les sons (v10.43), Course aux étoiles, Aventure des multiplications (v10.47), Quiz (v10.51), Chasse aux lettres (v10.54)
   await expect(carte).toContainText('La fabrique à mots');
-  await expect(carte).toContainText('+10');
+  await expect(carte).not.toContainText('+10'); // v10.54 : la tuile ne dit que le nom (les étoiles sont dites en haut de l'écran)
   expect(await debordements(page)).toEqual([]);
   await carte.click();
   await quiJoue(page); // un seul profil, pour les étoiles

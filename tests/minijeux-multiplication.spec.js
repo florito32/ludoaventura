@@ -47,7 +47,7 @@ test('Course aux étoiles : tables, 3 réponses, 50 bonnes réponses, +10 étoil
   await accueil(page);
   const avant = await compte(page);
   await page.locator('#btn-minijeux').click();
-  await expect(page.locator('.minijeu-carte', { hasText: 'Course aux étoiles' })).toContainText('+10');
+  await expect(page.locator('.minijeu-carte', { hasText: 'Course aux étoiles' })).not.toContainText('+10');
   expect(await debordements(page)).toEqual([]);
   await demarrerEtoiles(page, [3]);
   expect(await debordements(page)).toEqual([]);

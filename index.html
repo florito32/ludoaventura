@@ -1013,6 +1013,17 @@
   </div>
 </dialog>
 
+<!-- Mini-jeux (v10.54, demande du 25/11/2026) : fenêtre d'explication ouverte par la pastille « i » d'une tuile (js/minijeux.js) :
+     nom du jeu, explication et capture d'écran d'une partie (img/minijeux/<id>.webp, outils/captures_minijeux.py). -->
+<dialog class="fin minijeu-info-fenetre" id="minijeu-info" aria-labelledby="minijeu-info-titre" aria-describedby="minijeu-info-texte">
+  <h2 id="minijeu-info-titre">Mini-jeu</h2>
+  <p id="minijeu-info-texte"></p>
+  <img id="minijeu-info-img" class="minijeu-info-img" alt="" width="390" height="640" decoding="async">
+  <div class="fin-actions">
+    <button type="button" class="btn btn-principal" id="minijeu-info-fermer">Fermer</button>
+  </div>
+</dialog>
+
 <!-- Fenêtre de connexion (v10.3, demande du 17/11/2026, backlog ligne 405) : au lancement, tant que le joueur
      n'est pas connecté, une fenêtre au centre de l'écran propose de se connecter, de créer un compte ou de jouer
      en invité. Elle revient à chaque ouverture du jeu (choix de l'utilisateur). js/compte.js l'ouvre. -->
