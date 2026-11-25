@@ -2,8 +2,10 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
-  { v: '10.54', date: '2026-11-25', changes: [
+  { v: '10.55', date: '2026-11-25', changes: [
     "Plus aucun niveau n’est écrit sur les cartes de question : ni « Facile / Moyen / Difficile / Expert » (défi du jour, Conjugaison, Grammaire), ni « niveau N » (Maths et Français en « Suivre ma progression »)."
+  ] },
+  { v: '10.54', date: '2026-11-25', changes: [
     "Nouveau mini-jeu « Chasse aux lettres » : trouve le plus de fois possible la lettre demandée en une minute (b ou d, m ou n, p ou q…).",
     "Avant de jouer : choisis ta lettre (ou « Au hasard »), majuscule, minuscule ou mélange, écriture d'imprimerie ou cursive ; ton record est affiché.",
     "13 lettres immobiles à l'écran ; une lettre touchée disparaît et une nouvelle apparaît ailleurs ; toutes les 2 secondes, une lettre change toute seule. Pas de limite d'erreurs ni de quantité.",
