@@ -42,7 +42,7 @@ test('Mini-jeux : la liste, « Qui joue ? », la fabrique à mots et +10 étoile
   await page.locator('#btn-minijeux').click();
   await expect(page.getByRole('heading', { name: 'Mini-jeux' })).toBeVisible();
   const carte = page.locator('.minijeu-carte[data-jeu="fabrique"]');
-  await expect(page.locator('.minijeu-carte')).toHaveCount(5); // La fabrique à mots, Les sons (v10.43), Course aux étoiles, Aventure des multiplications (v10.47), Quiz (v10.51)
+  await expect(page.locator('.minijeu-carte')).toHaveCount(6); // La fabrique à mots, Les sons (v10.43), Course aux étoiles, Aventure des multiplications (v10.47), Quiz (v10.51), Chasse aux lettres (v10.54)
   await expect(carte).toContainText('La fabrique à mots');
   await expect(carte).toContainText('+10');
   expect(await debordements(page)).toEqual([]);
@@ -67,7 +67,12 @@ test('Mini-jeux : la liste, « Qui joue ? », la fabrique à mots et +10 étoile
   await expect(page.locator('.baby-fini')).toBeDisabled();
   await jouerFabrique(page);
   expect((await compte(page)).total - avant.total).toBe(20);
-  await page.locator('#minijeu-liste').click();
+  // « Retour à l'accueil » (v10.54, tous les mini-jeux) : l'écran de fin propose aussi d'aller directement à l'accueil.
+  await expect(page.locator('#minijeu-accueil')).toBeVisible();
+  expect(await debordements(page)).toEqual([]);
+  await page.locator('#minijeu-accueil').click();
+  await expect(page.locator('#ecran-accueil')).toBeVisible();
+  await page.locator('#btn-minijeux').click();
   await expect(page.locator('.minijeu-carte').first()).toBeVisible();
 });
 
