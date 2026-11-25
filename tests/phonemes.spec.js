@@ -126,12 +126,12 @@ async function fin(page, avant) {
   await sansDebordement(page);
 }
 
-test('Mini-jeux : « Les sons » est dans la liste avec +10 étoiles @smoke', async ({ page }) => {
+test('Mini-jeux : « Les sons » est dans la liste (tuile : le nom seulement, v10.54) @smoke', async ({ page }) => {
   await accueil(page);
   await page.locator('#btn-minijeux').click();
   const carte = page.locator('.minijeu-carte[data-jeu="sons"]');
   await expect(carte).toContainText('Les sons');
-  await expect(carte).toContainText('+10');
+  await expect(carte).not.toContainText('+10');
   await sansDebordement(page);
 });
 
