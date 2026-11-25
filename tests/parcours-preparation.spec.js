@@ -239,6 +239,21 @@ test('« Personnaliser » en Maths : les calculs sont de la bande du niveau choi
   });
   expect(r.filter((n) => n >= 71 && n <= 80).length).toBeGreaterThanOrEqual(34); // presque toutes (repli sur l'ancien tirage si rien ne sort)
 });
+test('« Personnaliser » en Maths (v10.52) : calculs et problèmes mélangés, titres « niveau N » sans Facile / Moyen / Difficile / Expert', async ({ page }) => {
+  await partiePerso(page);
+  const r = await page.evaluate(() => {
+    window.AVENTURA_SANS_BANDE = false;
+    const p = window.Aventura.partie, j = p.joueurs[0];
+    p.parcours[0] = 'perso'; p.niveauProg[0] = 8; p.matiere[0] = 'maths';
+    p.maths[0] = Object.assign({}, window.ProgressionCalcul.reglagesTout('difficile'), { type: 'calcul' });
+    const t = [];
+    for (let i = 0; i < 60; i++) t.push(window.Aventura.piocherCarte(j).packNom);
+    return t;
+  });
+  expect(r.filter((n) => n.startsWith('Problème')).length).toBeGreaterThan(10);
+  expect(r.filter((n) => n.startsWith('Calcul')).length).toBeGreaterThan(10);
+  for (const n of r) expect(n).toMatch(/^(Calcul|Problème) · niveau \d+/);
+});
 test('« Personnaliser » en Histoire : les questions sont tirées dans la bande du niveau choisi (niveau 3 = 21 à 30)', async ({ page }) => {
   await partiePerso(page);
   const r = await page.evaluate(() => {
@@ -292,8 +307,8 @@ test('fin de partie : le point de niveau va à la sous-matière la plus jouée p
   await page.reload();
   await expect(page.locator('#fin')).toBeVisible();
   const niv = await page.evaluate(() => JSON.parse(localStorage.getItem('ludoaventura-etoiles')).joueurs.find((x) => x.id === 'j-1').niv);
-  expect(niv['maths.probleme']).toBe(56);
-  expect(niv['maths.calcul']).toBe(55);
+  expect(niv['maths.probleme']).toBe(56); // v10.52 : en Maths, les deux sous-matières gagnent +1 (plus seulement la plus jouée)
+  expect(niv['maths.calcul']).toBe(56);
 });
 
 test('la préparation faite est gardée après un rechargement (parcours, matière, joueur prêt)', async ({ page }) => {

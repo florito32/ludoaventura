@@ -54,12 +54,12 @@ test('règle 6 : une aventure ratée en solo ne change pas la progression du pro
   expect(n['j-1'].niv).toEqual({ 'maths.calcul': 40, 'maths.probleme': 40 });
 });
 
-test('règle 5 : une aventure réussie en solo fait gagner 1 point dans la sous-matière jouée', async ({ page }) => {
+test('règle 5 (v10.52) : en Maths, une aventure réussie en solo fait gagner 1 point aux deux sous-matières (calcul mental et problèmes)', async ({ page }) => {
   await ouvrir(page);
   await aventureFabriquee(page, 1, [999]);
   await expect(page.locator('#fin-titre')).toHaveText('Aventure réussie !');
   const n = await niveaux(page);
-  expect(n['j-1'].niv).toEqual({ 'maths.calcul': 41, 'maths.probleme': 40 });
+  expect(n['j-1'].niv).toEqual({ 'maths.calcul': 41, 'maths.probleme': 41 });
 });
 
 test('règles 5 et 6 à deux : le point suit la part de chacun (objectif ÷ 2) ; équipe ratée : étoiles perdues, point gardé', async ({ page }) => {
