@@ -2,6 +2,11 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.53', date: '2026-11-25', changes: [
+    "Mathématiques : tu choisis de nouveau « Calcul mental » ou « Problèmes » à la préparation (« Suivre ma progression » mélange toujours les deux).",
+    "« Personnaliser » : au niveau choisi, les calculs sont toujours de la bonne tranche (le niveau 2 donne des calculs de 11 à 20), même avec peu de signes ou de nombres cochés.",
+    "Le niveau n’est plus écrit sur les cartes de Maths."
+  ] },
   { v: '10.52', date: '2026-11-25', changes: [
     "Mathématiques : tu reçois des calculs mentaux et des problèmes, mélangés (le choix « Calcul mental » ou « Problèmes » a disparu).",
     "Une aventure réussie fait gagner +1 point à la fois en calcul mental et en problèmes (si tu as ramené ta part).",

@@ -378,8 +378,9 @@
       var sm = j.profil && (sousSuivie(j) || j.sousMat); // v10.36 : « Suivre ma progression » = la sous-matière la plus jouée
       if (!sm) return;
       var reussi = pts[i] >= part;
-      // v10.52 (demande du 25/11/2026) : en Maths le joueur reçoit des calculs ET des problèmes : les deux sous-matières gagnent +1.
-      var cibles = sm.m === 'maths' ? [{ m: 'maths', s: 'calcul' }, { m: 'maths', s: 'probleme' }] : [sm];
+      // v10.52 (demande du 25/11/2026) : en « Suivre ma progression », Maths donne des calculs ET des problèmes : les deux sous-matières
+      // gagnent +1. En « Personnaliser » (le joueur choisit calcul ou problèmes) : seulement la sous-matière choisie (v10.53).
+      var cibles = sm.m === 'maths' && partie.parcours[i] === 'suivre' ? [{ m: 'maths', s: 'calcul' }, { m: 'maths', s: 'probleme' }] : [sm];
       if (reussi) cibles.forEach(function (t) { window.Joueurs.ajouterPoints(c.etat, j.profil, t.m, t.s, 1); });
       // v10.32 : statistiques du joueur (parties jouées / réussies / d'affilée par matière), pour « Statistiques » dans Mon compte.
       window.Joueurs.enregistrerPartie(c.etat, j.profil, sm.m, reussi);
@@ -1035,7 +1036,7 @@
     $('reglage-francais').hidden = !fr;
     $('reglages-maths').hidden = mat !== 'maths';
     $('reglage-niveau-maths').hidden = true; // v10.36 : Facile…Expert remplacés par le niveau 1 à 10 (reglage-niveau-prog)
-    $('reglage-type-maths').hidden = true; // v10.52 : plus de choix « Calcul mental » ou « Problèmes » : les deux sont mélangés
+    $('reglage-type-maths').hidden = mat !== 'maths';
     $('type-maths').querySelectorAll('input').forEach(function (i) { i.checked = i.value === (partie.maths[a].type || 'calcul'); });
     // Niveau de calcul : une phrase d'aide sous les choix ; au niveau Facile, les nombres deviennent des tables.
     // v10.36 : niveau 1 à 10 (toutes les matières sauf les phonèmes, dont les niveaux viennent après), coché = celui du joueur.
@@ -1327,10 +1328,10 @@
     f.type = 'calcul';
     if (probleme && window.Problemes) {
       window.Problemes.habiller(f);
-      f.packNom = 'Problème · niveau ' + f.prog;
+      f.packNom = 'Problème'; // le niveau n'est pas montré au joueur (25/11/2026)
       return f;
     }
-    f.packNom = 'Calcul · niveau ' + f.prog;
+    f.packNom = 'Calcul';
     return f;
   }
 
@@ -1428,20 +1429,28 @@
     if (mat === 'maths') {
       var m = mr, f = K.generer(m), bm = bandePerso(j.index);
       if (bm && window.ProgressionCalcul) { // v10.45 : un calcul de la bande, avec les signes et les nombres cochés
-        for (var essaiM = 0; essaiM < 300; essaiM++) { var nf = window.ProgressionCalcul.niveau(f); if (nf >= bm.bas && nf <= bm.haut) break; f = K.generer(m); }
+        var dansBande = false;
+        for (var essaiM = 0; essaiM < 300; essaiM++) { var nf = window.ProgressionCalcul.niveau(f); if (nf >= bm.bas && nf <= bm.haut) { dansBande = true; break; } f = K.generer(m); }
+        // v10.53 (25/11/2026) : si les réglages cochés ne donnent aucun calcul de la bande (ex. niveau 2 avec seulement la table de 7,
+        // dont les calculs vont de 5 à 31), c'était un calcul quelconque (niveau 29) : maintenant un calcul de la bande, avec les signes cochés.
+        if (!dansBande) {
+          for (var essaiB = 0; essaiB < 400; essaiB++) {
+            var g = window.ProgressionCalcul.genererDans(bm.bas, bm.haut);
+            if (!g || g.prog < bm.bas || g.prog > bm.haut) continue;
+            f = g;
+            if (g.operations.every(function (o) { return (m.signes || []).indexOf(o) >= 0; })) break;
+          }
+        }
       }
       f.type = 'calcul';
       // v9.0 : problème = le même calcul, raconté sur un thème tiré au hasard (même réponse).
-      // v10.52 (demande du 25/11/2026) : en Maths, calculs mentaux et problèmes sont mélangés (une chance sur deux) ; le défi du
-      // jour garde le type qu'il impose. AVENTURA_TYPE_MATHS : réservé aux tests (force « calcul » ou « probleme »).
-      var typeM = window.AVENTURA_TYPE_MATHS || (partie.defi || partie.rapide ? m.type : (Math.random() < 0.5 ? 'probleme' : 'calcul'));
-      if (typeM === 'probleme' && window.Problemes) {
+      // v10.53 : le joueur choisit « Calcul mental » ou « Problèmes » (rétabli) ; le niveau n'est jamais écrit sur la carte.
+      if (m.type === 'probleme' && window.Problemes) {
         window.Problemes.habiller(f);
-        f.packNom = 'Problème · ' + (bm && window.ProgressionCalcul ? 'niveau ' + window.ProgressionCalcul.niveau(f) : K.niveau(m.niveau).nom);
+        f.packNom = 'Problème' + (partie.defi ? ' · ' + K.niveau(m.niveau).nom : ''); // défi du jour : titre inchangé
         return f;
       }
-      // v10.52 : « Personnaliser » : le titre donne le niveau 1 à 100 de la carte (plus Facile / Moyen / Difficile / Expert).
-      f.packNom = 'Calcul · ' + (bm && window.ProgressionCalcul ? 'niveau ' + window.ProgressionCalcul.niveau(f) : K.niveau(m.niveau).nom) + (f.table ? ' · table de ' + f.table : '');
+      f.packNom = 'Calcul' + (partie.defi ? ' · ' + K.niveau(m.niveau).nom : '') + (f.table ? ' · table de ' + f.table : '');
       return f;
     }
     // « Personnaliser » : orthographe, conjugaison, grammaire dans la bande de niveaux choisie (v10.45).
