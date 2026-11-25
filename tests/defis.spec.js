@@ -175,13 +175,13 @@ test('défi en équipe : 3 profils cochés, 4e impossible, cartes au niveau de c
     const r = [];
     for (let i = 0; i < 2; i++) {
       const v = new Set();
-      for (let k = 0; k < 300; k++) { const carte = window.Aventura.piocherCarte({ index: i, tas: [] }); if (carte.packNom && /Calcul|Problème/.test(carte.packNom)) v.add(carte.packNom.split(' · ')[1]); }
+      for (let k = 0; k < 300; k++) { const carte = window.Aventura.piocherCarte({ index: i, tas: [] }); if (carte.packNom && /^(Calcul|Problème)/.test(carte.packNom)) { v.add(carte.niveauJeu); if (/niveau|Facile|Moyen|Difficile|Expert/i.test(carte.packNom)) v.add('niveau écrit : ' + carte.packNom); } }
       r.push([...v]);
     }
     return r;
   });
-  expect(niveaux[0]).toEqual(['Expert']);
-  expect(niveaux[1]).toEqual(['Facile']);
+  expect(niveaux[0]).toEqual(['expert']); // (niveau du générateur, jamais écrit sur la carte depuis la v10.54)
+  expect(niveaux[1]).toEqual(['facile']);
   // Le défi survit à un rechargement de la page.
   await page.reload();
   await expect(page.getByRole('heading', { name: 'Défi en équipe du jour' })).toBeVisible();
