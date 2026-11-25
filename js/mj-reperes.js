@@ -195,14 +195,21 @@
       jeu.debut = performance.now(); jeu.prochain = jeu.debut + delai * 1000;
       timer = setInterval(tic, 100);
     }
+    // Toucher une lettre (demande du 25/11/2026, 12 h 24) : elle disparaît, et une AUTRE lettre non demandée disparaît aussi ;
+    // deux nouvelles lettres apparaissent ailleurs : une demandée + une non demandée si la lettre touchée était bonne,
+    // deux non demandées si elle était mauvaise. Le nombre de lettres à l'écran (13) et de lettres demandées ne change donc pas.
     function toucher(slot) {
       if (!jeu || jeu.fini || !slot.occ) return;
       var bon = slot.data.cible;
       if (bon) jeu.bons++; else jeu.mauvais++;
       retour(slot, bon);
       retirer(slot);
-      // Une nouvelle lettre apparaît ailleurs, jamais à la place de celle qu'on vient de toucher.
-      var ou = vides(slot); if (ou.length) poser(tirer(ou), veutCible());
+      var non = jeu.slots.filter(function (s) { return s !== slot && s.occ && !s.data.cible; }), autre = non.length ? tirer(non) : null;
+      if (autre) retirer(autre);
+      // Les nouvelles lettres apparaissent ailleurs, jamais à la place de celles qui viennent de disparaître.
+      var ou = jeu.slots.filter(function (s) { return !s.occ && s !== slot && s !== autre; });
+      var nouvelles = bon ? [true, false] : [false, false], k;
+      for (k = 0; k < nouvelles.length && ou.length; k++) { var cas = tirer(ou); ou.splice(ou.indexOf(cas), 1); poser(cas, nouvelles[k]); }
       majHud((duree * 1000 - (performance.now() - jeu.debut)) / 1000);
     }
     // ✓ +1 (vert) ou ✗ (rouge) qui monte au-dessus de la lettre touchée ; le signe s'ajoute à la couleur.
