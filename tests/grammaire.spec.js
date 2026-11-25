@@ -175,7 +175,7 @@ test('orthographe : « Le ou la ? » et « Au pluriel » ne sont plus dans les q
 
 test('les contraires : la bonne réponse → dé FORT, sans bouton « Bonne / Mauvaise réponse »', async ({ page }) => {
   const c = await partie(page, { jeux: ['contraires'] });
-  await expect(page.locator('#carte-titre')).toHaveText('Grammaire · Facile · Les contraires');
+  await expect(page.locator('#carte-titre')).toHaveText('Grammaire · Les contraires');
   await expect(page.locator('#carte-consigne')).toHaveText('Quel est le contraire de :');
   await expect(page.locator('.gram-mot')).toHaveText(c.mot);
   await expect(page.locator('.gram-bouton')).toHaveCount(3);
