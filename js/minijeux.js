@@ -6,7 +6,8 @@
 // « Les sons » (v10.43, ex-matière Phonèmes de l'aventure : un des 6 jeux de js/phonemes.js tiré au hasard, sur tous les sons ;
 // les gestes sont ceux de js/grammaire-carte.js, empruntés avec GrammaireCarte.viser), puis « Course aux étoiles » (js/mj-etoiles.js)
 // et « Aventure des multiplications » (js/mj-aventure.js), repris de florito32/minijeux (v10.47), puis « Quiz » Histoire / Géographie
-// (js/mj-quiz.js, v10.51 : choix de la matière, de la sous-matière et du niveau 1 à 10 ; scores dans Supabase).
+// (js/mj-quiz.js, v10.51 : choix de la matière, de la sous-matière et du niveau 1 à 10 ; scores dans Supabase), puis « Chasse aux lettres »
+// (js/mj-reperes.js, v10.54 : repérage visuel des lettres qui se ressemblent, une minute, record par profil).
 // Pour en ajouter un : une ligne dans JEUX, et soit sa fonction de départ dans DEPARTS (elle rend { carte, titre… }), soit un champ
 // « module » : un script qui expose window.X.monter(hote, { fini(gagne, ligneHtml) }) et rend { detruire() }.
 (function () {
@@ -20,7 +21,8 @@
     { id: 'sons', nom: 'Les sons', icone: '👂', aide: 'Complète, trie, relie : trouve les sons des mots (phonèmes).' },
     { id: 'etoiles', nom: 'Course aux étoiles', icone: '⭐', module: 'MJEtoiles', aide: 'Choisis la bonne réponse parmi trois, gagne des étoiles et bats ton record.' },
     { id: 'aventure', nom: 'Aventure des multiplications', icone: '🏃', module: 'MJAventure', aide: 'Cours, saute et casse les caisses qui donnent le bon résultat.' },
-    { id: 'quiz', nom: 'Quiz', icone: '❓', module: 'MJQuiz', aide: 'Histoire et Géographie : 10 ou 15 questions, 15 secondes pour répondre, un niveau de 1 à 10 à choisir.' }
+    { id: 'quiz', nom: 'Quiz', icone: '❓', module: 'MJQuiz', aide: 'Histoire et Géographie : 10 ou 15 questions, 15 secondes pour répondre, un niveau de 1 à 10 à choisir.' },
+    { id: 'reperes', nom: 'Chasse aux lettres', icone: '🔎', module: 'MJReperes', aide: 'Trouve le plus de fois possible la lettre demandée en une minute : b ou d, m ou n…' }
   ];
   var etat = null; // partie en cours : { jeu, profil, carte, fini }
 
@@ -144,7 +146,8 @@
       (gain && gain.apres > gain.avant ? '<p class="fin-niveau">Niveau ' + gain.apres + ' atteint !</p>' : '') +
       (gain && gain.coffres && gain.coffres.length ? '<p class="petit">Un coffre t’attend dans « Mon compte ».</p>' : '') +
       '<div class="minijeu-actions"><button type="button" class="btn btn-principal" id="minijeu-rejouer">Rejouer</button>' +
-      '<button type="button" class="btn btn-secondaire" id="minijeu-liste">Autres mini-jeux</button></div></section>';
+      '<button type="button" class="btn btn-secondaire" id="minijeu-liste">Autres mini-jeux</button>' +
+      '<button type="button" class="btn btn-secondaire" id="minijeu-accueil">Retour à l\'accueil</button></div></section>';
     if (dansCarte) $('minijeu-fin').innerHTML = h; else $('minijeu-corps').innerHTML = h; // « Les sons » : la carte corrigée reste visible
     var b = $('minijeu-rejouer'); if (b) b.focus({ preventScroll: true });
     if (window.Voix && window.Voix.taire) window.Voix.taire();
@@ -162,6 +165,7 @@
     if (!etat) return;
     if (e.target.closest('#minijeu-rejouer')) { lancer(etat.jeu.id, etat.profil); return; }
     if (e.target.closest('#minijeu-liste')) { rendre(); window.Aventura.afficher('ecran-minijeux'); return; }
+    if (e.target.closest('#minijeu-accueil')) { rendre(); demonter(); etat = null; window.Aventura.afficher('ecran-accueil'); return; }
     if (etat.fini || !etat.carte) return;
     if (etat.carte.module === 'phonemes') GC.toucher(e); else BC.toucher(etat.carte, e, outils);
   });

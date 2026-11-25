@@ -2673,3 +2673,61 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
   .quiz-annonce { min-height: 1.2em; font-size: .9rem; }
   #minijeu-corps .quiz .minijeu-qui, .carte-page.minijeu:has(.quiz) .minijeu-qui { display: none; }
 }
+
+/* ---------- Mini-jeu « Chasse aux lettres » (v10.54, js/mj-reperes.js) ---------- */
+/* Polices hébergées sur le site (fonts/LISEZMOI.txt) : lettres d'imprimerie (Andika) et cursive à boucles (Playwrite FR Trad). */
+@font-face { font-family: "Ludo Imprimerie"; src: url("../fonts/lettres-imprimerie.woff") format("woff"); font-display: swap; }
+@font-face { font-family: "Ludo Cursive"; src: url("../fonts/lettres-cursive.woff") format("woff"); font-display: swap; }
+.rep { container-type: inline-size; width: 100%; text-align: center; }
+.rep-police-imp { font-family: "Ludo Imprimerie", Verdana, Arial, sans-serif; }
+.rep-police-cur { font-family: "Ludo Cursive", "Playwrite FR Trad", cursive; }
+/* Préparation */
+.rep-prep { display: grid; gap: clamp(6px, 1.8cqw, 12px); }
+.rep-record { margin: 0 auto; display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; background: #fff; border: 2px solid var(--encre); border-radius: 10px; font-weight: 800; font-size: clamp(.85rem, 3.4cqw, 1rem); }
+.rep-corps, .rep-col-lettres, .rep-col-options { display: grid; gap: clamp(6px, 1.8cqw, 12px); min-width: 0; }
+.rep-q { margin: 0; font-weight: 800; font-size: clamp(.95rem, 3.8cqw, 1.1rem); }
+.rep-touches { display: grid; grid-template-columns: repeat(7, 1fr); gap: clamp(3px, 1.2cqw, 8px); }
+.rep-touche { display: grid; place-items: center; min-height: clamp(40px, 10cqw, 52px); padding: 0; line-height: 1; font-size: clamp(1rem, 4.6cqw, 1.4rem); color: var(--encre); background: #fff;
+  border: 2px solid var(--encre); border-radius: 10px; box-shadow: 0 3px 0 var(--encre); cursor: pointer; }
+.rep-touche[aria-pressed="true"] { background: var(--encre); color: #fff; transform: translateY(2px); box-shadow: 0 1px 0 var(--encre); }
+.rep-touche.rep-hasard { grid-column: 1 / -1; font: 800 clamp(.9rem, 3.6cqw, 1.1rem) system-ui, sans-serif; border-radius: 12px; }
+.rep-seg { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.rep-seg button { min-height: 44px; padding: 4px 12px; font: 800 clamp(.85rem, 3.4cqw, 1rem) system-ui, sans-serif; color: var(--encre); background: #fff; border: 2px solid var(--encre); border-radius: 10px; cursor: pointer; }
+.rep-seg button[aria-pressed="true"] { background: var(--encre); color: #fff; }
+.rep-seg .rep-cursive { font-family: "Ludo Cursive", "Playwrite FR Trad", cursive; font-size: 1.05rem; }
+.rep-jouer { justify-self: center; min-width: 60%; }
+/* Écran large ou carré : lettres à gauche, options et bouton à droite, sans rien faire défiler */
+@container (min-width: 380px) {
+  .rep-prep { gap: 8px; }
+  .rep-corps { grid-template-columns: 1.2fr 1fr; column-gap: 16px; align-items: center; }
+  .rep-touches { grid-template-columns: repeat(6, 1fr); }
+  .rep-touche { min-height: 36px; font-size: .95rem; }
+  .rep-seg { flex-direction: column; align-items: stretch; gap: 5px; }
+  .rep-seg button { min-height: 40px; }
+}
+/* Partie */
+.rep-jeu { display: flex; flex-direction: column; }
+.rep-hud { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: clamp(6px, 2.4cqw, 14px); padding: clamp(6px, 2cqw, 12px); background: #1f7a3a; color: #fff; border: 3px solid var(--encre); border-bottom-width: 0; border-radius: 14px 14px 0 0; }
+.rep-cible { display: flex; align-items: center; gap: 8px; }
+.rep-cible small { font: 800 clamp(.7rem, 3cqw, .95rem) system-ui, sans-serif; line-height: 1.1; text-align: left; }
+.rep-lettre-cible { min-width: clamp(40px, 14cqw, 76px); height: clamp(40px, 14cqw, 76px); padding: 0 8px; display: grid; place-items: center; background: #fff; color: var(--encre); border: 3px solid var(--encre); border-radius: 14px;
+  font-size: clamp(1.6rem, 8.5cqw, 3rem); line-height: 1; box-shadow: 0 3px 0 rgb(0 0 0 / .35); white-space: nowrap; }
+.rep-lettre-cible.rep-police-cur { height: auto; min-height: clamp(40px, 14cqw, 76px); padding: 8px 12px; font-size: clamp(1.1rem, 5cqw, 1.9rem); line-height: 2.1; } /* hampes et jambes de la cursive : le cadre grandit */
+.rep-temps { display: grid; gap: 4px; justify-items: center; font: 800 clamp(1rem, 4.6cqw, 1.5rem) "Rockwell", "Roboto Slab", Georgia, serif; }
+.rep-barre { width: 100%; height: clamp(8px, 2.2cqw, 12px); background: rgb(255 255 255 / .35); border: 2px solid rgb(0 0 0 / .35); border-radius: 99px; overflow: hidden; }
+.rep-barre span { display: block; height: 100%; width: 100%; background: #fff; }
+.rep-compte { text-align: right; font: 800 clamp(1.1rem, 5cqw, 1.7rem) "Rockwell", "Roboto Slab", Georgia, serif; line-height: 1.1; }
+.rep-aire { position: relative; background: var(--parchemin); border: 3px solid var(--encre); border-radius: 0 0 14px 14px; overflow: hidden; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.rep-let { position: absolute; left: calc(var(--x) * 100% - var(--L) / 2); top: calc(var(--y) * 100% - var(--L) / 2); width: var(--L); height: var(--L); padding: 0; margin: 0; display: grid; place-items: center;
+  font-size: calc(var(--L) * .64); line-height: 1; color: #111; background: transparent; border: 0; cursor: pointer; font-family: inherit; -webkit-tap-highlight-color: transparent; }
+.rep-cursive-aire .rep-let { font-size: calc(var(--L) * .46); } /* la cursive à boucles a de grandes hampes et jambes : plus petite pour rester dans son emplacement */
+.rep-let:focus-visible { outline: 3px solid var(--bleu); outline-offset: 2px; box-shadow: none; border-radius: 12px; }
+.rep-vide { visibility: hidden; pointer-events: none; }
+.rep-entre { animation: rep-entre .22s ease-out; }
+@keyframes rep-entre { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: scale(1); } }
+.rep-fb { position: absolute; z-index: 5; pointer-events: none; transform: translate(-50%, -50%); padding: 2px 8px; border-radius: 99px; color: #fff; font: 800 clamp(1rem, 4.6cqw, 1.5rem) system-ui, sans-serif; white-space: nowrap; animation: rep-monte .65s ease-out forwards; }
+.rep-fb-bon { background: #1f7a3a; }
+.rep-fb-mauvais { background: var(--rouge-texte); }
+@keyframes rep-monte { to { opacity: 0; transform: translate(-50%, -190%); } }
+.rep-depart { position: absolute; inset: 0; z-index: 6; display: grid; place-items: center; background: rgb(0 0 0 / .35); color: #fff; font: 800 clamp(2.5rem, 16cqw, 5rem) "Rockwell", "Roboto Slab", Georgia, serif; }
+@media (prefers-reduced-motion: reduce) { .rep-entre, .rep-fb { animation: none; } }

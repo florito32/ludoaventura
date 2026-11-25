@@ -2,6 +2,14 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.54', date: '2026-11-25', changes: [
+    "Nouveau mini-jeu « Chasse aux lettres » : trouve le plus de fois possible la lettre demandée en une minute (b ou d, m ou n, p ou q…).",
+    "Avant de jouer : choisis ta lettre (ou « Au hasard »), majuscule, minuscule ou mélange, écriture d'imprimerie ou cursive ; ton record est affiché.",
+    "13 lettres immobiles à l'écran ; une lettre touchée disparaît et une nouvelle apparaît ailleurs ; toutes les 2 secondes, une lettre change toute seule. Pas de limite d'erreurs ni de quantité.",
+    "Ton record (un seul par profil) est gardé en ligne ; il reste aussi sur l'appareil.",
+    "L'écran de fin de tous les mini-jeux propose un bouton « Retour à l'accueil ».",
+    "Les polices d'écriture (imprimerie et cursive à boucles) sont hébergées sur le site."
+  ] },
   { v: '10.53', date: '2026-11-25', changes: [
     "Mathématiques : tu choisis de nouveau « Calcul mental » ou « Problèmes » à la préparation (« Suivre ma progression » mélange toujours les deux).",
     "« Personnaliser » : au niveau choisi, les calculs sont toujours de la bonne tranche (le niveau 2 donne des calculs de 11 à 20), même avec peu de signes ou de nombres cochés.",

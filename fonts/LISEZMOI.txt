@@ -1,0 +1,9 @@
+Polices du mini-jeu « Chasse aux lettres » (js/mj-reperes.js). Hébergées sur le site (pas de chargement chez Google).
+
+- lettres-imprimerie.woff : lettres A-Z / a-z de la police Andika (SIL Global, licence SIL OFL 1.1, voir OFL-Andika.txt),
+  version réduite aux lettres, renommée « Ludo Imprimerie » (la licence interdit de garder le nom réservé « Andika » sur une version modifiée).
+  Source : https://github.com/silnrsi/font-andika (references/v7000/Andika-Regular.ttf).
+- lettres-cursive.woff : lettres A-Z / a-z de Playwrite FR Trad (écriture cursive à boucles enseignée en France, The Playwrite Project Authors,
+  licence SIL OFL 1.1, voir OFL-Playwrite.txt), version réduite aux lettres, renommée « Ludo Cursive ».
+  Source : https://github.com/TypeTogether/Playwrite (fonts/ttf/PlaywriteFRTrad-Regular.ttf).
+Fabrication : fontTools.subset (Python), format WOFF, sans les tables de ligatures (les lettres sont isolées).
