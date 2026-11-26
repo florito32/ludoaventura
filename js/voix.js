@@ -169,6 +169,7 @@
       u.lang = voix && /^fr-FR$/i.test(String(voix.lang).replace('_', '-')) ? voix.lang : 'fr-FR';
       if (voix) u.voice = voix;
       u.rate = m.vitesse;
+      u.volume = racine.Sons ? racine.Sons.volumeVoix() : 1; // v10.61 : volume réglé dans Paramètres › Sons
       u.pitch = m.hauteur;
       synthese.speak(u); // toutes les phrases sont mises en file d'un coup : pas d'attente entre elles
       return u;
@@ -190,6 +191,7 @@
     u.lang = voix && /^fr-FR$/i.test(String(voix.lang).replace('_', '-')) ? voix.lang : 'fr-FR';
     if (voix) u.voice = voix;
     u.rate = 0.9; u.pitch = 1;
+    u.volume = racine.Sons ? racine.Sons.volumeVoix() : 1; // v10.61
     function couper() { if (!coupe && jeton === numeroDire) { coupe = true; synthese.cancel(); enCours = []; } }
     u.onstart = function () { setTimeout(couper, ms == null ? 500 : ms); };
     setTimeout(couper, 2000 + (ms == null ? 500 : ms)); // filet : pas d'événement « start »

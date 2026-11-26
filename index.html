@@ -219,6 +219,7 @@
       <div class="compte-onglets" role="tablist" aria-label="Sections des paramètres" hidden>
         <button type="button" role="tab" id="onglet-profil" aria-controls="panneau-profil" aria-selected="true" data-onglet="profil" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>Joueurs</span></button>
         <button type="button" role="tab" id="onglet-id" aria-controls="panneau-id" aria-selected="false" tabindex="-1" data-onglet="id"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3"/></svg><span>Connexion</span></button>
+        <button type="button" role="tab" id="onglet-sons" aria-controls="panneau-sons" aria-selected="false" tabindex="-1" data-onglet="sons"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg><span>Sons</span></button>
         <button type="button" role="tab" id="onglet-rgpd" aria-controls="panneau-rgpd" aria-selected="false" tabindex="-1" data-onglet="rgpd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9V6z"/></svg><span>RGPD</span></button>
         <button type="button" role="tab" id="onglet-aide" aria-controls="panneau-aide" aria-selected="false" tabindex="-1" data-onglet="aide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 115 0c0 2-2.5 2-2.5 4M12 17v.5"/></svg><span>Aide</span></button>
         <button type="button" role="tab" id="onglet-contact" aria-controls="panneau-contact" aria-selected="false" tabindex="-1" data-onglet="contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><span>Contact</span></button>
@@ -358,6 +359,30 @@
       </section>
       </div>
       <!-- Confidentialité et RGPD (v10.32) : ce qui est gardé, export des données, suppression définitive. js/compte.js. -->
+      <!-- Sons et vibration (v10.61, demande du 26/11/2026) : volume des sons de l'animation et de la voix, vibration (js/sons.js, js/compte.js). -->
+      <div class="compte-panneau" role="tabpanel" id="panneau-sons" aria-labelledby="onglet-sons" hidden>
+        <h3 class="panneau-titre">Sons et vibration</h3>
+        <section class="carte-page compte-carte sons-carte">
+          <div class="sons-reglage">
+            <label for="sons-anim">Sons de l’animation <span class="sons-valeur" id="sons-anim-val" aria-hidden="true">100 %</span></label>
+            <input type="range" id="sons-anim" min="0" max="100" step="10" value="100" aria-describedby="sons-anim-aide">
+            <p class="petit" id="sons-anim-aide">Dé, bonne ou mauvaise réponse, étoiles gagnées. 0 % : plus aucun son.</p>
+          </div>
+          <div class="sons-reglage">
+            <label for="sons-voix">Voix <span class="sons-valeur" id="sons-voix-val" aria-hidden="true">100 %</span></label>
+            <input type="range" id="sons-voix" min="0" max="100" step="10" value="100" aria-describedby="sons-voix-aide">
+            <p class="petit" id="sons-voix-aide">Les questions et les sons lus à voix haute. 0 % : la voix reste muette.</p>
+          </div>
+          <fieldset class="sons-reglage sons-vib">
+            <legend>Vibration du téléphone</legend>
+            <label><input type="radio" name="sons-vib" value="aucune"> Désactivée</label>
+            <label><input type="radio" name="sons-vib" value="legere"> Légère</label>
+            <label><input type="radio" name="sons-vib" value="normale" checked> Normale</label>
+            <label><input type="radio" name="sons-vib" value="forte"> Forte</label>
+            <p class="petit" id="sons-vib-aide">Sur Android. L’iPhone ne permet pas de vibrer depuis un site.</p>
+          </fieldset>
+        </section>
+      </div>
       <div class="compte-panneau" role="tabpanel" id="panneau-rgpd" aria-labelledby="onglet-rgpd" hidden>
         <h3 class="panneau-titre">Confidentialité et RGPD</h3>
         <section class="carte-page compte-carte">
@@ -1117,6 +1142,7 @@
 <script src="js/grammaire-carte.js"></script>
 <script src="js/phrases.js"></script>
 <script src="js/voix.js"></script>
+<script src="js/sons.js"></script>
 <script src="js/constructions.js"></script>
 <script src="js/regles.js"></script>
 <script src="js/articles.js"></script>
