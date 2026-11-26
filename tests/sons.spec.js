@@ -1,4 +1,4 @@
-// Sons et vibrations (v10.61, demande du 26/11/2026, backlog lignes 565 à 572) :
+// Sons et vibrations (v10.61, demande du 26/11/2026, backlog lignes 565 à 571) :
 //  - dé : son + vibration de 0,1 s ; bonne réponse : son « réussite » ; mauvaise : son « raté » ;
 //  - étoiles gagnées : un son toutes les 0,1 s avec de petites vibrations ;
 //  - Paramètres › Sons : volume de l'animation, volume de la voix, vibration à 4 niveaux (gardés sur l'appareil) ;

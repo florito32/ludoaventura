@@ -2,6 +2,12 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.61', date: '2026-11-26', changes: [
+    "Les sons arrivent : un son quand le dé roule (avec une vibration de 0,1 s sur téléphone), un son de réussite après une bonne réponse, un son différent après une mauvaise réponse.",
+    "À la fin d’une partie gagnée, les étoiles qui s’envolent font un petit son toutes les 0,1 s, avec de petites vibrations.",
+    "Nouvel onglet « Sons » dans les Paramètres (le rouage) : volume des sons de l’animation, volume de la voix, vibration désactivée, légère, normale ou forte. Tes choix restent sur l’appareil.",
+    "Les sons et les vibrations s’arrêtent dès que tu quittes l’écran en cours, ferme la page ou passes à une autre application."
+  ] },
   { v: '10.60', date: '2026-11-26', changes: [
     "« Les sons » : le jeu est enfin bien dessiné. Les boutons prennent toute la largeur de l’écran, et « [ə] » ne s’écrit plus lettre par lettre en hauteur.",
     "« Les sons » : quand tu touches un son (« Quel son ? », colonne de gauche de « Relier »), la voix le dit pendant une demi-seconde.",

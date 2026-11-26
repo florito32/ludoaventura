@@ -1,4 +1,4 @@
-// Sons et vibrations du jeu (v10.61, demande du 26/11/2026, backlog lignes 565 à 572).
+// Sons et vibrations du jeu (v10.61, demande du 26/11/2026, backlog lignes 565 à 571).
 //  - dé : son + vibration de 0,1 s au lancer ; réussite / raté : pendant l'animation du pion après la réponse ;
 //    étoile : un son toutes les 0,1 s (avec une petite vibration) pendant l'envol des étoiles gagnées.
 //  - Réglages dans Paramètres › Sons : volume des sons de l'animation, volume de la voix, vibration (désactivée, légère,
