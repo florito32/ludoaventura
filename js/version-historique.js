@@ -2,6 +2,10 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.58', date: '2026-11-26', changes: [
+    "Accueil : deux boutons en haut. « Mon compte » (à gauche) ouvre seulement tes profils et joueurs ; le rouage « Paramètres » (à droite) ouvre Connexion, RGPD, Aide et Contact.",
+    "Contact : le bouton « Nous contacter » (Paramètres → Contact) ouvre le formulaire du site ludo-aventura.fr dans un nouvel onglet."
+  ] },
   { v: '10.57', date: '2026-11-25', changes: [
     "Chasse aux lettres : quand tu touches une lettre, une autre mauvaise lettre disparaît aussi, et deux nouvelles lettres apparaissent (une bonne et une mauvaise si tu as trouvé une bonne lettre, deux mauvaises sinon)."
   ] },
