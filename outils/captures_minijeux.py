@@ -29,6 +29,8 @@ def fabrique(page):
     page.locator('.baby-touche').nth(3).click()
 
 def sons(page):
+    # La capture montre toujours « Relier son ↔ écriture » (le jeu le plus parlant), pas un jeu tiré au hasard.
+    page.evaluate("() => window.Minijeux.lancer('sons', window.Joueurs.duCompte()[0].id, 'relier')")
     page.wait_for_timeout(600)
 
 def etoiles(page):

@@ -160,6 +160,7 @@
     if (!disponible()) return false;
     Voix.dernier = String(texte == null ? '' : texte); // texte demandé, avant préparation (utile aux tests)
     var morceaux = preparer(texte);
+    numeroDire++; // une coupure de dire() encore en attente ne doit pas couper cette lecture
     synthese.cancel();
     if (synthese.paused && synthese.resume) synthese.resume(); // Chrome reste parfois bloqué en pause
     var voix = meilleureVoix();
@@ -175,8 +176,32 @@
     return morceaux.length > 0;
   }
 
+  // Dit un texte très court (un son, une syllabe) et coupe la voix après `ms` millisecondes (v10.60 : 500 ms pour un phonème).
+  // Le compte commence quand la voix démarre vraiment (événement « start »), pas au clic : la voix met parfois un instant à partir.
+  // Sans événement « start » (certaines voix), la coupure arrive au plus tard 2 s après le clic. Renvoie false si l'appareil ne sait pas lire.
+  function dire(texte, ms) {
+    if (!disponible()) return false;
+    texte = String(texte == null ? '' : texte).trim();
+    if (!texte) return false;
+    Voix.dernier = texte;
+    synthese.cancel();
+    if (synthese.paused && synthese.resume) synthese.resume();
+    var voix = meilleureVoix(), u = new racine.SpeechSynthesisUtterance(texte), coupe = false, jeton = ++numeroDire;
+    u.lang = voix && /^fr-FR$/i.test(String(voix.lang).replace('_', '-')) ? voix.lang : 'fr-FR';
+    if (voix) u.voice = voix;
+    u.rate = 0.9; u.pitch = 1;
+    function couper() { if (!coupe && jeton === numeroDire) { coupe = true; synthese.cancel(); enCours = []; } }
+    u.onstart = function () { setTimeout(couper, ms == null ? 500 : ms); };
+    setTimeout(couper, 2000 + (ms == null ? 500 : ms)); // filet : pas d'événement « start »
+    enCours = [u];
+    synthese.speak(u);
+    return true;
+  }
+  var numeroDire = 0; // un nouveau son annule la coupure du précédent
+
   // Arrête la lecture.
   function taire() {
+    numeroDire++;
     if (disponible()) synthese.cancel();
     enCours = [];
   }
@@ -212,7 +237,7 @@
   }
 
   var Voix = {
-    disponible: disponible, lire: lire, taire: taire, preparer: preparer, meilleureVoix: meilleureVoix, noteVoix: noteVoix,
+    disponible: disponible, lire: lire, dire: dire, taire: taire, preparer: preparer, meilleureVoix: meilleureVoix, noteVoix: noteVoix,
     texteCarte: texteCarte, phraseExemple: phraseExemple, dernier: ''
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = Voix; // tests Node

@@ -163,6 +163,18 @@
     return e.debut ? 'le son du début de « ' + mot + ' »' : 'le son « ' + e.son + ' » de « ' + mot + ' »';
   }
 
+  // Le son dit seul, très court (v10.60, demande du 26/11/2026 : « dès que le joueur clique sur un phonème, le son est dit pendant 0,5 s »).
+  // La synthèse vocale ne lit pas l'alphabet phonétique : on lui donne une syllabe que le français prononce avec ce son.
+  // Les consonnes sont dites avec « eu » (impossible de les prononcer sans voyelle) ; la voix est coupée après 0,5 s (js/voix.js, Voix.dire).
+  // HYPOTHÈSE À VALIDER à l'oreille : le rendu dépend de la voix de l'appareil.
+  var SON_DIT = {
+    p: 'peu', b: 'beu', t: 'teu', d: 'deu', k: 'queue', g: 'gueu', f: 'feu', v: 'veu', s: 'seu', z: 'zeu', S: 'cheu', Z: 'jeu',
+    m: 'meu', n: 'neu', J: 'gneu', N: 'ngueu', l: 'leu', R: 'reu',
+    i: 'i', e: 'é', E: 'è', a: 'a', A: 'â', O: 'oh', o: 'au', u: 'ou', y: 'u', 2: 'eux', 9: 'heure', '@': 'euh',
+    'e~': 'hein', 'a~': 'an', 'o~': 'on', '9~': 'un', j: 'yeu', w: 'oui', H: 'huit'
+  };
+  function sonDit(id) { return SON_DIT[id] || ''; }
+
   // ---------- Les jeux ----------
   var JEUX = [
     { id: 'completer', nom: 'Complète le mot', court: 'Compléter' },
@@ -379,7 +391,7 @@
   var api = {
     CATEGORIES: CATEGORIES, SONS: SONS, TOUS_SONS: TOUS_SONS, GRAPHIES: GRAPHIES, VOISINS: VOISINS, MOTS: MOTS, VRAIS_MOTS: VRAIS_MOTS,
     JEUX: JEUX, POSITIONS: POSITIONS, DELICATS: DELICATS, delicat: delicat,
-    jeu: jeu, lireMot: lireMot, exemple: exemple, sonOral: sonOral, nomPosition: nomPosition, mot: function (m) { return PAR_MOT[m] || null; }, crochets: crochets, placeDe: placeDe,
+    jeu: jeu, lireMot: lireMot, exemple: exemple, sonOral: sonOral, sonDit: sonDit, nomPosition: nomPosition, mot: function (m) { return PAR_MOT[m] || null; }, crochets: crochets, placeDe: placeDe,
     generer: generer, juste: juste, pairesJustes: pairesJustes, solution: solution, ecrituresPour: ecrituresPour
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
