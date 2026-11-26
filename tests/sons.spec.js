@@ -42,6 +42,9 @@ test('Paramètres › Sons : volumes et vibration, gardés après rechargement',
   expect(await page.evaluate(() => window.Sons.reglages())).toEqual({ anim: 0.4, voix: 0.7, vib: 'legere' });
   expect(await page.evaluate(() => window.Sons.volumeVoix())).toBe(0.7);
   await page.reload();
+  // Le rechargement garde l'écran affiché (sessionStorage) mais pas la vue : on revient à l'accueil, puis on rouvre les Paramètres.
+  const retour = page.locator('#ecran-compte [data-retour-accueil]');
+  if (await retour.isVisible()) await retour.click();
   await page.locator('#btn-parametres').click();
   await page.locator('#onglet-sons').click();
   await expect(page.locator('#sons-anim')).toHaveValue('40');
