@@ -429,6 +429,13 @@
     var a = et.querySelector('.ico').getBoundingClientRect(), b = cible.getBoundingClientRect();
     var dx = (b.left + b.width / 2) - (a.left + a.width / 2), dy = (b.top + b.height / 2) - (a.top + a.height / 2);
     var total = $('btn-compte');
+    // v10.61 (demande du 26/11/2026) : un son d'étoile toutes les 0,1 s pendant toute l'animation, avec une petite vibration ;
+    // indépendant du nombre d'étoiles volantes (qui peuvent partir plus vite que toutes les 0,1 s). finirGain() les arrête.
+    if (window.Sons) {
+      for (var k = 0; k * 100 < D; k++) {
+        vol.minuteurs.push(setTimeout(function () { if (vol) { window.Sons.jouer('etoile'); window.Sons.vibrer(20); } }, k * 100));
+      }
+    }
     // Étoile volante k : elle apporte sa part des n étoiles (1 en général, plusieurs pour un gros gain).
     function arrivee() {
       if (!vol) return;

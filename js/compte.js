@@ -412,12 +412,12 @@
   // « compte » = « Mon compte » : seulement les profils du compte (pas de barre d'onglets).
   // « parametres » = « Paramètres » (le rouage) : Connexion, RGPD, Aide, Contact.
   var vue = 'compte';
-  var ONGLETS_VUE = { compte: ['profil'], parametres: ['id', 'rgpd', 'aide', 'contact'] };
+  var ONGLETS_VUE = { compte: ['profil'], parametres: ['id', 'sons', 'rgpd', 'aide', 'contact'] };
   function appliquerVue() {
     var param = vue === 'parametres';
     $('titre-compte').textContent = param ? 'Paramètres' : 'Mon compte';
     var barre = document.querySelector('.compte-onglets'); if (barre) barre.hidden = !param;
-    ['profil', 'id', 'rgpd', 'aide', 'contact'].forEach(function (n) { $('onglet-' + n).hidden = ONGLETS_VUE[vue].indexOf(n) < 0; });
+    ['profil', 'id', 'sons', 'rgpd', 'aide', 'contact'].forEach(function (n) { $('onglet-' + n).hidden = ONGLETS_VUE[vue].indexOf(n) < 0; });
   }
   function ouvrirVue(v) { vue = v; window.Aventura.afficher('ecran-compte'); }
   function majPage() {
@@ -535,7 +535,7 @@
   // ---------- Onglets de « Mon compte » (v10.32) ----------
   // Profil et joueurs | Identifiant et connexion | Confidentialité et RGPD | Aide et mentions légales. Flèches, Début et Fin au clavier.
   // v10.58 : « Contact » s'ajoute ; la barre est cachée dans « Mon compte » et le profil n'est plus dans la barre des Paramètres.
-  var NOMS_ONGLETS = ['profil', 'id', 'rgpd', 'aide', 'contact'];
+  var NOMS_ONGLETS = ['profil', 'id', 'sons', 'rgpd', 'aide', 'contact'];
   var ongletCourant = null; // gardé en allant voir « Mes coffres » : on revient sur le même onglet
   function choisirOnglet(nom, avecFocus) {
     ongletCourant = nom;
@@ -547,6 +547,23 @@
     });
     if (nom === 'profil' && window.JoueursEcran) window.JoueursEcran.rendre();
   }
+  // ---------- Onglet « Sons » (v10.61) : volume de l'animation, volume de la voix, vibration (js/sons.js) ----------
+  // Un essai accompagne chaque changement : petit son d'étoile, mot dit à voix haute, vibration d'une demi-seconde.
+  (function () {
+    var S = window.Sons; if (!S || !$('sons-anim')) return;
+    var r = S.reglages();
+    function afficherVolume(id) { var v = Math.round(S.reglages()[id] * 100); $('sons-' + id).value = String(v); $('sons-' + id + '-val').textContent = v + ' %'; $('sons-' + id).setAttribute('aria-valuetext', v + ' %'); }
+    afficherVolume('anim'); afficherVolume('voix');
+    var radio = document.querySelector('input[name="sons-vib"][value="' + r.vib + '"]'); if (radio) radio.checked = true;
+    $('sons-anim').addEventListener('input', function (e) { S.regler('anim', e.target.value / 100); afficherVolume('anim'); });
+    $('sons-anim').addEventListener('change', function () { S.jouer('etoile'); });
+    $('sons-voix').addEventListener('input', function (e) { S.regler('voix', e.target.value / 100); afficherVolume('voix'); });
+    $('sons-voix').addEventListener('change', function () { if (window.Voix && window.Voix.lire) window.Voix.lire('Bonjour, c’est ma voix.'); });
+    document.querySelectorAll('input[name="sons-vib"]').forEach(function (b) {
+      b.addEventListener('change', function () { S.regler('vib', b.value); S.vibrer(500); });
+    });
+  })();
+
   var liste_onglets = document.querySelector('.compte-onglets');
   if (liste_onglets) {
     liste_onglets.addEventListener('click', function (e) { var b = e.target.closest('[data-onglet]'); if (b) choisirOnglet(b.getAttribute('data-onglet')); });

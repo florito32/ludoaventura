@@ -2748,3 +2748,14 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 @keyframes rep-monte { to { opacity: 0; transform: translate(-50%, -190%); } }
 .rep-depart { position: absolute; inset: 0; z-index: 6; display: grid; place-items: center; background: rgb(0 0 0 / .35); color: #fff; font: 800 clamp(2.5rem, 16cqw, 5rem) "Rockwell", "Roboto Slab", Georgia, serif; }
 @media (prefers-reduced-motion: reduce) { .rep-entre, .rep-fb { animation: none; } }
+
+/* ---------- Paramètres › Sons (v10.61, demande du 26/11/2026) : curseurs de volume et vibration à 4 niveaux ---------- */
+.sons-reglage { display: grid; gap: 6px; min-width: 0; border: 0; margin: 0; padding: 0; }
+.sons-reglage > label, .sons-vib legend { font-weight: 800; display: flex; justify-content: space-between; gap: 8px; padding: 0; }
+.sons-valeur { font-weight: 700; color: var(--encre-douce); }
+.sons-reglage input[type="range"] { width: 100%; min-height: 44px; margin: 0; accent-color: var(--encre); }
+.sons-vib { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.sons-vib legend { grid-column: 1 / -1; }
+.sons-vib label { display: flex; align-items: center; gap: 8px; min-height: 44px; font-weight: 700; }
+.sons-vib input { width: 22px; height: 22px; accent-color: var(--encre); flex: none; }
+.sons-vib .petit { grid-column: 1 / -1; }

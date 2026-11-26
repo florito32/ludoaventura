@@ -1,5 +1,5 @@
 // « Mon compte » et « Paramètres » (v10.32, demande du 23/11/2026, backlog lignes 459 à 465 ; scindés en v10.58, demande du 26/11/2026) :
-// « Mon compte » = Profil et joueurs ; « Paramètres » (le rouage) = Connexion | RGPD | Aide | Contact.
+// « Mon compte » = Profil et joueurs ; « Paramètres » (le rouage) = Connexion | Sons | RGPD | Aide | Contact (Sons : v10.61).
 // Le service Supabase est imité (aucun appel réel).
 const { test, expect } = require('@playwright/test');
 const J = require('../js/joueurs.js');
@@ -98,15 +98,15 @@ const ETAT_2 = { v: 1, total: 0, joueurs: [
   { id: 'j-1', nom: 'Léa', perso: 'lea', cree: '2026-11-01T00:00:00Z', maj: '2026-11-01T00:00:00Z', niv: { 'maths.calcul': 40 }, st: { maths: [4, 3, 1, 2] } },
   { id: 'j2', nom: 'Tom', perso: 'tom', cree: '2026-11-01T00:00:00Z', maj: '2026-11-01T00:00:00Z', niv: {} }] };
 
-test('Paramètres (le rouage) : 4 onglets Connexion, RGPD, Aide, Contact ; on arrive sur « Connexion » ; chacun sans débordement @smoke', async ({ page }) => {
+test('Paramètres (le rouage) : 5 onglets Connexion, Sons, RGPD, Aide, Contact ; on arrive sur « Connexion » ; chacun sans débordement @smoke', async ({ page }) => {
   await preparer(page);
   await page.goto('./');
   await page.locator('#btn-parametres').click();
   await expect(page.locator('#titre-compte')).toHaveText('Paramètres');
-  await expect(page.getByRole('tab')).toHaveCount(4); // « Joueurs » n'est plus dans les Paramètres
+  await expect(page.getByRole('tab')).toHaveCount(5); // « Joueurs » n'est plus dans les Paramètres
   await expect(page.locator('#onglet-id')).toHaveAttribute('aria-selected', 'true');
   await expect(page.locator('#compte-invite')).toBeVisible();
-  const titres = { id: 'Identifiant et connexion', rgpd: 'Confidentialité et RGPD', aide: 'Aide et mentions légales', contact: 'Nous contacter' };
+  const titres = { id: 'Identifiant et connexion', sons: 'Sons et vibration', rgpd: 'Confidentialité et RGPD', aide: 'Aide et mentions légales', contact: 'Nous contacter' };
   for (const [nom, titre] of Object.entries(titres)) {
     await page.locator('#onglet-' + nom).click();
     await expect(page.locator('#onglet-' + nom)).toHaveAttribute('aria-selected', 'true');
@@ -172,6 +172,8 @@ test('onglets des Paramètres au clavier : flèches, Début, Fin', async ({ page
   await page.goto('./');
   await page.locator('#btn-parametres').click();
   await page.locator('#onglet-id').focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(page.locator('#onglet-sons')).toBeFocused();
   await page.keyboard.press('ArrowRight');
   await expect(page.locator('#onglet-rgpd')).toBeFocused();
   await expect(page.locator('#onglet-rgpd')).toHaveAttribute('aria-selected', 'true');

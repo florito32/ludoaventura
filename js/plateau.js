@@ -2002,6 +2002,7 @@
     pion.classList.remove('saute', 'secoue', 'arrive'); // l'arrivée ne doit pas rejouer après la réaction
     void pion.offsetWidth;
     pion.classList.add(bonne ? 'saute' : 'secoue');
+    if (window.Sons) window.Sons.jouer(bonne ? 'reussite' : 'rate'); // v10.61 : le son accompagne l'animation du pion
     plusTard(function () { zone.hidden = true; pion.classList.remove('saute', 'secoue'); }, DUREE_REACTION);
   }
 
@@ -2843,6 +2844,7 @@
     if (partie.eval) { clearTimeout(minuteurDe); minuteurDe = null; suiteEval(); return; } // v10.49 : pas de dé, on passe à la question suivante
     clearTimeout(minuteurDe); minuteurDe = null; // lancé (par les tests) avant le lancer automatique
     partie.roule = true;
+    if (window.Sons) { window.Sons.jouer('de'); window.Sons.vibrer(100); } // v10.61 : son du dé + vibration de 0,1 s
     majPlein(); // v9.0 : le plateau revient pour le dé
     $('tour-actions').innerHTML = '';
     var v = window.Des.lancer(type);
