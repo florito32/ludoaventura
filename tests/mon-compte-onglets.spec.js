@@ -1,5 +1,5 @@
-// « Mon compte » en 4 onglets (v10.32, demande du 23/11/2026, backlog lignes 459 à 465) :
-// Profil et joueurs | Identifiant et connexion | Confidentialité et RGPD | Aide et mentions légales.
+// « Mon compte » et « Paramètres » (v10.32, demande du 23/11/2026, backlog lignes 459 à 465 ; scindés en v10.58, demande du 26/11/2026) :
+// « Mon compte » = Profil et joueurs ; « Paramètres » (le rouage) = Connexion | RGPD | Aide | Contact.
 // Le service Supabase est imité (aucun appel réel).
 const { test, expect } = require('@playwright/test');
 const J = require('../js/joueurs.js');
@@ -98,50 +98,102 @@ const ETAT_2 = { v: 1, total: 0, joueurs: [
   { id: 'j-1', nom: 'Léa', perso: 'lea', cree: '2026-11-01T00:00:00Z', maj: '2026-11-01T00:00:00Z', niv: { 'maths.calcul': 40 }, st: { maths: [4, 3, 1, 2] } },
   { id: 'j2', nom: 'Tom', perso: 'tom', cree: '2026-11-01T00:00:00Z', maj: '2026-11-01T00:00:00Z', niv: {} }] };
 
-test('4 onglets : pas connecté on arrive sur « Connexion », connecté sur « Joueurs » ; chacun sans débordement @smoke', async ({ page }) => {
+test('Paramètres (le rouage) : 4 onglets Connexion, RGPD, Aide, Contact ; on arrive sur « Connexion » ; chacun sans débordement @smoke', async ({ page }) => {
   await preparer(page);
   await page.goto('./');
-  await page.locator('#btn-compte').click();
-  const onglets = page.getByRole('tab');
-  await expect(onglets).toHaveCount(4);
+  await page.locator('#btn-parametres').click();
+  await expect(page.locator('#titre-compte')).toHaveText('Paramètres');
+  await expect(page.getByRole('tab')).toHaveCount(4); // « Joueurs » n'est plus dans les Paramètres
   await expect(page.locator('#onglet-id')).toHaveAttribute('aria-selected', 'true');
   await expect(page.locator('#compte-invite')).toBeVisible();
-  const titres = { profil: 'Profil et joueurs', id: 'Identifiant et connexion', rgpd: 'Confidentialité et RGPD', aide: 'Aide et mentions légales' };
+  const titres = { id: 'Identifiant et connexion', rgpd: 'Confidentialité et RGPD', aide: 'Aide et mentions légales', contact: 'Nous contacter' };
   for (const [nom, titre] of Object.entries(titres)) {
     await page.locator('#onglet-' + nom).click();
     await expect(page.locator('#onglet-' + nom)).toHaveAttribute('aria-selected', 'true');
     await expect(page.locator('#panneau-' + nom)).toBeVisible();
     await expect(page.locator('#panneau-' + nom).getByRole('heading', { name: titre, level: 3 }).first()).toBeVisible();
-    for (const autre of Object.keys(titres).filter((n) => n !== nom)) await expect(page.locator('#panneau-' + autre)).toBeHidden();
+    for (const autre of ['profil', ...Object.keys(titres).filter((n) => n !== nom)]) await expect(page.locator('#panneau-' + autre)).toBeHidden();
     expect(await sansDebordement(page), 'onglet ' + nom).toBe(true);
   }
 });
 
-test('onglets au clavier : flèches, Début, Fin', async ({ page }) => {
+test('« Mon compte » : seulement « Profil et joueurs », sans barre d’onglets (connecté ou non) @smoke', async ({ page }) => {
   await preparer(page);
   await page.goto('./');
   await page.locator('#btn-compte').click();
+  await expect(page.locator('#titre-compte')).toHaveText('Mon compte');
+  await expect(page.locator('.compte-onglets')).toBeHidden();
+  await expect(page.getByRole('tab')).toHaveCount(0);
+  await expect(page.locator('#panneau-profil')).toBeVisible();
+  await expect(page.locator('#panneau-profil').getByRole('heading', { name: 'Profil et joueurs', level: 3 })).toBeVisible();
+  for (const autre of ['id', 'rgpd', 'aide', 'contact']) await expect(page.locator('#panneau-' + autre)).toBeHidden();
+  expect(await sansDebordement(page)).toBe(true);
+  // Retour à l'accueil puis rouage : l'écran change de titre et d'onglets (la vue ne reste pas collée).
+  await page.getByRole('button', { name: /Accueil/ }).first().click();
+  await page.locator('#btn-parametres').click();
+  await expect(page.locator('#titre-compte')).toHaveText('Paramètres');
+  await expect(page.locator('#panneau-profil')).toBeHidden();
+  await page.getByRole('button', { name: /Accueil/ }).first().click();
+  await page.locator('#btn-compte').click();
+  await expect(page.locator('#titre-compte')).toHaveText('Mon compte');
+  await expect(page.locator('#panneau-profil')).toBeVisible();
+});
+
+test('accueil : « Mon compte » et le rouage « Paramètres » sont visibles, distincts et sans chevauchement', async ({ page }) => {
+  await preparer(page);
+  await page.goto('./');
+  const compte = page.locator('#btn-compte'), rouage = page.getByRole('button', { name: 'Paramètres' });
+  await expect(compte).toBeInViewport({ ratio: 1 });
+  await expect(rouage).toBeInViewport({ ratio: 1 });
+  await expect(page.locator('#btn-parametres svg use')).toHaveAttribute('href', '#i-rouage');
+  const a = await compte.boundingBox(), b = await rouage.boundingBox();
+  expect(a.x + a.width <= b.x || b.x + b.width <= a.x, 'les deux boutons ne se chevauchent pas').toBe(true);
+  expect(b.width).toBeGreaterThanOrEqual(44);
+  expect(b.height).toBeGreaterThanOrEqual(44);
+  expect(await sansDebordement(page)).toBe(true);
+  await expect(compte).toContainText('Mon compte');
+});
+
+test('Contact : un bouton « Nous contacter » ouvre le formulaire du site ludo-aventura.fr dans un nouvel onglet', async ({ page }) => {
+  await preparer(page);
+  await page.goto('./');
+  await page.locator('#btn-parametres').click();
+  await page.locator('#onglet-contact').click();
+  const lien = page.getByRole('link', { name: /Nous contacter/ });
+  await expect(lien).toBeVisible();
+  await expect(lien).toHaveAttribute('href', 'https://www.ludo-aventura.fr/pages/contact');
+  await expect(lien).toHaveAttribute('target', '_blank');
+  await expect(lien).toHaveAttribute('rel', /noopener/);
+  expect(await sansDebordement(page)).toBe(true);
+});
+
+test('onglets des Paramètres au clavier : flèches, Début, Fin', async ({ page }) => {
+  await preparer(page);
+  await page.goto('./');
+  await page.locator('#btn-parametres').click();
   await page.locator('#onglet-id').focus();
   await page.keyboard.press('ArrowRight');
   await expect(page.locator('#onglet-rgpd')).toBeFocused();
   await expect(page.locator('#onglet-rgpd')).toHaveAttribute('aria-selected', 'true');
   await page.keyboard.press('End');
-  await expect(page.locator('#onglet-aide')).toBeFocused();
+  await expect(page.locator('#onglet-contact')).toBeFocused();
   await page.keyboard.press('ArrowRight'); // retour au début
-  await expect(page.locator('#onglet-profil')).toBeFocused();
+  await expect(page.locator('#onglet-id')).toBeFocused();
   await page.keyboard.press('ArrowLeft');
-  await expect(page.locator('#onglet-aide')).toBeFocused();
+  await expect(page.locator('#onglet-contact')).toBeFocused();
   await page.keyboard.press('Home');
-  await expect(page.locator('#onglet-profil')).toBeFocused();
+  await expect(page.locator('#onglet-id')).toBeFocused();
 });
 
-test('connecté : « Mon compte » s’ouvre sur « Joueurs » ; l’e-mail et le pseudo sont dans « Connexion »', async ({ page }) => {
+test('connecté : « Mon compte » s’ouvre sur « Joueurs » ; l’e-mail et le pseudo sont dans Paramètres → « Connexion »', async ({ page }) => {
   await preparer(page, { session: SESSION });
   await service(page);
   await page.goto('./');
   await page.locator('#btn-compte').click();
-  await expect(page.locator('#onglet-profil')).toHaveAttribute('aria-selected', 'true');
-  await page.locator('#onglet-id').click();
+  await expect(page.locator('#panneau-profil')).toBeVisible();
+  await page.getByRole('button', { name: /Accueil/ }).first().click();
+  await page.locator('#btn-parametres').click();
+  await expect(page.locator('#onglet-id')).toHaveAttribute('aria-selected', 'true');
   await expect(page.locator('#compte-qui')).toHaveText('joueur@example.com');
   await expect(page.locator('#compte-pseudo')).toHaveText('Aventurier42');
   await expect(page.getByRole('button', { name: 'Changer mon adresse e-mail' })).toBeVisible();
@@ -152,7 +204,6 @@ test('carte fermée : visage, nom, crayon, niveau, Statistiques, poubelle ; icô
   await preparer(page, { etat: ETAT_2 });
   await page.goto('./');
   await page.locator('#btn-compte').click();
-  await page.locator('#onglet-profil').click();
   const c = carte(page, 'Léa');
   await expect(c.locator('.joueur-avatar')).toBeVisible();
   await expect(c.getByRole('button', { name: 'Modifier le joueur Léa' })).toBeVisible();
@@ -170,7 +221,6 @@ test('Statistiques : se déroule sous le joueur, avec parties jouées / réussie
   await preparer(page, { etat: ETAT_2 });
   await page.goto('./');
   await page.locator('#btn-compte').click();
-  await page.locator('#onglet-profil').click();
   const c = carte(page, 'Léa');
   const bouton = c.getByRole('button', { name: 'Statistiques' });
   await bouton.click();
@@ -194,7 +244,6 @@ test('poubelle : confirmation « détruira toute sa progression et ses gains » 
   await preparer(page, { etat: ETAT_2 });
   await page.goto('./');
   await page.locator('#btn-compte').click();
-  await page.locator('#onglet-profil').click();
   await carte(page, 'Tom').getByRole('button', { name: 'Supprimer le joueur Tom' }).click();
   const fenetre = page.getByRole('dialog');
   await expect(fenetre).toBeVisible();
@@ -218,7 +267,6 @@ test('poubelle : confirmation « détruira toute sa progression et ses gains » 
   await page.reload();
   // Le jeu rouvre l'écran où l'on était : on ne touche l'icône du compte que si elle est là.
   if (!(await page.locator('#ecran-compte').isVisible())) await page.locator('#btn-compte').click();
-  await page.locator('#onglet-profil').click();
   await expect(carte(page, 'Tom')).toHaveCount(0);
 });
 
@@ -226,7 +274,6 @@ test('supprimer le dernier joueur : un nouveau « Joueur 1 » vide apparaît', a
   await preparer(page, { etat: { v: 1, total: 0, joueurs: [ETAT_2.joueurs[0]] } });
   await page.goto('./');
   await page.locator('#btn-compte').click();
-  await page.locator('#onglet-profil').click();
   await carte(page, 'Léa').getByRole('button', { name: 'Supprimer le joueur Léa' }).click();
   await page.getByRole('button', { name: 'Oui, supprimer' }).click();
   await expect(carte(page, 'Joueur 1')).toBeVisible();
@@ -239,7 +286,6 @@ test('revenir de « Mes coffres » ramène sur l’onglet Joueurs', async ({ pag
   await preparer(page, { etat: ETAT_2 });
   await page.goto('./');
   await page.locator('#btn-compte').click();
-  await page.locator('#onglet-profil').click();
   await carte(page, 'Léa').getByRole('button', { name: 'Statistiques' }).click();
   await carte(page, 'Léa').getByRole('button', { name: 'Mes coffres' }).click();
   await expect(page.getByRole('heading', { name: 'Mes coffres' })).toBeVisible();
@@ -253,7 +299,7 @@ test('changer l’adresse e-mail : vérifiée, envoyée au service, message de c
   await preparer(page, { session: SESSION });
   const appels = await service(page);
   await page.goto('./');
-  await page.locator('#btn-compte').click();
+  await page.locator('#btn-parametres').click();
   await page.locator('#onglet-id').click();
   await page.getByRole('button', { name: 'Changer mon adresse e-mail' }).click();
   await expect(page.locator('#compte-email-champ')).toBeFocused();
@@ -276,7 +322,7 @@ test('changer le mot de passe : 6 caractères au moins, puis envoyé au service'
   await preparer(page, { session: SESSION });
   const appels = await service(page);
   await page.goto('./');
-  await page.locator('#btn-compte').click();
+  await page.locator('#btn-parametres').click();
   await page.locator('#onglet-id').click();
   await page.getByRole('button', { name: 'Changer le mot de passe' }).click();
   await page.locator('#compte-mdp-champ').fill('abc');
@@ -293,7 +339,7 @@ test('compte Google : ni e-mail ni mot de passe à changer ici', async ({ page }
   await preparer(page, { session: { ...SESSION, user: { ...UTILISATEUR, fournisseur: 'google' } } });
   await service(page);
   await page.goto('./');
-  await page.locator('#btn-compte').click();
+  await page.locator('#btn-parametres').click();
   await page.locator('#onglet-id').click();
   await expect(page.locator('#compte-qui')).toHaveText('joueur@example.com');
   await expect(page.getByRole('button', { name: 'Changer mon adresse e-mail' })).toBeHidden();
@@ -305,7 +351,7 @@ test('RGPD : ce qui est gardé, et export des données en fichier JSON sans les 
   await preparer(page, { etat: ETAT_2, session: SESSION });
   await service(page);
   await page.goto('./');
-  await page.locator('#btn-compte').click();
+  await page.locator('#btn-parametres').click();
   await page.locator('#onglet-rgpd').click();
   await expect(page.locator('#panneau-rgpd')).toContainText('aucune publicité');
   await expect(page.locator('#panneau-rgpd')).toContainText('Supabase');
@@ -325,7 +371,7 @@ test('RGPD : ce qui est gardé, et export des données en fichier JSON sans les 
 test('RGPD : supprimer le compte = confirmation, puis suppression côté service et appareil remis à zéro @smoke', async ({ page }) => {
   const appels = await service(page);
   await semer(page, { etat: ETAT_2, session: SESSION });
-  await page.locator('#btn-compte').click();
+  await page.locator('#btn-parametres').click();
   await page.locator('#onglet-rgpd').click();
   await page.getByRole('button', { name: 'Supprimer définitivement mon compte et mes données' }).click();
   const fenetre = page.getByRole('dialog');
@@ -347,7 +393,7 @@ test('RGPD : supprimer le compte = confirmation, puis suppression côté service
 
 test('RGPD : sans compte, le bouton efface les données de l’appareil après confirmation', async ({ page }) => {
   await semer(page, { etat: ETAT_2 });
-  await page.locator('#btn-compte').click();
+  await page.locator('#btn-parametres').click();
   await page.locator('#onglet-rgpd').click();
   await expect(page.locator('#rgpd-suppr-titre')).toHaveText('Effacer les données de cet appareil');
   await page.getByRole('button', { name: 'Effacer les données de cet appareil' }).click();
@@ -355,7 +401,6 @@ test('RGPD : sans compte, le bouton efface les données de l’appareil après c
   await page.getByRole('button', { name: 'Oui, tout effacer' }).click();
   await page.waitForLoadState('load');
   if (!(await page.locator('#ecran-compte').isVisible())) await page.locator('#btn-compte').click();
-  await page.locator('#onglet-profil').click();
   await expect(carte(page, 'Léa')).toHaveCount(0);
   await expect(carte(page, 'Joueur 1')).toBeVisible();
 });
@@ -367,7 +412,7 @@ test('Aide : politique de confidentialité, mentions légales, crédits et versi
   const pied = page.locator('footer.pied');
   await expect(pied).not.toContainText('Mentions légales');
   await expect(pied).not.toContainText('Crédits');
-  await page.locator('#btn-compte').click();
+  await page.locator('#btn-parametres').click();
   await page.locator('#onglet-aide').click();
   const aide = page.locator('#panneau-aide');
   await expect(aide.getByRole('link', { name: /Politique de confidentialité/ })).toHaveAttribute('href', 'https://www.ludo-aventura.fr/policies/privacy-policy');
@@ -388,7 +433,7 @@ test('Aide : le détail de la version (historique) n’apparaît que pour l’ad
   await preparer(page, { session: { ...SESSION, user: { ...UTILISATEUR, email: 'fborel64@gmail.com' } } });
   await service(page);
   await page.goto('./');
-  await page.locator('#btn-compte').click();
+  await page.locator('#btn-parametres').click();
   await page.locator('#onglet-aide').click();
   await expect(page.locator('#aide-version')).toHaveText(/^v\d+\.\d+$/);
   await expect(page.locator('.version-badge')).toHaveCount(1); // le badge cliquable (historique) du pied de page, pour lui seul

@@ -412,9 +412,22 @@
   function majPastille() {
     var b = $('btn-compte'); if (!b) return;
     b.classList.toggle('connecte', reel());
-    $('compte-pastille-texte').textContent = reel() ? 'Mon compte' : 'Se connecter';
-    $('compte-pastille-aide').textContent = reel() ? ' : connecté, progression sauvegardée' : ' : sauvegarder ma progression';
+    // v10.58 : le bouton s'appelle toujours « Mon compte » (il ouvre les profils) ; la connexion est dans « Paramètres ».
+    $('compte-pastille-texte').textContent = 'Mon compte';
+    $('compte-pastille-aide').textContent = reel() ? ' : mes profils, connecté, progression sauvegardée' : ' : mes profils';
   }
+  // v10.58 (demande du 26/11/2026) : le même écran sert deux boutons de l'accueil.
+  // « compte » = « Mon compte » : seulement les profils du compte (pas de barre d'onglets).
+  // « parametres » = « Paramètres » (le rouage) : Connexion, RGPD, Aide, Contact.
+  var vue = 'compte';
+  var ONGLETS_VUE = { compte: ['profil'], parametres: ['id', 'rgpd', 'aide', 'contact'] };
+  function appliquerVue() {
+    var param = vue === 'parametres';
+    $('titre-compte').textContent = param ? 'Paramètres' : 'Mon compte';
+    var barre = document.querySelector('.compte-onglets'); if (barre) barre.hidden = !param;
+    ['profil', 'id', 'rgpd', 'aide', 'contact'].forEach(function (n) { $('onglet-' + n).hidden = ONGLETS_VUE[vue].indexOf(n) < 0; });
+  }
+  function ouvrirVue(v) { vue = v; window.Aventura.afficher('ecran-compte'); }
   function majPage() {
     majPastille();
     if (window.JoueursEcran) window.JoueursEcran.rendre();
@@ -447,8 +460,9 @@
     var google = co && session.user && session.user.fournisseur === 'google';
     $('compte-email-bloc').hidden = !co || google;
     $('compte-mdp-bloc').hidden = !co || google;
-    // Un parcours de connexion en cours (création, e-mail à valider, nouveau mot de passe…) se voit dans l'onglet « Connexion ».
-    if (mode !== 'connexion') choisirOnglet('id');
+    // Un parcours de connexion en cours (création, e-mail à valider, nouveau mot de passe…) se voit dans l'onglet « Connexion »
+    // des Paramètres (v10.58).
+    if (mode !== 'connexion') { vue = 'parametres'; appliquerVue(); choisirOnglet('id'); }
     $('aide-version').textContent = window.SITE_VERSION ? 'v' + window.SITE_VERSION : '';
     $('rgpd-suppr-titre').textContent = session ? 'Supprimer mon compte' : 'Effacer les données de cet appareil';
     $('rgpd-suppr-texte').textContent = session
@@ -465,7 +479,8 @@
   }
   function changerMode(m) { mode = m; dire(''); majPage(); }
 
-  $('btn-compte').addEventListener('click', function () { window.Aventura.afficher('ecran-compte'); });
+  $('btn-compte').addEventListener('click', function () { ouvrirVue('compte'); });
+  $('btn-parametres').addEventListener('click', function () { ouvrirVue('parametres'); });
   $('compte-google').addEventListener('click', google);
   $('compte-form').addEventListener('submit', function (e) { e.preventDefault(); seConnecter(); });
   $('compte-creer').addEventListener('click', function () {
@@ -519,17 +534,20 @@
   $('compte-voir').addEventListener('change', function () { $('compte-mdp').type = this.checked ? 'text' : 'password'; });
   // En quittant « Mon compte », l'écran revient à la connexion (sauf « nouveau mot de passe », pas encore choisi).
   document.addEventListener('aventura-ecran', function (e) {
-    // Pas connecté : on arrive sur « Identifiant et connexion » ; connecté : sur « Profil et joueurs ».
-    if (e.detail === 'ecran-compte') { majPage(); if (mode === 'connexion') choisirOnglet(ongletCourant || (reel() ? 'profil' : 'id')); }
-    else {
-      if (e.detail !== 'ecran-coffres') ongletCourant = null;
+    // v10.58 : « Mon compte » arrive sur « Profil et joueurs » ; « Paramètres » sur « Connexion » (ou l'onglet où l'on était).
+    if (e.detail === 'ecran-compte') {
+      majPage(); appliquerVue();
+      if (mode === 'connexion') choisirOnglet(vue === 'compte' ? 'profil' : (ONGLETS_VUE.parametres.indexOf(ongletCourant) >= 0 ? ongletCourant : 'id'));
+    } else {
+      if (e.detail !== 'ecran-coffres') { ongletCourant = null; vue = 'compte'; } // « Mes coffres » revient sur la même vue
       if (mode !== 'nouveau') { mode = 'connexion'; editionPseudo = false; fermerFormulaires(); dire(''); }
     }
   });
 
   // ---------- Onglets de « Mon compte » (v10.32) ----------
   // Profil et joueurs | Identifiant et connexion | Confidentialité et RGPD | Aide et mentions légales. Flèches, Début et Fin au clavier.
-  var NOMS_ONGLETS = ['profil', 'id', 'rgpd', 'aide'];
+  // v10.58 : « Contact » s'ajoute ; la barre est cachée dans « Mon compte » et le profil n'est plus dans la barre des Paramètres.
+  var NOMS_ONGLETS = ['profil', 'id', 'rgpd', 'aide', 'contact'];
   var ongletCourant = null; // gardé en allant voir « Mes coffres » : on revient sur le même onglet
   function choisirOnglet(nom, avecFocus) {
     ongletCourant = nom;
@@ -545,11 +563,12 @@
   if (liste_onglets) {
     liste_onglets.addEventListener('click', function (e) { var b = e.target.closest('[data-onglet]'); if (b) choisirOnglet(b.getAttribute('data-onglet')); });
     liste_onglets.addEventListener('keydown', function (e) {
-      var i = NOMS_ONGLETS.indexOf(document.activeElement && document.activeElement.getAttribute('data-onglet'));
+      var noms = ONGLETS_VUE[vue], t = noms.length;
+      var i = noms.indexOf(document.activeElement && document.activeElement.getAttribute('data-onglet'));
       if (i < 0) return;
-      var n = e.key === 'ArrowRight' ? (i + 1) % 4 : e.key === 'ArrowLeft' ? (i + 3) % 4 : e.key === 'Home' ? 0 : e.key === 'End' ? 3 : -1;
+      var n = e.key === 'ArrowRight' ? (i + 1) % t : e.key === 'ArrowLeft' ? (i + t - 1) % t : e.key === 'Home' ? 0 : e.key === 'End' ? t - 1 : -1;
       if (n < 0) return;
-      e.preventDefault(); choisirOnglet(NOMS_ONGLETS[n], true);
+      e.preventDefault(); choisirOnglet(noms[n], true);
     });
   }
 
@@ -658,7 +677,7 @@
     var q = new URLSearchParams(location.search), jetonLien = q.get('valider'), jetonMdp = q.get('mdp');
     if (jetonLien || jetonMdp) {
       history.replaceState(null, '', location.pathname + location.hash); // le jeton ne reste pas dans l'adresse
-      window.Aventura.afficher('ecran-compte');
+      ouvrirVue('parametres');
       if (jetonMdp) {
         action(appel('/auth/v1/verify', { methode: 'POST', corps: { type: 'recovery', token_hash: jetonMdp } }).then(function (s) {
           garderSession(s); mode = 'nouveau'; dire('Choisis ton nouveau mot de passe.', '');
@@ -679,7 +698,7 @@
     if (!/(access_token|error)=/.test(h)) return false;
     var p = {}; h.split('&').forEach(function (x) { var i = x.indexOf('='); if (i > 0) p[decodeURIComponent(x.slice(0, i))] = decodeURIComponent(x.slice(i + 1).replace(/\+/g, ' ')); });
     history.replaceState(null, '', location.pathname + location.search); // les jetons ne restent pas dans l'adresse
-    window.Aventura.afficher('ecran-compte');
+    ouvrirVue('parametres');
     if (p.error) {
       if (p.error_code === 'otp_expired') lienValidationRate(null);
       else dire('Connexion annulée ou impossible (' + (p.error_description || p.error) + ').', 'erreur');
@@ -707,7 +726,7 @@
   function fermerFenetre() { if (fenetre && fenetre.open) fenetre.close(); }
   function ouvrirCompte(m, champ) {
     fermerFenetre();
-    window.Aventura.afficher('ecran-compte');
+    ouvrirVue('parametres');
     changerMode(m);
     if ($(champ)) $(champ).focus();
   }

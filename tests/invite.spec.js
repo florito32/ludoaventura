@@ -88,7 +88,7 @@ test('« Mon compte » rappelle le pseudo d’invité, sans débordement', async
   await service(page);
   await page.goto('./');
   await fenetre(page).getByRole('button', { name: 'Jouer en invité' }).click();
-  await page.locator('#btn-compte').click();
+  await page.locator('#btn-parametres').click();
   await expect(page.locator('#compte-invite-nom')).toBeVisible();
   await expect(page.locator('#compte-invite-pseudo')).toHaveText('invité0001');
   await expect(page.locator('#compte-pseudo-bloc')).toBeHidden(); // pas de changement de pseudo pour un invité

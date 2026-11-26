@@ -83,22 +83,23 @@ test.describe('fusion des progressions', () => {
   });
 });
 
-test('accueil : bouton « Se connecter », écran Mon compte, retour en invité, sans débordement ni défaut d’accessibilité', async ({ page }) => {
+test('accueil : boutons « Mon compte » et rouage, écran Paramètres (connexion), retour en invité, sans débordement ni défaut d’accessibilité', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await preparer(page);
   await page.goto('./');
-  const bouton = page.locator('#btn-compte');
+  const bouton = page.locator('#btn-parametres');
   await expect(bouton).toBeVisible();
-  await expect(bouton).toHaveAccessibleName(/Se connecter/);
+  await expect(bouton).toHaveAccessibleName(/Paramètres/);
+  await expect(page.locator('#btn-compte')).toHaveAccessibleName(/Mon compte/);
   // La barre du haut tient dans l'écran.
   const larg = page.viewportSize().width;
-  for (const id of ['btn-defi', 'btn-compte']) { // v10.30 : plus d'étoiles ni de coffre sur l'accueil
+  for (const id of ['btn-defi', 'btn-compte', 'btn-parametres']) { // v10.30 : plus d'étoiles ni de coffre sur l'accueil
     const b = await page.locator('#' + id).boundingBox();
     expect(b.x).toBeGreaterThanOrEqual(0);
     expect(b.x + b.width).toBeLessThanOrEqual(larg + 1);
   }
   await bouton.click();
-  await expect(page.getByRole('heading', { name: 'Mon compte' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Paramètres' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Continuer avec Google' })).toBeVisible();
   await expect(page.locator('#compte-email')).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
@@ -112,7 +113,7 @@ test('connexion par e-mail : la progression de l’appareil est ajoutée à cell
   await preparer(page, { local: progression(20, 1) });
   const envois = await service(page, { distant: progression(50, 2) });
   await page.goto('./');
-  await page.locator('#btn-compte').click();
+  await page.locator('#btn-parametres').click();
   await page.locator('#compte-email').fill('joueur@example.com');
   await page.locator('#compte-mdp').fill('secret123');
   await page.getByRole('button', { name: 'Se connecter', exact: true }).click();
@@ -135,7 +136,7 @@ test('connexion refusée : message clair en français', async ({ page }) => {
   await preparer(page);
   await service(page, { erreurConnexion: { error_code: 'invalid_credentials', msg: 'Invalid login credentials' } });
   await page.goto('./');
-  await page.locator('#btn-compte').click();
+  await page.locator('#btn-parametres').click();
   await page.locator('#compte-email').fill('joueur@example.com');
   await page.locator('#compte-mdp').fill('mauvais1');
   await page.getByRole('button', { name: 'Se connecter', exact: true }).click();
@@ -148,7 +149,7 @@ test('création de compte : bouton seul, formulaire à part (e-mail, pseudo + 2 
   await preparer(page);
   const envois = await service(page);
   await page.goto('./');
-  await page.locator('#btn-compte').click();
+  await page.locator('#btn-parametres').click();
   // « Créer un compte » n'est pas à côté de « Se connecter » : il est seul dans sa carte.
   const creer = page.getByRole('button', { name: 'Créer un compte' });
   const entrer = page.getByRole('button', { name: 'Se connecter', exact: true });
@@ -188,7 +189,7 @@ test('mot de passe oublié : e-mail envoyé, explication affichée', async ({ pa
   await preparer(page);
   const envois = await service(page);
   await page.goto('./');
-  await page.locator('#btn-compte').click();
+  await page.locator('#btn-parametres').click();
   await page.locator('#compte-email').fill('nouveau@example.com');
   await page.getByRole('button', { name: 'Mot de passe oublié ?' }).click();
   await expect(page.locator('#compte-message')).toContainText('un e-mail vient de partir');
@@ -200,7 +201,7 @@ test('connexion avant validation : l’écran « Vérifie tes e-mails » revient
   await preparer(page);
   await service(page, { erreurConnexion: { error_code: 'email_not_confirmed', msg: 'Email not confirmed' } });
   await page.goto('./');
-  await page.locator('#btn-compte').click();
+  await page.locator('#btn-parametres').click();
   await page.locator('#compte-email').fill('nouveau@example.com');
   await page.locator('#compte-mdp').fill('secret123');
   await page.getByRole('button', { name: 'Se connecter', exact: true }).click();
@@ -248,7 +249,7 @@ test('retour de Google : connecté, jetons retirés de l’adresse, progression 
   await preparer(page);
   const envois = await service(page, { distant: progression(120, 4) });
   await page.goto('./#access_token=jeton-google&refresh_token=r&expires_in=3600&token_type=bearer');
-  await expect(page.getByRole('heading', { name: 'Mon compte' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Paramètres' })).toBeVisible(); // v10.58 : le retour de connexion arrive dans les Paramètres
   await expect(page.locator('#compte-qui')).toHaveText('joueur@example.com');
   expect(page.url()).not.toContain('access_token');
   await expect(page.locator('#compte-etat')).toContainText('Progression sauvegardée');
@@ -284,16 +285,19 @@ test('connecté : chaque gain est envoyé au compte, et la déconnexion remet l�
   expect(envois.progression[0].donnees.total).toBe(30);
   await page.evaluate(() => window.Recompenses.compte.gagner(5, 'partie', 'test'));
   await expect.poll(() => envois.progression.at(-1).donnees.total).toBe(35);
-  await page.locator('#btn-compte').click();
+  await page.locator('#btn-parametres').click();
   await page.locator('#onglet-id').click(); // v10.32 : « Se déconnecter » est dans « Identifiant et connexion »
   await page.getByRole('button', { name: 'Se déconnecter' }).click();
   await expect(page.locator('#compte-message')).toContainText('Tu es déconnecté');
   expect(envois.deconnexion).toBe(1);
   await expect(page.locator('#compte-invite')).toBeVisible();
   expect(await page.evaluate(() => localStorage.getItem('ludoaventura-session'))).toBeNull();
-  await page.locator('#onglet-profil').click();
+  await page.locator('#ecran-compte [data-retour-accueil]').click();
+  await page.locator('#btn-compte').click(); // v10.58 : les joueurs sont dans « Mon compte »
   await page.locator('.joueur-carte .stats-btn').first().click(); // v10.32 : les étoiles se lisent dans « Statistiques »
   await expect(page.locator('.joueur-carte .jt-etoiles strong').first()).toHaveText('0'); // v10.30 : carte du joueur
+  await page.locator('#ecran-compte [data-retour-accueil]').click();
+  await page.locator('#btn-parametres').click();
   await page.locator('#onglet-id').click();
   await page.getByRole('button', { name: 'Jouer en invité' }).click();
 });

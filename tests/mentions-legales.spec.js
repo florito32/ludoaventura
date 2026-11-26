@@ -5,7 +5,7 @@ const { test, expect } = require('@playwright/test');
 async function ouvrirAide(page) {
   await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); } catch (e) { /* */ } });
   await page.goto('./');
-  await page.locator('#btn-compte').click();
+  await page.locator('#btn-parametres').click();
   await page.locator('#onglet-aide').click();
 }
 
