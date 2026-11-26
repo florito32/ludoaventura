@@ -2,6 +2,10 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.62', date: '2026-11-26', changes: [
+    "Quand tu finis un mini-jeu et que tu reviens à l’accueil, l’animation des étoiles gagnées se joue : « +10 étoiles » au centre, puis les étoiles filent vers « Mon compte », avec le petit son d’étoile et les vibrations.",
+    "Si tu enchaînes plusieurs mini-jeux avant de revenir à l’accueil, un seul envol réunit toutes les étoiles gagnées."
+  ] },
   { v: '10.61', date: '2026-11-26', changes: [
     "Les sons arrivent : un son quand le dé roule (avec une vibration de 0,1 s sur téléphone), un son de réussite après une bonne réponse, un son différent après une mauvaise réponse.",
     "À la fin d’une partie gagnée, les étoiles qui s’envolent font un petit son toutes les 0,1 s, avec de petites vibrations.",
