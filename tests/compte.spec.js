@@ -83,7 +83,7 @@ test.describe('fusion des progressions', () => {
   });
 });
 
-test('accueil : boutons « Mon compte » et rouage, écran Paramètres (connexion), retour en invité, sans débordement ni défaut d’accessibilité', async ({ page }) => {
+test('accueil : boutons « Mon compte » et rouage, écran Paramètres (connexion) sans mode invité, sans débordement ni défaut d’accessibilité', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await preparer(page);
   await page.goto('./');
@@ -105,8 +105,8 @@ test('accueil : boutons « Mon compte » et rouage, écran Paramètres (connexio
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
   const r = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
   expect(r.violations.map((v) => v.id + ' : ' + v.nodes.slice(0, 3).map((n) => n.target.join(' ')).join(' | '))).toEqual([]);
-  await page.getByRole('button', { name: 'Jouer en invité' }).click();
-  await expect(page.locator('#ecran-accueil')).toBeVisible();
+  // Fin du mode invité (v10.58) : plus aucun bouton « Jouer en invité » sur l'écran Mon compte.
+  await expect(page.getByRole('button', { name: 'Jouer en invité' })).toHaveCount(0);
 });
 
 test('connexion par e-mail : la progression de l’appareil est ajoutée à celle du compte et envoyée', async ({ page }) => {
@@ -275,7 +275,7 @@ test('ancien lien déjà utilisé alors qu’on est connecté (capture du 17/11/
   await expect(page.locator('#compte-message')).toBeHidden();
 });
 
-test('connecté : chaque gain est envoyé au compte, et la déconnexion remet l’appareil en invité', async ({ page }) => {
+test('connecté : chaque gain est envoyé au compte, et la déconnexion remet l’appareil à zéro', async ({ page }) => {
   // Appareil déjà synchronisé (base = 30 ⭐ déjà envoyées) : rien n'est ajouté deux fois à l'ouverture.
   await preparer(page, { local: progression(30), session: sessionValide(), base: { uid: UTILISATEUR.id, total: 30, gemmes: 0 } });
   const envois = await service(page, { distant: progression(30) });
@@ -299,5 +299,5 @@ test('connecté : chaque gain est envoyé au compte, et la déconnexion remet l�
   await page.locator('#ecran-compte [data-retour-accueil]').click();
   await page.locator('#btn-parametres').click();
   await page.locator('#onglet-id').click();
-  await page.getByRole('button', { name: 'Jouer en invité' }).click();
+  await expect(page.getByRole('button', { name: 'Jouer en invité' })).toHaveCount(0);
 });

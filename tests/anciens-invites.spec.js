@@ -1,6 +1,7 @@
-// Joueur invité (v10.27, demande du 23/11/2026) : « Jouer en invité » crée une connexion anonyme Supabase (sans e-mail),
-// pseudo « invité0001 » donné par la base ; à la création du compte ou à la connexion, la progression de l'invité est
-// fusionnée dans le compte, puis la ligne invité est supprimée. Le service Supabase est imité (page.route) : aucun appel réel.
+// Fin du mode invité (v10.58, demande du 26/11/2026) : plus de « Jouer en invité » ; un ancien invité (connexion anonyme Supabase
+// gardée sur l'appareil, v10.27) est invité à créer son compte ; à la création du compte ou à la connexion, sa progression est
+// fusionnée dans le compte, puis la ligne invité est supprimée. Le jeu enregistre aussi la localisation approximative du compte
+// (fonction « localiser »), jamais celle d'un invité. Le service Supabase est imité (page.route) : aucun appel réel.
 // Les règles de la base (numérotation, suppression réservée aux anonymes) sont testées dans la base (voir la pull request).
 const { test, expect } = require('@playwright/test');
 
@@ -14,7 +15,7 @@ const sessionGardee = (u, jeton) => ({ ...sessionDe(u, jeton), user: { id: u.id,
 
 // Imite le service. distant : progression déjà dans le compte « joueur@example.com ». echecProgression : l'envoi échoue.
 async function service(page, { distant = null, echecProgression = false } = {}) {
-  const e = { signups: [], progression: [], suppressions: [], ordre: [] };
+  const e = { signups: [], progression: [], suppressions: [], ordre: [], localisations: [] };
   await page.route(SERVICE + '/**', async (route) => {
     const req = route.request(), url = new URL(req.url()), m = req.method();
     const json = (status, corps) => route.fulfill({ status, contentType: 'application/json', body: corps === undefined ? '' : JSON.stringify(corps) });
@@ -35,6 +36,7 @@ async function service(page, { distant = null, echecProgression = false } = {}) 
       if (echecProgression && auth.includes('jeton-compte')) return json(500, { message: 'panne' });
       const d = req.postDataJSON(); d.jeton = auth; e.progression.push(d); e.ordre.push('progression:' + d.user_id); return json(201);
     }
+    if (chemin === '/functions/v1/localiser') { e.localisations.push(auth); return json(200, { ok: true }); }
     if (chemin === '/rest/v1/rpc/supprimer_invite') { e.suppressions.push(auth); e.ordre.push('suppression'); return json(200, true); }
     return json(404, { message: 'inconnu' });
   });
@@ -53,46 +55,38 @@ const fenetre = (page) => page.locator('#fenetre-compte');
 const sansDebordement = (page) => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1);
 const progression = (total) => ({ v: 1, total, gemmes: 0, parJour: {}, journal: [] });
 
-test('« Jouer en invité » crée une connexion anonyme (sans e-mail) et sauvegarde la progression @smoke', async ({ page }) => {
-  await preparer(page, { local: progression(12) });
+test('plus de « Jouer en invité » : aucune connexion anonyme n’est créée @smoke', async ({ page }) => {
+  await preparer(page);
   const e = await service(page);
   await page.goto('./');
-  await fenetre(page).getByRole('button', { name: 'Jouer en invité' }).click();
-  await expect(fenetre(page)).toBeHidden();
-  await expect.poll(() => e.signups.length).toBe(1);
-  expect(e.signups[0].email).toBeUndefined(); // aucune adresse e-mail envoyée : c'est ce qui rend l'invité « anonyme »
-  expect(e.signups[0].password).toBeUndefined();
-  await expect.poll(() => e.progression.length).toBeGreaterThan(0);
-  expect(e.progression.at(-1).user_id).toBe(INVITE.id);
-  expect(e.progression.at(-1).donnees.total).toBe(12);
-  const s = await page.evaluate(() => JSON.parse(localStorage.getItem('ludoaventura-session')));
-  expect(s.user.anonyme).toBe(true);
-  expect(s.user.email == null).toBe(true);
-  // Un invité n'est pas « connecté » : la pastille reste « Se connecter ».
-  await expect(page.locator('#btn-compte')).not.toHaveClass(/connecte/);
-});
-
-test('l’invité garde sa connexion : pas de nouvel invité à la réouverture, la fenêtre revient', async ({ page }) => {
-  await preparer(page, { session: sessionGardee(INVITE, 'jeton-invite') });
-  const e = await service(page);
-  await page.goto('./');
-  await expect(fenetre(page)).toBeVisible(); // pas de vrai compte : la fenêtre revient à chaque ouverture
-  await fenetre(page).getByRole('button', { name: 'Jouer en invité' }).click();
-  await expect(fenetre(page)).toBeHidden();
+  await expect(fenetre(page)).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Jouer en invité' })).toHaveCount(0);
   await page.waitForTimeout(300);
   expect(e.signups).toHaveLength(0);
 });
 
-test('« Mon compte » rappelle le pseudo d’invité, sans débordement', async ({ page }) => {
-  await preparer(page, { session: sessionGardee(INVITE, 'jeton-invite') });
-  await service(page);
+test('un ancien invité voit la fenêtre qui lui propose de créer son compte, sans pouvoir la fermer', async ({ page }) => {
+  await preparer(page, { session: sessionGardee(INVITE, 'jeton-invite'), local: progression(12) });
+  const e = await service(page);
   await page.goto('./');
-  await fenetre(page).getByRole('button', { name: 'Jouer en invité' }).click();
-  await page.locator('#btn-parametres').click();
-  await expect(page.locator('#compte-invite-nom')).toBeVisible();
-  await expect(page.locator('#compte-invite-pseudo')).toHaveText('invité0001');
-  await expect(page.locator('#compte-pseudo-bloc')).toBeHidden(); // pas de changement de pseudo pour un invité
+  await expect(fenetre(page)).toBeVisible();
+  await expect(fenetre(page)).toContainText('Le mode invité s’arrête');
+  await page.keyboard.press('Escape');
+  await expect(fenetre(page)).toBeVisible();
+  await page.waitForTimeout(300);
+  expect(e.signups).toHaveLength(0);
+  expect(e.localisations).toHaveLength(0); // jamais de localisation pour un invité
+  await fenetre(page).getByRole('button', { name: 'Créer un compte' }).click();
+  await expect(page.locator('#compte-creation')).toBeVisible();
   expect(await sansDebordement(page)).toBe(true);
+});
+
+test('un compte connecté est localisé avec son jeton (fonction « localiser »)', async ({ page }) => {
+  await preparer(page, { session: sessionGardee(COMPTE, 'jeton-compte') });
+  const e = await service(page);
+  await page.goto('./');
+  await expect.poll(() => e.localisations.length).toBeGreaterThan(0);
+  expect(e.localisations[0]).toContain('jeton-compte');
 });
 
 test('l’invité qui se connecte retrouve sa progression dans le compte, puis la ligne invité est supprimée', async ({ page }) => {

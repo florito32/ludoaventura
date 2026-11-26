@@ -257,13 +257,6 @@
           <p class="petit">Crée ton compte en une minute avec ton adresse e-mail.</p>
           <button type="button" class="btn btn-secondaire compte-large" id="compte-creer">Créer un compte</button>
         </section>
-        <section class="carte-page compte-carte">
-          <h3>Jouer en invité</h3>
-          <p class="petit">Sans compte, tu joues sous un pseudo d’invité (invité0001…). Quand tu crées ton compte ou que tu te connectes, tu gardes ce que tu as gagné : rien n’est perdu.</p>
-          <p class="petit" id="compte-invite-nom" hidden>Ton pseudo d’invité : <strong id="compte-invite-pseudo"></strong></p>
-          <p class="petit">Moins de 15 ans ? Demande à un parent de se connecter avec toi.</p>
-          <button type="button" class="btn btn-bleu" id="compte-invite-ok">Jouer en invité</button>
-        </section>
       </div>
       <!-- Création de compte (v9.9) : e-mail, mot de passe, confirmation du mot de passe. -->
       <section class="carte-page compte-carte" id="compte-creation" hidden>
@@ -371,7 +364,7 @@
           <h3>Ce que le jeu garde de toi</h3>
           <ul class="rgpd-liste">
             <li><strong>Sur cet appareil</strong> : ta progression, tes joueurs (noms, personnages, niveaux, statistiques) et tes choix de jeu.</li>
-            <li><strong>Sur ton compte</strong> (connecté, ou invité sous un pseudo « invité0001 ») : ton adresse e-mail s’il y en a une, ton pseudo, ta progression et tes joueurs, hébergés par Supabase.</li>
+            <li><strong>Sur ton compte</strong> (connecté) : ton adresse e-mail, ton pseudo, ta progression et tes joueurs, hébergés par Supabase, ainsi que ton pays et ta ville approximatifs, déduits de l’adresse IP de ta connexion (service api.country.is).</li>
             <li><strong>Pas de suivi</strong> : le jeu n’affiche aucune publicité et n’utilise ni mesure d’audience ni cookie de suivi, donc il n’y a aucun consentement à donner ici.</li>
           </ul>
         </section>
@@ -1056,9 +1049,8 @@
   <div class="menu-actions">
     <button type="button" class="btn btn-principal" id="fenetre-connecter">Se connecter</button>
     <button type="button" class="btn btn-secondaire" id="fenetre-creer">Créer un compte</button>
-    <button type="button" class="btn btn-secondaire" id="fenetre-invite">Jouer en invité</button>
   </div>
-  <p class="petit fenetre-compte-note">En invité, tu gardes ta progression en créant un compte plus tard.</p>
+  <p class="petit fenetre-compte-note">Moins de 15 ans ? Demande à un parent de se connecter avec toi.</p>
 </dialog>
 
 <!-- Fenêtre « Choisis ton pseudo » (v10.9, demande du 17/11/2026) : à la prochaine ouverture du jeu après la création
