@@ -2,6 +2,11 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.59', date: '2026-11-26', changes: [
+    "Il n’y a plus de « Jouer en invité » : pour jouer, il faut se connecter ou créer un compte avec une adresse e-mail. La fenêtre du début ne se ferme plus avec Échap.",
+    "Si tu jouais en invité, le jeu te propose de créer ton compte : tu gardes tout ce que tu as gagné.",
+    "Le pays et la ville approximatifs de ta connexion sont enregistrés avec ton compte (déduits de l’adresse IP) ; c’est écrit dans les mentions légales."
+  ] },
   { v: '10.58', date: '2026-11-26', changes: [
     "Accueil : deux boutons en haut. « Mon compte » (à gauche) ouvre seulement tes profils et joueurs ; le rouage « Paramètres » (à droite) ouvre Connexion, RGPD, Aide et Contact.",
     "Contact : le bouton « Nous contacter » (Paramètres → Contact) ouvre le formulaire du site ludo-aventura.fr dans un nouvel onglet."

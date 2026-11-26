@@ -18,7 +18,9 @@
 // tant que le joueur ne l'a pas changé. Modifiable dans « Mon compte ». Tout est rangé dans Supabase (tables profils,
 // stats_joueur, etoiles_jour : outils/supabase/20261117_pseudos_stats_classements.sql) ; les étoiles, pierres et niveaux
 // y sont recopiés par la base à chaque sauvegarde de la progression : le jeu n'envoie rien de plus.
-// Invité (v10.27, demande du 23/11/2026) : « Jouer en invité » crée une connexion ANONYME Supabase (aucune adresse e-mail) ;
+// Fin du mode invité (v10.58, demande du 26/11/2026) : plus personne ne peut jouer sans compte, la fenêtre de connexion ne se ferme pas.
+// Les anciens invités (connexion anonyme gardée sur l'appareil) sont invités à créer leur compte et gardent leur progression.
+// Historique (v10.27, demande du 23/11/2026) : « Jouer en invité » créait une connexion ANONYME Supabase (aucune adresse e-mail) ;
 // la base lui donne le pseudo « invité0001 », « invité0002 »… et la progression est sauvegardée comme pour un compte, ce qui
 // rend l'invité visible dans Supabase (Authentication › Users, e-mail vide). Quand il crée un compte ou se connecte, sa progression
 // est fusionnée dans le compte (même fusion que d'habitude), puis la ligne invité est supprimée (rpc supprimer_invite) : pas de
@@ -294,6 +296,7 @@
         garderSession(Object.assign({}, session, { user: u }));
         dire(message || 'Tu es connecté. Ta progression est maintenant sauvegardée sur ton compte.', 'ok');
         lireProfil(); // pseudo du compte (sans attendre la synchronisation)
+        localiser();
         return synchroniser().then(function () { return effacerInvite(inv); });
       });
     });
@@ -301,18 +304,6 @@
   function effacerInvite(inv) {
     if (!inv || !session || inv.uid === session.user.id || etat.synchro !== 'ok') return null;
     return appel('/rest/v1/rpc/supprimer_invite', { methode: 'POST', jeton: inv.jeton, corps: {} }).catch(function () { /* l'invité reste : sans gravité */ });
-  }
-  // « Jouer en invité » : crée la connexion anonyme (une seule par appareil : tant qu'elle existe, on la garde).
-  // Hors ligne ou service refusant : on joue quand même, l'invité sera créé à la prochaine ouverture.
-  function jouerInvite() {
-    if (session) return Promise.resolve();
-    return appel('/auth/v1/signup', { methode: 'POST', corps: { data: {} } }).then(function (s) {
-      if (!s || !s.access_token) return;
-      garderSession(s);
-      majPage();
-      lireProfil();
-      return synchroniser();
-    }).catch(function () { /* on joue sans sauvegarde en ligne */ });
   }
   function google() {
     location.href = URL_SUPABASE + '/auth/v1/authorize?provider=google&redirect_to=' + encodeURIComponent(adresseRetour());
@@ -386,7 +377,7 @@
       $('compte-nouveau').value = ''; mode = 'connexion'; dire('Nouveau mot de passe enregistré.', 'ok');
     }));
   }
-  // Déconnexion : le compte garde la progression ; l'appareil repart en invité, à zéro.
+  // Déconnexion : le compte garde la progression ; l'appareil repart à zéro et la fenêtre de connexion revient.
   function seDeconnecter() {
     var j = session && session.access_token;
     clearTimeout(minuterie);
@@ -395,8 +386,9 @@
       profil = null; editionPseudo = false; // le pseudo reste sur le compte
       poserLocal({ v: 1, total: 0 });
       etat.synchro = 'aucune';
-      dire('Tu es déconnecté. Ta progression reste sur ton compte ; sur cet appareil tu joues maintenant en invité.', 'ok');
+      dire('Tu es déconnecté. Ta progression reste sur ton compte.', 'ok');
       majPage();
+      fenetreAuLancement();
     };
     // Dernier envoi avant de partir, puis fin de session côté service (sans bloquer si hors ligne).
     action(synchroniser().then(function () { return j ? appel('/auth/v1/logout', { methode: 'POST', jeton: j }).catch(function () {}) : null; }).then(fin, fin));
@@ -441,9 +433,6 @@
     $('compte-bienvenue').hidden = mode !== 'bienvenue';
     $('compte-nouveau-bloc').hidden = mode !== 'nouveau';
     $('attente-email').textContent = emailAttente;
-    // Invité : son pseudo (invité0001…) est rappelé dans la carte « Jouer en invité ».
-    var nomInvite = $('compte-invite-nom');
-    if (nomInvite) { nomInvite.hidden = !(invite() && profil); if (invite() && profil) $('compte-invite-pseudo').textContent = profil.pseudo; }
     var qui = session && session.user && session.user.email ? session.user.email : 'ton compte';
     $('bienvenue-email').textContent = qui;
     $('bienvenue-titre').textContent = bienvenueDeja ? 'Ton compte est déjà validé' : 'Ton compte est validé !';
@@ -493,7 +482,6 @@
   $('attente-renvoyer').addEventListener('click', function () { renvoyer(emailAttente); });
   $('bienvenue-jouer').addEventListener('click', function () { window.Aventura.afficher('ecran-accueil'); });
   $('compte-oublie').addEventListener('click', oublie);
-  $('compte-invite-ok').addEventListener('click', function () { window.Aventura.afficher('ecran-accueil'); jouerInvite(); });
   $('compte-synchro').addEventListener('click', function () { action(synchroniser()); });
   $('compte-sortir').addEventListener('click', seDeconnecter);
   // Changer de pseudo depuis « Mon compte » (mis à jour tout de suite dans Supabase).
@@ -717,9 +705,10 @@
   }
 
   // ---------- Fenêtre de connexion au lancement (v10.3, backlog ligne 405) ----------
-  // Demande du 17/11/2026 : il faut se connecter pour jouer. Tant que le joueur n'est pas connecté, une fenêtre
-  // au centre de l'écran propose « Se connecter », « Créer un compte » ou « Jouer en invité », à CHAQUE ouverture
-  // du jeu (choix de l'utilisateur). Échap = « Jouer en invité ».
+  // Demande du 17/11/2026 : il faut se connecter pour jouer. Depuis la v10.58 (demande du 26/11/2026), il n'y a plus de mode invité :
+  // tant que le joueur n'est pas connecté, la fenêtre propose seulement « Se connecter » ou « Créer un compte », elle ne se ferme
+  // pas avec Échap et revient dès que le joueur quitte l'écran « Mon compte » sans être connecté. Un ancien invité (connexion
+  // anonyme gardée sur l'appareil) est invité à créer son compte : sa progression est fusionnée dans le compte.
   // Les tests automatiques (navigator.webdriver) ne la voient pas, sauf s'ils la demandent (AVENTURA_FENETRE_COMPTE) :
   // sinon elle couvrirait l'accueil de tous les autres tests.
   var fenetre = $('fenetre-compte');
@@ -733,19 +722,35 @@
   if (fenetre) {
     $('fenetre-connecter').addEventListener('click', function () { ouvrirCompte('connexion', 'compte-email'); });
     $('fenetre-creer').addEventListener('click', function () { ouvrirCompte('creation', 'creation-email'); });
-    $('fenetre-invite').addEventListener('click', function () { fermerFenetre(); jouerInvite(); });
   }
   function fenetreAuLancement() {
     if (!fenetre || reel()) return;
     var auto = typeof navigator !== 'undefined' && navigator.webdriver;
     if (auto && window.AVENTURA_FENETRE_COMPTE !== true) return;
+    $('fenetre-compte-texte').textContent = invite()
+      ? 'Le mode invité s’arrête. Crée ton compte avec ton adresse e-mail (ou connecte-toi) : tu gardes tout ce que tu as gagné.'
+      : 'Connecte-toi ou crée ton compte pour jouer : tes étoiles, tes coffres et tes niveaux te suivent sur tous tes appareils.';
     if (!fenetre.open) fenetre.showModal();
     $('fenetre-connecter').focus();
+  }
+  if (fenetre) {
+    // Échap ne ferme pas la fenêtre : il faut un compte pour jouer.
+    fenetre.addEventListener('cancel', function (e) { e.preventDefault(); });
+    // Quitter l'écran « Mon compte » sans être connecté (Accueil, retour…) : la fenêtre revient.
+    document.addEventListener('aventura-ecran', function (e) { if (e.detail !== 'ecran-compte') fenetreAuLancement(); });
+  }
+  // Localisation approximative (pays, ville) du compte, enregistrée par la fonction serveur « localiser » ; sans gravité si elle échoue.
+  function localiser() {
+    if (!reel()) return;
+    jeton().then(function (j) {
+      if (!j) return null;
+      return fetch(URL_SUPABASE + '/functions/v1/localiser', { method: 'POST', headers: { apikey: CLE_API, Authorization: 'Bearer ' + j } });
+    }).catch(function () { /* on réessaiera à la prochaine ouverture */ });
   }
 
   majPage();
   if (!lireRetour()) {
-    if (session) { synchroniser(); lireProfil(); } // ouverture du jeu : on récupère ce qui a été gagné ailleurs, et le pseudo
+    if (session) { synchroniser(); lireProfil(); localiser(); } // ouverture du jeu : on récupère ce qui a été gagné ailleurs, et le pseudo
     if (!reel()) fenetreAuLancement(); // pas de vrai compte (même en invité) : la fenêtre revient à chaque ouverture
   }
   // rpc : appelle une fonction de la base avec le jeton du joueur connecté (invité compris) ; rend null si personne n'est connecté.

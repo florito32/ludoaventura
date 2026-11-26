@@ -1,6 +1,6 @@
 // Fenêtre de connexion au lancement (v10.3, demande du 17/11/2026, backlog ligne 405).
 // Tant que le joueur n'est pas connecté, une fenêtre centrée propose « Se connecter », « Créer un compte »
-// ou « Jouer en invité », à chaque ouverture du jeu. Le service Supabase est imité (aucun appel réel).
+// (v10.58 : plus de « Jouer en invité »), à chaque ouverture du jeu ; elle ne se ferme pas avec Échap. Le service Supabase est imité (aucun appel réel).
 const { test, expect } = require('@playwright/test');
 const AxeBuilder = require('@axe-core/playwright').default;
 
@@ -18,12 +18,12 @@ async function preparer(page, { session = null } = {}) {
 }
 const fenetre = (page) => page.locator('#fenetre-compte');
 
-test('pas connecté : la fenêtre s’ouvre au centre, avec les trois choix, sans débordement @smoke', async ({ page }) => {
+test('pas connecté : la fenêtre s’ouvre au centre, avec les deux choix, sans mode invité, sans débordement @smoke', async ({ page }) => {
   await preparer(page);
   await page.goto('./');
   await expect(fenetre(page)).toBeVisible();
   await expect(page.getByRole('dialog', { name: 'Bienvenue dans Aventura !' })).toBeVisible();
-  for (const nom of ['Se connecter', 'Créer un compte', 'Jouer en invité']) {
+  for (const nom of ['Se connecter', 'Créer un compte']) {
     await expect(fenetre(page).getByRole('button', { name: nom, exact: true })).toBeVisible();
   }
   // Centrée et entièrement dans l'écran (aucun défilement nécessaire).
@@ -36,25 +36,27 @@ test('pas connecté : la fenêtre s’ouvre au centre, avec les trois choix, san
   expect(Math.abs((b.y + b.height / 2) - v.height / 2)).toBeLessThan(3);
   const deborde = await fenetre(page).evaluate((d) => d.scrollHeight > d.clientHeight + 1 || d.scrollWidth > d.clientWidth + 1);
   expect(deborde).toBe(false);
-  // Les trois boutons ne sortent pas de la fenêtre.
-  for (const id of ['fenetre-connecter', 'fenetre-creer', 'fenetre-invite']) {
+  await expect(fenetre(page).getByRole('button', { name: 'Jouer en invité' })).toHaveCount(0);
+  // Les deux boutons ne sortent pas de la fenêtre.
+  for (const id of ['fenetre-connecter', 'fenetre-creer']) {
     const bb = await page.locator('#' + id).boundingBox();
     expect(bb.x).toBeGreaterThanOrEqual(b.x);
     expect(bb.x + bb.width).toBeLessThanOrEqual(b.x + b.width + 1);
   }
 });
 
-test('« Jouer en invité » ferme la fenêtre ; elle revient à l’ouverture suivante', async ({ page }) => {
+test('la fenêtre ne se ferme pas avec Échap et revient quand on quitte « Mon compte » sans être connecté', async ({ page }) => {
   await preparer(page);
   await page.goto('./');
-  await fenetre(page).getByRole('button', { name: 'Jouer en invité' }).click();
-  await expect(fenetre(page)).toBeHidden();
-  await expect(page.locator('#ecran-accueil')).toBeVisible();
-  await page.reload();
   await expect(fenetre(page)).toBeVisible();
-  // Échap : comme « Jouer en invité ».
   await page.keyboard.press('Escape');
+  await expect(fenetre(page)).toBeVisible(); // obligatoire : pas d'invité
+  await fenetre(page).getByRole('button', { name: 'Se connecter' }).click();
   await expect(fenetre(page)).toBeHidden();
+  await expect(page.locator('#ecran-compte')).toBeVisible();
+  // Retour à l'accueil sans s'être connecté : la fenêtre revient.
+  await page.evaluate(() => window.Aventura.afficher('ecran-accueil'));
+  await expect(fenetre(page)).toBeVisible();
 });
 
 test('« Se connecter » ouvre l’écran Mon compte sur le formulaire de connexion', async ({ page }) => {
