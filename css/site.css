@@ -2164,6 +2164,11 @@ body:has(#ecran-accueil:not([hidden])) .ludo-bouton { display: none; }
 .minijeu-qui { margin: 0; min-height: 1.2em; color: var(--encre-douce); font-weight: 700; }
 .minijeu-consigne { margin: 0; font-size: 1.1rem; font-weight: 700; }
 .minijeu-jeu { width: 100%; }
+/* v10.60 : « Les sons » — le cadre du jeu prend toute la largeur de la carte. Sans cela, la grille centrée (justify-items) le
+   réduisait à la taille de son contenu : colonnes de 40 px, « [ə] » écrit lettre par lettre en hauteur. */
+.minijeu .carte-gram, .minijeu #minijeu-fin { width: 100%; }
+.minijeu .gram-col { gap: 8px; }
+.minijeu .gram-mot-relier { min-height: 48px; font-size: 1.15rem; }
 .minijeu-fin { padding-block: 12px; }
 .minijeu-bravo { margin: 0; font-size: 1.5rem; font-weight: 800; }
 .minijeu-resultat { margin: 0; font-size: 1.2rem; }

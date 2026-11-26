@@ -2,6 +2,12 @@
 // (js/version.js). Séparé du numéro depuis l'audit du 17/11/2026 (backlog ligne 395) : les joueurs ne le
 // téléchargent plus, et une mise en ligne ajoute une entrée en tête de ce tableau.
 window.SITE_HISTORY = [
+  { v: '10.60', date: '2026-11-26', changes: [
+    "« Les sons » : le jeu est enfin bien dessiné. Les boutons prennent toute la largeur de l’écran, et « [ə] » ne s’écrit plus lettre par lettre en hauteur.",
+    "« Les sons » : quand tu touches un son (« Quel son ? », colonne de gauche de « Relier »), la voix le dit pendant une demi-seconde.",
+    "Menu des mini-jeux : la capture de « Les sons » (bouton « i ») montre le jeu corrigé.",
+    "Bouton « i » : le jeu ouvert avant ne s’affiche plus une fraction de seconde. La fenêtre s’ouvre avec la bonne capture."
+  ] },
   { v: '10.59', date: '2026-11-26', changes: [
     "Il n’y a plus de « Jouer en invité » : pour jouer, il faut se connecter ou créer un compte avec une adresse e-mail. La fenêtre du début ne se ferme plus avec Échap.",
     "Si tu jouais en invité, le jeu te propose de créer ton compte : tu gardes tout ce que tu as gagné.",

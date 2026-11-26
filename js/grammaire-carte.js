@@ -240,10 +240,20 @@
   }
 
   // ---------- Gestes ----------
+  // v10.60 : un clic sur un phonème (« Quel son ? », colonne de gauche de « Relier ») le fait dire 0,5 s par la voix.
+  function direSon(c, e) {
+    var P = racine.Phonemes, V = racine.Voix, b, id = null;
+    if (!V || !P || c.module !== 'phonemes') return;
+    if (c.jeu === 'son' && (b = e.target.closest('.gram-bouton'))) id = b.dataset.v;
+    else if (c.jeu === 'relier' && (b = e.target.closest('.gram-mot-relier[data-cote="g"]'))) id = c.gauche[Number(b.dataset.i)];
+    if (id && P.SONS[id]) V.dire(P.sonDit(id), 500);
+  }
+
   function toucher(e) {
     var c = rappels.carte();
     if (!c || c.type !== 'grammaire' || c.reponseDonnee != null || !actif()) return;
     var b;
+    direSon(c, e);
     if ((b = e.target.closest('.gram-bouton'))) { repondre(c, b.dataset.v, texteChoix(c, b.dataset.v)); return; }
     if (c.module === 'baby' && racine.BabyCarte.toucher(c, e, outilsBaby(c))) return;
     if (c.module === 'phonemes' && c.jeu === 'trier') { trierToucher(c, e); return; }

@@ -54,8 +54,8 @@
   var DEPARTS = {
     fabrique: function () { return B.generer('fabrique', B.defaut(), Math.random); },
     // Un jeu de sons au hasard, sur tous les sons (aucun niveau). Une carte qui ne sort pas est remplacée par un autre jeu.
-    sons: function () {
-      var jeux = PH.JEUX.map(function (x) { return x.id; }).sort(function () { return Math.random() - 0.5; }), c = null;
+    sons: function (jeuForce) { // jeuForce : un jeu précis (tests et capture d'écran), sinon au hasard
+      var jeux = jeuForce ? [jeuForce] : PH.JEUX.map(function (x) { return x.id; }).sort(function () { return Math.random() - 0.5; }), c = null;
       for (var k = 0; k < jeux.length && !c; k++) c = PH.generer(jeux[k], PH.TOUS_SONS, Math.random, []);
       c.type = 'grammaire';
       c.consigne = c.consigne || PH.jeu(c.jeu).nom;
@@ -83,11 +83,11 @@
   }
   // Démonte le mini-jeu à module en cours (boucle d'animation, clavier, minuteurs).
   function demonter() { if (etat && etat.inst) { etat.inst.detruire(); etat.inst = null; } }
-  function lancer(idJeu, idProfil) {
+  function lancer(idJeu, idProfil, jeuForce) {
     var j = jeuDe(idJeu);
     if (!j || (!DEPARTS[idJeu] && !(j.module && window[j.module]))) return;
     rendre(); demonter();
-    etat = { jeu: j, profil: idProfil || null, carte: DEPARTS[idJeu] ? DEPARTS[idJeu]() : null, inst: null, fini: false };
+    etat = { jeu: j, profil: idProfil || null, carte: DEPARTS[idJeu] ? DEPARTS[idJeu](jeuForce) : null, inst: null, fini: false };
     $('titre-minijeu').textContent = j.nom;
     window.Aventura.afficher('ecran-minijeu');
     if (j.module) { // jeu à lui seul (étoiles, aventure) : il se dessine lui-même dans l'écran et dit quand il est fini
@@ -154,21 +154,28 @@
       '<button type="button" class="btn btn-secondaire" id="minijeu-accueil">Retour à l\'accueil</button></div></section>';
     if (dansCarte) $('minijeu-fin').innerHTML = h; else $('minijeu-corps').innerHTML = h; // « Les sons » : la carte corrigée reste visible
     var b = $('minijeu-rejouer'); if (b) b.focus({ preventScroll: true });
-    if (window.Voix && window.Voix.taire) window.Voix.taire();
+    // « Les sons » : le clic qui termine la partie vient de faire dire un phonème (0,5 s), on ne le coupe pas.
+    if (!dansCarte && window.Voix && window.Voix.taire) window.Voix.taire();
   }
 
   // ---------- Branchements ----------
   $('btn-minijeux').addEventListener('click', function () { window.Aventura.afficher('ecran-minijeux'); });
   // Pastille « i » : la fenêtre d'explication d'un jeu (nom, explication, capture d'écran). Se ferme avec « Fermer », Échap ou un clic à côté.
+  // v10.60 : la fenêtre ne s'ouvre qu'une fois la capture du bon jeu chargée et décodée ; avant, l'ancienne image restait
+  // visible une fraction de seconde (celle du jeu ouvert en dernier) le temps que la nouvelle arrive.
+  var ouverture = 0; // le dernier clic sur « i » gagne
   function expliquer(j) {
     var f = $('minijeu-info');
     if (!f || !j) return;
+    var n = ++ouverture;
     $('minijeu-info-titre').textContent = j.nom;
     $('minijeu-info-texte').textContent = j.aide;
     var img = $('minijeu-info-img');
     img.alt = 'Capture d’écran de ' + j.nom + ' : une partie en cours';
-    img.src = IMAGES + j.id + '.webp';
-    if (!f.open) f.showModal();
+    function ouvrir() { if (n === ouverture && !f.open) f.showModal(); }
+    if (f.open) { img.src = IMAGES + j.id + '.webp'; return; }
+    img.src = IMAGES + j.id + '.webp'; // fenêtre fermée : le changement d'image ne se voit pas
+    if (img.decode) img.decode().then(ouvrir, ouvrir); else ouvrir(); // image introuvable : on ouvre quand même (texte seul)
   }
   $('minijeux-corps').addEventListener('click', function (e) {
     var i = e.target.closest('.minijeu-info');
@@ -197,5 +204,5 @@
   document.addEventListener('aventura-ecran', function (e) { if (e.detail !== 'ecran-minijeu') { rendre(); demonter(); } if (e.detail === 'ecran-minijeux') liste(); });
   if (!$('ecran-minijeux').hidden) liste();
 
-  window.Minijeux = { JEUX: JEUX, ETOILES: ETOILES, carte: function () { return etat && etat.carte; } }; // carte() : pour les tests
+  window.Minijeux = { JEUX: JEUX, ETOILES: ETOILES, carte: function () { return etat && etat.carte; }, lancer: lancer }; // carte() et lancer() : pour les tests et les captures
 })();
