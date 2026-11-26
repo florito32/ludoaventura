@@ -375,6 +375,15 @@
     retenu = n > 0 ? n : 0;
     try { if (retenu) sessionStorage.setItem(CLE_GAIN, JSON.stringify({ n: retenu })); else sessionStorage.removeItem(CLE_GAIN); } catch (e) { /* rien */ }
   }
+  // v10.62 (demande du 26/11/2026) : un mini-jeu terminé met ses étoiles en attente (js/minijeux.js) ; elles s'ajoutent à celles
+  // qui attendent déjà (plusieurs parties de suite = un seul envol du cumul) et s'envolent dès que le joueur arrive à l'accueil,
+  // par « Retour à l'accueil » comme par la flèche de retour (voir l'écouteur « aventura-ecran » plus bas).
+  function annoncerGain(n) {
+    n = Math.floor(Number(n));
+    if (!(n > 0)) return;
+    retenir(Math.floor(retenu) + n);
+    demarrerGain(); // sans effet hors de l'accueil : l'envol part à l'arrivée
+  }
   // Lance l'envol si des étoiles attendent et que l'accueil est affiché (sinon elles attendent : voir l'écouteur plus bas).
   function demarrerGain() {
     if (vol || !retenu) return;
@@ -487,6 +496,6 @@
     if (l.length) ouvrirCoffres(l);
   }
 
-  window.Recompenses = { compte: compte, finDePartie: finDePartie, majTout: majTout, ouvrirCoffres: ouvrirCoffres, gainTotal: gainTotal,
+  window.Recompenses = { compte: compte, finDePartie: finDePartie, majTout: majTout, ouvrirCoffres: ouvrirCoffres, gainTotal: gainTotal, annoncerGain: annoncerGain,
     resume: resume, voir: voir, aideEtoiles: ouvrirCommentGagner, ouvrirCoffresDe: ouvrirCoffresDe, vue: vue, idVu: idVu };
 })();

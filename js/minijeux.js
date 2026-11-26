@@ -140,6 +140,8 @@
       var s = etat.profil && R && R.compte.pourJoueur(etat.profil);
       if (s) { s.visite(); gain = s.gagner(ETOILES, 'minijeu', etat.jeu.nom); }
     } catch (e) { gain = null; }
+    // v10.62 : ces étoiles s'envolent vers « Mon compte » (son et vibration compris) quand le joueur revient à l'accueil.
+    if (gain && R && R.annoncerGain) R.annoncerGain(ETOILES);
     var nom = nomJoueur(etat.profil);
     var h = '<section class="carte-page minijeu minijeu-fin" role="status">' +
       '<p class="minijeu-bravo">' + (gagne ? 'Bravo' + (nom ? ' ' + esc(nom) : '') + ' !' : 'Dommage, mais tu as bien joué !') + '</p>' +

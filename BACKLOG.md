@@ -194,3 +194,4 @@ Numéros : toujours relire la dernière ligne de `main` juste avant la fusion (d
 | 570 | Idem : les sons et vibrations s'arrêtent si le joueur quitte la page en cours | fait à valider (v10.61) — changement d'écran, fermeture ou arrière-plan de la page : sons, vibration et voix coupés | ✅ script Playwright local + CI |
 | 571 | Le fichier « laser.mp3 » du dossier Sons n'est utilisé nulle part : où le brancher ? | question en attente — aucune consigne ; non copié dans le dépôt | — |
 | 572 | Supprimer la branche fusionnée `claude/sons-vibrations` | question en attente — suppression refusée par le proxy : à supprimer à la main sur GitHub (onglet Branches) | — |
+| 573 | 26/11 (17 h 19) : mini-jeu fini, retour à l'accueil : animation des étoiles gagnées, son, vibrations | fait à valider (v10.62) — envol vers « Mon compte » ; hypothèses : tout retour à l'accueil ; plusieurs parties = un envol du cumul | ✅ local (4 formats) + CI (gain-minijeux.spec.js) |
