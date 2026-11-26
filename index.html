@@ -156,6 +156,11 @@
     <rect x="21" y="26" width="6" height="13" rx="1" fill="#3f7a46"/>
     <path d="M34 21.5l1.9 4 4.3.5-3.2 3 .8 4.3-3.8-2.1-3.8 2.1.8-4.3-3.2-3 4.3-.5z" fill="#ffd23f" stroke="#3b2a1e" stroke-width="1.6" stroke-linejoin="round"/>
   </symbol>
+  <!-- Paramètres (v10.58) : un rouage. -->
+  <symbol id="i-rouage" viewBox="0 0 48 48">
+    <path d="M21 4h6l1.2 5.2 3.6 1.5 4.5-2.9 4.2 4.2-2.9 4.5 1.5 3.6L44 21v6l-5.2 1.2-1.5 3.6 2.9 4.5-4.2 4.2-4.5-2.9-3.6 1.5L27 44h-6l-1.2-5.2-3.6-1.5-4.5 2.9-4.2-4.2 2.9-4.5-1.5-3.6L4 27v-6l5.2-1.2 1.5-3.6-2.9-4.5 4.2-4.2 4.5 2.9 3.6-1.5z" fill="#ffd23f" stroke="#3b2a1e" stroke-width="3" stroke-linejoin="round"/>
+    <circle cx="24" cy="24" r="6.5" fill="#fff" stroke="#3b2a1e" stroke-width="3"/>
+  </symbol>
   <!-- Compte (v9.4) : un aventurier stylisé (tête + épaules). -->
   <symbol id="i-compte" viewBox="0 0 48 48">
     <circle cx="24" cy="17" r="9" fill="#fff" stroke="#3b2a1e" stroke-width="3"/>
@@ -171,10 +176,15 @@
     <!-- Barre du haut (v6.36, js/recompenses.js). v10.30 (demande du 23/11/2026, backlog ligne 453) : rien de chiffré sur
          l'accueil ; étoiles, pierres, niveaux et coffres sont dans la carte de chaque joueur (Mon compte). -->
     <div class="accueil-haut">
-      <!-- Compte (v9.4, js/compte.js) : se connecter pour garder sa progression sur tous ses appareils (facultatif). -->
+      <!-- v10.58 (demande du 26/11/2026) : « Mon compte » (les profils du compte) et « Paramètres » (le rouage : connexion,
+           RGPD, aide, contact), deux boutons côte à côte. js/compte.js. -->
       <button type="button" class="pastille pastille-compte" id="btn-compte">
         <svg class="ico" aria-hidden="true"><use href="#i-compte"/></svg>
-        <span id="compte-pastille-texte">Se connecter</span><span class="visually-hidden" id="compte-pastille-aide"> : sauvegarder ma progression</span>
+        <span id="compte-pastille-texte">Mon compte</span><span class="visually-hidden" id="compte-pastille-aide"> : mes profils</span>
+      </button>
+      <button type="button" class="pastille pastille-parametres" id="btn-parametres">
+        <svg class="ico" aria-hidden="true"><use href="#i-rouage"/></svg>
+        <span class="visually-hidden">Paramètres</span>
       </button>
     </div>
     <div class="scene">
@@ -204,11 +214,14 @@
       <p class="compte-message" id="compte-message" role="status" aria-live="polite" hidden></p>
       <!-- v10.32 (demande du 23/11/2026, backlog lignes 459 à 466) : « Mon compte » en 4 onglets (proposition A de la page de test :
            icône + texte). js/compte.js gère l'onglet affiché (flèches, Début, Fin au clavier). -->
-      <div class="compte-onglets" role="tablist" aria-label="Sections de Mon compte">
-        <button type="button" role="tab" id="onglet-profil" aria-controls="panneau-profil" aria-selected="true" data-onglet="profil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>Joueurs</span></button>
+      <!-- v10.58 : « Mon compte » ne montre que « Profil et joueurs » (la barre d'onglets est cachée) ; « Paramètres » montre
+           Connexion, RGPD, Aide et Contact. js/compte.js (appliquerVue). -->
+      <div class="compte-onglets" role="tablist" aria-label="Sections des paramètres" hidden>
+        <button type="button" role="tab" id="onglet-profil" aria-controls="panneau-profil" aria-selected="true" data-onglet="profil" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>Joueurs</span></button>
         <button type="button" role="tab" id="onglet-id" aria-controls="panneau-id" aria-selected="false" tabindex="-1" data-onglet="id"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3"/></svg><span>Connexion</span></button>
         <button type="button" role="tab" id="onglet-rgpd" aria-controls="panneau-rgpd" aria-selected="false" tabindex="-1" data-onglet="rgpd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3l8 3v6c0 5-4 8-8 9-4-1-8-4-8-9V6z"/></svg><span>RGPD</span></button>
         <button type="button" role="tab" id="onglet-aide" aria-controls="panneau-aide" aria-selected="false" tabindex="-1" data-onglet="aide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><path d="M9.5 9a2.5 2.5 0 115 0c0 2-2.5 2-2.5 4M12 17v.5"/></svg><span>Aide</span></button>
+        <button type="button" role="tab" id="onglet-contact" aria-controls="panneau-contact" aria-selected="false" tabindex="-1" data-onglet="contact"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><span>Contact</span></button>
       </div>
       <div class="compte-panneau" role="tabpanel" id="panneau-profil" aria-labelledby="onglet-profil">
       <!-- v10.26 (demande du 23/11/2026, backlog lignes 438 à 449) : un compte fait jouer plusieurs joueurs (js/joueurs.js,
@@ -384,6 +397,15 @@
             <button type="button" class="btn btn-secondaire aide-lien" id="btn-credits" aria-haspopup="dialog">Crédits</button>
           </div>
           <p class="petit">Version du jeu : <strong id="aide-version"></strong></p>
+        </section>
+      </div>
+      <!-- Contact (v10.58, demande du 26/11/2026) : un seul outil, le formulaire de la boutique ludo-aventura.fr (page « Contact »).
+           Les messages arrivent à l'adresse d'expéditeur de la boutique (réglage Shopify, pas dans ce dépôt). -->
+      <div class="compte-panneau" role="tabpanel" id="panneau-contact" aria-labelledby="onglet-contact" hidden>
+        <h3 class="panneau-titre">Nous contacter</h3>
+        <section class="carte-page compte-carte">
+          <p class="petit">Une question, un problème, une idée ? Écris-nous : le formulaire s’ouvre sur le site du jeu, dans un nouvel onglet.</p>
+          <a class="btn btn-principal compte-large aide-lien" id="contact-lien" href="https://www.ludo-aventura.fr/pages/contact" target="_blank" rel="noopener">Nous contacter <span class="visually-hidden">(s’ouvre dans un nouvel onglet)</span></a>
         </section>
       </div>
     </div>

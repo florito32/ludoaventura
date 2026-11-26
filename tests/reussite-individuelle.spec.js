@@ -84,7 +84,6 @@ test('statistiques : une partie finie compte pour le joueur, dans la matière jo
   // Affichée dans « Statistiques » de sa carte.
   await page.locator('#fin').evaluate((d) => d.close());
   await page.evaluate(() => window.Aventura.afficher('ecran-compte'));
-  await page.locator('#onglet-profil').click();
   await page.locator('.joueur-carte').first().getByRole('button', { name: 'Statistiques' }).click();
   await expect(page.locator('.joueur-carte').first().locator('.joueur-stats > .petit')).toContainText('1 partie jouée');
 });

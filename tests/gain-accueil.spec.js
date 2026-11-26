@@ -124,7 +124,6 @@ test('coffres ouverts depuis la carte du joueur : pas d\'envol en revenant à l\
   }, [ETAT(175)]);
   await page.goto('./');
   await page.locator('#btn-compte').click();
-  await page.locator('#onglet-profil').click();
   await page.locator('.joueur-carte [data-act="coffres"]').first().click();
   for (let k = 0; k < 12; k++) {
     await page.locator('#btn-coffre-ouvrir').click();

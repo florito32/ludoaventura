@@ -111,7 +111,6 @@ async function ouvrirCompte(page) {
   await page.goto('./');
   await page.locator('#btn-compte').click();
   await expect(page.locator('#ecran-compte')).toBeVisible();
-  await page.locator('#onglet-profil').click(); // v10.32 : « Profil et joueurs » (pas connecté, on arrive sur « Connexion »)
 }
 // v10.32 : les jauges et les chiffres sont dans « Statistiques », qui se déroule sous le nom du joueur.
 async function ouvrirStats(c) {
@@ -183,7 +182,6 @@ test('créer un joueur : nom et personnage, sans limite, gardés après recharge
   await page.reload();
   // Le jeu rouvre l'écran où l'on était : on ne clique sur l'icône du compte que si elle est là.
   if (!(await page.locator('#ecran-compte').isVisible())) await page.locator('#btn-compte').click();
-  await page.locator('#onglet-profil').click();
   await expect(carte(page, 'Tom')).toBeVisible();
   await expect(carte(page, 'Tom').locator('.joueur-avatar')).toHaveAttribute('src', /aventuriers\/tom\.webp/);
   expect(await sansDebordement(page)).toBe(true);

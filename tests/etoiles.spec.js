@@ -159,7 +159,6 @@ test('carte du joueur : étoiles, niveau, pierres et coffre du jour ; le coffre 
   await expect(page.locator('#btn-commencer')).toBeInViewport({ ratio: 1 });
   await expect(page.locator('#btn-etoiles-haut, #btn-coffre-haut, #accueil-total')).toHaveCount(0);
   await page.locator('#btn-compte').click();
-  await page.locator('#onglet-profil').click(); // v10.32
   const carte = carteJoueur(page);
   await expect(carte.locator('.jt-etoiles strong')).toHaveText('0');
   await expect(carte.locator('.jt-niveau')).toHaveText('niveau 1');
@@ -187,7 +186,6 @@ test('carte du joueur : étoiles, niveau, pierres et coffre du jour ; le coffre 
   const p2 = await context.newPage();
   await p2.goto('./');
   await p2.locator('#btn-compte').click();
-  await p2.locator('#onglet-profil').click(); // v10.32
   await expect(carteJoueur(p2).locator('.jt-etoiles strong')).toHaveText(String(n));
   await expect(carteJoueur(p2).locator('[data-act="coffres"]')).toHaveCount(0);
 });
@@ -197,7 +195,6 @@ test('écran « Mes coffres » : niveau, coffres de niveau, coffre du jour, sér
   // simplesDepuis : 99 → pas de coffre simple (v6.46) si le coffre du jour fait passer le niveau 7 (test déterministe).
   await accueil(page, { v: 1, total: 265, journal: [{ quand: new Date().toISOString(), jour: auj, type: 'partie', n: 18, texte: 'Aventure réussie · Viking' }], parJour: { [auj]: 18 }, coffresJour: {}, coffresNiveau: {}, defis: {}, parties: [], simplesDepuis: 99 });
   await page.locator('#btn-compte').click();
-  await page.locator('#onglet-profil').click(); // v10.32
   await expect(carteJoueur(page).locator('.jt-niveau')).toHaveText('niveau 6');
   await expect(carteJoueur(page).locator('[data-act="coffres"]')).toHaveText(/mes 2 coffres/); // coffre du jour + coffre d'argent du niveau 5
   await carteJoueur(page).getByRole('button', { name: 'Statistiques' }).click();
@@ -286,7 +283,6 @@ test('fin de partie : passer le niveau 5 annonce le coffre d\'argent, qui s\'ouv
   await expect(page.locator('#btn-fin-coffre')).toHaveCount(0);
   await page.locator('#fin').evaluate((d) => d.close());
   await page.evaluate(() => window.Aventura.afficher('ecran-compte'));
-  await page.locator('#onglet-profil').click(); // v10.32
   await expect(carteJoueur(page).locator('[data-act="coffres"]')).toBeVisible();
   await carteJoueur(page).getByRole('button', { name: 'Statistiques' }).click();
   await carteJoueur(page).getByRole('button', { name: 'Mes coffres' }).click();
@@ -301,7 +297,6 @@ test('coffre simple au passage de niveau et pierres précieuses : carte du joueu
   // Niveau 3 atteint après la v6.46 (coffres simples depuis le niveau 1), coffre du jour déjà ouvert, 4 pierres.
   await accueil(page, { v: 1, total: E.seuil(3), gemmes: 4, simplesDepuis: 1, coffresJour: { [auj]: 10 }, coffresNiveau: {}, parJour: {}, journal: [], defis: {}, parties: [] });
   await page.locator('#btn-compte').click();
-  await page.locator('#onglet-profil').click(); // v10.32
   const carte = carteJoueur(page);
   await expect(carte.locator('.jt-gemmes strong')).toHaveText('4');
   await expect(carte.locator('.jt-gemmes')).toContainText('pierres');
@@ -336,7 +331,6 @@ test('deux joueurs : chacun son coffre du jour et ses étoiles, sans se mélange
   await accueil(page);
   await creerJoueurs(page, 2); // Léa (Joueur 1 renommé) et Tom
   await page.locator('#btn-compte').click();
-  await page.locator('#onglet-profil').click(); // v10.32
   const lea = carteJoueur(page, 'Léa'), tom = carteJoueur(page, 'Tom');
   await expect(lea.locator('[data-act="coffres"]')).toBeVisible();
   await expect(tom.locator('[data-act="coffres"]')).toBeVisible();
@@ -363,7 +357,6 @@ test('deux joueurs : chacun son coffre du jour et ses étoiles, sans se mélange
 test('carte du joueur : le « ? » à côté des étoiles explique comment en gagner ; le bouton coffre ouvre Mes coffres', async ({ page }) => {
   await accueil(page, { v: 1, total: 12, journal: [], parJour: {}, coffresJour: {}, coffresNiveau: {}, defis: {}, parties: [], simplesDepuis: 99 });
   await page.locator('#btn-compte').click();
-  await page.locator('#onglet-profil').click();
   const carte = carteJoueur(page);
   await carte.getByRole('button', { name: 'Statistiques' }).click();
   const ligne = carte.locator('.jt-etoiles');

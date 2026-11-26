@@ -7,7 +7,7 @@ const { test, expect } = require('@playwright/test');
 test('accueil : le compte tient en haut, le défi du jour est sous « Commencer », sans débordement ; aucun nombre @smoke', async ({ page }) => {
   await page.addInitScript(() => { try { localStorage.setItem('ludo-vu', '1'); } catch (e) { /* */ } });
   await page.goto('./');
-  for (const id of ['btn-compte', 'btn-defi', 'btn-commencer', 'btn-minijeux', 'btn-didacticiel']) await expect(page.locator('#' + id)).toBeInViewport({ ratio: 1 });
+  for (const id of ['btn-compte', 'btn-parametres', 'btn-defi', 'btn-commencer', 'btn-minijeux', 'btn-didacticiel']) await expect(page.locator('#' + id)).toBeInViewport({ ratio: 1 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1)).toBe(true);
   // Le défi du jour n'est plus dans la barre du haut.
   await expect(page.locator('.accueil-haut #btn-defi')).toHaveCount(0);

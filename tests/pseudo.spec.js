@@ -75,7 +75,7 @@ test('création de compte : le pseudo est contrôlé (4 à 20 caractères, libre
   await preparer(page);
   const etat = await service(page);
   await page.goto('./');
-  await page.locator('#btn-compte').click();
+  await page.locator('#btn-parametres').click();
   await page.getByRole('button', { name: 'Créer un compte' }).click();
   const champ = page.locator('#creation-pseudo');
   await expect(champ).toBeVisible();
@@ -112,7 +112,7 @@ test('Mon compte : le pseudo est affiché et se change tout de suite, avec des m
   await preparer(page, { session: sessionValide() });
   const etat = await service(page, { profil: { pseudo: 'FlorianB01', pseudo_auto: true, a_proposer: false } });
   await page.goto('./');
-  await page.locator('#btn-compte').click();
+  await page.locator('#btn-parametres').click();
   await page.locator('#onglet-id').click(); // v10.32 : le pseudo est dans « Identifiant et connexion »
   await expect(page.locator('#compte-pseudo')).toHaveText('FlorianB01');
   await expect(page.locator('#compte-pseudo-note')).toBeVisible(); // pseudo choisi par le jeu
@@ -150,7 +150,7 @@ test('pas de pseudo affiché quand il n’est pas lisible ou hors connexion', as
   await preparer(page, { session: sessionValide() });
   await service(page, { profil: null });
   await page.goto('./');
-  await page.locator('#btn-compte').click();
+  await page.locator('#btn-parametres').click();
   await page.locator('#onglet-id').click(); // v10.32
   await expect(page.locator('#compte-connecte')).toBeVisible();
   await expect(page.locator('#compte-pseudo-bloc')).toBeHidden();
@@ -226,7 +226,7 @@ for (const [nom, profil] of [
     await expect(page.locator('#btn-compte')).toHaveClass(/connecte/);
     await page.waitForTimeout(400);
     await expect(fenetre(page)).toBeHidden();
-    await page.locator('#btn-compte').click();
+    await page.locator('#btn-parametres').click();
     await page.locator('#onglet-id').click(); // v10.32
     await expect(page.locator('#compte-pseudo')).toHaveText(profil.pseudo);
     if (profil.pseudo_auto) await expect(page.locator('#compte-pseudo-note')).toBeVisible();

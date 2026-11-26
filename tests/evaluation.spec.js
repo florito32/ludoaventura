@@ -92,7 +92,6 @@ async function ouvrirCompte(page, niv) {
   }, JOUEUR(niv));
   await ouvrirNeuf(page);
   await page.locator('#btn-compte').click();
-  await page.locator('#onglet-profil').click();
   await page.locator('.joueur-carte').first().getByRole('button', { name: 'Statistiques' }).click();
 }
 const enregistre = (page) => page.evaluate(() => { const e = JSON.parse(localStorage.getItem('ludoaventura-etoiles')); return { niv: e.joueurs[0].niv, nivT: e.joueurs[0].nivT || {}, st: e.joueurs[0].st || {}, total: e.total }; });
@@ -223,7 +222,6 @@ test('Évaluer : chaque matière (Français, Maths, Histoire, Géographie) pose 
     await page.reload();
     await expect(page.locator('#ecran-accueil')).toBeVisible();
     await page.locator('#btn-compte').click();
-    await page.locator('#onglet-profil').click();
     await page.locator('.joueur-carte').first().getByRole('button', { name: 'Statistiques' }).click();
   }
   expect(erreurs).toEqual([]);
